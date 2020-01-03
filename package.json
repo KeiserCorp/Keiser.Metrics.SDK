@@ -1,0 +1,49 @@
+{
+  "name": "@keiser/metrics-sdk",
+  "version": "0.0.0",
+  "description": "Keiser Metrics SDK",
+  "keywords": [
+    "keiser",
+    "metrics"
+  ],
+  "author": "Keiser Corporation",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeiserCorp/Keiser.Metrics.SDK.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KeiserCorp/Keiser.Metrics.SDK/issues"
+  },
+  "homepage": "https://github.com/KeiserCorp/Keiser.Metrics.SDK#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "lint": "tslint --project tsconfig.json",
+    "dev": "webpack-dev-server --config webpack/dev.config.js",
+    "build": "webpack --config webpack/prod.config.js",
+    "push": "npm run build && cd ./dist && npm publish"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "create-file-webpack": "^1.0.2",
+    "dts-bundle": "^0.7.3",
+    "html-webpack-plugin": "^3.2.0",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.1",
+    "tslint-config-standard": "^9.0.0",
+    "typescript": "3.7.4",
+    "vue": "^2.6.11",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1",
+    "write-json-webpack-plugin": "^1.1.0"
+  },
+  "dependencies": {
+    "cockatiel": "^0.1.2"
+  }
+}
