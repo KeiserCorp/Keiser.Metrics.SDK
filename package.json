@@ -24,7 +24,7 @@
     "lint": "tslint --project tsconfig.json",
     "dev": "webpack-dev-server --config webpack/dev.config.js",
     "build": "webpack --config webpack/prod.config.js",
-    "push": "npm run build && cd ./dist && npm publish"
+    "push": "exit;npm run build && cd ./dist && npm publish"
   },
   "devDependencies": {
     "@types/node": "^13.1.2",
