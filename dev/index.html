@@ -6,8 +6,8 @@
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
-<body>
-  <h1>Works</h1>
+<body x-data="{ happiness: '' }">
+  <h1 x-on:click="happiness += '!'">Works<span x-html="happiness"></span></h1>
 </body>
 
 </html>

@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^13.1.7",
+    "alpinejs": "^1.9.2",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "create-file-webpack": "^1.0.2",

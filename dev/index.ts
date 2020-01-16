@@ -1,1 +1,2 @@
-require('../src/entry')
+import 'alpinejs'
+import '../src/entry'
