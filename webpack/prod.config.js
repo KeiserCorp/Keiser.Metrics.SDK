@@ -58,7 +58,7 @@ function replace(file, rules) {
 
 module.exports = {
   mode: 'production',
-  entry: './src/entry.ts',
+  entry: './src/index.ts',
   module: {
     rules: [
       {
@@ -91,7 +91,7 @@ module.exports = {
     }),
     new DtsBundlePlugin({
       name: 'Metrics',
-      main: path.join(DIST, 'types/entry.d.ts'),
+      main: path.join(DIST, 'types/index.d.ts'),
       out: path.join(DIST, 'index.d.ts'),
       removeSource: true,
       newLine: 'lf',

@@ -1,2 +1,2 @@
 import 'alpinejs'
-import '../src/entry'
+import '../src'
