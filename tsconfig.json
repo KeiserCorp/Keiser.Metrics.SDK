@@ -12,7 +12,6 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "typeRoots": [
-      "./types",
       "./node_modules/@types"
     ],
     "lib": [
@@ -22,7 +21,6 @@
   },
   "include": [
     "./src/**/*",
-    "./types",
     "./node_modules/@types"
   ],
   "exclude": [
