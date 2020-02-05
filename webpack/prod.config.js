@@ -66,7 +66,6 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: [DIST],
       cleanAfterEveryBuildPatterns: [path.join(DIST, 'types')]
     }),
-    new CopyWebpackPlugin([{ from: 'README.md', to: 'README.md' }]),
     new CopyWebpackPlugin([{ from: 'LICENSE.md', to: 'LICENSE.md' }]),
     new CreateFileWebpack({
       path: './dist',
