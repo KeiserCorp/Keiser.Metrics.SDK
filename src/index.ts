@@ -1,10 +1,15 @@
-import { DEFAULT_ENDPOINT } from './constants'
+import {  } from './constants'
 import { ConnectionOptions } from './interfaces'
+import { MetricsConnection } from './connection'
 
-export default class MetricsConnection {
-  public readonly endpoint: string
+export default class Metrics {
+  private readonly _connection: MetricsConnection
 
-  constructor (options: ConnectionOptions) {
-    this.endpoint = options.endpoint || DEFAULT_ENDPOINT
+  constructor (options: ConnectionOptions = {}) {
+    this._connection = new MetricsConnection(options)
+  }
+
+  public get socketConnected () {
+    return this._connection.socketConnected
   }
 }

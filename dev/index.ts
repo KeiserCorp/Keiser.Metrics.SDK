@@ -1,2 +1,6 @@
 import 'alpinejs'
-import '../src'
+import Metrics from '../src'
+
+let metrics = new Metrics()
+
+console.log(metrics.socketConnected)
