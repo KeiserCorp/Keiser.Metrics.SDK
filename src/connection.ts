@@ -122,7 +122,7 @@ export class MetricsConnection {
       }
     }
 
-    this._checkCallbacksTimeout = setTimeout(this.checkCallbacks, 100)
+    this._checkCallbacksTimeout = window.setTimeout(this.checkCallbacks, 100)
   }
 
   private clearCallbacks () {
