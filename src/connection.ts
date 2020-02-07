@@ -1,4 +1,4 @@
-import { SimpleEventDispatcher } from 'strongly-typed-events'
+import { SimpleEventDispatcher } from 'ste-simple-events'
 import Axios from 'axios'
 import { DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT, DEFAULT_REQUEST_TIMEOUT } from './constants'
 import { ConnectionOptions, ConnectionEvent } from './interfaces'

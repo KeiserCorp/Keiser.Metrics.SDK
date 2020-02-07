@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "strongly-typed-events": "^1.6.8"
+    "ste-simple-events": "^1.6.8"
   }
 }
