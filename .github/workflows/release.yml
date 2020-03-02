@@ -3,12 +3,12 @@ on:
     branches:
       - npm
 
-name: Publish
+name: Release
 
 jobs:
-  publish:
-    name: Build and Publish
-    runs-on: windows-latest
+  release:
+    name: Build and Release
+    runs-on: linux-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -33,9 +33,9 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: npm ci
 
-      - name: Build and Publish
+      - name: Build and Release
         if: steps.check.outputs.changed == 'true'
-        run: npm run publish
+        run: npm run release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       
