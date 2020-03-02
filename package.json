@@ -27,12 +27,15 @@
     "push": "exit;npm run build && cd ./dist && npm publish"
   },
   "devDependencies": {
-    "alpinejs": "^1.9.8",
+    "@types/chai": "^4.2.9",
+    "@types/mocha": "^7.0.1",
+    "chai": "^4.2.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "create-file-webpack": "^1.0.2",
     "dts-bundle": "^0.7.3",
     "html-webpack-plugin": "^3.2.0",
+    "mocha": "^7.1.0",
     "ts-loader": "^6.2.1",
     "tslint": "^5.20.1",
     "tslint-config-standard": "^9.0.0",

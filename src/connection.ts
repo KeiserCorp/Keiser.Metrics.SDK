@@ -12,8 +12,8 @@ export class MetricsConnection {
   private _requestTimeout: number
   private _socket: WebSocket | null = null
   private _lastMessageId = 0
-  private _checkCallbacksTimeout: number | null = null
-  private _retryAttempts: number = 0
+  private _checkCallbacksTimeoutInstance: number | null = null
+  private _socketRetryAttempts: number = 0
   private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = {}
 
   private _onConnectionChangeEvent = new SimpleEventDispatcher<ConnectionEvent>()
@@ -36,6 +36,14 @@ export class MetricsConnection {
     return this._socket?.readyState === WebSocket.OPEN
   }
 
+  public get persistConnection () {
+    return this._persistConnection
+  }
+
+  public get onConnectionChangeEvent () {
+    return this._onConnectionChangeEvent.asEvent()
+  }
+
   private async openConnection () {
     if (this._persistConnection) {
       this.checkCallbacks()
@@ -48,7 +56,7 @@ export class MetricsConnection {
   }
 
   private onSocketOpened () {
-    this._retryAttempts = 0
+    this._socketRetryAttempts = 0
     this.dispatchConnectionChange()
   }
 
@@ -56,8 +64,19 @@ export class MetricsConnection {
     this.dispatchConnectionChange()
     this._socket = null
 
-    let retryTimeout = this._retryAttempts++ < 3 ? 0 : (this._retryAttempts < 24 ? 2000 : 30000)
+    let retryTimeout = this._socketRetryAttempts++ < 3 ? 0 : (this._socketRetryAttempts < 24 ? 2000 : 30000)
     setTimeout(() => this.openConnection(), retryTimeout)
+  }
+
+  private closeConnection () {
+    this._socket?.close()
+    this.checkCallbacks(true)
+  }
+
+  private dispatchConnectionChange () {
+    this._onConnectionChangeEvent.dispatchAsync({
+      socketConnection: this.socketConnected
+    })
   }
 
   private onSocketMessage (messageEvent: MessageEvent) {
@@ -76,21 +95,6 @@ export class MetricsConnection {
     }
   }
 
-  private closeConnection () {
-    this._socket?.close()
-    this.clearCallbacks()
-  }
-
-  private dispatchConnectionChange () {
-    this._onConnectionChangeEvent.dispatchAsync({
-      socketConnection: this.socketConnected
-    })
-  }
-
-  public onConnectionChangeEvent () {
-    return this._onConnectionChangeEvent.asEvent()
-  }
-
   public action (action: string, params: Object = {}) {
     return new Promise((resolve, reject) => {
       const callback = (success: any, fail: any) => fail ? reject(fail) : resolve(success)
@@ -103,16 +107,16 @@ export class MetricsConnection {
     })
   }
 
-  private checkCallbacks () {
-    if (this._checkCallbacksTimeout) {
-      clearTimeout(this._checkCallbacksTimeout)
+  private checkCallbacks (clear: boolean = false) {
+    if (this._checkCallbacksTimeoutInstance) {
+      clearTimeout(this._checkCallbacksTimeoutInstance)
     }
     const now = Date.now()
 
     for (const key in this._callbacks) {
       if (this._callbacks.hasOwnProperty(key)) {
         const cb = this._callbacks[key]
-        if (cb.expiresAt && cb.expiresAt <= now) {
+        if (clear || (cb.expiresAt && cb.expiresAt <= now)) {
           try {
             cb.callback(null, { error: { statusText: 'Request timed out.' } })
           } finally {
@@ -122,23 +126,8 @@ export class MetricsConnection {
       }
     }
 
-    this._checkCallbacksTimeout = window.setTimeout(this.checkCallbacks, 100)
-  }
-
-  private clearCallbacks () {
-    if (this._checkCallbacksTimeout) {
-      clearTimeout(this._checkCallbacksTimeout)
-    }
-
-    for (const key in this._callbacks) {
-      if (this._callbacks.hasOwnProperty(key)) {
-        const cb = this._callbacks[key]
-        try {
-          cb.callback(null, { error: { statusText: 'Request timed out.' } })
-        } finally {
-          delete this._callbacks[key]
-        }
-      }
+    if (!clear) {
+      this._checkCallbacksTimeoutInstance = window.setTimeout(this.checkCallbacks, 100)
     }
   }
 
@@ -146,9 +135,13 @@ export class MetricsConnection {
     this._socket?.send(`"primus::pong::${time}"`)
   }
 
-  private parseResponse (data: { messageId?: number }) {
+  private parseResponse (data: { messageId?: number, error?: any }) {
     if (data.messageId && this._callbacks[data.messageId]) {
-      this._callbacks[data.messageId].callback(data)
+      if (data?.error) {
+        this._callbacks[data.messageId].callback(null, { error: data.error })
+      } else {
+        this._callbacks[data.messageId].callback(data)
+      }
       delete this._callbacks[data.messageId]
     }
   }
@@ -173,13 +166,23 @@ export class MetricsConnection {
     try {
       const response = await Axios({
         method: 'POST',
-        url: `${this._restEndpoint}?=action=${action}`,
+        url: `${this._restEndpoint}?action=${action}`,
         data: params,
         timeout: this._requestTimeout
       })
-      callback(response)
+      callback(response.data)
     } catch (error) {
-      callback(null, error)
+      if (error?.response?.data) {
+        callback(null, error.response.data)
+      } else {
+        callback(null, {error: {
+          name: error.name,
+          message: error.message,
+          status: 500,
+          code: 0,
+          explanation: ''
+        }})
+      }
     }
   }
 }

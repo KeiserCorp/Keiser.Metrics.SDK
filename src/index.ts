@@ -12,4 +12,20 @@ export default class Metrics {
   public get socketConnected () {
     return this._connection.socketConnected
   }
+
+  public get persistConnection () {
+    return this._connection.persistConnection
+  }
+
+  public dispose () {
+    this._connection.dispose()
+  }
+
+  public action (action: string, params: Object = {}) {
+    return this._connection.action(action, params)
+  }
+
+  public get onConnectionChangeEvent () {
+    return this._connection.onConnectionChangeEvent
+  }
 }
