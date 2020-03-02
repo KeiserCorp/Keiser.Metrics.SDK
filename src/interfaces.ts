@@ -1,3 +1,10 @@
 export interface ConnectionOptions {
-  endpoint?: string
+  restEndpoint?: string
+  socketEndpoint?: string
+  persistConnection?: boolean
+  requestTimeout?: number
+}
+
+export interface ConnectionEvent {
+  socketConnection: boolean
 }
