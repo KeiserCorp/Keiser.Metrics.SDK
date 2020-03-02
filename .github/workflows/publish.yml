@@ -1,50 +1,58 @@
-name: Publish NPM
-
-on:
+on: 
   push:
     branches:
-    - production
+      - npm
+
+name: Publish
 
 jobs:
   publish:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x]
-
+    name: Build and Publish
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install, Build, and Publish
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      run: |
-        npm ci
-        npm run push
-    - name: Notifying Success
-      if: success()
-      uses: rtCamp/action-slack-notify@v1.0.0
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_USERNAME: 'GitHub Actions'
-        SLACK_CHANNEL: deployment
-        SLACK_COLOR: 'good'
-        SLACK_ICON: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
-        SLACK_TITLE: 'Keiser.Metrics.SDK'
-        SLACK_MESSAGE: 'Build Success'
-    - name: Notifying Failure
-      if: failure()
-      uses: rtCamp/action-slack-notify@v1.0.0
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_USERNAME: 'GitHub Actions'
-        SLACK_CHANNEL: deployment
-        SLACK_COLOR: 'bad'
-        SLACK_ICON: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
-        SLACK_TITLE: 'Keiser.Metrics.SDK'
-        SLACK_MESSAGE: 'Build Failure'
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v12
+        uses: actions/setup-node@v1.4.0
+        with:
+          node-version: 12
+
+      - name: Check Version
+        id: check
+        uses: EndBug/version-check@v1.2.0
+        with:
+          diff-search: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Log New Version
+        if: steps.check.outputs.changed == 'true'
+        run: 'echo "Version change found! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+
+      - name: Install Dependencies
+        if: steps.check.outputs.changed == 'true'
+        run: npm ci
+
+      - name: Build and Publish
+        if: steps.check.outputs.changed == 'true'
+        run: npm run publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create Release
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check.outputs.version }}
+          release_name: Release v${{ steps.check.outputs.version }}
+
+      - name: Send Notification
+        uses: bayssmekanique/action-simple-slack-notifier@v1
+        if: steps.check.outputs.changed == 'true' && always()
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: '#deployment'
+          status: ${{ job.status }}
+          version: ${{ steps.check.outputs.version }}
