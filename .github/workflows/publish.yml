@@ -20,7 +20,7 @@ jobs:
 
       - name: Check Version
         id: check
-        uses: EndBug/version-check@master
+        uses: EndBug/version-check@v1.2.1
         with:
           diff-search: true
           token: ${{ secrets.GITHUB_TOKEN }}
