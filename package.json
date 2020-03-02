@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "1.0.0-alpha.3",
+  "version": "0.0.0-alpha.0",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -17,14 +17,14 @@
   },
   "homepage": "https://github.com/KeiserCorp/Keiser.Metrics.SDK#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "private"
   },
   "scripts": {
     "start": "npm run dev",
     "lint": "tslint --project tsconfig.json",
     "dev": "webpack-dev-server --config webpack/dev.config.js",
     "build": "webpack --config webpack/prod.config.js",
-    "release": "npm run build && node ./scripts/release.js --dry-run"
+    "release": "npm run build && node ./scripts/release.js"
   },
   "devDependencies": {
     "@types/chai": "^4.2.10",
