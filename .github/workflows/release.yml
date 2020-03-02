@@ -1,0 +1,58 @@
+on: 
+  push:
+    branches:
+      - master
+
+name: Release
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v12
+        uses: actions/setup-node@v1.4.0
+        with:
+          node-version: 12
+
+      - name: Check Version
+        id: check
+        uses: EndBug/version-check@v1.2.1
+        with:
+          diff-search: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Log New Version
+        if: steps.check.outputs.changed == 'true'
+        run: 'echo "Version change found! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+
+      - name: Install Dependencies
+        if: steps.check.outputs.changed == 'true'
+        run: npm ci
+
+      - name: Build and Release
+        if: steps.check.outputs.changed == 'true'
+        run: npm run release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create Release
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check.outputs.version }}
+          release_name: Release v${{ steps.check.outputs.version }}
+
+      - name: Send Notification
+        uses: bayssmekanique/action-simple-slack-notifier@v1
+        if: steps.check.outputs.changed == 'true' && always()
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: '#deployment'
+          status: ${{ job.status }}
+          version: ${{ steps.check.outputs.version }}
