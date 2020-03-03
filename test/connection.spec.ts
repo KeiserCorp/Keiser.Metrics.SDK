@@ -2,6 +2,8 @@ import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
 import Metrics from '../src'
 
+const connectionTimeout = 3000
+
 describe('Connection', function () {
 
   if (IsBrowser) {
@@ -22,7 +24,7 @@ describe('Connection', function () {
       })
 
       it('can create a socket connection to server', async function () {
-        this.timeout(1000)
+        this.timeout(connectionTimeout)
 
         expect(metricsInstance.persistConnection).to.be.equal(true)
         expect(metricsInstance.socketConnected).to.equal(false) // This doesn't have to work, just seeing if it ever fails
@@ -40,7 +42,7 @@ describe('Connection', function () {
       })
 
       it('ensures connection is closed after dispose', async function () {
-        this.timeout(2000)
+        this.timeout(connectionTimeout)
 
         const openResult = await (new Promise(resolve => {
           metricsInstance.onConnectionChangeEvent.one(event => {
@@ -69,7 +71,7 @@ describe('Connection', function () {
       })
 
       it('can make request to server after connection event', async function () {
-        this.timeout(1000)
+        this.timeout(connectionTimeout)
 
         const result = await(new Promise(resolve => {
           metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
@@ -82,7 +84,7 @@ describe('Connection', function () {
       })
 
       it('can make request to server before connection event', async function () {
-        this.timeout(1000)
+        this.timeout(connectionTimeout)
 
         const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
         expect(typeof healthResponse.error).to.equal('undefined')
@@ -109,7 +111,7 @@ describe('Connection', function () {
       })
 
       it('can create a socket connection to server', async function () {
-        this.timeout(1000)
+        this.timeout(connectionTimeout)
 
         expect(metricsInstance.persistConnection).to.be.equal(true)
         expect(metricsInstance.socketConnected).to.equal(false) // This doesn't have to work, just seeing if it ever fails
@@ -127,7 +129,7 @@ describe('Connection', function () {
       })
 
       it('can make request to server', async function () {
-        this.timeout(1000)
+        this.timeout(connectionTimeout)
 
         const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
         expect(typeof healthResponse.error).to.equal('undefined')
@@ -154,7 +156,7 @@ describe('Connection', function () {
     })
 
     it('does not automatically create a connection to server', async function () {
-      this.timeout(1100)
+      this.timeout(connectionTimeout + 100)
 
       expect(metricsInstance.persistConnection).to.be.equal(false)
       expect(metricsInstance.socketConnected).to.equal(false)
@@ -166,7 +168,7 @@ describe('Connection', function () {
           }
         })
 
-        setTimeout(() => resolve(false), 1000)
+        setTimeout(() => resolve(false), connectionTimeout)
       }))
 
       expect(result).to.equal(false)
@@ -174,7 +176,7 @@ describe('Connection', function () {
     })
 
     it('can make request to server', async function () {
-      this.timeout(1000)
+      this.timeout(connectionTimeout)
 
       const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
       expect(typeof healthResponse.error).to.equal('undefined')
@@ -197,7 +199,7 @@ describe('Connection', function () {
     })
 
     it('can make request to server', async function () {
-      this.timeout(1000)
+      this.timeout(connectionTimeout)
 
       const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
       expect(typeof healthResponse.error).to.equal('undefined')
