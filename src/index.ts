@@ -1,12 +1,14 @@
 import {  } from './constants'
-import { ConnectionOptions } from './interfaces'
-import { MetricsConnection } from './connection'
+import { MetricsConnection, ConnectionOptions } from './connection'
+import { Core } from './core'
 
 export default class Metrics {
   private readonly _connection: MetricsConnection
+  private readonly _core: Core
 
   constructor (options: ConnectionOptions = {}) {
     this._connection = new MetricsConnection(options)
+    this._core = new Core(this._connection)
   }
 
   public get socketConnected () {
@@ -15,6 +17,10 @@ export default class Metrics {
 
   public get persistConnection () {
     return this._connection.persistConnection
+  }
+
+  public get core () {
+    return this._core
   }
 
   public dispose () {

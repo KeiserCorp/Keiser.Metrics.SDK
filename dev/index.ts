@@ -1,5 +1,5 @@
 mocha.setup('bdd')
-mocha.growl()
+// mocha.growl()
 
 import '../test'
 

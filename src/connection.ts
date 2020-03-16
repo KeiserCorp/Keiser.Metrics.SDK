@@ -1,9 +1,29 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import Axios from 'axios'
 import { DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT, DEFAULT_REQUEST_TIMEOUT } from './constants'
-import { ConnectionOptions, ConnectionEvent } from './interfaces'
 
 const PING_REGEX = /^primus::ping::(\d{13})$/
+
+export interface ErrorResponse {
+  error: {
+    code: number
+    explanation: string
+    message: string
+    name: string
+    status: number
+  }
+}
+
+export interface ConnectionOptions {
+  restEndpoint?: string
+  socketEndpoint?: string
+  persistConnection?: boolean
+  requestTimeout?: number
+}
+
+export interface ConnectionEvent {
+  socketConnection: boolean
+}
 
 export class MetricsConnection {
   private _restEndpoint: string

@@ -1,2 +1,3 @@
-import './core.spec'
+import './base.spec'
 import './connection.spec'
+import './core.spec'
