@@ -1,6 +1,6 @@
-import {  } from './constants'
 import { MetricsConnection, ConnectionOptions } from './connection'
 import { Core } from './core'
+import { Authentication } from './session'
 
 export default class Metrics {
   private readonly _connection: MetricsConnection
@@ -33,5 +33,9 @@ export default class Metrics {
 
   public get onConnectionChangeEvent () {
     return this._connection.onConnectionChangeEvent
+  }
+
+  public async authenticateWithCredentials (email: string, password: string, refreshable: boolean = true) {
+    return Authentication.useCredentials(this._connection, email, password, refreshable)
   }
 }

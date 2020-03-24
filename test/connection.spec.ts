@@ -156,7 +156,7 @@ describe('Connection', function () {
     })
 
     it('does not automatically create a connection to server', async function () {
-      this.timeout(connectionTimeout + 100)
+      this.timeout(connectionTimeout + 200)
 
       expect(metricsInstance.persistConnection).to.be.equal(false)
       expect(metricsInstance.socketConnected).to.equal(false)
