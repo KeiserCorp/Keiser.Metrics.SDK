@@ -38,4 +38,8 @@ export default class Metrics {
   public async authenticateWithCredentials (email: string, password: string, refreshable: boolean = true) {
     return Authentication.useCredentials(this._connection, email, password, refreshable)
   }
+
+  public async authenticateWithToken (token: string) {
+    return Authentication.useToken(this._connection, token)
+  }
 }

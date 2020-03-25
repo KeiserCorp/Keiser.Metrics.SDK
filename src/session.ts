@@ -1,7 +1,7 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { User, UserData } from './models/user'
+import { User, UserData, UserResponse } from './models/user'
 import { JWT_TTL_LIMIT } from './constants'
 
 export interface AuthenticatedResponse {
@@ -41,12 +41,17 @@ export class Authentication {
     const response = await connection.action('auth:login', { email, password, refreshable }) as LoginResponse
     return new Session(response, connection)
   }
+
+  static async useToken (connection: MetricsConnection, token: string) {
+    const response = await connection.action('user:show', { authorization: token }) as UserResponse
+    return new Session(response, connection)
+  }
 }
 
 export class SessionHandler {
   private _connection: MetricsConnection
   private _keepAlive: boolean = true
-  private _accessToken: string | null = null
+  private _accessToken: string = ''
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
@@ -57,19 +62,22 @@ export class SessionHandler {
   }
 
   private updateTokens (response: AuthenticatedResponse) {
-    this._accessToken = response.accessToken
-    if (this._accessTokenTimeout) {
-      clearTimeout(this._accessTokenTimeout)
-    }
+    if (response.accessToken) {
+      this._accessToken = response.accessToken
 
-    if (this._keepAlive) {
-      const tokenTTL = (DecodeJWT(this._accessToken) as AccessToken).exp * 1000 - Date.now() - JWT_TTL_LIMIT
-      this._accessTokenTimeout = setTimeout(() => this.keepAccessTokenAlive(), tokenTTL)
-    }
+      if (this._accessTokenTimeout) {
+        clearTimeout(this._accessTokenTimeout)
+      }
 
-    if (response.refreshToken) {
-      this._refreshToken = response.refreshToken
-      this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
+      if (this._keepAlive) {
+        const tokenTTL = (DecodeJWT(this._accessToken) as AccessToken).exp * 1000 - Date.now() - JWT_TTL_LIMIT
+        this._accessTokenTimeout = setTimeout(() => this.keepAccessTokenAlive(), tokenTTL)
+      }
+
+      if (response.refreshToken) {
+        this._refreshToken = response.refreshToken
+        this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
+      }
     }
   }
 
@@ -100,8 +108,14 @@ export class SessionHandler {
 
   public close () {
     this.keepAlive = false
-    this._accessToken = null
+    this._accessToken = ''
     this._refreshToken = null
+  }
+
+  public async logout () {
+    const authParams = { authorization: this._refreshToken ?? this._accessToken }
+    await this._connection.action('auth:logout', authParams)
+    this.close()
   }
 
   public async action (action: string, params: Object = {}) {
@@ -149,6 +163,10 @@ export class Session {
 
   public close () {
     this._sessionHandler.close()
+  }
+
+  public async logout () {
+    await this._sessionHandler.logout()
   }
 
   get user () {

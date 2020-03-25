@@ -33,6 +33,19 @@ describe('Auth', function () {
     session.close()
   })
 
+  it('can authenticate using token', async function () {
+    const credentialSession = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const refreshToken = credentialSession.refreshToken ?? ''
+    credentialSession.close()
+
+    const tokenSession = await metricsInstance.authenticateWithToken(refreshToken)
+
+    expect(tokenSession).to.be.an('object')
+    expect(tokenSession.user).to.be.an('object')
+    expect(tokenSession.user.id).to.equal(DemoUserId)
+    tokenSession.close()
+  })
+
   it('can catch authenticate error using basic credentials', async function () {
     let session
     let extError
@@ -72,6 +85,7 @@ describe('Auth', function () {
 
     const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
     session.keepAlive = false
+
     const event = await new Promise(resolve => {
       session.onRefreshTokenChangeEvent.one(e => resolve(e))
       setTimeout(() => session.user.reload(), accessTokenTimeout + 100)
@@ -86,22 +100,63 @@ describe('Auth', function () {
   it('can make model request', async function () {
     const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
     expect(session).to.be.an('object')
+
     await session.user.reload()
+    session.close()
   })
 
   it('cannot make model request after close', async function () {
     let extError
+
     const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
     expect(session).to.be.an('object')
     session.close()
+
     try {
       await session.user.reload()
     } catch (error) {
       extError = error
     }
+
     expect(extError).to.be.an('object')
     expect(extError.error).to.be.an('object')
     expect(extError.error.code).to.equal(613)
+  })
+
+  it('cannot make model request after logout', async function () {
+    let extError
+
+    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    expect(session).to.be.an('object')
+    await session.logout()
+
+    try {
+      await session.user.reload()
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('object')
+    expect(extError.error).to.be.an('object')
+    expect(extError.error.code).to.equal(613)
+  })
+
+  it('cannot start session after logout', async function () {
+    let extError
+
+    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const refreshToken = session.refreshToken ?? ''
+    await session.logout()
+
+    try {
+      await metricsInstance.authenticateWithToken(refreshToken)
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('object')
+    expect(extError.error).to.be.an('object')
+    expect(extError.error.code).to.equal(615)
   })
 
 })
