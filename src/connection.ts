@@ -201,7 +201,7 @@ export class MetricsConnection {
         callback(null, {error: {
           name: error.name,
           message: error.message,
-          status: 503,
+          status: 500,
           code: 0,
           explanation: ''
         }})

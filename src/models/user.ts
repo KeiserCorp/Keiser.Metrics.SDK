@@ -1,11 +1,11 @@
-import { SessionHandler } from '../session'
+import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
 import { EmailAddressResponse } from './emailAddress'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { OAuthServiceResponse } from './oauthService'
 import { ProfileResponse } from './profile'
 
-export interface UserResponse {
+export interface UserData {
   id: number
   emailAddress: EmailAddressResponse[]
   primaryEmailAddress: PrimaryEmailAddressResponse
@@ -14,25 +14,29 @@ export interface UserResponse {
   profile: ProfileResponse
 }
 
-export class User extends Model {
-  private _userResponse: UserResponse
+export interface UserResponse extends AuthenticatedResponse {
+  user: UserData
+}
 
-  constructor (userResponse: UserResponse, sessionHandler: SessionHandler) {
+export class User extends Model {
+  private _userData: UserData
+
+  constructor (userData: UserData, sessionHandler: SessionHandler) {
     super(sessionHandler)
-    this._userResponse = userResponse
-    this.setUserResponse(userResponse)
+    this._userData = userData
+    this.setUserResponse(userData)
   }
 
-  private setUserResponse (userResponse: UserResponse) {
-    this._userResponse = userResponse
+  private setUserResponse (userData: UserData) {
+    this._userData = userData
   }
 
   get id () {
-    return this._userResponse.id
+    return this._userData.id
   }
 
   async reload () {
-    const { user } = await this.action('user:show') as { user: UserResponse }
+    const { user } = await this.action('user:show') as UserResponse
     this.setUserResponse(user)
   }
 }

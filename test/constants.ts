@@ -4,3 +4,4 @@ export const IsBrowser = typeof window !== 'undefined'
 export const IsNode = !IsBrowser
 export const DemoEmail = 'demo@keiser.com'
 export const DemoPassword = 'password'
+export const DemoUserId = 1

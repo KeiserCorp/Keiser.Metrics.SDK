@@ -1,6 +1,8 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
+import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { User, UserResponse } from './models/user'
+import { User, UserData } from './models/user'
+import { JWT_TTL_LIMIT } from './constants'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -8,11 +10,30 @@ export interface AuthenticatedResponse {
 }
 
 export interface LoginResponse extends AuthenticatedResponse {
-  user: UserResponse
+  user: UserData
 }
 
 export interface RefreshTokenChangeEvent {
   refreshToken: string
+}
+
+export interface JWTToken {
+  user: { id: number }
+  facility: object | null
+  facilityRole: string | null
+  type: 'access' | 'refresh'
+  iat: number
+  exp: number
+  iss: string
+  jti: string
+}
+
+export interface AccessToken extends JWTToken {
+  type: 'access'
+}
+
+export interface RefreshToken extends JWTToken {
+  type: 'refresh'
 }
 
 export class Authentication {
@@ -24,35 +45,80 @@ export class Authentication {
 
 export class SessionHandler {
   private _connection: MetricsConnection
-  private _accessToken: string
-  private _refreshToken: string | null
+  private _keepAlive: boolean = true
+  private _accessToken: string | null = null
+  private _refreshToken: string | null = null
+  private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
 
   constructor (connection: MetricsConnection, loginResponse: LoginResponse) {
     this._connection = connection
-    this._accessToken = loginResponse.accessToken
-    this._refreshToken = loginResponse.refreshToken ?? null
+    this.updateTokens(loginResponse)
+  }
+
+  private updateTokens (response: AuthenticatedResponse) {
+    this._accessToken = response.accessToken
+    if (this._accessTokenTimeout) {
+      clearTimeout(this._accessTokenTimeout)
+    }
+
+    if (this._keepAlive) {
+      const tokenTTL = (DecodeJWT(this._accessToken) as AccessToken).exp * 1000 - Date.now() - JWT_TTL_LIMIT
+      this._accessTokenTimeout = setTimeout(() => this.keepAccessTokenAlive(), tokenTTL)
+    }
+
+    if (response.refreshToken) {
+      this._refreshToken = response.refreshToken
+      this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
+    }
+  }
+
+  private async keepAccessTokenAlive () {
+    if (this._keepAlive) {
+      await this.action('auth:keepAlive')
+    }
+  }
+
+  public get keepAlive () {
+    return this._keepAlive
+  }
+
+  public set keepAlive (value: boolean) {
+    this._keepAlive = value
+    if (!this._keepAlive && this._accessTokenTimeout) {
+      clearTimeout(this._accessTokenTimeout)
+    }
+  }
+
+  public get refreshToken () {
+    return this._refreshToken
   }
 
   public get onRefreshTokenChangeEvent () {
     return this._onRefreshTokenChangeEvent.asEvent()
   }
 
+  public close () {
+    this.keepAlive = false
+    this._accessToken = null
+    this._refreshToken = null
+  }
+
   public async action (action: string, params: Object = {}) {
-    const response = await this._connection.action(action, params) as AuthenticatedResponse
-    this._accessToken = response.accessToken
-    if (response.refreshToken) {
-      this._refreshToken = response.refreshToken
+    let response
+    try {
+      const authParams = { authorization: this._accessToken, ...params }
+      response = await this._connection.action(action, authParams) as AuthenticatedResponse
+    } catch (error) {
+      if (error?.error.code === 616 && this._refreshToken && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
+        const authParams = { authorization: this._refreshToken, ...params }
+        response = await this._connection.action(action, authParams) as AuthenticatedResponse
+      } else {
+        throw error
+      }
     }
-    return response as unknown
-  }
-
-  public get accessToken () {
-    return this._accessToken
-  }
-
-  public get refreshToken () {
-    return this._refreshToken
+    this.updateTokens(response)
+    return response
   }
 }
 
@@ -65,8 +131,24 @@ export class Session {
     this._user = new User(loginResponse.user, this._sessionHandler)
   }
 
+  public get keepAlive () {
+    return this._sessionHandler.keepAlive
+  }
+
+  public set keepAlive (value: boolean) {
+    this._sessionHandler.keepAlive = value
+  }
+
+  public get refreshToken () {
+    return this._sessionHandler.refreshToken
+  }
+
   public get onRefreshTokenChangeEvent () {
     return this._sessionHandler.onRefreshTokenChangeEvent
+  }
+
+  public close () {
+    this._sessionHandler.close()
   }
 
   get user () {
