@@ -46,4 +46,20 @@ export default class Metrics {
   public async authenticateWithToken (token: string) {
     return Authentication.useToken(this._connection, token)
   }
+
+  public async authenticateWithResetToken (token: string, password: string, refreshable: boolean = true) {
+    return Authentication.useResetToken(this._connection, token, password)
+  }
+
+  public async authenticateWithOAuth (service: string, redirect: string) {
+    return Authentication.useOAuth(this._connection, service, redirect)
+  }
+
+  public async createUser (email: string, password: string, refreshable: boolean = true) {
+    return Authentication.createUser(this._connection, email, password, refreshable)
+  }
+
+  public async passwordReset (email: string) {
+    await Authentication.passwordReset(this._connection, email)
+  }
 }

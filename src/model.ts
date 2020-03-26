@@ -1,13 +1,13 @@
 import { SessionHandler } from './session'
 
 export class Model {
-  private _sessionHandler: SessionHandler
+  protected sessionHandler: SessionHandler
 
   constructor (sessionHandler: SessionHandler) {
-    this._sessionHandler = sessionHandler
+    this.sessionHandler = sessionHandler
   }
 
   protected action (action: string, params: Object = {}) {
-    return this._sessionHandler.action(action, params)
+    return this.sessionHandler.action(action, params)
   }
 }

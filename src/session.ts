@@ -1,7 +1,7 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { User, UserData, UserResponse } from './models/user'
+import { User, UserResponse } from './models/user'
 import { JWT_TTL_LIMIT } from './constants'
 
 export interface AuthenticatedResponse {
@@ -9,8 +9,8 @@ export interface AuthenticatedResponse {
   refreshToken?: string
 }
 
-export interface LoginResponse extends AuthenticatedResponse {
-  user: UserData
+export interface OAuthResponse {
+  url: string
 }
 
 export interface RefreshTokenChangeEvent {
@@ -38,13 +38,32 @@ export interface RefreshToken extends JWTToken {
 
 export class Authentication {
   static async useCredentials (connection: MetricsConnection, email: string, password: string, refreshable: boolean = true) {
-    const response = await connection.action('auth:login', { email, password, refreshable }) as LoginResponse
+    const response = await connection.action('auth:login', { email, password, refreshable }) as UserResponse
     return new Session(response, connection)
   }
 
   static async useToken (connection: MetricsConnection, token: string) {
     const response = await connection.action('user:show', { authorization: token }) as UserResponse
     return new Session(response, connection)
+  }
+
+  static async useResetToken (connection: MetricsConnection, token: string, password: string, refreshable: boolean = true) {
+    const response = await connection.action('auth:resetFulfillment', { resetToken: token, password, refreshable }) as UserResponse
+    return new Session(response, connection)
+  }
+
+  static async useOAuth (connection: MetricsConnection, service: string, redirect: string) {
+    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthResponse
+    return response.url
+  }
+
+  static async createUser (connection: MetricsConnection, email: string, password: string, refreshable: boolean = true) {
+    const response = await connection.action('user:create', { email, password, refreshable }) as UserResponse
+    return new Session(response, connection)
+  }
+
+  static async passwordReset (connection: MetricsConnection, email: string) {
+    await connection.action('auth:resetRequest', { email })
   }
 }
 
@@ -56,7 +75,7 @@ export class SessionHandler {
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
 
-  constructor (connection: MetricsConnection, loginResponse: LoginResponse) {
+  constructor (connection: MetricsConnection, loginResponse: UserResponse) {
     this._connection = connection
     this._connection.onDisposeEvent.one(() => this.close())
     this.updateTokens(loginResponse)
@@ -71,7 +90,7 @@ export class SessionHandler {
       }
 
       if (this._keepAlive) {
-        const tokenTTL = (DecodeJWT(this._accessToken) as AccessToken).exp * 1000 - Date.now() - JWT_TTL_LIMIT
+        const tokenTTL = this.decodedAccessToken.exp * 1000 - Date.now() - JWT_TTL_LIMIT
         this._accessTokenTimeout = setTimeout(() => this.keepAccessTokenAlive(), tokenTTL)
       }
 
@@ -99,8 +118,16 @@ export class SessionHandler {
     }
   }
 
+  public get decodedAccessToken () {
+    return DecodeJWT(this._accessToken) as AccessToken
+  }
+
   public get refreshToken () {
     return this._refreshToken
+  }
+
+  public get decodedRefreshToken () {
+    return this._refreshToken ? DecodeJWT(this._refreshToken) as RefreshToken : undefined
   }
 
   public get onRefreshTokenChangeEvent () {
@@ -141,7 +168,7 @@ export class Session {
   private _sessionHandler: SessionHandler
   private _user: User
 
-  constructor (loginResponse: LoginResponse, connection: MetricsConnection) {
+  constructor (loginResponse: UserResponse, connection: MetricsConnection) {
     this._sessionHandler = new SessionHandler(connection, loginResponse)
     this._user = new User(loginResponse.user, this._sessionHandler)
   }

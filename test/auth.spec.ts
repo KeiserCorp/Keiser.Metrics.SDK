@@ -33,17 +33,13 @@ describe('Auth', function () {
     session.close()
   })
 
-  it('can authenticate using token', async function () {
-    const credentialSession = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
-    const refreshToken = credentialSession.refreshToken ?? ''
-    credentialSession.close()
+  it('can authenticate without refresh token', async function () {
+    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword, false)
 
-    const tokenSession = await metricsInstance.authenticateWithToken(refreshToken)
-
-    expect(tokenSession).to.be.an('object')
-    expect(tokenSession.user).to.be.an('object')
-    expect(tokenSession.user.id).to.equal(DemoUserId)
-    tokenSession.close()
+    expect(session).to.be.an('object')
+    expect(session.user).to.be.an('object')
+    expect(session.user.id).to.equal(DemoUserId)
+    session.close()
   })
 
   it('can catch authenticate error using basic credentials', async function () {
@@ -59,6 +55,50 @@ describe('Auth', function () {
     expect(extError).to.be.an('object')
     expect(extError.error).to.be.an('object')
     expect(extError.error.code).to.equal(603)
+    expect(session).to.not.be.an('object')
+  })
+
+  it('can authenticate using token', async function () {
+    const credentialSession = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const refreshToken = credentialSession.refreshToken ?? ''
+    credentialSession.close()
+
+    const tokenSession = await metricsInstance.authenticateWithToken(refreshToken)
+
+    expect(tokenSession).to.be.an('object')
+    expect(tokenSession.user).to.be.an('object')
+    expect(tokenSession.user.id).to.equal(DemoUserId)
+    tokenSession.close()
+  })
+
+  it('can authenticate using OAuth', async function () {
+    const redirectUrl = await metricsInstance.authenticateWithOAuth('google', 'localhost:8080')
+    expect(redirectUrl).to.be.a('string')
+  })
+
+  it('can create a new user with basic authentication', async function () {
+    const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+    const session = await metricsInstance.createUser(emailAddress, DemoPassword)
+
+    expect(session).to.be.an('object')
+    expect(session.user).to.be.an('object')
+    expect(session.user.id).to.not.equal(DemoUserId)
+    session.close()
+  })
+
+  it('can catch error when creating new user (duplicate user)', async function () {
+    let session
+    let extError
+
+    try {
+      session = await metricsInstance.createUser(DemoEmail, 'wrongPassword')
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('object')
+    expect(extError.error).to.be.an('object')
+    expect(extError.error.code).to.equal(606)
     expect(session).to.not.be.an('object')
   })
 
@@ -159,4 +199,7 @@ describe('Auth', function () {
     expect(extError.error.code).to.equal(615)
   })
 
+  it('can request password reset', async function () {
+    await metricsInstance.passwordReset(DemoEmail)
+  })
 })
