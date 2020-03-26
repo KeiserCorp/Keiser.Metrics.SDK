@@ -58,6 +58,7 @@ export class SessionHandler {
 
   constructor (connection: MetricsConnection, loginResponse: LoginResponse) {
     this._connection = connection
+    this._connection.onDisposeEvent.one(() => this.close())
     this.updateTokens(loginResponse)
   }
 

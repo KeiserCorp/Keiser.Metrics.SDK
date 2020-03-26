@@ -4,7 +4,7 @@ import Metrics from '../src'
 
 const connectionTimeout = 3000
 
-describe.skip('Connection', function () {
+describe('Connection', function () {
 
   if (IsBrowser) {
 

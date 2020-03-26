@@ -11,6 +11,10 @@ export default class Metrics {
     this._core = new Core(this._connection)
   }
 
+  public get onDisposeEvent () {
+    return this._connection.onDisposeEvent
+  }
+
   public get socketConnected () {
     return this._connection.socketConnected
   }

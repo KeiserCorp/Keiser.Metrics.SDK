@@ -36,6 +36,7 @@ export class MetricsConnection {
   private _socketRetryAttempts: number = 0
   private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = {}
 
+  private _onDisposeEvent = new SimpleEventDispatcher<void>()
   private _onConnectionChangeEvent = new SimpleEventDispatcher<ConnectionEvent>()
 
   constructor (options: ConnectionOptions) {
@@ -50,8 +51,13 @@ export class MetricsConnection {
     void this.openConnection()
   }
 
+  public get onDisposeEvent () {
+    return this._onDisposeEvent.asEvent()
+  }
+
   public dispose () {
     this._persistConnection = false
+    this._onDisposeEvent.dispatchAsync()
     this.closeConnection()
   }
 
