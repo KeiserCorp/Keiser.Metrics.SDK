@@ -2,16 +2,18 @@ import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
 import { EmailAddressData, EmailAddress, EmailAddressResponse } from './emailAddress'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
-import { OAuthServiceResponse } from './oauthService'
-import { ProfileResponse } from './profile'
+import { OAuthServiceData } from './oauthService'
+import { ProfileData, Profile } from './profile'
+import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 
 export interface UserData {
   id: number
   emailAddresses: EmailAddressData[]
   primaryEmailAddress: PrimaryEmailAddressResponse
   basicCredential: boolean
-  oauthServices: OAuthServiceResponse[]
-  profile: ProfileResponse
+  oauthServices: OAuthServiceData[]
+  profile: ProfileData,
+  acceptedTermsVersion: AcceptedTermsVersionData
 }
 
 export interface UserResponse extends AuthenticatedResponse {
@@ -79,5 +81,18 @@ export class User extends Model {
 
   get basicCredential () {
     return this._userData.basicCredential
+  }
+
+  get profile () {
+    return new Profile(this._userData.profile, this.id, this.sessionHandler)
+  }
+
+  get acceptedTermsVersion () {
+    return this._userData.acceptedTermsVersion ? new AcceptedTermsVersion(this._userData.acceptedTermsVersion, this.id, this.sessionHandler) : undefined
+  }
+
+  async createAcceptedTermsVersion (revision: string) {
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { userId : this.id, revision }) as AcceptedTermsVersionResponse
+    return new AcceptedTermsVersion(acceptedTermsVersion, this.id, this.sessionHandler)
   }
 }
