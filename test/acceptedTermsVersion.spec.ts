@@ -32,7 +32,7 @@ describe('Accepted Terms Version', function () {
   })
 
   it('can create accepted terms version', async function () {
-    acceptedTermsVersion = await user.createAcceptedTermsVersion('2020-01-01')
+    acceptedTermsVersion = await user.createAcceptedTermsVersion({ revision: '2020-01-01' })
 
     expect(acceptedTermsVersion).to.be.an('object')
     expect(acceptedTermsVersion.updatedAt instanceof Date).to.equal(true)

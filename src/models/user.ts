@@ -1,10 +1,12 @@
 import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { EmailAddressData, EmailAddress, EmailAddressResponse } from './emailAddress'
+import { EmailAddressData, EmailAddress, EmailAddressResponse, EmailAddressListResponse } from './emailAddress'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { OAuthServiceData } from './oauthService'
 import { ProfileData, Profile } from './profile'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
+import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
+import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, HeightMeasurementListResponse } from './heightMeasurement'
 
 export interface UserData {
   id: number
@@ -13,7 +15,9 @@ export interface UserData {
   basicCredential: boolean
   oauthServices: OAuthServiceData[]
   profile: ProfileData,
-  acceptedTermsVersion: AcceptedTermsVersionData
+  acceptedTermsVersion?: AcceptedTermsVersionData
+  weightMeasurement?: WeightMeasurementData
+  heightMeasurement?: HeightMeasurementData
 }
 
 export interface UserResponse extends AuthenticatedResponse {
@@ -71,12 +75,17 @@ export class User extends Model {
   }
 
   get emailAddresses () {
-    return this._userData.emailAddresses.map(e => new EmailAddress(e, this.id, this.sessionHandler))
+    return this._userData.emailAddresses.map(emailAddress => new EmailAddress(emailAddress, this.id, this.sessionHandler))
   }
 
-  async createEmailAddress (email: string) {
-    const { emailAddress } = await this.action('emailAddress:create', { userId : this.id, email }) as EmailAddressResponse
+  async createEmailAddress (params: {email: string}) {
+    const { emailAddress } = await this.action('emailAddress:create', { userId : this.id, ...params }) as EmailAddressResponse
     return new EmailAddress(emailAddress, this.id, this.sessionHandler)
+  }
+
+  async getEmailAddresses () {
+    const { emailAddresses } = await this.action('emailAddress:list', { userId : this.id }) as EmailAddressListResponse
+    return emailAddresses.map(emailAddress => new EmailAddress(emailAddress, this.id, this.sessionHandler))
   }
 
   get basicCredential () {
@@ -91,8 +100,36 @@ export class User extends Model {
     return this._userData.acceptedTermsVersion ? new AcceptedTermsVersion(this._userData.acceptedTermsVersion, this.id, this.sessionHandler) : undefined
   }
 
-  async createAcceptedTermsVersion (revision: string) {
-    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { userId : this.id, revision }) as AcceptedTermsVersionResponse
+  async createAcceptedTermsVersion (params: {revision: string}) {
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { userId : this.id, ...params }) as AcceptedTermsVersionResponse
     return new AcceptedTermsVersion(acceptedTermsVersion, this.id, this.sessionHandler)
+  }
+
+  get latestWeightMeasurement () {
+    return this._userData.weightMeasurement ? new WeightMeasurement(this._userData.weightMeasurement, this.id,this.sessionHandler) : undefined
+  }
+
+  async createWeightMeasurement (params: {source: string, takenAt: Date, metricWeight?: number, imperialWeight?: number, bodyFatPercentage?: number}) {
+    const { weightMeasurement } = await this.action('weightMeasurement:create', { userId : this.id, ...params }) as WeightMeasurementResponse
+    return new WeightMeasurement(weightMeasurement, this.id, this.sessionHandler)
+  }
+
+  async getWeightMeasurements (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { weightMeasurements } = await this.action('weightMeasurement:list', { userId : this.id, ...options }) as WeightMeasurementListResponse
+    return weightMeasurements.map(weightMeasurement => new WeightMeasurement(weightMeasurement, this.id, this.sessionHandler))
+  }
+
+  get latestHeightMeasurement () {
+    return this._userData.heightMeasurement ? new HeightMeasurement(this._userData.heightMeasurement, this.id,this.sessionHandler) : undefined
+  }
+
+  async createHeightMeasurement (params: {source: string, takenAt: Date, metricHeight?: number, imperialHeight?: number, bodyFatPercentage?: number}) {
+    const { heightMeasurement } = await this.action('heightMeasurement:create', { userId : this.id, ...params }) as HeightMeasurementResponse
+    return new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler)
+  }
+
+  async getHeightMeasurements (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { heightMeasurements } = await this.action('heightMeasurement:list', { userId : this.id, ...options }) as HeightMeasurementListResponse
+    return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler))
   }
 }

@@ -28,7 +28,7 @@ describe('Email Address', function () {
   })
 
   it('can add email address', async function () {
-    emailAddress = await user.createEmailAddress(newEmail)
+    emailAddress = await user.createEmailAddress({ email: newEmail })
 
     expect(emailAddress).to.be.an('object')
     expect(emailAddress.email).to.equal(newEmail)
@@ -39,6 +39,13 @@ describe('Email Address', function () {
 
     expect(emailAddress).to.be.an('object')
     expect(emailAddress.email).to.equal(newEmail)
+  })
+
+  it('can get updated email addresses', async function () {
+    const emailAddresses = await user.getEmailAddresses()
+
+    expect(emailAddresses).to.be.an('array')
+    expect(emailAddresses.length).to.equal(2)
   })
 
   it('can delete email address', async function () {
