@@ -1,10 +1,10 @@
 import { MetricsConnection, ConnectionOptions } from './connection'
-import { Core } from './core'
+import { Core } from './models/core'
 import { Authentication } from './session'
 
 export default class Metrics {
-  private readonly _connection: MetricsConnection
-  private readonly _core: Core
+  protected readonly _connection: MetricsConnection
+  protected readonly _core: Core
 
   constructor (options: ConnectionOptions = {}) {
     this._connection = new MetricsConnection(options)
@@ -61,5 +61,15 @@ export default class Metrics {
 
   public async passwordReset (email: string) {
     await Authentication.passwordReset(this._connection, email)
+  }
+}
+
+export class MetricsAdmin extends Metrics {
+  public async authenticateAdminWithCredentials (email: string, password: string, token: string, refreshable: boolean = true) {
+    return Authentication.useAdminCredentials(this._connection, email, password, token, refreshable)
+  }
+
+  public async authenticateAdminWithToken (token: string) {
+    return Authentication.useAdminToken(this._connection, token)
   }
 }

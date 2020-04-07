@@ -1,8 +1,9 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { User, UserResponse } from './models/user'
+import { User, UserResponse, Users } from './models/user'
 import { JWT_TTL_LIMIT } from './constants'
+import { Stats } from './models/stats'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -26,6 +27,7 @@ export interface JWTToken {
   exp: number
   iss: string
   jti: string
+  superUser?: boolean
 }
 
 export interface AccessToken extends JWTToken {
@@ -64,6 +66,20 @@ export class Authentication {
 
   static async passwordReset (connection: MetricsConnection, email: string) {
     await connection.action('auth:resetRequest', { email })
+  }
+
+  static async useAdminCredentials (connection: MetricsConnection, email: string, password: string, token: string, refreshable: boolean = true) {
+    const response = await connection.action('admin:login', { email, password, token, refreshable }) as UserResponse
+    return new AdminSession(response, connection)
+  }
+
+  static async useAdminToken (connection: MetricsConnection, token: string) {
+    const response = await connection.action('user:show', { authorization: token }) as UserResponse
+    const accessToken = DecodeJWT(response.accessToken) as AccessToken
+    if (accessToken?.superUser !== true) {
+      throw new Error('not admin user session')
+    }
+    return new AdminSession(response, connection)
   }
 }
 
@@ -165,8 +181,8 @@ export class SessionHandler {
 }
 
 export class Session {
-  private _sessionHandler: SessionHandler
-  private _user: User
+  protected _sessionHandler: SessionHandler
+  protected _user: User
 
   constructor (loginResponse: UserResponse, connection: MetricsConnection) {
     this._sessionHandler = new SessionHandler(connection, loginResponse)
@@ -199,5 +215,16 @@ export class Session {
 
   get user () {
     return this._user
+  }
+}
+
+export class AdminSession extends Session {
+
+  get stats () {
+    return new Stats(this._sessionHandler)
+  }
+
+  get users () {
+    return new Users(this._sessionHandler)
   }
 }

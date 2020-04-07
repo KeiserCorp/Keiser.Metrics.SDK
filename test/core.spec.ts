@@ -29,16 +29,6 @@ describe('Core', function () {
     expect(healthy).to.equal(true)
   })
 
-  it('cannot get stats without admin', async function () {
-    let response
-    try {
-      response = await metricsInstance.core.stats()
-    } catch ({ error }) {
-      expect(error.code).to.equal(613)
-    }
-    expect(typeof response).to.equal('undefined')
-  })
-
   it('can get status', async function () {
     let status = await metricsInstance.core.status()
 

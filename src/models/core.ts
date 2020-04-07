@@ -1,4 +1,4 @@
-import { MetricsConnection } from './connection'
+import { MetricsConnection } from '../connection'
 
 export interface DocsResponse {
   documentation: any
@@ -6,22 +6,6 @@ export interface DocsResponse {
 
 export interface HealthResponse {
   healthy: boolean
-}
-
-export interface StatsResponse {
-  stats: {
-    id: number
-    createdAt: Date
-    users: number
-    msApps: number
-    sessions: number
-    oauths: number
-    facebook: number
-    google: number
-    trainingpeaks: number
-    strava: number
-    inbody: number
-  }
 }
 
 export interface StatusResponse {
@@ -48,11 +32,6 @@ export class Core {
 
   public health () {
     return this._connection.action('core:health') as Promise<HealthResponse>
-  }
-
-  public stats () {
-    // Require Admin Access
-    return this._connection.action('core:stats') as Promise<StatsResponse>
   }
 
   public status () {

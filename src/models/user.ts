@@ -133,3 +133,15 @@ export class User extends Model {
     return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler))
   }
 }
+
+export class Users extends Model {
+  async getUsers (params: {name?: string, limit?: number, offset?: number} = { limit: 20 }) {
+    const { users } = await this.action('user:list', params) as UserListResponse
+    return users.map(user => new User(user, this.sessionHandler))
+  }
+
+  async mergeUsers (params: {fromUserId: number, toUserId: number}) {
+    const { user } = await this.action('user:merge', params) as UserResponse
+    return new User(user, this.sessionHandler)
+  }
+}
