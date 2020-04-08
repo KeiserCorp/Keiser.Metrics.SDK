@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/KeiserCorp/Keiser.Metrics.SDK#readme",
   "publishConfig": {
-    "access": "private"
+    "access": "public"
   },
   "scripts": {
     "start": "npm run dev",
