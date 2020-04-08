@@ -26,10 +26,6 @@ export class Core {
     this._connection = connection
   }
 
-  public docs () {
-    return this._connection.action('core:docs') as Promise<DocsResponse>
-  }
-
   public health () {
     return this._connection.action('core:health') as Promise<HealthResponse>
   }

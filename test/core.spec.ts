@@ -17,12 +17,6 @@ describe('Core', function () {
     metricsInstance?.dispose()
   })
 
-  it('can get docs', async function () {
-    const response = await metricsInstance.core.docs()
-
-    expect(response.documentation).to.be.an('object')
-  })
-
   it('can get health', async function () {
     const { healthy } = await metricsInstance.core.health()
 
