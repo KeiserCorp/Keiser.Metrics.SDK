@@ -1,8 +1,10 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import Axios from 'axios'
+import { Policy, ConsecutiveBreaker, BrokenCircuitError } from 'cockatiel'
 import { DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT, DEFAULT_REQUEST_TIMEOUT } from './constants'
 
 const PING_REGEX = /^primus::ping::(\d{13})$/
+const ERROR_FILTER = (error: any) => typeof error.error === 'undefined' || error.error?.code === 0
 
 export interface ErrorResponse {
   error: {
@@ -35,6 +37,10 @@ export class MetricsConnection {
   private _checkCallbacksTimeoutInstance: number | null = null
   private _socketRetryAttempts: number = 0
   private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = {}
+  private _retryStrategy = Policy.wrap(
+    Policy.handleWhen(ERROR_FILTER).retry().exponential({ maxAttempts: 3, initialDelay: 500 }),
+    Policy.handleWhen(ERROR_FILTER).circuitBreaker(30000, new ConsecutiveBreaker(10))
+    )
 
   private _onDisposeEvent = new SimpleEventDispatcher<void>()
   private _onConnectionChangeEvent = new SimpleEventDispatcher<ConnectionEvent>()
@@ -124,16 +130,31 @@ export class MetricsConnection {
     }
   }
 
-  public action (action: string, params: Object = {}) {
-    return new Promise((resolve, reject) => {
-      const callback = (success: any, fail: any) => fail ? reject(fail) : resolve(success)
+  public async action (action: string, params: Object = {}) {
+    try {
+      return await this._retryStrategy.execute(() => {
+        return new Promise((resolve, reject) => {
+          const callback = (success: any, fail: any) => fail ? reject(fail) : resolve(success)
 
-      if (this.socketConnected) {
-        this.actionSocket(action, params, callback)
-      } else {
-        void this.actionRest(action, params, callback)
+          if (this.socketConnected) {
+            this.actionSocket(action, params, callback)
+          } else {
+            void this.actionRest(action, params, callback)
+          }
+        })
+      })
+    } catch (error) {
+      if (error instanceof BrokenCircuitError) {
+        throw {error: {
+          name: 'BrokenCircuit',
+          message: 'execution prevented because the circuit breaker is open',
+          status: 500,
+          code: 0,
+          explanation: 'too many server requests responding with errors'
+        }}
       }
-    })
+      throw error
+    }
   }
 
   private checkCallbacks (clear: boolean = false) {

@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "cockatiel": "^0.1.5",
     "ste-simple-events": "^1.6.8"
   }
 }
