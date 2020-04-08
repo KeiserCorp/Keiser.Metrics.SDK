@@ -1,6 +1,7 @@
 import { MetricsConnection, ConnectionOptions } from './connection'
 import { Core } from './models/core'
 import { Authentication } from './session'
+import { OAuthProviders } from './constants'
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection
@@ -51,8 +52,12 @@ export default class Metrics {
     return Authentication.useResetToken(this._connection, token, password)
   }
 
-  public async authenticateWithOAuth (service: string, redirect: string) {
-    return Authentication.useOAuth(this._connection, service, redirect)
+  public async authenticateWithFacebook (redirect: string) {
+    return Authentication.useOAuth(this._connection, OAuthProviders.Facebook, redirect)
+  }
+
+  public async authenticateWithGoogle (redirect: string) {
+    return Authentication.useOAuth(this._connection, OAuthProviders.Google, redirect)
   }
 
   public async createUser (email: string, password: string, refreshable: boolean = true) {

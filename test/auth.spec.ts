@@ -71,8 +71,13 @@ describe('Auth', function () {
     tokenSession.close()
   })
 
-  it('can authenticate using OAuth', async function () {
-    const redirectUrl = await metricsInstance.authenticateWithOAuth('google', 'localhost:8080')
+  it('can authenticate using Google', async function () {
+    const redirectUrl = await metricsInstance.authenticateWithGoogle('localhost:8080')
+    expect(redirectUrl).to.be.a('string')
+  })
+
+  it('can authenticate using Facebook', async function () {
+    const redirectUrl = await metricsInstance.authenticateWithFacebook('localhost:8080')
     expect(redirectUrl).to.be.a('string')
   })
 

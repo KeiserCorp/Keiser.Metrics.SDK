@@ -2,7 +2,7 @@ import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
 import { User, UserResponse, Users } from './models/user'
-import { JWT_TTL_LIMIT } from './constants'
+import { JWT_TTL_LIMIT, OAuthProviders } from './constants'
 import { Stats } from './models/stats'
 
 export interface AuthenticatedResponse {
@@ -54,7 +54,7 @@ export class Authentication {
     return new Session(response, connection)
   }
 
-  static async useOAuth (connection: MetricsConnection, service: string, redirect: string) {
+  static async useOAuth (connection: MetricsConnection, service: OAuthProviders, redirect: string) {
     const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthResponse
     return response.url
   }
