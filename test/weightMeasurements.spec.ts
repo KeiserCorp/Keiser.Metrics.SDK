@@ -41,7 +41,6 @@ describe('Weight Measurement', function () {
     const weightMeasurements = await user.getWeightMeasurements({ limit: 2 })
 
     expect(Array.isArray(weightMeasurements)).to.equal(true)
-    expect(weightMeasurements.length).to.equal(2)
   })
 
   it('can create weight measurement', async function () {

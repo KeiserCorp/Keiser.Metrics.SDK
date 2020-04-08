@@ -119,7 +119,11 @@ export class SessionHandler {
 
   private async keepAccessTokenAlive () {
     if (this._keepAlive) {
-      await this.action('auth:keepAlive')
+      try {
+        await this.action('auth:keepAlive')
+      } catch (error) {
+        return
+      }
     }
   }
 

@@ -48,8 +48,6 @@ describe('Admin', function () {
     const stats = await session.stats.getStats()
 
     expect(Array.isArray(stats)).to.equal(true)
-    expect(stats.length).to.be.above(0)
-    expect(typeof stats[0].id).to.equal('number')
   })
 
   it('can get users', async function () {
