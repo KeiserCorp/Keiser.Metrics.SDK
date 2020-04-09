@@ -38,8 +38,8 @@ export class MetricsConnection {
   private _socketRetryAttempts: number = 0
   private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = {}
   private _retryStrategy = Policy.wrap(
-    Policy.handleWhen(ERROR_FILTER).retry().exponential({ maxAttempts: 3, initialDelay: 500 }),
-    Policy.handleWhen(ERROR_FILTER).circuitBreaker(30000, new ConsecutiveBreaker(10))
+    Policy.handleWhen(ERROR_FILTER).retry().delay([125, 1000, 5000]),
+    Policy.handleWhen(ERROR_FILTER).circuitBreaker(15000, new ConsecutiveBreaker(10))
     )
 
   private _onDisposeEvent = new SimpleEventDispatcher<void>()
