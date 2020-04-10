@@ -12,69 +12,69 @@ export default class Metrics {
     this._core = new Core(this._connection)
   }
 
-  public get onDisposeEvent () {
+  get onDisposeEvent () {
     return this._connection.onDisposeEvent
   }
 
-  public get socketConnected () {
+  get socketConnected () {
     return this._connection.socketConnected
   }
 
-  public get persistConnection () {
+  get persistConnection () {
     return this._connection.persistConnection
   }
 
-  public get core () {
+  get core () {
     return this._core
   }
 
-  public dispose () {
+  dispose () {
     this._connection.dispose()
   }
 
-  public action (action: string, params: Object = {}) {
+  action (action: string, params: Object = {}) {
     return this._connection.action(action, params)
   }
 
-  public get onConnectionChangeEvent () {
+  get onConnectionChangeEvent () {
     return this._connection.onConnectionChangeEvent
   }
 
-  public async authenticateWithCredentials (email: string, password: string, refreshable: boolean = true) {
+  async authenticateWithCredentials (email: string, password: string, refreshable: boolean = true) {
     return Authentication.useCredentials(this._connection, email, password, refreshable)
   }
 
-  public async authenticateWithToken (token: string) {
+  async authenticateWithToken (token: string) {
     return Authentication.useToken(this._connection, token)
   }
 
-  public async authenticateWithResetToken (token: string, password: string, refreshable: boolean = true) {
+  async authenticateWithResetToken (token: string, password: string, refreshable: boolean = true) {
     return Authentication.useResetToken(this._connection, token, password)
   }
 
-  public async authenticateWithFacebook (redirect: string) {
+  async authenticateWithFacebook (redirect: string) {
     return Authentication.useOAuth(this._connection, OAuthProviders.Facebook, redirect)
   }
 
-  public async authenticateWithGoogle (redirect: string) {
+  async authenticateWithGoogle (redirect: string) {
     return Authentication.useOAuth(this._connection, OAuthProviders.Google, redirect)
   }
 
-  public async createUser (email: string, password: string, refreshable: boolean = true) {
+  async createUser (email: string, password: string, refreshable: boolean = true) {
     return Authentication.createUser(this._connection, email, password, refreshable)
   }
 
-  public async passwordReset (email: string) {
+  async passwordReset (email: string) {
     await Authentication.passwordReset(this._connection, email)
   }
 }
 
 export class MetricsAdmin extends Metrics {
-  public async authenticateAdminWithCredentials (email: string, password: string, token: string, refreshable: boolean = true) {
+  async authenticateAdminWithCredentials (email: string, password: string, token: string, refreshable: boolean = true) {
     return Authentication.useAdminCredentials(this._connection, email, password, token, refreshable)
   }
 
-  public async authenticateAdminWithToken (token: string) {
+  async authenticateAdminWithToken (token: string) {
     return Authentication.useAdminToken(this._connection, token)
   }
 }

@@ -57,25 +57,25 @@ export class MetricsConnection {
     void this.openConnection()
   }
 
-  public get onDisposeEvent () {
+  get onDisposeEvent () {
     return this._onDisposeEvent.asEvent()
   }
 
-  public dispose () {
+  dispose () {
     this._persistConnection = false
     this._onDisposeEvent.dispatchAsync()
     this.closeConnection()
   }
 
-  public get socketConnected () {
+  get socketConnected () {
     return !!this._socket && this._socket.readyState === WebSocket.OPEN
   }
 
-  public get persistConnection () {
+  get persistConnection () {
     return this._persistConnection
   }
 
-  public get onConnectionChangeEvent () {
+  get onConnectionChangeEvent () {
     return this._onConnectionChangeEvent.asEvent()
   }
 
@@ -130,7 +130,7 @@ export class MetricsConnection {
     }
   }
 
-  public async action (action: string, params: Object = {}) {
+  async action (action: string, params: Object = {}) {
     try {
       return await this._retryStrategy.execute(() => {
         return new Promise((resolve, reject) => {

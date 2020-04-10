@@ -26,11 +26,11 @@ export class Core {
     this._connection = connection
   }
 
-  public health () {
+  health () {
     return this._connection.action('core:health') as Promise<HealthResponse>
   }
 
-  public status () {
+  status () {
     return this._connection.action('core:status') as Promise<StatusResponse>
   }
 }

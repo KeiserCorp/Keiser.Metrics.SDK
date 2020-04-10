@@ -127,46 +127,46 @@ export class SessionHandler {
     }
   }
 
-  public get keepAlive () {
+  get keepAlive () {
     return this._keepAlive
   }
 
-  public set keepAlive (value: boolean) {
+  set keepAlive (value: boolean) {
     this._keepAlive = value
     if (!this._keepAlive && this._accessTokenTimeout) {
       clearTimeout(this._accessTokenTimeout)
     }
   }
 
-  public get decodedAccessToken () {
+  get decodedAccessToken () {
     return DecodeJWT(this._accessToken) as AccessToken
   }
 
-  public get refreshToken () {
+  get refreshToken () {
     return this._refreshToken
   }
 
-  public get decodedRefreshToken () {
+  get decodedRefreshToken () {
     return this._refreshToken ? DecodeJWT(this._refreshToken) as RefreshToken : undefined
   }
 
-  public get onRefreshTokenChangeEvent () {
+  get onRefreshTokenChangeEvent () {
     return this._onRefreshTokenChangeEvent.asEvent()
   }
 
-  public close () {
+  close () {
     this.keepAlive = false
     this._accessToken = ''
     this._refreshToken = null
   }
 
-  public async logout () {
+  async logout () {
     const authParams = { authorization: this._refreshToken ?? this._accessToken }
     await this._connection.action('auth:logout', authParams)
     this.close()
   }
 
-  public async action (action: string, params: Object = {}) {
+  async action (action: string, params: Object = {}) {
     let response
     try {
       const authParams = { authorization: this._accessToken, ...params }
@@ -193,27 +193,27 @@ export class Session {
     this._user = new User(loginResponse.user, this._sessionHandler)
   }
 
-  public get keepAlive () {
+  get keepAlive () {
     return this._sessionHandler.keepAlive
   }
 
-  public set keepAlive (value: boolean) {
+  set keepAlive (value: boolean) {
     this._sessionHandler.keepAlive = value
   }
 
-  public get refreshToken () {
+  get refreshToken () {
     return this._sessionHandler.refreshToken
   }
 
-  public get onRefreshTokenChangeEvent () {
+  get onRefreshTokenChangeEvent () {
     return this._sessionHandler.onRefreshTokenChangeEvent
   }
 
-  public close () {
+  close () {
     this._sessionHandler.close()
   }
 
-  public async logout () {
+  async logout () {
     await this._sessionHandler.logout()
   }
 
