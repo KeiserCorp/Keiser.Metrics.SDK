@@ -1,7 +1,7 @@
 import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { Facility, FacilityData } from './facility'
-import { UserData } from './user'
+import { Facility, FacilityData, PrivilegedFacility } from './facility'
+import { User, UserData } from './user'
 
 export interface FacilityRelationshipData {
   id: number
@@ -86,7 +86,13 @@ export class UserFacilityRelationship extends FacilityRelationship {
   }
 
   get facility () {
-    return this._facilityRelationshipData.facility ? new Facility(this._facilityRelationshipData.facility, this.sessionHandler) : undefined
+    if (typeof this._facilityRelationshipData.facility === 'undefined') {
+      return undefined
+    }
+    if (this._facilityRelationshipData.employeeRole !== null) {
+      return new PrivilegedFacility(this._facilityRelationshipData.facility, this.sessionHandler)
+    }
+    return new Facility(this._facilityRelationshipData.facility, this.sessionHandler)
   }
 }
 

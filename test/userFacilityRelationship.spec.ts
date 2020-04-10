@@ -3,7 +3,8 @@ import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './c
 import Metrics from '../src'
 import { Session } from '../src/session'
 import { User } from '../src/models/user'
-import { UserFacilityRelationship } from '../src/models/userFacilityRelationship'
+import { UserFacilityRelationship } from '../src/models/facilityRelationship'
+import { PrivilegedFacility } from '../src/models/facility'
 
 describe('User to Facility Relationship', function () {
   let metricsInstance: Metrics
@@ -45,6 +46,7 @@ describe('User to Facility Relationship', function () {
   it('can access facility instance', async function () {
     expect(typeof facilityRelationship.facility).to.equal('object')
     expect(typeof facilityRelationship.facility?.id).to.equal('number')
+    expect(facilityRelationship.facility instanceof PrivilegedFacility).to.equal(true)
   })
 
   it('can reload facility relationships', async function () {

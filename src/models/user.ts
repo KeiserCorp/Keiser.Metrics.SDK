@@ -7,9 +7,9 @@ import { ProfileData, Profile } from './profile'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
 import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, HeightMeasurementListResponse } from './heightMeasurement'
-import { FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
-import { UserFacilityRelationship } from './userFacilityRelationship'
+import { UserFacilityRelationship, FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
 import { OAuthProviders } from '../constants'
+import { FacilityListResponse, Facility } from './facility'
 
 export interface UserData {
   id: number
@@ -153,6 +153,11 @@ export class User extends Model {
   async getHeightMeasurements (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
     const { heightMeasurements } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
     return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler))
+  }
+
+  async getFacilities (params: {name?: string, quantity?: number} = { quantity: 20 }) {
+    const { facilities } = await this.action('facility:list', params) as FacilityListResponse
+    return facilities.map(facility => new Facility(facility, this.sessionHandler))
   }
 
   async getFacilityMembershipRelationships () {

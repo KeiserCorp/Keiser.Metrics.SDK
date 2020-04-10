@@ -34,12 +34,18 @@ export class Facility extends Model {
     return this._facilityData.id
   }
 
-  get licensedUntil () {
-    return new Date(this._facilityData.licensedUntil)
-  }
-
   get facilityProfile () {
     return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this.sessionHandler) : undefined
+  }
+}
+
+export class PrivilegedFacility extends Facility {
+  constructor (facilityData: FacilityData, sessionHandler: SessionHandler) {
+    super(facilityData, sessionHandler)
+  }
+
+  get licensedUntil () {
+    return new Date(this._facilityData.licensedUntil)
   }
 
   async getFacilityProfile () {
