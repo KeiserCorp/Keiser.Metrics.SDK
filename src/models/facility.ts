@@ -15,7 +15,7 @@ export interface FacilityResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityListResponse extends AuthenticatedResponse {
-  facilitys: FacilityData[]
+  facilities: FacilityData[]
 }
 
 export class Facility extends Model {
