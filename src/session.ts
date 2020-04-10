@@ -4,6 +4,7 @@ import { MetricsConnection } from './connection'
 import { User, UserResponse, Users } from './models/user'
 import { JWT_TTL_LIMIT, OAuthProviders } from './constants'
 import { Stats } from './models/stats'
+import { PrivilegedFacility, FacilityData } from './models/facility'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -20,7 +21,7 @@ export interface RefreshTokenChangeEvent {
 
 export interface JWTToken {
   user: { id: number }
-  facility: object | null
+  facility: FacilityData | null
   facilityRole: string | null
   type: 'access' | 'refresh'
   iat: number
@@ -219,6 +220,10 @@ export class Session {
 
   get user () {
     return this._user
+  }
+
+  get activeFacility () {
+    return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 }
 

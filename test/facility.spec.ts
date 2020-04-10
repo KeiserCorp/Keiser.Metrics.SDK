@@ -2,9 +2,9 @@ import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import Metrics from '../src'
 import { Session } from '../src/session'
-import { Facility } from '../src/models/facility'
+import { Facility, PrivilegedFacility } from '../src/models/facility'
 
-describe('Facility', function () {
+describe.only('Facility', function () {
   let metricsInstance: Metrics
   let session: Session
   let facility: Facility | undefined
@@ -36,13 +36,29 @@ describe('Facility', function () {
     }
   })
 
-  // Requires facility set in session state
-  // it('can get updated facility profile', async function () {
-  //   if (facility) {
-  //     const facilityProfile = await facility.getFacilityProfile()
-  //     expect(typeof facilityProfile).to.equal('object')
-  //     expect(typeof facilityProfile.name).to.equal('string')
-  //   }
-  // })
+  it('can set active facility', async function () {
+    if (facility) {
+      expect(facility instanceof PrivilegedFacility).to.equal(true)
+      if (facility instanceof PrivilegedFacility) {
+        expect(typeof session.activeFacility).to.equal('undefined')
+        expect(facility.isActive).to.equal(false)
+
+        await facility.setActive()
+
+        expect(facility.isActive).to.equal(true)
+        expect(session.activeFacility instanceof PrivilegedFacility).to.equal(true)
+      }
+    }
+  })
+
+  // To-Do: Add Facility Profile Update Logic
+
+  it('can get updated facility profile', async function () {
+    if (session.activeFacility) {
+      const facilityProfile = await session.activeFacility.getFacilityProfile()
+      expect(typeof facilityProfile).to.equal('object')
+      expect(typeof facilityProfile.name).to.equal('string')
+    }
+  })
 
 })

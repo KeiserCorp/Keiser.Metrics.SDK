@@ -48,6 +48,14 @@ export class PrivilegedFacility extends Facility {
     return new Date(this._facilityData.licensedUntil)
   }
 
+  get isActive () {
+    return this.id === this.sessionHandler.decodedAccessToken?.facility?.id
+  }
+
+  async setActive () {
+    await this.action('auth:setFacility', { facilityId: this.id, refreshable: this.sessionHandler.refreshToken !== null })
+  }
+
   async getFacilityProfile () {
     const { facilityProfile } = await this.action('facilityProfile:show') as FacilityProfileResponse
     return facilityProfile

@@ -155,7 +155,7 @@ export class User extends Model {
     return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler))
   }
 
-  async getFacilities (params: {name?: string, quantity?: number} = { quantity: 20 }) {
+  async getFacilities (params: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { limit: 20 }) {
     const { facilities } = await this.action('facility:list', params) as FacilityListResponse
     return facilities.map(facility => new Facility(facility, this.sessionHandler))
   }
