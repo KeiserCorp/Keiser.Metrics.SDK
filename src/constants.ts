@@ -5,7 +5,9 @@ export const JWT_TTL_LIMIT = 5000
 
 export enum OAuthProviders {
   Google = 'google',
-  Facebook = 'facebook'
+  Facebook = 'facebook',
+  Strava = 'strava',
+  TrainingPeaks = 'trainingpeaks'
 }
 
 export enum Gender {

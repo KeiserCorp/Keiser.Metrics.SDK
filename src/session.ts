@@ -10,7 +10,7 @@ export interface AuthenticatedResponse {
   refreshToken?: string
 }
 
-export interface OAuthResponse {
+export interface OAuthLoginResponse {
   url: string
 }
 
@@ -55,7 +55,7 @@ export class Authentication {
   }
 
   static async useOAuth (connection: MetricsConnection, service: OAuthProviders, redirect: string) {
-    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthResponse
+    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthLoginResponse
     return response.url
   }
 
