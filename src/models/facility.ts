@@ -1,6 +1,6 @@
 import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { FacilityProfileData, FacilityProfile, FacilityProfileResponse } from './facilityProfile'
+import { FacilityProfileData, FacilityProfile } from './facilityProfile'
 
 export interface FacilityData {
   id: number
@@ -35,7 +35,7 @@ export class Facility extends Model {
   }
 
   get facilityProfile () {
-    return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this.sessionHandler) : undefined
+    return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 }
 
@@ -54,10 +54,5 @@ export class PrivilegedFacility extends Facility {
 
   async setActive () {
     await this.action('auth:setFacility', { facilityId: this.id, refreshable: this.sessionHandler.refreshToken !== null })
-  }
-
-  async getFacilityProfile () {
-    const { facilityProfile } = await this.action('facilityProfile:show') as FacilityProfileResponse
-    return facilityProfile
   }
 }

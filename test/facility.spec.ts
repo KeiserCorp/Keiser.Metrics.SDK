@@ -36,6 +36,19 @@ describe.only('Facility', function () {
     }
   })
 
+  it('cannot reload facility profile without active', async function () {
+    if (facility?.facilityProfile) {
+      let extError
+
+      try {
+        await facility.facilityProfile.reload()
+      } catch (error) {
+        extError = error
+      }
+      expect(typeof extError).to.not.equal('undefined')
+    }
+  })
+
   it('can set active facility', async function () {
     if (facility) {
       expect(facility instanceof PrivilegedFacility).to.equal(true)
@@ -51,13 +64,21 @@ describe.only('Facility', function () {
     }
   })
 
-  // To-Do: Add Facility Profile Update Logic
+  it('can reload facility profile with active', async function () {
+    if (facility?.facilityProfile) {
+      const facilityProfile = await facility.facilityProfile.reload()
 
-  it('can get updated facility profile', async function () {
-    if (session.activeFacility) {
-      const facilityProfile = await session.activeFacility.getFacilityProfile()
       expect(typeof facilityProfile).to.equal('object')
       expect(typeof facilityProfile.name).to.equal('string')
+    }
+  })
+
+  it('can update facility profile with active', async function () {
+    if (facility?.facilityProfile) {
+      const facilityProfile = await facility.facilityProfile.update({ name: '_test_' })
+
+      expect(typeof facilityProfile).to.equal('object')
+      expect(facilityProfile.name).to.equal('_test_')
     }
   })
 

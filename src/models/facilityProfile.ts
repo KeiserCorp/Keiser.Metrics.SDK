@@ -1,5 +1,6 @@
 import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { Facility, PrivilegedFacility } from './facility'
 
 export interface FacilityProfileData {
   name: string | null
@@ -22,14 +23,53 @@ export interface FacilityProfileListResponse extends AuthenticatedResponse {
 
 export class FacilityProfile extends Model {
   protected _facilityProfileData: FacilityProfileData
+  private _facility: Facility
 
-  constructor (facilityProfileData: FacilityProfileData, sessionHandler: SessionHandler) {
+  constructor (facilityProfileData: FacilityProfileData, facility: Facility, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._facilityProfileData = facilityProfileData
+    this._facility = facility
   }
 
   protected setFacilityProfileData (facilityProfileData: FacilityProfileData) {
     Object.assign(this._facilityProfileData, facilityProfileData)
+  }
+
+  async update (params: {
+    name: string | null,
+    phone?: string | null,
+    address?: string | null,
+    city?: string | null,
+    postcode?: string | null,
+    state?: string | null,
+    country?: string | null,
+    website?: string | null
+  }) {
+    if (!(this._facility instanceof PrivilegedFacility)) {
+      throw new Error('cannot update facility without privilege')
+    }
+
+    if (!this._facility.isActive) {
+      throw new Error('can only update profile of active facility')
+    }
+
+    const { facilityProfile } = await this.action('facilityProfile:update', params) as FacilityProfileResponse
+    this.setFacilityProfileData(facilityProfile)
+    return facilityProfile
+  }
+
+  async reload () {
+    if (!(this._facility instanceof PrivilegedFacility)) {
+      throw new Error('cannot reload facility with privilege')
+    }
+
+    if (!this._facility.isActive) {
+      throw new Error('can only reload profile of active facility')
+    }
+
+    const { facilityProfile } = await this.action('facilityProfile:show') as FacilityProfileResponse
+    this.setFacilityProfileData(facilityProfile)
+    return facilityProfile
   }
 
   get name () {
