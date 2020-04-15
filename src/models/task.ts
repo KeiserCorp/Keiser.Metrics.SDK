@@ -17,7 +17,7 @@ export interface TaskStats {
 }
 
 export interface TaskWorkers {
-  [key: string]: string | TaskWorkerStatus
+  [key: string]: 'started' | TaskWorkerStatus
 }
 
 export interface TaskPayload {
@@ -43,12 +43,16 @@ export interface TaskFailure {
   worker: string
 }
 
-export interface TaskDetailsResponse extends AuthenticatedResponse {
+export interface ResqueDetailsResponse extends AuthenticatedResponse {
   details: {
     queues: TaskQueues
     stats: TaskStats
     workers: TaskWorkers
   }
+}
+
+export interface WorkersResponse extends AuthenticatedResponse {
+  workers: TaskWorkers
 }
 
 export interface TaskQueueResponse extends AuthenticatedResponse {
@@ -63,8 +67,13 @@ export interface TaskFailedResponse extends AuthenticatedResponse {
 
 export class Tasks extends Model {
   async getDetails () {
-    const { details } = await this.action('resque:task:details') as TaskDetailsResponse
+    const { details } = await this.action('resque:details') as ResqueDetailsResponse
     return details
+  }
+
+  async getWorkers () {
+    const { workers } = await this.action('resque:worker:list') as WorkersResponse
+    return Object.keys(workers).map(key => ({ worker: key, status: workers[key] }))
   }
 
   async getQueue (options: {queue: Queue, offset?: number, limit?: number}) {

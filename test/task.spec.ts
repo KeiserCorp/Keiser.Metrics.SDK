@@ -22,17 +22,23 @@ describe('Task', function () {
   })
 
   it('can get details', async function () {
-    const taskDetails = await session.tasks.getDetails()
+    const details = await session.tasks.getDetails()
 
-    expect(typeof taskDetails).to.equal('object')
-    expect(typeof taskDetails.queues).to.equal('object')
-    expect(typeof taskDetails.queues.high).to.equal('object')
-    expect(typeof taskDetails.queues.high.length).to.equal('number')
-    expect(typeof taskDetails.queues.low).to.equal('object')
-    expect(typeof taskDetails.queues.low.length).to.equal('number')
-    expect(typeof taskDetails.stats).to.equal('object')
-    expect(typeof taskDetails.stats.failed).to.equal('string')
-    expect(typeof taskDetails.stats.processed).to.equal('string')
+    expect(typeof details).to.equal('object')
+    expect(typeof details.queues).to.equal('object')
+    expect(typeof details.queues.high).to.equal('object')
+    expect(typeof details.queues.high.length).to.equal('number')
+    expect(typeof details.queues.low).to.equal('object')
+    expect(typeof details.queues.low.length).to.equal('number')
+    expect(typeof details.stats).to.equal('object')
+    expect(typeof details.stats.failed).to.equal('string')
+    expect(typeof details.stats.processed).to.equal('string')
+  })
+
+  it('can get workers', async function () {
+    const workers = await session.tasks.getWorkers()
+
+    expect(Array.isArray(workers)).to.equal(true)
   })
 
   it('can get queue', async function () {
