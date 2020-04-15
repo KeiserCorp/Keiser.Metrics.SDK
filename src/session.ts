@@ -5,6 +5,7 @@ import { User, UserResponse, Users } from './models/user'
 import { JWT_TTL_LIMIT, OAuthProviders } from './constants'
 import { Stats } from './models/stats'
 import { PrivilegedFacility, FacilityData } from './models/facility'
+import { Cache } from './models/cache'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -235,5 +236,9 @@ export class AdminSession extends Session {
 
   get users () {
     return new Users(this._sessionHandler)
+  }
+
+  get cache () {
+    return new Cache(this._sessionHandler)
   }
 }

@@ -4,7 +4,7 @@ import Metrics from '../src'
 import { Session } from '../src/session'
 import { Facility, PrivilegedFacility } from '../src/models/facility'
 
-describe.only('Facility', function () {
+describe('Facility', function () {
   let metricsInstance: Metrics
   let session: Session
   let facility: Facility | undefined
