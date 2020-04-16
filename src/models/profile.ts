@@ -1,6 +1,12 @@
 import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { Gender, Units } from '../constants'
+import { Units } from '../constants'
+
+export enum Gender {
+  Male = 'm',
+  Female = 'f',
+  Other = 'o'
+}
 
 export interface ProfileData {
   updatedAt: string

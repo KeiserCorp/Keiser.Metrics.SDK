@@ -8,8 +8,14 @@ import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionRes
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
 import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, HeightMeasurementListResponse } from './heightMeasurement'
 import { UserFacilityRelationship, FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
-import { OAuthProviders } from '../constants'
 import { FacilityListResponse, Facility } from './facility'
+
+export enum OAuthProviders {
+  Google = 'google',
+  Facebook = 'facebook',
+  Strava = 'strava',
+  TrainingPeaks = 'trainingpeaks'
+}
 
 export interface UserData {
   id: number
@@ -104,14 +110,14 @@ export class User extends Model {
     return (this._userData.oauthServices || []).map(oauthService => new OAuthService(oauthService, this.id, this.sessionHandler))
   }
 
+  async createOAuthService (params: {service: OAuthProviders, redirect: string}) {
+    const response = await this.action('oauth:initiate', { ...params, type: 'connect' }) as OAuthConnectResponse
+    return response.url
+  }
+
   async getOAuthServices (options: { limit?: number, offset?: number } = { }) {
     const { oauthServices } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
     return oauthServices.map(oauthService => new OAuthService(oauthService, this.id, this.sessionHandler))
-  }
-
-  async createOAuthService (options: {service: OAuthProviders, redirect: string}) {
-    const response = await this.action('oauth:initiate', { ...options, type: 'connect' }) as OAuthConnectResponse
-    return response.url
   }
 
   get profile () {
@@ -155,8 +161,8 @@ export class User extends Model {
     return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.id, this.sessionHandler))
   }
 
-  async getFacilities (params: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { limit: 20 }) {
-    const { facilities } = await this.action('facility:list', params) as FacilityListResponse
+  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { limit: 20 }) {
+    const { facilities } = await this.action('facility:list', options) as FacilityListResponse
     return facilities.map(facility => new Facility(facility, this.sessionHandler))
   }
 
@@ -172,8 +178,8 @@ export class User extends Model {
 }
 
 export class Users extends Model {
-  async getUsers (params: {name?: string, limit?: number, offset?: number} = { limit: 20 }) {
-    const { users } = await this.action('user:list', params) as UserListResponse
+  async getUsers (options: {name?: string, limit?: number, offset?: number} = { limit: 20 }) {
+    const { users } = await this.action('user:list', options) as UserListResponse
     return users.map(user => new User(user, this.sessionHandler))
   }
 

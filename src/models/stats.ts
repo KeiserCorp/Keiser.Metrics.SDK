@@ -25,8 +25,8 @@ export class Stats extends Model {
     return stats[0]
   }
 
-  async getStats (params: {from?: Date, to?: Date, limit?: number, offset?: number, ascending?: boolean} = { limit: 20 }) {
-    const { stats } = await this.action('stats:list', params) as StatsResponse
+  async getStats (options: {from?: Date, to?: Date, limit?: number, offset?: number, ascending?: boolean} = { limit: 20 }) {
+    const { stats } = await this.action('stats:list', options) as StatsResponse
     return stats
   }
 }
