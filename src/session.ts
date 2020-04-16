@@ -7,6 +7,7 @@ import { Stats } from './models/stats'
 import { PrivilegedFacility, FacilityData } from './models/facility'
 import { Cache } from './models/cache'
 import { Tasks } from './models/task'
+import { FacilityLicenses } from './models/facilityLicense'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -245,5 +246,9 @@ export class AdminSession extends Session {
 
   get tasks () {
     return new Tasks(this._sessionHandler)
+  }
+
+  get facilityLicenses () {
+    return new FacilityLicenses(this._sessionHandler)
   }
 }
