@@ -27,7 +27,7 @@ describe('Height Measurement', function () {
 
   it('has latest height measurement on first load', async function () {
     expect(typeof user.latestHeightMeasurement).to.not.equal('undefined')
-    expect(typeof user.latestHeightMeasurement.metricHeight).to.equal('number')
+    expect(typeof user.latestHeightMeasurement?.metricHeight).to.equal('number')
   })
 
   it('can get list of height measurement', async function () {

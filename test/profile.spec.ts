@@ -3,7 +3,7 @@ import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 import Metrics from '../src'
 import { Session } from '../src/session'
 import { User } from '../src/models/user'
-import { Gender } from '../src/constants'
+import { Gender } from '../src/models/profile'
 
 describe('Profile', function () {
   let metricsInstance: Metrics

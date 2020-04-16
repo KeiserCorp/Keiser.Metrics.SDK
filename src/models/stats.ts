@@ -20,13 +20,13 @@ export interface StatsResponse extends AuthenticatedResponse {
 }
 
 export class Stats extends Model {
-  public async getLatestStats () {
+  async getLatestStats () {
     const { stats } = await this.action('stats:list', { limit: 1 }) as StatsResponse
     return stats[0]
   }
 
-  public async getStats (params: {from?: Date, to?: Date, limit?: number, offset?: number, ascending?: boolean} = { limit: 20 }) {
-    const { stats } = await this.action('stats:list', params) as StatsResponse
+  async getStats (options: {from?: Date, to?: Date, limit?: number, offset?: number, ascending?: boolean} = { limit: 20 }) {
+    const { stats } = await this.action('stats:list', options) as StatsResponse
     return stats
   }
 }

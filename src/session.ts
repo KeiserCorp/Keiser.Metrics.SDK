@@ -1,16 +1,20 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { User, UserResponse, Users } from './models/user'
-import { JWT_TTL_LIMIT, OAuthProviders } from './constants'
+import { UserResponse, User, Users, OAuthProviders } from './models/user'
+import { JWT_TTL_LIMIT } from './constants'
 import { Stats } from './models/stats'
+import { PrivilegedFacility, FacilityData } from './models/facility'
+import { Cache } from './models/cache'
+import { Tasks } from './models/task'
+import { FacilityLicenses } from './models/facilityLicense'
 
 export interface AuthenticatedResponse {
   accessToken: string
   refreshToken?: string
 }
 
-export interface OAuthResponse {
+export interface OAuthLoginResponse {
   url: string
 }
 
@@ -20,7 +24,7 @@ export interface RefreshTokenChangeEvent {
 
 export interface JWTToken {
   user: { id: number }
-  facility: object | null
+  facility: FacilityData | null
   facilityRole: string | null
   type: 'access' | 'refresh'
   iat: number
@@ -55,7 +59,7 @@ export class Authentication {
   }
 
   static async useOAuth (connection: MetricsConnection, service: OAuthProviders, redirect: string) {
-    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthResponse
+    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthLoginResponse
     return response.url
   }
 
@@ -127,46 +131,46 @@ export class SessionHandler {
     }
   }
 
-  public get keepAlive () {
+  get keepAlive () {
     return this._keepAlive
   }
 
-  public set keepAlive (value: boolean) {
+  set keepAlive (value: boolean) {
     this._keepAlive = value
     if (!this._keepAlive && this._accessTokenTimeout) {
       clearTimeout(this._accessTokenTimeout)
     }
   }
 
-  public get decodedAccessToken () {
+  get decodedAccessToken () {
     return DecodeJWT(this._accessToken) as AccessToken
   }
 
-  public get refreshToken () {
+  get refreshToken () {
     return this._refreshToken
   }
 
-  public get decodedRefreshToken () {
+  get decodedRefreshToken () {
     return this._refreshToken ? DecodeJWT(this._refreshToken) as RefreshToken : undefined
   }
 
-  public get onRefreshTokenChangeEvent () {
+  get onRefreshTokenChangeEvent () {
     return this._onRefreshTokenChangeEvent.asEvent()
   }
 
-  public close () {
+  close () {
     this.keepAlive = false
     this._accessToken = ''
     this._refreshToken = null
   }
 
-  public async logout () {
+  async logout () {
     const authParams = { authorization: this._refreshToken ?? this._accessToken }
     await this._connection.action('auth:logout', authParams)
     this.close()
   }
 
-  public async action (action: string, params: Object = {}) {
+  async action (action: string, params: Object = {}) {
     let response
     try {
       const authParams = { authorization: this._accessToken, ...params }
@@ -193,32 +197,36 @@ export class Session {
     this._user = new User(loginResponse.user, this._sessionHandler)
   }
 
-  public get keepAlive () {
+  get keepAlive () {
     return this._sessionHandler.keepAlive
   }
 
-  public set keepAlive (value: boolean) {
+  set keepAlive (value: boolean) {
     this._sessionHandler.keepAlive = value
   }
 
-  public get refreshToken () {
+  get refreshToken () {
     return this._sessionHandler.refreshToken
   }
 
-  public get onRefreshTokenChangeEvent () {
+  get onRefreshTokenChangeEvent () {
     return this._sessionHandler.onRefreshTokenChangeEvent
   }
 
-  public close () {
+  close () {
     this._sessionHandler.close()
   }
 
-  public async logout () {
+  async logout () {
     await this._sessionHandler.logout()
   }
 
   get user () {
     return this._user
+  }
+
+  get activeFacility () {
+    return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 }
 
@@ -230,5 +238,17 @@ export class AdminSession extends Session {
 
   get users () {
     return new Users(this._sessionHandler)
+  }
+
+  get cache () {
+    return new Cache(this._sessionHandler)
+  }
+
+  get tasks () {
+    return new Tasks(this._sessionHandler)
+  }
+
+  get facilityLicenses () {
+    return new FacilityLicenses(this._sessionHandler)
   }
 }
