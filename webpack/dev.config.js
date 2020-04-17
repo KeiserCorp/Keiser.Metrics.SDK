@@ -31,6 +31,8 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin()
   ],
   output: {
-    filename: 'index.js'
+    filename: 'index.js',
+    libraryTarget: 'commonjs2',
+    library: 'Metrics'
   }
 }

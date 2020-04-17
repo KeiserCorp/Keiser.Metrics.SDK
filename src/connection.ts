@@ -51,7 +51,7 @@ export class MetricsConnection {
     this._persistConnection = !(options.persistConnection === false)
     this._requestTimeout = options.requestTimeout || DEFAULT_REQUEST_TIMEOUT
 
-    if (typeof (window as any) === 'undefined' || !(window as any)?.WebSocket) {
+    if (typeof (window as any) === 'undefined' || !window.WebSocket) {
       this._persistConnection = false
     }
     void this.openConnection()

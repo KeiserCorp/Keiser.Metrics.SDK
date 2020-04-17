@@ -6,7 +6,8 @@ const WriteJsonPlugin = require('write-json-webpack-plugin')
 const CreateFileWebpack = require('create-file-webpack')
 const DIST = path.resolve(__dirname, '../dist')
 const package = Object.assign(require('../package.json'), {
-  main: 'index.js',
+  main: 'index.node.js',
+  browser: 'index.browser.js',
   types: 'index.d.ts',
   private: false,
   devDependencies: {},
@@ -46,7 +47,7 @@ function replace(file, rules) {
   fs.writeFileSync(src, template)
 }
 
-module.exports = {
+const baseConfig = {
   mode: 'production',
   entry: './src/index.ts',
   module: {
@@ -60,11 +61,16 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
-  },
+  }
+}
+
+const browserConfig = {
+  ...baseConfig,
+  target: 'web',
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [DIST],
-      cleanAfterEveryBuildPatterns: [path.join(DIST, 'types')]
+      cleanAfterEveryBuildPatterns: []
     }),
     new CopyWebpackPlugin([{ from: 'README.md', to: 'README.md' }]),
     new CopyWebpackPlugin([{ from: 'LICENSE.md', to: 'LICENSE.md' }]),
@@ -89,9 +95,28 @@ module.exports = {
     })
   ],
   output: {
-    filename: 'index.js',
+    filename: 'index.browser.js',
     path: DIST,
     libraryTarget: 'umd',
     library: 'Metrics'
   }
 }
+
+const nodeConfig = {
+  ...baseConfig,
+  target: 'node',
+  plugins: [
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [],
+      cleanAfterEveryBuildPatterns: [path.join(DIST, 'types')]
+    })
+  ],
+  output: {
+    filename: 'index.node.js',
+    path: DIST,
+    libraryTarget: 'umd',
+    library: 'Metrics'
+  }
+}
+
+module.exports = [browserConfig, nodeConfig]
