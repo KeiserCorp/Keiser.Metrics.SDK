@@ -10,7 +10,7 @@ if (!semverValid(version)) {
 }
 
 const prerelease = semverPrerelease(version)
-const tag = prerelease.length ? prerelease.filter(part => typeof part === 'string').join('.') || 'prerelease' : false
+const tag = (prerelease && prerelease.length) ? prerelease.filter(part => typeof part === 'string').join('.') || 'prerelease' : false
 
 const args = process.argv.slice(2)
 const tagArgs = tag ? ['--tag', tag] : []

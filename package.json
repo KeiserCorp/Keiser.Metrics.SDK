@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
