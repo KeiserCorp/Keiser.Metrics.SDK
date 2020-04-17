@@ -40,41 +40,41 @@ export default class Metrics {
     return this._connection.onConnectionChangeEvent
   }
 
-  async authenticateWithCredentials (email: string, password: string, refreshable: boolean = true) {
-    return Authentication.useCredentials(this._connection, email, password, refreshable)
+  async authenticateWithCredentials (params: {email: string, password: string, refreshable?: boolean}) {
+    return Authentication.useCredentials(this._connection, { refreshable: true, ...params })
   }
 
-  async authenticateWithToken (token: string) {
-    return Authentication.useToken(this._connection, token)
+  async authenticateWithToken (params: {token: string}) {
+    return Authentication.useToken(this._connection, params)
   }
 
-  async authenticateWithResetToken (token: string, password: string, refreshable: boolean = true) {
-    return Authentication.useResetToken(this._connection, token, password)
+  async authenticateWithResetToken (params: {resetToken: string, password: string, refreshable?: boolean }) {
+    return Authentication.useResetToken(this._connection, { refreshable: true, ...params })
   }
 
-  async authenticateWithFacebook (redirect: string) {
-    return Authentication.useOAuth(this._connection, OAuthProviders.Facebook, redirect)
+  async authenticateWithFacebook (params: {redirect: string}) {
+    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
   }
 
-  async authenticateWithGoogle (redirect: string) {
-    return Authentication.useOAuth(this._connection, OAuthProviders.Google, redirect)
+  async authenticateWithGoogle (params: {redirect: string}) {
+    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
   }
 
-  async createUser (email: string, password: string, refreshable: boolean = true) {
-    return Authentication.createUser(this._connection, email, password, refreshable)
+  async createUser (params: {email: string, password: string, refreshable?: boolean}) {
+    return Authentication.createUser(this._connection, { refreshable: true, ...params })
   }
 
-  async passwordReset (email: string) {
-    await Authentication.passwordReset(this._connection, email)
+  async passwordReset (params: {email: string}) {
+    await Authentication.passwordReset(this._connection, params)
   }
 }
 
 export class MetricsAdmin extends Metrics {
-  async authenticateAdminWithCredentials (email: string, password: string, token: string, refreshable: boolean = true) {
-    return Authentication.useAdminCredentials(this._connection, email, password, token, refreshable)
+  async authenticateAdminWithCredentials (params: {email: string, password: string, token: string, refreshable?: boolean}) {
+    return Authentication.useAdminCredentials(this._connection, { refreshable: true, ...params })
   }
 
-  async authenticateAdminWithToken (token: string) {
-    return Authentication.useAdminToken(this._connection, token)
+  async authenticateAdminWithToken (params: {token: string}) {
+    return Authentication.useAdminToken(this._connection, params)
   }
 }

@@ -43,42 +43,42 @@ export interface RefreshToken extends JWTToken {
 }
 
 export class Authentication {
-  static async useCredentials (connection: MetricsConnection, email: string, password: string, refreshable: boolean = true) {
-    const response = await connection.action('auth:login', { email, password, refreshable }) as UserResponse
+  static async useCredentials (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean}) {
+    const response = await connection.action('auth:login', params) as UserResponse
     return new Session(response, connection)
   }
 
-  static async useToken (connection: MetricsConnection, token: string) {
-    const response = await connection.action('user:show', { authorization: token }) as UserResponse
+  static async useToken (connection: MetricsConnection, params: { token: string }) {
+    const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     return new Session(response, connection)
   }
 
-  static async useResetToken (connection: MetricsConnection, token: string, password: string, refreshable: boolean = true) {
-    const response = await connection.action('auth:resetFulfillment', { resetToken: token, password, refreshable }) as UserResponse
+  static async useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean}) {
+    const response = await connection.action('auth:resetFulfillment', params) as UserResponse
     return new Session(response, connection)
   }
 
-  static async useOAuth (connection: MetricsConnection, service: OAuthProviders, redirect: string) {
-    const response = await connection.action('oauth:initiate', { service, redirect, type: 'login' }) as OAuthLoginResponse
+  static async useOAuth (connection: MetricsConnection, params: {service: OAuthProviders, redirect: string}) {
+    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
     return response.url
   }
 
-  static async createUser (connection: MetricsConnection, email: string, password: string, refreshable: boolean = true) {
-    const response = await connection.action('user:create', { email, password, refreshable }) as UserResponse
+  static async createUser (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean}) {
+    const response = await connection.action('user:create', params) as UserResponse
     return new Session(response, connection)
   }
 
-  static async passwordReset (connection: MetricsConnection, email: string) {
-    await connection.action('auth:resetRequest', { email })
+  static async passwordReset (connection: MetricsConnection, params: {email: string}) {
+    await connection.action('auth:resetRequest', params)
   }
 
-  static async useAdminCredentials (connection: MetricsConnection, email: string, password: string, token: string, refreshable: boolean = true) {
-    const response = await connection.action('admin:login', { email, password, token, refreshable }) as UserResponse
+  static async useAdminCredentials (connection: MetricsConnection, params: {email: string, password: string, token: string, refreshable: boolean}) {
+    const response = await connection.action('admin:login', params) as UserResponse
     return new AdminSession(response, connection)
   }
 
-  static async useAdminToken (connection: MetricsConnection, token: string) {
-    const response = await connection.action('user:show', { authorization: token }) as UserResponse
+  static async useAdminToken (connection: MetricsConnection, params: { token: string}) {
+    const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (accessToken?.superUser !== true) {
       throw new Error('not admin user session')
