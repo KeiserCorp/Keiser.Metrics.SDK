@@ -8,7 +8,7 @@ const DIST = path.resolve(__dirname, '../dist')
 const package = Object.assign(require('../package.json'), {
   main: 'index.node.js',
   browser: 'index.browser.js',
-  types: 'index.d.ts',
+  types: 'types/index.d.ts',
   private: false,
   devDependencies: {},
   scripts: {}
@@ -83,15 +83,6 @@ const browserConfig = {
       object: package,
       filename: 'package.json',
       pretty: true
-    }),
-    new DtsBundlePlugin({
-      name: 'Metrics',
-      main: path.join(DIST, 'types/index.d.ts'),
-      out: path.join(DIST, 'index.d.ts'),
-      removeSource: true,
-      newLine: 'lf',
-      indent: '  ',
-      outputAsModuleFolder: true
     })
   ],
   output: {
@@ -105,12 +96,6 @@ const browserConfig = {
 const nodeConfig = {
   ...baseConfig,
   target: 'node',
-  plugins: [
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: [],
-      cleanAfterEveryBuildPatterns: [path.join(DIST, 'types')]
-    })
-  ],
   output: {
     filename: 'index.node.js',
     path: DIST,
