@@ -1,13 +1,13 @@
 import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 import Metrics from '../src'
-import { Session } from '../src/session'
+import { UserSession } from '../src/session'
 import { User } from '../src/models/user'
 import { EmailAddress } from '../src/models/emailAddress'
 
 describe('Email Address', function () {
   let metricsInstance: Metrics
-  let session: Session
+  let userSession: UserSession
   let user: User
   let emailAddress: EmailAddress
   const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
@@ -19,8 +19,8 @@ describe('Email Address', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.createUser(newUserEmail, 'password')
-    user = session.user
+    userSession = await metricsInstance.createUser({ email: newUserEmail, password: 'password' })
+    user = userSession.user
   })
 
   after(function () {

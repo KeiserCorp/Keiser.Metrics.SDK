@@ -14,7 +14,7 @@ describe('Task', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateAdminWithCredentials(DemoEmail, DemoPassword, '123456')
+    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
   })
 
   after(function () {

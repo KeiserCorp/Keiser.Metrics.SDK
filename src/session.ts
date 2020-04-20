@@ -45,17 +45,17 @@ export interface RefreshToken extends JWTToken {
 export class Authentication {
   static async useCredentials (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean}) {
     const response = await connection.action('auth:login', params) as UserResponse
-    return new Session(response, connection)
+    return new UserSession(response, connection)
   }
 
   static async useToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
-    return new Session(response, connection)
+    return new UserSession(response, connection)
   }
 
   static async useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean}) {
     const response = await connection.action('auth:resetFulfillment', params) as UserResponse
-    return new Session(response, connection)
+    return new UserSession(response, connection)
   }
 
   static async useOAuth (connection: MetricsConnection, params: {service: OAuthProviders, redirect: string}) {
@@ -65,7 +65,7 @@ export class Authentication {
 
   static async createUser (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean}) {
     const response = await connection.action('user:create', params) as UserResponse
-    return new Session(response, connection)
+    return new UserSession(response, connection)
   }
 
   static async passwordReset (connection: MetricsConnection, params: {email: string}) {
@@ -188,7 +188,7 @@ export class SessionHandler {
   }
 }
 
-export class Session {
+export class UserSession {
   protected _sessionHandler: SessionHandler
   protected _user: User
 
@@ -230,7 +230,7 @@ export class Session {
   }
 }
 
-export class AdminSession extends Session {
+export class AdminSession extends UserSession {
 
   get stats () {
     return new Stats(this._sessionHandler)
