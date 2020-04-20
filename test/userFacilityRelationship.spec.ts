@@ -1,14 +1,14 @@
 import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import Metrics from '../src'
-import { Session } from '../src/session'
+import { UserSession } from '../src/session'
 import { User } from '../src/models/user'
 import { UserFacilityRelationship } from '../src/models/facilityRelationship'
 import { PrivilegedFacility } from '../src/models/facility'
 
 describe('User to Facility Relationship', function () {
   let metricsInstance: Metrics
-  let session: Session
+  let userSession: UserSession
   let user: User
   let facilityRelationship: UserFacilityRelationship
 
@@ -18,8 +18,8 @@ describe('User to Facility Relationship', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
-    user = session.user
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    user = userSession.user
   })
 
   after(function () {
@@ -65,6 +65,7 @@ describe('User to Facility Relationship', function () {
       extError = error
     }
 
+    console.log(extError)
     expect(typeof extError).to.not.equal('undefined')
     expect(extError.error.code).to.equal(626)
   })

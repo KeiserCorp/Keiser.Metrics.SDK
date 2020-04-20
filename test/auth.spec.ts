@@ -25,7 +25,7 @@ describe('Auth', function () {
   })
 
   it('can authenticate using basic credentials', async function () {
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
 
     expect(session).to.be.an('object')
     expect(session.user).to.be.an('object')
@@ -34,7 +34,7 @@ describe('Auth', function () {
   })
 
   it('can authenticate without refresh token', async function () {
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword, false)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: false })
 
     expect(session).to.be.an('object')
     expect(session.user).to.be.an('object')
@@ -47,7 +47,7 @@ describe('Auth', function () {
     let extError
 
     try {
-      session = await metricsInstance.authenticateWithCredentials(DemoEmail, 'wrongPassword')
+      session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: 'wrongPassword' })
     } catch (error) {
       extError = error
     }
@@ -59,11 +59,11 @@ describe('Auth', function () {
   })
 
   it('can authenticate using token', async function () {
-    const credentialSession = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const credentialSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
     const refreshToken = credentialSession.refreshToken ?? ''
     credentialSession.close()
 
-    const tokenSession = await metricsInstance.authenticateWithToken(refreshToken)
+    const tokenSession = await metricsInstance.authenticateWithToken({ token: refreshToken })
 
     expect(tokenSession).to.be.an('object')
     expect(tokenSession.user).to.be.an('object')
@@ -72,18 +72,18 @@ describe('Auth', function () {
   })
 
   it('can authenticate using Google', async function () {
-    const redirectUrl = await metricsInstance.authenticateWithGoogle('localhost:8080')
+    const redirectUrl = await metricsInstance.authenticateWithGoogle({ redirect: 'localhost:8080' })
     expect(redirectUrl).to.be.a('string')
   })
 
   it('can authenticate using Facebook', async function () {
-    const redirectUrl = await metricsInstance.authenticateWithFacebook('localhost:8080')
+    const redirectUrl = await metricsInstance.authenticateWithFacebook({ redirect: 'localhost:8080' })
     expect(redirectUrl).to.be.a('string')
   })
 
   it('can create a new user with basic authentication', async function () {
     const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-    const session = await metricsInstance.createUser(emailAddress, DemoPassword)
+    const session = await metricsInstance.createUser({ email: emailAddress, password: DemoPassword })
 
     expect(session).to.be.an('object')
     expect(session.user).to.be.an('object')
@@ -96,7 +96,7 @@ describe('Auth', function () {
     let extError
 
     try {
-      session = await metricsInstance.createUser(DemoEmail, 'wrongPassword')
+      session = await metricsInstance.createUser({ email: DemoEmail, password: 'wrongPassword' })
     } catch (error) {
       extError = error
     }
@@ -110,7 +110,7 @@ describe('Auth', function () {
   it('does keep access token alive', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword, false)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: false })
     await new Promise((resolve, reject) => {
       setTimeout(async () => {
         try {
@@ -128,7 +128,7 @@ describe('Auth', function () {
   it('can subscribe to refresh token change', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
     session.keepAlive = false
 
     const event = await new Promise(resolve => {
@@ -143,7 +143,7 @@ describe('Auth', function () {
   })
 
   it('can make model request', async function () {
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     expect(session).to.be.an('object')
 
     await session.user.reload()
@@ -153,7 +153,7 @@ describe('Auth', function () {
   it('cannot make model request after close', async function () {
     let extError
 
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     expect(session).to.be.an('object')
     session.close()
 
@@ -171,7 +171,7 @@ describe('Auth', function () {
   it('cannot make model request after logout', async function () {
     let extError
 
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     expect(session).to.be.an('object')
     await session.logout()
 
@@ -189,12 +189,12 @@ describe('Auth', function () {
   it('cannot start session after logout', async function () {
     let extError
 
-    const session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
     const refreshToken = session.refreshToken ?? ''
     await session.logout()
 
     try {
-      await metricsInstance.authenticateWithToken(refreshToken)
+      await metricsInstance.authenticateWithToken({token: refreshToken})
     } catch (error) {
       extError = error
     }
@@ -205,6 +205,6 @@ describe('Auth', function () {
   })
 
   it('can request password reset', async function () {
-    await metricsInstance.passwordReset(DemoEmail)
+    await metricsInstance.passwordReset({email: DemoEmail})
   })
 })

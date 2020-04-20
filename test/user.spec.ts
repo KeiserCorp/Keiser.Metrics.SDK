@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, DemoPassword, DemoUserId } from './constants'
 import Metrics from '../src'
-import { Session } from '../src/session'
+import { UserSession } from '../src/session'
 import { User } from '../src/models/user'
 
 describe('User', function () {
   let metricsInstance: Metrics
-  let session: Session
+  let userSession: UserSession
   let user: User
   const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
@@ -23,12 +23,12 @@ describe('User', function () {
   })
 
   it('can create new user', async function () {
-    session = await metricsInstance.createUser(userEmailAddress, DemoPassword)
-    expect(session).to.be.an('object')
-    expect(session.user).to.be.an('object')
-    expect(session.user.id).to.not.equal(DemoUserId)
+    userSession = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
+    expect(userSession).to.be.an('object')
+    expect(userSession.user).to.be.an('object')
+    expect(userSession.user.id).to.not.equal(DemoUserId)
 
-    user = session.user
+    user = userSession.user
   })
 
   it('can access user email address properties', async function () {

@@ -1,13 +1,13 @@
 import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import Metrics from '../src'
-import { Session } from '../src/session'
+import { UserSession } from '../src/session'
 import { User } from '../src/models/user'
 import { HeightMeasurement } from '../src/models/heightMeasurement'
 
 describe('Height Measurement', function () {
   let metricsInstance: Metrics
-  let session: Session
+  let userSession: UserSession
   let user: User
   let createdHeightMeasurement: HeightMeasurement
 
@@ -17,8 +17,8 @@ describe('Height Measurement', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
-    user = session.user
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    user = userSession.user
   })
 
   after(function () {

@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import Metrics from '../src'
-import { Session } from '../src/session'
+import { UserSession } from '../src/session'
 import { Facility, PrivilegedFacility } from '../src/models/facility'
 
 describe('Facility', function () {
   let metricsInstance: Metrics
-  let session: Session
+  let userSession: UserSession
   let facility: Facility | undefined
 
   before(async function () {
@@ -15,8 +15,8 @@ describe('Facility', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateWithCredentials(DemoEmail, DemoPassword)
-    facility = (await session.user.getFacilityMembershipRelationships())[0].facility
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    facility = (await userSession.user.getFacilityMembershipRelationships())[0].facility
   })
 
   after(function () {
@@ -53,13 +53,13 @@ describe('Facility', function () {
     if (facility) {
       expect(facility instanceof PrivilegedFacility).to.equal(true)
       if (facility instanceof PrivilegedFacility) {
-        expect(typeof session.activeFacility).to.equal('undefined')
+        expect(typeof userSession.activeFacility).to.equal('undefined')
         expect(facility.isActive).to.equal(false)
 
         await facility.setActive()
 
         expect(facility.isActive).to.equal(true)
-        expect(session.activeFacility instanceof PrivilegedFacility).to.equal(true)
+        expect(userSession.activeFacility instanceof PrivilegedFacility).to.equal(true)
       }
     }
   })
