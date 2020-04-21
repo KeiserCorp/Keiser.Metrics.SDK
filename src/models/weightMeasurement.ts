@@ -1,6 +1,6 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
-import { Model } from '../model'
 import { DeepReadonly } from '../lib/readonly'
+import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface WeightMeasurementData {
   id: number

@@ -1,6 +1,6 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
-import { Model } from '../model'
 import { Units } from '../constants'
+import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum Gender {
   Male = 'm',

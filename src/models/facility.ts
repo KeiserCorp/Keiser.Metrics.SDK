@@ -1,6 +1,6 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { FacilityProfileData, FacilityProfile } from './facilityProfile'
+import { AuthenticatedResponse, SessionHandler } from '../session'
+import { FacilityProfile, FacilityProfileData } from './facilityProfile'
 
 export interface FacilityData {
   id: number

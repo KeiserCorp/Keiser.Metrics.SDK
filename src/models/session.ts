@@ -1,10 +1,10 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { User, UserData } from './user'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
-import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 import { HeightMeasurement, HeightMeasurementData } from './heightMeasurement'
-import { MSeriesDataSetData, MSeriesDataSet } from './mSeriesDataSet'
+import { MSeriesDataSet, MSeriesDataSetData } from './mSeriesDataSet'
+import { User, UserData } from './user'
+import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 
 export interface SessionData {
   id: number

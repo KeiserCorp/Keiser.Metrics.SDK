@@ -1,13 +1,13 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
-import { DecodeJWT } from './lib/jwt'
 import { MetricsConnection } from './connection'
-import { UserResponse, User, Users, OAuthProviders } from './models/user'
 import { JWT_TTL_LIMIT } from './constants'
-import { Stats } from './models/stats'
-import { PrivilegedFacility, FacilityData } from './models/facility'
+import { DecodeJWT } from './lib/jwt'
 import { Cache } from './models/cache'
-import { Tasks } from './models/task'
+import { FacilityData, PrivilegedFacility } from './models/facility'
 import { FacilityLicenses } from './models/facilityLicense'
+import { Stats } from './models/stats'
+import { Tasks } from './models/task'
+import { OAuthProviders, User, UserResponse, Users } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
