@@ -12,8 +12,8 @@ export interface TaskQueues {
 }
 
 export interface TaskStats {
-  failed: string
-  processed: string
+  failed?: string
+  processed?: string
 }
 
 export interface TaskWorkers {

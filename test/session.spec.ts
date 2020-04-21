@@ -5,7 +5,7 @@ import { UserSession } from '../src/session'
 import { User } from '../src/models/user'
 import { Session } from '../src/models/session'
 
-describe.only('Session', function () {
+describe('Session', function () {
   let metricsInstance: Metrics
   let userSession: UserSession
   let user: User

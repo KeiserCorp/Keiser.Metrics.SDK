@@ -31,7 +31,6 @@ describe('Task', function () {
     expect(typeof details.queues.low).to.equal('object')
     expect(typeof details.queues.low.length).to.equal('number')
     expect(typeof details.stats).to.equal('object')
-    expect(typeof details.stats.failed).to.equal('string')
     expect(typeof details.stats.processed).to.equal('string')
   })
 
