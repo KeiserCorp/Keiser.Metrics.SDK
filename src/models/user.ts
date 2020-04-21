@@ -9,6 +9,7 @@ import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse
 import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, HeightMeasurementListResponse } from './heightMeasurement'
 import { UserFacilityRelationship, FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
 import { FacilityListResponse, Facility } from './facility'
+import { Session, SessionListResponse, SessionResponse } from './session'
 
 export enum OAuthProviders {
   Google = 'google',
@@ -103,7 +104,7 @@ export class User extends Model {
   }
 
   get basicCredential () {
-    return this._userData.basicCredential
+    return this._userData.basicCredential === true
   }
 
   get oauthServices () {
@@ -174,6 +175,16 @@ export class User extends Model {
   async getFacilityEmploymentRelationships (options: { employeeRole?: string } = {}) {
     const { facilityRelationships } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as FacilityRelationshipListResponse
     return facilityRelationships.map(facilityRelationship => new UserFacilityRelationship(facilityRelationship, this.sessionHandler))
+  }
+
+  async startSession (params: {forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number} = {}) {
+    const { session } = await this.action('session:start', { ...params, userId : this.id }) as SessionResponse
+    return new Session(session, this.id, this.sessionHandler)
+  }
+
+  async getSessions (options: {open?: boolean, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { sessions } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
+    return sessions.map(session => new Session(session, this.id, this.sessionHandler))
   }
 }
 
