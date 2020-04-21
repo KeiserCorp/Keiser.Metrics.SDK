@@ -68,6 +68,7 @@ describe('Height Measurement', function () {
 
   it('can reload new height measurement', async function () {
     const heightMeasurement = await createdHeightMeasurement.reload()
+
     expect(typeof heightMeasurement).to.equal('object')
     expect(heightMeasurement.source).to.equal('test')
     expect(heightMeasurement.id).to.equal(createdHeightMeasurement.id)

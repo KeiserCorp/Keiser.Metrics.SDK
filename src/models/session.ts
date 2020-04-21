@@ -4,6 +4,7 @@ import { User, UserData } from './user'
 import { Facility, FacilityData } from './facility'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 import { HeightMeasurement, HeightMeasurementData } from './heightMeasurement'
+import { MSeriesDataSetData, MSeriesDataSet } from './mSeriesDataSet'
 
 export interface SessionData {
   id: number
@@ -14,10 +15,10 @@ export interface SessionData {
   user?: UserData
   facility?: FacilityData
 
-  sessionPlanSequenceInstance?: any
-  heartRateDataSets?: any[]
-  mSeriesDataSets?: any[]
-  strengthMachineDataSets?: any[]
+  sessionPlanSequenceInstance?: any   // To-Do: Add Session Plan Sequence Instance model
+  heartRateDataSets?: any[]           // To-Do: Add Heart Rate Data Set model
+  mSeriesDataSets?: MSeriesDataSetData[]
+  strengthMachineDataSets?: any[]     // To-Do: Add Strength Machine Data Set model
 
   heightMeasurement?: HeightMeasurementData
   weightMeasurement?: WeightMeasurementData
@@ -78,7 +79,7 @@ export class Session extends Model {
   }
 
   get endedAt () {
-    return this._sessionData.endedAt ? new Date(this._sessionData.startedAt) : null
+    return this._sessionData.endedAt ? new Date(this._sessionData.endedAt) : null
   }
 
   get user () {
@@ -87,6 +88,10 @@ export class Session extends Model {
 
   get facility () {
     return this._sessionData.facility ? new Facility(this._sessionData.facility, this.sessionHandler) : undefined
+  }
+
+  get mSeriesDataSets () {
+    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this._userId, this.sessionHandler)) : undefined
   }
 
   get heightMeasurement () {

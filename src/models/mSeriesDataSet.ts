@@ -1,0 +1,218 @@
+import { SessionHandler, AuthenticatedResponse } from '../session'
+import { Model } from '../model'
+import { Session, SessionData } from './session'
+
+export interface MSeriesDataSetData {
+  id: number
+  source: string | null
+  startedAt: string
+  endedAt: string
+  machineType: string
+  ordinalId: number
+  buildMajor: number
+  buildMinor: number
+  maxCadence: number
+  averageCadence: number
+  maxPower: number
+  averagePower: number
+  energyOutput: number
+  caloricBurn: number
+  distance: number
+  averageMetabolicEquivalent: number | null
+  stepCount: number | null
+  duration: number
+  initialOffset: number
+
+  mSeriesFtpMeasurement?: any         // To-Do: Add M Series Ftp Measurement model
+  graphData?: MSeriesDataPointData[]
+
+  session?: SessionData
+}
+
+export interface MSeriesDataSetResponse extends AuthenticatedResponse {
+  mSeriesDataSet: MSeriesDataSetData
+}
+
+export interface MSeriesDataSetListResponse extends AuthenticatedResponse {
+  mSeriesDataSets: MSeriesDataSetData[]
+}
+
+export class MSeriesDataSet extends Model {
+  private _mSeriesDataSetData: MSeriesDataSetData
+  private _userId: number
+
+  constructor (mSeriesDataSetData: MSeriesDataSetData, userId: number, sessionHandler: SessionHandler) {
+    super(sessionHandler)
+    this._mSeriesDataSetData = mSeriesDataSetData
+    this._userId = userId
+  }
+
+  private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
+    Object.assign(this._mSeriesDataSetData, mSeriesDataSetData)
+  }
+
+  async reload () {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { userId: this._userId, id: this.id, graph: true }) as MSeriesDataSetResponse
+    this.setMSeriesDataSet(mSeriesDataSet)
+    return this
+  }
+
+  async delete () {
+    await this.action('session:delete', { userId: this._userId, id: this.id })
+  }
+
+  get id () {
+    return this._mSeriesDataSetData.id
+  }
+
+  get source () {
+    return this._mSeriesDataSetData.source
+  }
+
+  get startedAt () {
+    return new Date(this._mSeriesDataSetData.startedAt)
+  }
+
+  get endedAt () {
+    return new Date(this._mSeriesDataSetData.endedAt)
+  }
+
+  get machineType () {
+    return this._mSeriesDataSetData.machineType
+  }
+
+  get ordinalId () {
+    return this._mSeriesDataSetData.ordinalId
+  }
+
+  get buildMajor () {
+    return this._mSeriesDataSetData.buildMajor
+  }
+
+  get buildMinor () {
+    return this._mSeriesDataSetData.buildMinor
+  }
+
+  get maxCadence () {
+    return this._mSeriesDataSetData.maxCadence
+  }
+
+  get averageCadence () {
+    return this._mSeriesDataSetData.averageCadence
+  }
+
+  get maxPower () {
+    return this._mSeriesDataSetData.maxPower
+  }
+
+  get averagePower () {
+    return this._mSeriesDataSetData.averagePower
+  }
+
+  get energyOutput () {
+    return this._mSeriesDataSetData.energyOutput
+  }
+
+  get caloricBurn () {
+    return this._mSeriesDataSetData.caloricBurn
+  }
+
+  get distance () {
+    return this._mSeriesDataSetData.distance
+  }
+
+  get averageMetabolicEquivalent () {
+    return this._mSeriesDataSetData.averageMetabolicEquivalent
+  }
+
+  get stepCount () {
+    return this._mSeriesDataSetData.stepCount
+  }
+
+  get duration () {
+    return this._mSeriesDataSetData.duration
+  }
+
+  get initialOffset () {
+    return this._mSeriesDataSetData.initialOffset
+  }
+
+  get graphData () {
+    return this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
+  }
+
+  get Session () {
+    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this._userId, this.sessionHandler) : undefined
+  }
+
+}
+
+export interface MSeriesDataPointData {
+  takenAt: string
+  realTime: boolean
+  interval: number
+  cadence: number
+  power: number
+  caloricBurn: number
+  duration: number
+  distance: number
+  gear: number | null
+  metabolicEquivalent: number | null
+  stepCount: number | null
+}
+
+export class MSeriesDataPoint {
+  private _mSeriesDataPointData: MSeriesDataPointData
+
+  constructor (mSeriesDataPointData: MSeriesDataPointData) {
+    this._mSeriesDataPointData = mSeriesDataPointData
+  }
+
+  get takenAt () {
+    return new Date(this._mSeriesDataPointData.takenAt)
+  }
+
+  get takenAtRaw () {
+    return this._mSeriesDataPointData.takenAt
+  }
+
+  get realTime () {
+    return this._mSeriesDataPointData.realTime
+  }
+
+  get interval () {
+    return this._mSeriesDataPointData.interval
+  }
+
+  get cadence () {
+    return this._mSeriesDataPointData.cadence
+  }
+
+  get power () {
+    return this._mSeriesDataPointData.power
+  }
+
+  get caloricBurn () {
+    return this._mSeriesDataPointData.caloricBurn
+  }
+
+  get duration () {
+    return this._mSeriesDataPointData.duration
+  }
+
+  get distance () {
+    return this._mSeriesDataPointData.distance
+  }
+
+  get gear () {
+    return this._mSeriesDataPointData.gear
+  }
+
+  get metabolicEquivalent () {
+    return this._mSeriesDataPointData.metabolicEquivalent
+  }
+
+  get stepCount () {
+    return this._mSeriesDataPointData.stepCount
+  }
+}

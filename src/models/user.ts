@@ -10,6 +10,7 @@ import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, He
 import { UserFacilityRelationship, FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
 import { FacilityListResponse, Facility } from './facility'
 import { Session, SessionListResponse, SessionResponse } from './session'
+import { MSeriesDataSetListResponse, MSeriesDataSet } from './mSeriesDataSet'
 
 export enum OAuthProviders {
   Google = 'google',
@@ -186,6 +187,13 @@ export class User extends Model {
     const { sessions } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
     return sessions.map(session => new Session(session, this.id, this.sessionHandler))
   }
+
+  async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { mSeriesDataSets } = await this.action('session:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
+    return mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler))
+  }
+
+  // To-Do: Add Create M Series Data Set method
 }
 
 export class Users extends Model {
