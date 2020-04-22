@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface EmailAddressData {
   id: number
@@ -26,7 +26,7 @@ export class EmailAddress extends Model {
   }
 
   private setEmailAddressData (emailAddressData: EmailAddressData) {
-    Object.assign(this._emailAddressData, emailAddressData)
+    this._emailAddressData = emailAddressData
   }
 
   async reload () {

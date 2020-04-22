@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface AcceptedTermsVersionData {
   updatedAt: string
@@ -21,7 +21,7 @@ export class AcceptedTermsVersion extends Model {
   }
 
   private setAcceptedTermsVersionData (acceptedTermsVersion: AcceptedTermsVersionData) {
-    Object.assign(this._acceptedTermsVersionData, acceptedTermsVersion)
+    this._acceptedTermsVersionData = acceptedTermsVersion
   }
 
   async reload () {

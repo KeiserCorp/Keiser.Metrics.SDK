@@ -1,6 +1,6 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
-import { Model } from '../model'
 import { DeepReadonly } from '../lib/readonly'
+import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface WeightMeasurementData {
   id: number
@@ -65,7 +65,7 @@ export class WeightMeasurement extends Model {
   }
 
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
-    Object.assign(this._weightMeasurementData, weightMeasurementData)
+    this._weightMeasurementData = weightMeasurementData
   }
 
   async reload () {

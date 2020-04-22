@@ -1,5 +1,5 @@
-import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum Queue {
   High= 'high',
@@ -12,8 +12,8 @@ export interface TaskQueues {
 }
 
 export interface TaskStats {
-  failed: string
-  processed: string
+  failed?: string
+  processed?: string
 }
 
 export interface TaskWorkers {

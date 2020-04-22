@@ -1,3 +1,4 @@
+/* tslint:disable ordered-imports */
 import './base.spec'
 import './connection.spec'
 import './core.spec'
@@ -15,3 +16,8 @@ import './heightMeasurements.spec'
 import './userFacilityRelationship.spec'
 import './facility.spec'
 import './facilityLicense.spec'
+import './session.spec'
+import './mSeriesDataSet.spec'
+import './mSeriesFtpMeasurement.spec'
+import './heartRateDataSet.spec'
+import './strengthMachineDataSet.spec'

@@ -1,9 +1,9 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 import Metrics from '../src'
-import { UserSession } from '../src/session'
-import { User } from '../src/models/user'
 import { EmailAddress } from '../src/models/emailAddress'
+import { User } from '../src/models/user'
+import { UserSession } from '../src/session'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Email Address', function () {
   let metricsInstance: Metrics

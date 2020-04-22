@@ -1,7 +1,7 @@
-import { MetricsConnection, ConnectionOptions } from './connection'
+import { ConnectionOptions, MetricsConnection } from './connection'
 import { Core } from './models/core'
-import { Authentication } from './session'
 import { OAuthProviders } from './models/user'
+import { Authentication } from './session'
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection

@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 const msPerDay = 86400000
 
@@ -37,7 +37,7 @@ export class FacilityLicense extends Model {
   }
 
   private setFacilityLicenseData (facilityLicenseData: FacilityLicenseData) {
-    Object.assign(this._facilityLicenseData, facilityLicenseData)
+    this._facilityLicenseData = facilityLicenseData
   }
 
   async reload () {

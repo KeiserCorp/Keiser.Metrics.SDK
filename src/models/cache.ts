@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface CacheKeysResponse extends AuthenticatedResponse {
   cacheKeys: string[]

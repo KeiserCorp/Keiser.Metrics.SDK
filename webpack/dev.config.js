@@ -3,6 +3,7 @@ const webpack = require('webpack')
 
 module.exports = {
   mode: 'development',
+  target: 'web',
   entry: './dev/index.ts',
   module: {
     rules: [
@@ -32,7 +33,7 @@ module.exports = {
   ],
   output: {
     filename: 'index.js',
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'umd',
     library: 'Metrics'
   }
 }

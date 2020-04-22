@@ -1,14 +1,19 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
-import { EmailAddressData, EmailAddress, EmailAddressResponse, EmailAddressListResponse } from './emailAddress'
-import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
-import { OAuthServiceData, OAuthService, OAuthServiceListResponse } from './oauthService'
-import { ProfileData, Profile } from './profile'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
+import { EmailAddress, EmailAddressData, EmailAddressListResponse, EmailAddressResponse } from './emailAddress'
+import { Facility, FacilityListResponse } from './facility'
+import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
+import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
+import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
+import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
+import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
+import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
+import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
+import { Profile, ProfileData } from './profile'
+import { Session, SessionListResponse, SessionResponse } from './session'
+import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse } from './strengthMachineDataSet'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
-import { HeightMeasurementData, HeightMeasurement, HeightMeasurementResponse, HeightMeasurementListResponse } from './heightMeasurement'
-import { UserFacilityRelationship, FacilityRelationshipData, FacilityRelationshipListResponse } from './facilityRelationship'
-import { FacilityListResponse, Facility } from './facility'
 
 export enum OAuthProviders {
   Google = 'google',
@@ -53,7 +58,7 @@ export class User extends Model {
   }
 
   private setUserData (userData: UserData) {
-    Object.assign(this._userData, userData)
+    this._userData = userData
   }
 
   async reload () {
@@ -103,7 +108,7 @@ export class User extends Model {
   }
 
   get basicCredential () {
-    return this._userData.basicCredential
+    return this._userData.basicCredential === true
   }
 
   get oauthServices () {
@@ -174,6 +179,56 @@ export class User extends Model {
   async getFacilityEmploymentRelationships (options: { employeeRole?: string } = {}) {
     const { facilityRelationships } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as FacilityRelationshipListResponse
     return facilityRelationships.map(facilityRelationship => new UserFacilityRelationship(facilityRelationship, this.sessionHandler))
+  }
+
+  async startSession (params: {forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number} = {}) {
+    const { session } = await this.action('session:start', { ...params, userId : this.id }) as SessionResponse
+    return new Session(session, this.id, this.sessionHandler)
+  }
+
+  async getSessions (options: {open?: boolean, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { sessions } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
+    return sessions.map(session => new Session(session, this.id, this.sessionHandler))
+  }
+
+  async createMSeriesDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, machineType: string, ordinalId: number, buildMajor: number, buildMinor: number, mSeriesDataPoints: MSeriesCapturedDataPoint[]}) {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:create', { ...params, mSeriesDataPoints: JSON.stringify(params.mSeriesDataPoints), userId : this.id }) as MSeriesDataSetResponse
+    return new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler)
+  }
+
+  async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { mSeriesDataSets } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
+    return mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler))
+  }
+
+  async createMSeriesFtpMeasurement (params: {source: string, takenAt: Date, machineType: string, ftp: number}) {
+    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:create', { ...params, userId : this.id }) as MSeriesFtpMeasurementResponse
+    return new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.id, this.sessionHandler)
+  }
+
+  async getMSeriesFtpMeasurements (options: {machineType?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { mSeriesFtpMeasurements } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId : this.id }) as MSeriesFtpMeasurementListResponse
+    return mSeriesFtpMeasurements.map(mSeriesFtpMeasurement => new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.id, this.sessionHandler))
+  }
+
+  async createHeartRateDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[]}) {
+    const { heartRateDataSet } = await this.action('heartRateDataSet:create', { ...params, heartRateDataPoints: JSON.stringify(params.heartRateDataPoints), userId : this.id }) as HeartRateDataSetResponse
+    return new HeartRateDataSet(heartRateDataSet, this.id, this.sessionHandler)
+  }
+
+  async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { heartRateDataSets } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
+    return heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.id, this.sessionHandler))
+  }
+
+  async createStrengthMachineDataSet (params: {sessionId?: number, autoAttachSession?: boolean, strengthMachineId: number, exerciseId?: number, facilityId?: number, version: string, serial: string, completedAt: Date, chest?: number, rom1?: number, rom2?: number, seat?: number, resistance: number, resistancePrecision: ResistancePrecision, repetitionCount: number, forceUnit: ForceUnit, peakPower: number, work: number, distance?: number, addedWeight?: number}) {
+    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:create', { ...params, userId : this.id }) as StrengthMachineDataSetResponse
+    return new StrengthMachineDataSet(strengthMachineDataSet, this.id, this.sessionHandler)
+  }
+
+  async getStrengthMachineDataSets (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { strengthMachineDataSets } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
+    return strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.id, this.sessionHandler))
   }
 }
 

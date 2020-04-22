@@ -1,10 +1,10 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface OAuthServiceData {
   id: number
   name: string
-  lastTransaction: string
+  lastTransaction: string | null
   reauthRequired: boolean
 }
 
@@ -27,7 +27,7 @@ export class OAuthService extends Model {
   }
 
   private setOAuthServiceData (oauthServiceData: OAuthServiceData) {
-    Object.assign(this._oauthServiceData, oauthServiceData)
+    this._oauthServiceData = oauthServiceData
   }
 
   async reload () {
@@ -49,7 +49,7 @@ export class OAuthService extends Model {
   }
 
   get lastTransaction () {
-    return new Date(this._oauthServiceData.lastTransaction)
+    return this._oauthServiceData.lastTransaction ? new Date(this._oauthServiceData.lastTransaction) : null
   }
 
   get reauthRequired () {

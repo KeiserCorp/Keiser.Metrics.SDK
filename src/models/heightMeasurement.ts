@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface HeightMeasurementData {
   id: number
@@ -28,7 +28,7 @@ export class HeightMeasurement extends Model {
   }
 
   private setHeightMeasurementData (heightMeasurementData: HeightMeasurementData) {
-    Object.assign(this._heightMeasurementData, heightMeasurementData)
+    this._heightMeasurementData = heightMeasurementData
   }
 
   async reload () {

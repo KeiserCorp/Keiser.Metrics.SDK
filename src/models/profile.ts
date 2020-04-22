@@ -1,6 +1,6 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
-import { Model } from '../model'
 import { Units } from '../constants'
+import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum Gender {
   Male = 'm',
@@ -32,7 +32,7 @@ export class Profile extends Model {
   }
 
   private setProfileData (profileData: ProfileData) {
-    Object.assign(this._profileData, profileData)
+    this._profileData = profileData
   }
 
   async reload () {

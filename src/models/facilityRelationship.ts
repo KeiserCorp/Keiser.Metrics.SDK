@@ -1,5 +1,5 @@
-import { SessionHandler, AuthenticatedResponse } from '../session'
 import { Model } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { User, UserData } from './user'
 
@@ -32,7 +32,7 @@ export class FacilityRelationship extends Model {
   }
 
   protected setFacilityRelationshipData (facilityRelationshipData: FacilityRelationshipData) {
-    Object.assign(this._facilityRelationshipData, facilityRelationshipData)
+    this._facilityRelationshipData = facilityRelationshipData
   }
 
   get id () {

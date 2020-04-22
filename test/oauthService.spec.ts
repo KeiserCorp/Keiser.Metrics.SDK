@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import Metrics from '../src'
+import { OAuthProviders, User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { User, OAuthProviders } from '../src/models/user'
+import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('OAuth Service', function () {
   let metricsInstance: Metrics

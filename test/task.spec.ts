@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import { MetricsAdmin } from '../src'
-import { AdminSession } from '../src/session'
 import { Queue } from '../src/models/task'
+import { AdminSession } from '../src/session'
+import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Task', function () {
   let metricsInstance: MetricsAdmin
@@ -31,7 +31,6 @@ describe('Task', function () {
     expect(typeof details.queues.low).to.equal('object')
     expect(typeof details.queues.low.length).to.equal('number')
     expect(typeof details.stats).to.equal('object')
-    expect(typeof details.stats.failed).to.equal('string')
     expect(typeof details.stats.processed).to.equal('string')
   })
 
