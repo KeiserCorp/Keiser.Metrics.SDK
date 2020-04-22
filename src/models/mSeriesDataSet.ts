@@ -51,8 +51,8 @@ export class MSeriesDataSet extends Model {
     this._mSeriesDataSetData = mSeriesDataSetData
   }
 
-  async reload () {
-    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { userId: this._userId, id: this.id, graph: true }) as MSeriesDataSetResponse
+  async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { userId: this._userId, id: this.id, graph: options.graphResolution }) as MSeriesDataSetResponse
     this.setMSeriesDataSet(mSeriesDataSet)
     return this
   }
@@ -159,6 +159,20 @@ export interface MSeriesDataPointData {
   gear: number | null
   metabolicEquivalent: number | null
   stepCount: number | null
+}
+
+export interface MSeriesCapturedDataPoint {
+  takenAt: Date
+  realTime: boolean
+  interval: number
+  cadence: number
+  power: number
+  caloricBurn: number
+  duration: number
+  distance: number
+  gear?: number
+  metabolicEquivalent?: number
+  stepCount?: number
 }
 
 export class MSeriesDataPoint {

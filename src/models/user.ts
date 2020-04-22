@@ -5,7 +5,7 @@ import { EmailAddress, EmailAddressData, EmailAddressListResponse, EmailAddressR
 import { Facility, FacilityListResponse } from './facility'
 import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
-import { MSeriesDataSet, MSeriesDataSetListResponse } from './mSeriesDataSet'
+import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
@@ -188,12 +188,15 @@ export class User extends Model {
     return sessions.map(session => new Session(session, this.id, this.sessionHandler))
   }
 
+  async createMSeriesDataSets (params: {sessionId?: number,autoAttachSession?: boolean, source: string, machineType: string, ordinalId: number, buildMajor: number, buildMinor: number, mSeriesDataPoints: MSeriesCapturedDataPoint[]}) {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:create', { ...params, mSeriesDataPoints: JSON.stringify(params.mSeriesDataPoints), userId : this.id }) as MSeriesDataSetResponse
+    return new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler)
+  }
+
   async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
     const { mSeriesDataSets } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
     return mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler))
   }
-
-  // To-Do: Add Create M Series Data Set method
 }
 
 export class Users extends Model {
