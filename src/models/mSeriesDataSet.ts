@@ -48,7 +48,7 @@ export class MSeriesDataSet extends Model {
   }
 
   private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
-    Object.assign(this._mSeriesDataSetData, mSeriesDataSetData)
+    this._mSeriesDataSetData = mSeriesDataSetData
   }
 
   async reload () {
@@ -58,7 +58,7 @@ export class MSeriesDataSet extends Model {
   }
 
   async delete () {
-    await this.action('session:delete', { userId: this._userId, id: this.id })
+    await this.action('mSeriesDataSet:delete', { userId: this._userId, id: this.id })
   }
 
   get id () {

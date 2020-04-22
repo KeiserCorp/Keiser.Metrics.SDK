@@ -32,7 +32,7 @@ export class FacilityProfile extends Model {
   }
 
   protected setFacilityProfileData (facilityProfileData: FacilityProfileData) {
-    Object.assign(this._facilityProfileData, facilityProfileData)
+    this._facilityProfileData = facilityProfileData
   }
 
   async update (params: {

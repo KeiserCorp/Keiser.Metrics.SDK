@@ -27,7 +27,7 @@ export class OAuthService extends Model {
   }
 
   private setOAuthServiceData (oauthServiceData: OAuthServiceData) {
-    Object.assign(this._oauthServiceData, oauthServiceData)
+    this._oauthServiceData = oauthServiceData
   }
 
   async reload () {

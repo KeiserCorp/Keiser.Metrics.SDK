@@ -65,7 +65,7 @@ export class WeightMeasurement extends Model {
   }
 
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
-    Object.assign(this._weightMeasurementData, weightMeasurementData)
+    this._weightMeasurementData = weightMeasurementData
   }
 
   async reload () {

@@ -43,7 +43,7 @@ export class Session extends Model {
   }
 
   private setSessionData (session: SessionData) {
-    Object.assign(this._sessionData, session)
+    this._sessionData = session
   }
 
   async end () {

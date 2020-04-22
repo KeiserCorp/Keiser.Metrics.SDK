@@ -21,7 +21,7 @@ export class AcceptedTermsVersion extends Model {
   }
 
   private setAcceptedTermsVersionData (acceptedTermsVersion: AcceptedTermsVersionData) {
-    Object.assign(this._acceptedTermsVersionData, acceptedTermsVersion)
+    this._acceptedTermsVersionData = acceptedTermsVersion
   }
 
   async reload () {

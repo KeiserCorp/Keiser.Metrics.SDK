@@ -32,7 +32,7 @@ export class FacilityRelationship extends Model {
   }
 
   protected setFacilityRelationshipData (facilityRelationshipData: FacilityRelationshipData) {
-    Object.assign(this._facilityRelationshipData, facilityRelationshipData)
+    this._facilityRelationshipData = facilityRelationshipData
   }
 
   get id () {

@@ -28,7 +28,7 @@ export class HeightMeasurement extends Model {
   }
 
   private setHeightMeasurementData (heightMeasurementData: HeightMeasurementData) {
-    Object.assign(this._heightMeasurementData, heightMeasurementData)
+    this._heightMeasurementData = heightMeasurementData
   }
 
   async reload () {

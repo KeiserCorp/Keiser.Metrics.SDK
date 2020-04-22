@@ -27,7 +27,7 @@ export class Facility extends Model {
   }
 
   protected setFacilityData (facilityData: FacilityData) {
-    Object.assign(this._facilityData, facilityData)
+    this._facilityData = facilityData
   }
 
   get id () {

@@ -55,7 +55,7 @@ export class User extends Model {
   }
 
   private setUserData (userData: UserData) {
-    Object.assign(this._userData, userData)
+    this._userData = userData
   }
 
   async reload () {
@@ -189,7 +189,7 @@ export class User extends Model {
   }
 
   async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { mSeriesDataSets } = await this.action('session:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
+    const { mSeriesDataSets } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
     return mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.id, this.sessionHandler))
   }
 

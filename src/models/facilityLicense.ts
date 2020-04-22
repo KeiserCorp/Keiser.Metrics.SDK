@@ -37,7 +37,7 @@ export class FacilityLicense extends Model {
   }
 
   private setFacilityLicenseData (facilityLicenseData: FacilityLicenseData) {
-    Object.assign(this._facilityLicenseData, facilityLicenseData)
+    this._facilityLicenseData = facilityLicenseData
   }
 
   async reload () {

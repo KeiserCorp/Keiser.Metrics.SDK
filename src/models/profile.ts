@@ -32,7 +32,7 @@ export class Profile extends Model {
   }
 
   private setProfileData (profileData: ProfileData) {
-    Object.assign(this._profileData, profileData)
+    this._profileData = profileData
   }
 
   async reload () {
