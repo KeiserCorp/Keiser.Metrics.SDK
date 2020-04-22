@@ -4,6 +4,7 @@ import { Facility, FacilityData } from './facility'
 import { HeartRateDataSet, HeartRateDataSetData } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData } from './heightMeasurement'
 import { MSeriesDataSet, MSeriesDataSetData } from './mSeriesDataSet'
+import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMachineDataSet'
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 
@@ -19,7 +20,7 @@ export interface SessionData {
   sessionPlanSequenceInstance?: any   // To-Do: Add Session Plan Sequence Instance model
   heartRateDataSets?: HeartRateDataSetData[]
   mSeriesDataSets?: MSeriesDataSetData[]
-  strengthMachineDataSets?: any[]     // To-Do: Add Strength Machine Data Set model
+  strengthMachineDataSets?: StrengthMachineDataSetData[]
 
   heightMeasurement?: HeightMeasurementData
   weightMeasurement?: WeightMeasurementData
@@ -91,12 +92,16 @@ export class Session extends Model {
     return this._sessionData.facility ? new Facility(this._sessionData.facility, this.sessionHandler) : undefined
   }
 
+  get heartRateDataSets () {
+    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this._userId, this.sessionHandler)) : undefined
+  }
+
   get mSeriesDataSets () {
     return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this._userId, this.sessionHandler)) : undefined
   }
 
-  get heartRateDataSets () {
-    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this._userId, this.sessionHandler)) : undefined
+  get strengthMachineDataSets () {
+    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this._userId, this.sessionHandler)) : undefined
   }
 
   get heightMeasurement () {

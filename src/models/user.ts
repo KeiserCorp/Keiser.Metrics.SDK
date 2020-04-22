@@ -12,6 +12,7 @@ import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oaut
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { Session, SessionListResponse, SessionResponse } from './session'
+import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse } from './strengthMachineDataSet'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
 
 export enum OAuthProviders {
@@ -218,6 +219,16 @@ export class User extends Model {
   async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
     const { heartRateDataSets } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
     return heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.id, this.sessionHandler))
+  }
+
+  async createStrengthMachineDataSet (params: {sessionId?: number, autoAttachSession?: boolean, strengthMachineId: number, exerciseId?: number, facilityId?: number, version: string, serial: string, completedAt: Date, chest?: number, rom1?: number, rom2?: number, seat?: number, resistance: number, resistancePrecision: ResistancePrecision, repetitionCount: number, forceUnit: ForceUnit, peakPower: number, work: number, distance?: number, addedWeight?: number}) {
+    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:create', { ...params, userId : this.id }) as StrengthMachineDataSetResponse
+    return new StrengthMachineDataSet(strengthMachineDataSet, this.id, this.sessionHandler)
+  }
+
+  async getStrengthMachineDataSets (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { strengthMachineDataSets } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
+    return strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.id, this.sessionHandler))
   }
 }
 
