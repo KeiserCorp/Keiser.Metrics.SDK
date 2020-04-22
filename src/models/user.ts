@@ -4,6 +4,7 @@ import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionRes
 import { EmailAddress, EmailAddressData, EmailAddressListResponse, EmailAddressResponse } from './emailAddress'
 import { Facility, FacilityListResponse } from './facility'
 import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
+import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
@@ -207,6 +208,16 @@ export class User extends Model {
   async getMSeriesFtpMeasurements (options: {machineType?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
     const { mSeriesFtpMeasurements } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId : this.id }) as MSeriesFtpMeasurementListResponse
     return mSeriesFtpMeasurements.map(mSeriesFtpMeasurement => new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.id, this.sessionHandler))
+  }
+
+  async createHeartRateDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[]}) {
+    const { heartRateDataSet } = await this.action('heartRateDataSet:create', { ...params, heartRateDataPoints: JSON.stringify(params.heartRateDataPoints), userId : this.id }) as HeartRateDataSetResponse
+    return new HeartRateDataSet(heartRateDataSet, this.id, this.sessionHandler)
+  }
+
+  async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+    const { heartRateDataSets } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
+    return heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.id, this.sessionHandler))
   }
 }
 
