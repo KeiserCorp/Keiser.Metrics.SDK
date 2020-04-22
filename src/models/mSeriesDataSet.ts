@@ -1,5 +1,6 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { MSeriesFtpMeasurement, MSeriesFtpMeasurementData } from './mSeriesFtpMeasurement'
 import { Session, SessionData } from './session'
 
 export interface MSeriesDataSetData {
@@ -22,10 +23,8 @@ export interface MSeriesDataSetData {
   stepCount: number | null
   duration: number
   initialOffset: number
-
-  mSeriesFtpMeasurement?: any         // To-Do: Add M Series Ftp Measurement model
+  mSeriesFtpMeasurement?: MSeriesFtpMeasurementData
   graphData?: MSeriesDataPointData[]
-
   session?: SessionData
 }
 
@@ -56,6 +55,8 @@ export class MSeriesDataSet extends Model {
     this.setMSeriesDataSet(mSeriesDataSet)
     return this
   }
+
+  // To-Do: Decide if `update` method is necessary
 
   async delete () {
     await this.action('mSeriesDataSet:delete', { userId: this._userId, id: this.id })
@@ -135,6 +136,10 @@ export class MSeriesDataSet extends Model {
 
   get initialOffset () {
     return this._mSeriesDataSetData.initialOffset
+  }
+
+  get mSeriesFtpMeasurement () {
+    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this._userId, this.sessionHandler) : undefined
   }
 
   get graphData () {

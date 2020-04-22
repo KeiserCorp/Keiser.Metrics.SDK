@@ -47,7 +47,7 @@ describe('M Series Data Set', function () {
 
   it('can create new M Series data set', async function () {
     const genDataSet = generateMSeriesDataSet()
-    mSeriesDataSet = await user.createMSeriesDataSets({
+    mSeriesDataSet = await user.createMSeriesDataSet({
       source: 'test',
       machineType: 'm3i',
       ordinalId: 0,
