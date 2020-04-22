@@ -39,6 +39,7 @@ export interface UserResponse extends AuthenticatedResponse {
   user: UserData
 }
 
+/** @hidden */
 export interface UserListResponse extends AuthenticatedResponse {
   users: UserData[]
 }
@@ -232,6 +233,7 @@ export class User extends Model {
   }
 }
 
+/** @hidden */
 export class Users extends Model {
   async getUsers (options: {name?: string, limit?: number, offset?: number} = { limit: 20 }) {
     const { users } = await this.action('user:list', options) as UserListResponse
