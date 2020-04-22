@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 import Metrics from '../src'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Core', function () {
   let metricsInstance: Metrics

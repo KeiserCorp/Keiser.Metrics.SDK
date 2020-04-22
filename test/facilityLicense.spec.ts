@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword } from './constants'
 import { MetricsAdmin } from '../src'
-import { AdminSession } from '../src/session'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
+import { AdminSession } from '../src/session'
+import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility License', function () {
   let metricsInstance: MetricsAdmin
@@ -15,7 +15,7 @@ describe('Facility License', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateAdminWithCredentials({email: DemoEmail, password: DemoPassword, token: '123456'})
+    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
   })
 
   after(function () {

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
 import Metrics from '../src'
+import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
 
 const connectionTimeout = 3000
 

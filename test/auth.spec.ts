@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { DevRestEndpoint, DevSocketEndpoint, DemoEmail, DemoPassword, DemoUserId } from './constants'
 import Metrics from '../src'
+import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Auth', function () {
   const accessTokenTimeout = 6000
@@ -194,7 +194,7 @@ describe('Auth', function () {
     await session.logout()
 
     try {
-      await metricsInstance.authenticateWithToken({token: refreshToken})
+      await metricsInstance.authenticateWithToken({ token: refreshToken })
     } catch (error) {
       extError = error
     }
@@ -205,6 +205,6 @@ describe('Auth', function () {
   })
 
   it('can request password reset', async function () {
-    await metricsInstance.passwordReset({email: DemoEmail})
+    await metricsInstance.passwordReset({ email: DemoEmail })
   })
 })
