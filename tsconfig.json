@@ -35,7 +35,7 @@
     "mode": "file",
     "out": "docs",
     "theme": "default",
-    "name": "Keiser Metrics SDK Library",
+    "name": "Keiser Metrics SDK API",
     "readme": "none",
     "exclude": [
       "src/lib/*",
