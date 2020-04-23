@@ -69,7 +69,7 @@ const userSession = await metrics.authenticateWithCredentials({email: 'demo@keis
 
 localStorage.setItem(refreshTokenKey, userSession.refreshToken)
 
-userSession.onRefreshTokenChangeEvent.subscribe(refreshToken => {
+userSession.onRefreshTokenChangeEvent.subscribe(({refreshToken}) => {
   // Will update token in local storage each time it is updated
   localStorage.setItem(refreshTokenKey, refreshToken)
 })
