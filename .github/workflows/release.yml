@@ -55,6 +55,9 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: docs
+          SINGLE_COMMIT: true
+          CLEAN: true
+          COMMIT_MESSAGE: v${{ steps.check.outputs.version }}
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
