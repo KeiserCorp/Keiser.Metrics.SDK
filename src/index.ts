@@ -69,6 +69,7 @@ export default class Metrics {
   }
 }
 
+/** @hidden */
 export class MetricsAdmin extends Metrics {
   async authenticateAdminWithCredentials (params: {email: string, password: string, token: string, refreshable?: boolean}) {
     return Authentication.useAdminCredentials(this._connection, { refreshable: true, ...params })

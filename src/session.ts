@@ -72,11 +72,13 @@ export class Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
+  /** @hidden */
   static async useAdminCredentials (connection: MetricsConnection, params: {email: string, password: string, token: string, refreshable: boolean}) {
     const response = await connection.action('admin:login', params) as UserResponse
     return new AdminSession(response, connection)
   }
 
+  /** @hidden */
   static async useAdminToken (connection: MetricsConnection, params: { token: string}) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
@@ -230,6 +232,7 @@ export class UserSession {
   }
 }
 
+/** @hidden */
 export class AdminSession extends UserSession {
 
   get stats () {

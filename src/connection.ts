@@ -3,7 +3,9 @@ import { BrokenCircuitError, ConsecutiveBreaker, Policy } from 'cockatiel'
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
 
+/** @ignore */
 const PING_REGEX = /^primus::ping::(\d{13})$/
+/** @ignore */
 const ERROR_FILTER = (error: any) => typeof error.error === 'undefined' || error.error?.code === 0
 
 export interface ErrorResponse {

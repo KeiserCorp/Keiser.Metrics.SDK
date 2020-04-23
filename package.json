@@ -25,12 +25,13 @@
     "lint": "tslint --project tsconfig.json",
     "dev": "webpack-dev-server --config webpack/dev.config.js",
     "build": "webpack --config webpack/prod.config.js",
-    "release": "npm run build && node ./scripts/release.js"
+    "release": "npm run build && node ./scripts/release.js",
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^13.11.1",
+    "@types/node": "^13.13.2",
     "chai": "^4.2.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
@@ -39,13 +40,14 @@
     "html-webpack-plugin": "^4.2.0",
     "mocha": "^7.1.1",
     "semver": "^7.3.2",
-    "ts-loader": "^7.0.0",
+    "ts-loader": "^7.0.1",
     "ts-mocha": "^7.0.0",
     "tslint": "^6.1.1",
     "tslint-config-standard": "^9.0.0",
+    "typedoc": "^0.17.4",
     "typescript": "^3.8.3",
     "vue": "^2.6.11",
-    "webpack": "^4.42.1",
+    "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
     "write-json-webpack-plugin": "^1.1.0"

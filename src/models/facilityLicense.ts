@@ -1,6 +1,7 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
+
 const msPerDay = 86400000
 
 export enum LicenseType {
@@ -87,6 +88,7 @@ export class FacilityLicense extends Model {
   }
 }
 
+/** @hidden */
 export class FacilityLicenses extends Model {
   async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string} = {}) {
     const { facilityLicenses } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse

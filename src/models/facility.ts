@@ -1,5 +1,6 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
 
 export interface FacilityData {
@@ -7,7 +8,7 @@ export interface FacilityData {
   licensedUntil: string
   facilityProfile?: FacilityProfileData
   facilityConfiguration?: any
-  facilityLicenses?: any
+  facilityLicenses?: FacilityLicenseData
 }
 
 export interface FacilityResponse extends AuthenticatedResponse {
