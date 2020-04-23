@@ -44,6 +44,18 @@ jobs:
           tag_name: v${{ steps.check.outputs.version }}
           release_name: Release v${{ steps.check.outputs.version }}
 
+      - name: Build Docs
+        if: steps.check.outputs.changed == 'true'
+        run: npm run docs
+
+      - name: Push Docs
+        if: steps.check.outputs.changed == 'true'
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs
+
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
         if: steps.check.outputs.changed == 'true' && always()
