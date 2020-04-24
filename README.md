@@ -1,20 +1,20 @@
-# Keiser Metrics SDK Library
+# Keiser Metrics SDK
 ![Release](https://github.com/KeiserCorp/Keiser.Metrics.SDK/workflows/Release/badge.svg)
 
 ## Project
-This library facilitate communication between a client system (_ie: phone app, website, server_) and [Keiser Metrics](https://metrics.keiser.com). The library is written in [TypeScript](https://www.typescriptlang.org) and supports both [browser](https://caniuse.com/#feat=es6) and [NodeJS](https://nodejs.org) platforms.
+This SDK facilitates communication between a client system (_ie: phone app, website, server_) and [Keiser Metrics](https://metrics.keiser.com). The SDK is written in [TypeScript](https://www.typescriptlang.org) and supports both [browser](https://caniuse.com/#feat=es6) and [NodeJS](https://nodejs.org) platforms.
 
-For a more information about this library visit the [Keiser Developer Zone](https://dev.keiser.com/metrics/sdk).
+For a more information about this SDK visit the [Keiser Developer Zone](https://dev.keiser.com/metrics/sdk).
 
 To play around with the SDK try out the [Keiser Metrics SDK REPL](https://repl.it/@KeiserDev/Metrics-SDK-Example).
 
-To see the full SDK API view the [Keiser Metrics SDK API](https://keisercorp.github.io/Keiser.Metrics.SDK/).
+To see the full SDK API view the [Keiser Metrics SDK Documentation](https://keisercorp.github.io/Keiser.Metrics.SDK/).
 
 ## Installation
 Install with [npm](https://www.npmjs.com/): `npm install @keiser/metrics-sdk`
 
 ## Initialization
-Import the library root class and instantiate a [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html) connection instance. Each instance maintains a connection to the Keiser Metrics servers so only one instance should be created per an application.
+Import the SDK package root class and instantiate a [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html) connection instance. Each instance maintains a connection to the Keiser Metrics servers so only one instance should be created per an application.
 
 This instance handles multiplexing requests, throttling, and request retries automatically. The default implementation for browsers uses a [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection, but it will fall back to a normal HTTP request strategy if WebSockets are not supported. The NodeJS implementation will always use HTTP requests.
 
@@ -143,8 +143,8 @@ metrics.dispose()
 ## Copyright and License
 Copyright © 2020 [Keiser Corporation](http://keiser.com/).
 
-The Keiser Metrics SDK Library source code and library package are made available through the [MIT license](LICENSE.md).
+The Keiser Metrics SDK source code and distributed package are made available through the [MIT license](LICENSE.md).
 
-Using any of the APIs made available through the Keiser Metrics SDK Library to communicate with [Keiser Metrics](https://metrics.keiser.com) make you subject to the following agreements. Please read all documents in their entirety as they govern your use of the APIs and Keiser Metrics servers.
+Using any of the APIs made available through the Keiser Metrics SDK to communicate with [Keiser Metrics](https://metrics.keiser.com) make you subject to the following agreements. Please read all documents in their entirety as they govern your use of the APIs and Keiser Metrics servers.
 - [API Agreement](https://dev.keiser.com/api-agreement/)
 - [Brand Guidelines for Developers](https://dev.keiser.com/brand-guidelines/)
