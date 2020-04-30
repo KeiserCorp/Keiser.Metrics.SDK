@@ -125,25 +125,25 @@ try {
 
 ### Error Categories
 
-| Name            | Purpose                                                      |
-| --------------- | ------------------------------------------------------------ |
-| RequestError    | Issue with the parameters provided for the request           |
-| SessionError    | Issue with the session instance (session is no longer valid) |
-| ServerError     | Issue with the server (potentially overloaded or offline)    |
-| ConnectionError | Issue with connection to server                              |
+| Name                                                                                       | Reason                                                       |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Request](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/requesterror.html)       | Issue with the parameters provided for the request           |
+| [Session](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/sessionerror.html)       | Issue with the session instance (session is no longer valid) |
+| [Server](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/servererror.html)         | Issue with the server (potentially overloaded or offline)    |
+| [Connection](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/connectionerror.html) | Issue with connection to server                              |
 
 ### Common Errors
 
-| Name                  | Category     | Message                                                        |
-| --------------------- | ------------ | -------------------------------------------------------------- |
-| MissingParams         | RequestError | missing parameter(s) for action                                |
-| InvalidCredentials    | RequestError | credentials do not match any active users                      |
-| Validation            | RequestError | validation error in parameters                                 |
-| UnknownEntity         | RequestError | entity does not exist                                          |
-| DuplicateEntity       | RequestError | entity already exists                                          |
-| UnauthorizedResource  | RequestError | unauthorized to access resource                                |
-| ActionPrevented       | RequestError | action cannot be performed                                     |
-| FacilityAccessControl | RequestError | action is prevented due to facility access control limitations |
+| Name                    | Category | Reason                                                                     |
+| ----------------------- | -------- | -------------------------------------------------------------------------- |
+| Missing Params          | Request  | Parameters are missing from action (potentially `null` or `undefined`)     |
+| Invalid Credentials     | Request  | Invalid login credentials (don't match any active user)                    |
+| Validation              | Request  | Parameters are present but do not pass validation                          |
+| Unknown Entity          | Request  | Request target does not exist (deleted or never existed)                   |
+| Duplicate Entity        | Request  | Cannot create a new instance because identical one exists                  |
+| Unauthorized Resource   | Request  | Insufficient permissions to access the target                              |
+| Action Prevented        | Request  | Request cannot be performed for reason other than those above (edge cases) |
+| Facility Access Control | Request  | Request is prevented due to facility access control limitations            |
 
 ## Closing Connection
 
