@@ -104,33 +104,46 @@ function generateUsername(user: User) {
 
 All errors are handled by throwing inside the method call with the expectation of a [`try/catch`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch) to catch the error.
 
-All errors will be in the same format which includes a `code` value that can be used to determine the type of error, as well as a `message`.
+All errors will be thrown as a typed error instance corresponding to the reason for the error, with the global [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) as the base instance, and an intermediate category type inheritance (for easier bucketing).
 
 ```ts
 let userSession
 try {
   userSession = await metrics.authenticateWithCredentials({email: 'demo@keiser.com', password: 'wrongPassword'})
-} catch (exception) {
-  if (exception.error.code === 603) {
-    this.userCredentialsIncorrect()
+} catch (error) {
+  if (error instanceof RequestError) {
+    if (error instanceof InvalidCredentialsError) {
+      this.userCredentialsIncorrect()
+    } else if (error instanceof ValidationError) {
+      this.userCredentialsValidationError()
+    }
+  } else if (error instanceof ServerError) {
+    this.serverDown()
   }
 }
 ```
 
+### Error Categories
+
+| Name            | Purpose                                                      |
+| --------------- | ------------------------------------------------------------ |
+| RequestError    | Issue with the parameters provided for the request           |
+| SessionError    | Issue with the session instance (session is no longer valid) |
+| ServerError     | Issue with the server (potentially overloaded or offline)    |
+| ConnectionError | Issue with connection to server                              |
+
 ### Common Errors
 
-| Code | Name | Message |
-| ---- | ---- | ------- |
-| 601 | MissingParams | missing parameter(s) for action |
-| 603 | InvalidCredentials | credentials do not match any active users |
-| 604 | ValidationError | validation error in parameters |
-| 605 | UnknownEntity | entity does not exist |
-| 606 | DuplicateEntity | entity already exists |
-| 621 | UnauthorizedResource | unauthorized to access resource |
-| 625 | ActionPrevented | action cannot be performed |
-| 630 | FacilityAccessControlError | action is prevented due to facility access control limitations |
-
-A full list of errors is available here: [Metrics API Errors List](https://metrics-api.keiser.com/api?action=core:errors)
+| Name                  | Category     | Message                                                        |
+| --------------------- | ------------ | -------------------------------------------------------------- |
+| MissingParams         | RequestError | missing parameter(s) for action                                |
+| InvalidCredentials    | RequestError | credentials do not match any active users                      |
+| Validation            | RequestError | validation error in parameters                                 |
+| UnknownEntity         | RequestError | entity does not exist                                          |
+| DuplicateEntity       | RequestError | entity already exists                                          |
+| UnauthorizedResource  | RequestError | unauthorized to access resource                                |
+| ActionPrevented       | RequestError | action cannot be performed                                     |
+| FacilityAccessControl | RequestError | action is prevented due to facility access control limitations |
 
 ## Closing Connection
 

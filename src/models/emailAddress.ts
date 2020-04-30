@@ -1,3 +1,4 @@
+import { ClientSideActionPrevented } from '../error'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
@@ -41,7 +42,7 @@ export class EmailAddress extends Model {
 
   async fulfillValidation (token: string) {
     if (this._userId !== this.sessionHandler.decodedAccessToken.user.id) {
-      throw new Error('Cannot perform validation fulfillment for other users')
+      throw new ClientSideActionPrevented({ explanation: 'Cannot perform validation fulfillment for other users' })
     }
 
     await this.action('emailAddress:validationFulfillment', { validationToken: token })

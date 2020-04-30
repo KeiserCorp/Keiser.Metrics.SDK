@@ -52,9 +52,8 @@ describe('Auth', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(603)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(603)
     expect(session).to.not.be.an('object')
   })
 
@@ -101,9 +100,8 @@ describe('Auth', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(606)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(606)
     expect(session).to.not.be.an('object')
   })
 
@@ -163,9 +161,8 @@ describe('Auth', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(613)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(613)
   })
 
   it('cannot make model request after logout', async function () {
@@ -181,9 +178,8 @@ describe('Auth', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(613)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(613)
   })
 
   it('cannot start session after logout', async function () {
@@ -199,9 +195,8 @@ describe('Auth', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(615)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(615)
   })
 
   it('can request password reset', async function () {

@@ -1,6 +1,7 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
+import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
@@ -83,7 +84,7 @@ export class Authentication {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (accessToken?.superUser !== true) {
-      throw new Error('not admin user session')
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for super-user actions.' })
     }
     return new AdminSession(response, connection)
   }
@@ -178,7 +179,7 @@ export class SessionHandler {
       const authParams = { authorization: this._accessToken, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse
     } catch (error) {
-      if (error?.error.code === 616 && this._refreshToken && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
+      if (error instanceof SessionError && this._refreshToken && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
         const authParams = { authorization: this._refreshToken, ...params }
         response = await this._connection.action(action, authParams) as AuthenticatedResponse
       } else {

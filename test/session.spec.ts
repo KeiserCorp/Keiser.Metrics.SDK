@@ -48,8 +48,8 @@ describe('Session', function () {
       extError = error
     }
 
-    expect(typeof extError).to.equal('object')
-    expect(extError.error.code).to.equal(625)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(625)
   })
 
   it('can end session', async function () {
@@ -79,8 +79,8 @@ describe('Session', function () {
       extError = error
     }
 
-    expect(typeof extError).to.equal('object')
-    expect(extError.error.code).to.equal(605)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(605)
   })
 
 })

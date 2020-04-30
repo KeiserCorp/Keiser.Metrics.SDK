@@ -2,6 +2,7 @@ import Axios from 'axios'
 import { BrokenCircuitError, ConsecutiveBreaker, Policy } from 'cockatiel'
 import { SimpleEventDispatcher } from 'ste-simple-events'
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
+import { ActionErrorProperties, ConnectionFaultError, GetErrorInstance, RequestError, SessionError } from './error'
 
 /** @ignore */
 const PING_REGEX = /^primus::ping::(\d{13})$/
@@ -134,7 +135,7 @@ export class MetricsConnection {
 
   async action (action: string, params: Object = {}) {
     try {
-      return await this._retryStrategy.execute(() => {
+      const result = await this._retryStrategy.execute(() => {
         return new Promise((resolve, reject) => {
           const callback = (success: any, fail: any) => fail ? reject(fail) : resolve(success)
 
@@ -145,15 +146,15 @@ export class MetricsConnection {
           }
         })
       })
+
+      if (result instanceof Error) {
+        throw result
+      }
+
+      return result
     } catch (error) {
       if (error instanceof BrokenCircuitError) {
-        throw {error: {
-          name: 'BrokenCircuit',
-          message: 'execution prevented because the circuit breaker is open',
-          status: 500,
-          code: 0,
-          explanation: 'too many server requests responding with errors'
-        }}
+        throw new ConnectionFaultError()
       }
       throw error
     }
@@ -190,7 +191,12 @@ export class MetricsConnection {
   private parseResponse (data: { messageId?: number, error?: any }) {
     if (data.messageId && this._callbacks[data.messageId]) {
       if (data?.error) {
-        this._callbacks[data.messageId].callback(null, { error: data.error })
+        const errorInstance = GetErrorInstance(data.error as ActionErrorProperties)
+        if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
+          this._callbacks[data.messageId].callback(errorInstance)
+        } else {
+          this._callbacks[data.messageId].callback(null, errorInstance)
+        }
       } else {
         this._callbacks[data.messageId].callback(data)
       }
@@ -208,7 +214,7 @@ export class MetricsConnection {
 
     this._callbacks[this._lastMessageId] = {
       callback,
-      expiresAt: Date.now()
+      expiresAt: Date.now() + this._requestTimeout
     }
 
     this._socket?.send(JSON.stringify(args))
@@ -225,15 +231,14 @@ export class MetricsConnection {
       callback(response.data)
     } catch (error) {
       if (error?.response?.data) {
-        callback(null, error.response.data)
+        const errorInstance = GetErrorInstance(error.response.data.error as ActionErrorProperties)
+        if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
+          callback(errorInstance)
+        } else {
+          callback(null, errorInstance)
+        }
       } else {
-        callback(null, {error: {
-          name: error.name,
-          message: error.message,
-          status: 500,
-          code: 0,
-          explanation: ''
-        }})
+        callback(null, { error })
       }
     }
   }

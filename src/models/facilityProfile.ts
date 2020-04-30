@@ -1,3 +1,4 @@
+import { ClientSideActionPrevented } from '../error'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, PrivilegedFacility } from './facility'
@@ -46,11 +47,11 @@ export class FacilityProfile extends Model {
     website?: string | null
   }) {
     if (!(this._facility instanceof PrivilegedFacility)) {
-      throw new Error('cannot update facility without privilege')
+      throw new ClientSideActionPrevented({ explanation: 'cannot update facility without privilege' })
     }
 
     if (!this._facility.isActive) {
-      throw new Error('can only update profile of active facility')
+      throw new ClientSideActionPrevented({ explanation: 'can only update profile of active facility' })
     }
 
     const { facilityProfile } = await this.action('facilityProfile:update', params) as FacilityProfileResponse
@@ -60,11 +61,11 @@ export class FacilityProfile extends Model {
 
   async reload () {
     if (!(this._facility instanceof PrivilegedFacility)) {
-      throw new Error('cannot reload facility with privilege')
+      throw new ClientSideActionPrevented({ explanation: 'cannot reload facility with privilege' })
     }
 
     if (!this._facility.isActive) {
-      throw new Error('can only reload profile of active facility')
+      throw new ClientSideActionPrevented({ explanation: 'can only reload profile of active facility' })
     }
 
     const { facilityProfile } = await this.action('facilityProfile:show') as FacilityProfileResponse

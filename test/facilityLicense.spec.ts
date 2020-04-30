@@ -55,7 +55,7 @@ describe('Facility License', function () {
       extError = error
     }
 
-    expect(typeof extError).to.not.equal('undefined')
-    expect(extError.error.code).to.equal(605)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(605)
   })
 })

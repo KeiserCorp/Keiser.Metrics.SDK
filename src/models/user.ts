@@ -1,3 +1,4 @@
+import { ClientSideActionPrevented } from '../error'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
@@ -70,7 +71,7 @@ export class User extends Model {
 
   async addBasicLogin (email: string, password: string) {
     if (!this._isSessionUser) {
-      throw new Error('Cannot set basic login for other users')
+      throw new ClientSideActionPrevented({ explanation: 'Cannot set basic login for other users' })
     }
 
     const { user } = await this.action('auth:connect', { email, password }) as UserResponse
@@ -79,7 +80,7 @@ export class User extends Model {
 
   async changePassword (password: string) {
     if (!this._isSessionUser) {
-      throw new Error('Cannot change password for other users')
+      throw new ClientSideActionPrevented({ explanation: 'Cannot change password for other users' })
     }
 
     const { user } = await this.action('auth:update', { password }) as UserResponse

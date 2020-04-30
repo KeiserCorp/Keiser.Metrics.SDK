@@ -65,8 +65,8 @@ describe('User to Facility Relationship', function () {
       extError = error
     }
 
-    expect(typeof extError).to.not.equal('undefined')
-    expect(extError.error.code).to.equal(625)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(625)
   })
 
 })

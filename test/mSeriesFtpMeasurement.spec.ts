@@ -59,9 +59,8 @@ describe('M Series FTP Measurement', function () {
       extError = error
     }
 
-    expect(extError).to.be.an('object')
-    expect(extError.error).to.be.an('object')
-    expect(extError.error.code).to.equal(605)
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(605)
   })
 
 })
