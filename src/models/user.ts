@@ -2,7 +2,7 @@ import { ClientSideActionPrevented } from '../error'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
-import { EmailAddress, EmailAddressData, EmailAddressListResponse, EmailAddressResponse } from './emailAddress'
+import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse } from './emailAddress'
 import { Facility, FacilityListResponse } from './facility'
 import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
@@ -95,18 +95,14 @@ export class User extends Model {
     return this._userData.id
   }
 
-  get emailAddresses () {
-    return this._userData.emailAddresses.map(emailAddress => new EmailAddress(emailAddress, this.id, this.sessionHandler))
-  }
-
   async createEmailAddress (params: {email: string}) {
     const { emailAddress } = await this.action('emailAddress:create', { ...params, userId : this.id }) as EmailAddressResponse
     return new EmailAddress(emailAddress, this.id, this.sessionHandler)
   }
 
-  async getEmailAddresses () {
-    const { emailAddresses } = await this.action('emailAddress:list', { userId : this.id }) as EmailAddressListResponse
-    return emailAddresses.map(emailAddress => new EmailAddress(emailAddress, this.id, this.sessionHandler))
+  async getEmailAddresses (options: {email?: string, sort?: 'id' | 'email', ascending?: boolean, limit?: number, offset?: number} = {}) {
+    const { emailAddresses, emailAddressesMeta } = await this.action('emailAddress:list', { ...options, userId : this.id }) as EmailAddressListResponse
+    return new EmailAddresses(emailAddresses, emailAddressesMeta, this.id, this.sessionHandler)
   }
 
   get basicCredential () {

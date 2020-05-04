@@ -1,5 +1,5 @@
 import { ClientSideActionPrevented } from '../error'
-import { Model } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface EmailAddressData {
@@ -14,6 +14,18 @@ export interface EmailAddressResponse extends AuthenticatedResponse {
 
 export interface EmailAddressListResponse extends AuthenticatedResponse {
   emailAddresses: EmailAddressData[]
+  emailAddressesMeta: EmailAddressListResponseMeta
+}
+
+export interface EmailAddressListResponseMeta extends ListMeta {
+  email: string | undefined
+  sort: 'id' | 'email'
+}
+
+export class EmailAddresses extends ModelList<EmailAddress, EmailAddressListResponseMeta> {
+  constructor (emailAddresses: EmailAddressData[], emailAddressesMeta: EmailAddressListResponseMeta, userId: number, sessionHandler: SessionHandler) {
+    super((emailAddresses || []).map(emailAddress => new EmailAddress(emailAddress, userId, sessionHandler)), emailAddressesMeta)
+  }
 }
 
 export class EmailAddress extends Model {

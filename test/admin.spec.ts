@@ -63,10 +63,11 @@ describe('Admin', function () {
     const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
 
     const mergedUser = await session.users.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
+    const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
 
-    expect(mergedUser.emailAddresses).to.be.an('array')
-    expect(mergedUser.emailAddresses.length).to.above(1)
-    expect(mergedUser.emailAddresses.filter(e => e.email === userEmailAddress).length).to.equal(1)
+    expect(emailAddresses).to.be.an('array')
+    expect(emailAddresses.length).to.above(1)
+    expect(emailAddresses.filter(e => e.email === userEmailAddress).length).to.equal(1)
   })
 
 })
