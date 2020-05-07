@@ -64,8 +64,11 @@ export class Exercise extends Model {
   }
 }
 
+/** @hidden */
 export class PrivilegedExercise extends Exercise {
   constructor (exerciseData: ExerciseData, sessionHandler: SessionHandler) {
     super(exerciseData, sessionHandler)
   }
+
+  // To-Do: Add admin methods
 }

@@ -4,7 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
-import { Facility, FacilityListResponse } from './facility'
+import { Facilities, Facility, FacilityListResponse } from './facility'
 import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
@@ -170,9 +170,9 @@ export class User extends Model {
     return new Exercises(exercises, exercisesMeta, this.sessionHandler, this.id)
   }
 
-  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { limit: 20 }) {
-    const { facilities } = await this.action('facility:list', options) as FacilityListResponse
-    return facilities.map(facility => new Facility(facility, this.sessionHandler))
+  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { }) {
+    const { facilities ,facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
+    return new Facilities(facilities, facilitiesMeta, this.sessionHandler, this.id)
   }
 
   async getFacilityMembershipRelationships () {

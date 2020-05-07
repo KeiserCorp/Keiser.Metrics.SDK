@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { Facility, PrivilegedFacility } from '../src/models/facility'
+import { Facility, FacilitySorting, PrivilegedFacility } from '../src/models/facility'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -23,7 +23,15 @@ describe('Facility', function () {
     metricsInstance?.dispose()
   })
 
-  it('has facilitiy properties', async function () {
+  it('can list facilities', async function () {
+    const facilities = await userSession.user.getFacilities()
+
+    expect(Array.isArray(facilities)).to.equal(true)
+    expect(facilities.length).to.be.above(0)
+    expect(facilities.meta.sort).to.equal(FacilitySorting.ID)
+  })
+
+  it('has facility properties', async function () {
     expect(typeof facility).to.equal('object')
     expect(typeof facility?.id).to.equal('number')
   })
