@@ -1,0 +1,34 @@
+body {
+  background-color: #212121;
+  color: #eeeeee;
+}
+
+#mocha-stats {
+  color: #eeeeee;
+}
+
+#mocha-stats em {
+  color: #14ffec;
+}
+
+#mocha-stats .progress canvas {
+  background-color: #eeeeee;
+  border-radius: 20px;
+}
+
+#mocha .test a.replay {
+  background-color: #14ffec;
+  color: #212121;
+}
+
+#mocha .test.pass::before{
+  color: #14ffec;
+}
+
+#mocha .test.pass.medium .duration {
+  background: #dd7631;
+}
+
+#mocha .test.pass.slow .duration {
+  background: #bb3b0e;
+}
