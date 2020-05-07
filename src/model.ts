@@ -20,11 +20,15 @@ export class Model {
   }
 }
 
-export class ModelList<T, V> extends Array<T> {
-  protected _meta: V
+export interface UserModelClass<Model> {
+  new(x: any, sessionHandler: SessionHandler, userId: number): Model
+}
 
-  constructor (items: Array<T>, meta: V) {
-    super(...items)
+export class ModelList<Model, Data, Meta> extends Array<Model> {
+  protected _meta: Meta
+
+  constructor (type: UserModelClass<Model>, items: Array<Data> | number, meta: Meta, sessionHandler: SessionHandler, userId: number) {
+    Array.isArray(items) ? super(...items.map(x => new type(x, sessionHandler, userId))) : super(items)
     this._meta = meta
   }
 

@@ -77,7 +77,7 @@ export class StrengthMachineDataSet extends Model {
   private _strengthMachineDataSetData: StrengthMachineDataSetData
   private _userId: number
 
-  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, userId: number, sessionHandler: SessionHandler) {
+  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._strengthMachineDataSetData = strengthMachineDataSetData
     this._userId = userId
@@ -172,6 +172,6 @@ export class StrengthMachineDataSet extends Model {
   }
 
   get Session () {
-    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this._userId, this.sessionHandler) : undefined
+    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler, this._userId) : undefined
   }
 }

@@ -38,7 +38,7 @@ export class Session extends Model {
   private _sessionData: SessionData
   private _userId: number
 
-  constructor (sessionData: SessionData, userId: number, sessionHandler: SessionHandler) {
+  constructor (sessionData: SessionData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._sessionData = sessionData
     this._userId = userId
@@ -93,22 +93,22 @@ export class Session extends Model {
   }
 
   get heartRateDataSets () {
-    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get mSeriesDataSets () {
-    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get strengthMachineDataSets () {
-    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get heightMeasurement () {
-    return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this._userId, this.sessionHandler) : undefined
+    return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this.sessionHandler, this._userId) : undefined
   }
 
   get weightMeasurement () {
-    return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this._userId, this.sessionHandler) : undefined
+    return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler, this._userId) : undefined
   }
 }

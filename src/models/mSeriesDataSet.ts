@@ -40,7 +40,7 @@ export class MSeriesDataSet extends Model {
   private _mSeriesDataSetData: MSeriesDataSetData
   private _userId: number
 
-  constructor (mSeriesDataSetData: MSeriesDataSetData, userId: number, sessionHandler: SessionHandler) {
+  constructor (mSeriesDataSetData: MSeriesDataSetData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._mSeriesDataSetData = mSeriesDataSetData
     this._userId = userId
@@ -139,7 +139,7 @@ export class MSeriesDataSet extends Model {
   }
 
   get mSeriesFtpMeasurement () {
-    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this._userId, this.sessionHandler) : undefined
+    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler, this._userId) : undefined
   }
 
   get graphData () {
@@ -147,7 +147,7 @@ export class MSeriesDataSet extends Model {
   }
 
   get Session () {
-    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this._userId, this.sessionHandler) : undefined
+    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this.sessionHandler, this._userId) : undefined
   }
 
 }

@@ -2,6 +2,11 @@ import { ClientSideActionPrevented } from '../error'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
+export enum EmailAddressSorting {
+  ID = 'id',
+  Name = 'name'
+}
+
 export interface EmailAddressData {
   id: number
   email: string
@@ -19,12 +24,12 @@ export interface EmailAddressListResponse extends AuthenticatedResponse {
 
 export interface EmailAddressListResponseMeta extends ListMeta {
   email: string | undefined
-  sort: 'id' | 'email'
+  sort: EmailAddressSorting
 }
 
-export class EmailAddresses extends ModelList<EmailAddress, EmailAddressListResponseMeta> {
-  constructor (emailAddresses: EmailAddressData[], emailAddressesMeta: EmailAddressListResponseMeta, userId: number, sessionHandler: SessionHandler) {
-    super((emailAddresses || []).map(emailAddress => new EmailAddress(emailAddress, userId, sessionHandler)), emailAddressesMeta)
+export class EmailAddresses extends ModelList<EmailAddress, EmailAddressData, EmailAddressListResponseMeta> {
+  constructor (emailAddresses: EmailAddressData[], emailAddressesMeta: EmailAddressListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(EmailAddress, emailAddresses, emailAddressesMeta, sessionHandler, userId)
   }
 }
 
@@ -32,7 +37,7 @@ export class EmailAddress extends Model {
   private _emailAddressData: EmailAddressData
   private _userId: number
 
-  constructor (emailAddressData: EmailAddressData, userId: number, sessionHandler: SessionHandler) {
+  constructor (emailAddressData: EmailAddressData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._emailAddressData = emailAddressData
     this._userId = userId

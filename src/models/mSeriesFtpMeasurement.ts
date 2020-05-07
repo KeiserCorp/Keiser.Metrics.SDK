@@ -21,7 +21,7 @@ export class MSeriesFtpMeasurement extends Model {
   private _mSeriesFtpMeasurement: MSeriesFtpMeasurementData
   private _userId: number
 
-  constructor (mSeriesFtpMeasurement: MSeriesFtpMeasurementData, userId: number, sessionHandler: SessionHandler) {
+  constructor (mSeriesFtpMeasurement: MSeriesFtpMeasurementData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._mSeriesFtpMeasurement = mSeriesFtpMeasurement
     this._userId = userId

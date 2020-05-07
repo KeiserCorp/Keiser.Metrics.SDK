@@ -58,7 +58,7 @@ export class WeightMeasurement extends Model {
   private _weightMeasurementData: WeightMeasurementData
   private _userId: number
 
-  constructor (weightMeasurementData: WeightMeasurementData, userId: number, sessionHandler: SessionHandler) {
+  constructor (weightMeasurementData: WeightMeasurementData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._weightMeasurementData = weightMeasurementData
     this._userId = userId

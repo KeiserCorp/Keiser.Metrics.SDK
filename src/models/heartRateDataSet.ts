@@ -25,7 +25,7 @@ export class HeartRateDataSet extends Model {
   private _heartRateDataSetData: HeartRateDataSetData
   private _userId: number
 
-  constructor (heartRateDataSetData: HeartRateDataSetData, userId: number, sessionHandler: SessionHandler) {
+  constructor (heartRateDataSetData: HeartRateDataSetData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._heartRateDataSetData = heartRateDataSetData
     this._userId = userId
@@ -76,7 +76,7 @@ export class HeartRateDataSet extends Model {
   }
 
   get Session () {
-    return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this._userId, this.sessionHandler) : undefined
+    return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this.sessionHandler, this._userId) : undefined
   }
 
 }

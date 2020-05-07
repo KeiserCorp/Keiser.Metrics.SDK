@@ -21,7 +21,7 @@ export class HeightMeasurement extends Model {
   private _heightMeasurementData: HeightMeasurementData
   private _userId: number
 
-  constructor (heightMeasurementData: HeightMeasurementData, userId: number, sessionHandler: SessionHandler) {
+  constructor (heightMeasurementData: HeightMeasurementData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._heightMeasurementData = heightMeasurementData
     this._userId = userId

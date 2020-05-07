@@ -20,7 +20,7 @@ export class OAuthService extends Model {
   private _oauthServiceData: OAuthServiceData
   private _userId: number
 
-  constructor (oauthServiceData: OAuthServiceData, userId: number, sessionHandler: SessionHandler) {
+  constructor (oauthServiceData: OAuthServiceData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._oauthServiceData = oauthServiceData
     this._userId = userId

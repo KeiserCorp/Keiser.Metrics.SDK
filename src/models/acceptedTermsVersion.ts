@@ -14,7 +14,7 @@ export class AcceptedTermsVersion extends Model {
   private _acceptedTermsVersionData: AcceptedTermsVersionData
   private _userId: number
 
-  constructor (acceptedTermsVersion: AcceptedTermsVersionData, userId: number, sessionHandler: SessionHandler) {
+  constructor (acceptedTermsVersion: AcceptedTermsVersionData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._acceptedTermsVersionData = acceptedTermsVersion
     this._userId = userId
