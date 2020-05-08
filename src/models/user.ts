@@ -4,7 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
-import { Facilities, Facility, FacilityListResponse } from './facility'
+import { Facilities, FacilityListResponse } from './facility'
 import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
@@ -167,7 +167,7 @@ export class User extends Model {
 
   async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
-    return new Exercises(exercises, exercisesMeta, this.sessionHandler, this.id)
+    return new Exercises(exercises, exercisesMeta, this.sessionHandler)
   }
 
   async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { }) {

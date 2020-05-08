@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList  } from '../model'
+import { ListMeta, Model, UserModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
@@ -36,7 +36,7 @@ export interface FacilityListResponseMeta extends ListMeta {
   sort: FacilitySorting
 }
 
-export class Facilities extends ModelList<Facility, FacilityData, FacilityListResponseMeta> {
+export class Facilities extends UserModelList<Facility, FacilityData, FacilityListResponseMeta> {
   constructor (facilities: FacilityData[], facilitiesMeta: FacilityListResponseMeta, sessionHandler: SessionHandler, userId: number) {
     super(Facility, facilities, facilitiesMeta, sessionHandler, userId)
   }

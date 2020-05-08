@@ -1,4 +1,4 @@
-import { Model } from '../model'
+import { ListMeta, Model, BaseModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 
@@ -8,6 +8,13 @@ export enum LicenseType {
   Normal = 'normal',
   Demo = 'demo',
   Test = 'test'
+}
+
+export enum FacilityLicenseSorting {
+  ID = 'id',
+  Type = 'type',
+  Term = 'term',
+  EffectiveDate = 'effectiveDate'
 }
 
 export interface FacilityLicenseData {
@@ -27,6 +34,18 @@ export interface FacilityLicenseResponse extends AuthenticatedResponse {
 
 export interface FacilityLicenseListResponse extends AuthenticatedResponse {
   facilityLicenses: FacilityLicenseData[]
+  facilityLicensesMeta: FacilityLicenseListResponseMeta
+}
+
+export interface FacilityLicenseListResponseMeta extends ListMeta {
+  name: string | undefined
+  sort: FacilityLicenseSorting
+}
+
+export class FacilityLicenses extends BaseModelList<FacilityLicense, FacilityLicenseData, FacilityLicenseListResponseMeta> {
+  constructor (facilityLicenses: FacilityLicenseData[], facilityLicensesMeta: FacilityLicenseListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityLicense, facilityLicenses, facilityLicensesMeta, sessionHandler)
+  }
 }
 
 export class FacilityLicense extends Model {
@@ -89,10 +108,10 @@ export class FacilityLicense extends Model {
 }
 
 /** @hidden */
-export class FacilityLicenses extends Model {
+export class FacilityLicenseAdministration extends Model {
   async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string} = {}) {
-    const { facilityLicenses } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
-    return facilityLicenses.map(facilityLicense => new FacilityLicense(facilityLicense, this.sessionHandler))
+    const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
+    return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)
   }
 
   async createFacilityLicense (params: {accountId?: string, term: number, type: LicenseType, name?: string, email?: string}) {

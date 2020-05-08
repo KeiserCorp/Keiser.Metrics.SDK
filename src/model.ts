@@ -24,11 +24,28 @@ export interface UserModelClass<Model> {
   new(x: any, sessionHandler: SessionHandler, userId: number): Model
 }
 
-export class ModelList<Model, Data, Meta> extends Array<Model> {
+export class UserModelList<Model, Data, Meta> extends Array<Model> {
   protected _meta: Meta
 
   constructor (type: UserModelClass<Model>, items: Array<Data> | number, meta: Meta, sessionHandler: SessionHandler, userId: number) {
     Array.isArray(items) ? super(...items.map(x => new type(x, sessionHandler, userId))) : super(items)
+    this._meta = meta
+  }
+
+  get meta () {
+    return this._meta
+  }
+}
+
+export interface BaseModelClass<Model> {
+  new(x: any, sessionHandler: SessionHandler): Model
+}
+
+export class BaseModelList<Model, Data, Meta> extends Array<Model> {
+  protected _meta: Meta
+
+  constructor (type: BaseModelClass<Model>, items: Array<Data> | number, meta: Meta, sessionHandler: SessionHandler) {
+    Array.isArray(items) ? super(...items.map(x => new type(x, sessionHandler))) : super(items)
     this._meta = meta
   }
 

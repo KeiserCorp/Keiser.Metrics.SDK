@@ -1,5 +1,5 @@
 import { ClientSideActionPrevented } from '../error'
-import { ListMeta, Model, ModelList } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum EmailAddressSorting {
@@ -27,7 +27,7 @@ export interface EmailAddressListResponseMeta extends ListMeta {
   sort: EmailAddressSorting
 }
 
-export class EmailAddresses extends ModelList<EmailAddress, EmailAddressData, EmailAddressListResponseMeta> {
+export class EmailAddresses extends UserModelList<EmailAddress, EmailAddressData, EmailAddressListResponseMeta> {
   constructor (emailAddresses: EmailAddressData[], emailAddressesMeta: EmailAddressListResponseMeta, sessionHandler: SessionHandler, userId: number) {
     super(EmailAddress, emailAddresses, emailAddressesMeta, sessionHandler, userId)
   }

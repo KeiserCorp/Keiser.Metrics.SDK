@@ -5,7 +5,7 @@ import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
-import { FacilityLicenses } from './models/facilityLicense'
+import { FacilityLicenseAdministration } from './models/facilityLicense'
 import { Stats } from './models/stats'
 import { Tasks } from './models/task'
 import { OAuthProviders, User, UserResponse, Users } from './models/user'
@@ -253,6 +253,6 @@ export class AdminSession extends UserSession {
   }
 
   get facilityLicenses () {
-    return new FacilityLicenses(this._sessionHandler)
+    return new FacilityLicenseAdministration(this._sessionHandler)
   }
 }

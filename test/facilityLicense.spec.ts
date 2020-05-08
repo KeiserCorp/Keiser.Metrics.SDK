@@ -27,6 +27,7 @@ describe('Facility License', function () {
 
     expect(Array.isArray(facilityLicenses)).to.equal(true)
     expect(facilityLicenses[0].accountId).to.equal('2568000')
+    expect(facilityLicenses.meta.totalCount).to.be.above(0)
   })
 
   it('can reload facility licenses', async function () {
