@@ -21,6 +21,18 @@ body {
   color: #212121;
 }
 
+#mocha .test.fail {
+  color: #bb3b0e;
+}
+
+#mocha .test pre.error {
+  color: #bb3b0e;
+}
+
+#mocha .test.fail::before {
+  color: #bb3b0e;
+}
+
 #mocha .test.pass::before{
   color: #14ffec;
 }
@@ -31,4 +43,8 @@ body {
 
 #mocha .test.pass.slow .duration {
   background: #bb3b0e;
+}
+
+#mocha .test.pending {
+  color: #14ffec;
 }
