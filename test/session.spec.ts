@@ -26,6 +26,8 @@ describe('Session', function () {
   })
 
   it('can list latest sessions', async function () {
+    this.timeout(5000)
+
     const sessions = await user.getSessions()
 
     expect(Array.isArray(sessions)).to.equal(true)

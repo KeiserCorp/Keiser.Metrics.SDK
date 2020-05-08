@@ -5,7 +5,7 @@ import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionRes
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
 import { Facilities, FacilityListResponse } from './facility'
-import { FacilityRelationshipData, FacilityRelationshipListResponse, UserFacilityRelationship } from './facilityRelationship'
+import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
@@ -176,13 +176,13 @@ export class User extends Model {
   }
 
   async getFacilityMembershipRelationships () {
-    const { facilityRelationships } = await this.action('facilityRelationship:userList', { userId : this.id, member: true }) as FacilityRelationshipListResponse
-    return facilityRelationships.map(facilityRelationship => new UserFacilityRelationship(facilityRelationship, this.sessionHandler))
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { userId : this.id, member: true }) as UserFacilityRelationshipListResponse
+    return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 
   async getFacilityEmploymentRelationships (options: { employeeRole?: string } = {}) {
-    const { facilityRelationships } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as FacilityRelationshipListResponse
-    return facilityRelationships.map(facilityRelationship => new UserFacilityRelationship(facilityRelationship, this.sessionHandler))
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as UserFacilityRelationshipListResponse
+    return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 
   async startSession (params: {forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number} = {}) {
