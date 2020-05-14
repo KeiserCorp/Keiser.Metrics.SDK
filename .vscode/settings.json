@@ -20,6 +20,8 @@
   "tslint.jsEnable": true,
   "tslint.ignoreDefinitionFiles": false,
   "cSpell.words": [
+    "echip",
+    "id",
     "reauth",
     "refreshable",
     "required",

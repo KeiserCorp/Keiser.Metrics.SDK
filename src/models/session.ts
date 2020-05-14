@@ -1,4 +1,4 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 import { HeartRateDataSet, HeartRateDataSetData } from './heartRateDataSet'
@@ -7,6 +7,12 @@ import { MSeriesDataSet, MSeriesDataSetData } from './mSeriesDataSet'
 import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMachineDataSet'
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
+
+export enum SessionSorting {
+  ID = 'id',
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt'
+}
 
 export interface SessionData {
   id: number
@@ -32,6 +38,17 @@ export interface SessionResponse extends AuthenticatedResponse {
 
 export interface SessionListResponse extends AuthenticatedResponse {
   sessions: SessionData[]
+  sessionsMeta: SessionListResponseMeta
+}
+
+export interface SessionListResponseMeta extends ListMeta {
+  sort: SessionSorting
+}
+
+export class Sessions extends UserModelList<Session, SessionData, SessionListResponseMeta> {
+  constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(Session, sessions, sessionsMeta, sessionHandler, userId)
+  }
 }
 
 export class Session extends Model {

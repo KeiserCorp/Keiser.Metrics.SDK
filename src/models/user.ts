@@ -13,7 +13,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { Session, SessionListResponse, SessionResponse } from './session'
+import { Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse } from './strengthMachineDataSet'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
@@ -190,9 +190,9 @@ export class User extends Model {
     return new Session(session, this.sessionHandler, this.id)
   }
 
-  async getSessions (options: {open?: boolean, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { sessions } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
-    return sessions.map(session => new Session(session, this.sessionHandler, this.id))
+  async getSessions (options: {open?: boolean, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number} = { limit: 20 }) {
+    const { sessions, sessionsMeta } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
+    return new Sessions(sessions, sessionsMeta, this.sessionHandler, this.id)
   }
 
   async createMSeriesDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, machineType: string, ordinalId: number, buildMajor: number, buildMinor: number, mSeriesDataPoints: MSeriesCapturedDataPoint[]}) {
