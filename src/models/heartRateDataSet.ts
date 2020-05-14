@@ -1,6 +1,15 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
+
+export enum HeartRateDataSetSorting {
+  ID = 'id',
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt',
+  Source = 'source',
+  MaxHeartRate = 'maxHeartRate',
+  AverageHeartRate = 'averageHeartRate'
+}
 
 export interface HeartRateDataSetData {
   id: number
@@ -19,13 +28,27 @@ export interface HeartRateDataSetResponse extends AuthenticatedResponse {
 
 export interface HeartRateDataSetListResponse extends AuthenticatedResponse {
   heartRateDataSets: HeartRateDataSetData[]
+  heartRateDataSetsMeta: HeartRateDataSetListResponseMeta
+}
+
+export interface HeartRateDataSetListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  source: string | undefined
+  sort: HeartRateDataSetSorting
+}
+
+export class HeartRateDataSets extends UserModelList<HeartRateDataSet, HeartRateDataSetData, HeartRateDataSetListResponseMeta> {
+  constructor (heartRateDataSets: HeartRateDataSetData[], heartRateDataSetsMeta: HeartRateDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(HeartRateDataSet, heartRateDataSets, heartRateDataSetsMeta, sessionHandler, userId)
+  }
 }
 
 export class HeartRateDataSet extends Model {
   private _heartRateDataSetData: HeartRateDataSetData
   private _userId: number
 
-  constructor (heartRateDataSetData: HeartRateDataSetData, userId: number, sessionHandler: SessionHandler) {
+  constructor (heartRateDataSetData: HeartRateDataSetData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._heartRateDataSetData = heartRateDataSetData
     this._userId = userId
@@ -40,8 +63,6 @@ export class HeartRateDataSet extends Model {
     this.setHeartRateDataSet(heartRateDataSet)
     return this
   }
-
-  // To-Do: Decide if `update` method is necessary
 
   async delete () {
     await this.action('heartRateDataSet:delete', { userId: this._userId, id: this.id })
@@ -72,11 +93,11 @@ export class HeartRateDataSet extends Model {
   }
 
   get graphData () {
-    return this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRadeDataPointData => new HeartRateDataPoint(heartRadeDataPointData)) : undefined
+    return this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   get Session () {
-    return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this._userId, this.sessionHandler) : undefined
+    return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this.sessionHandler, this._userId) : undefined
   }
 
 }

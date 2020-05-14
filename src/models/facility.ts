@@ -1,7 +1,12 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
+
+export enum FacilitySorting {
+  ID = 'id',
+  Name = 'name'
+}
 
 export interface FacilityData {
   id: number
@@ -16,7 +21,25 @@ export interface FacilityResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityListResponse extends AuthenticatedResponse {
-  facilities: FacilityData[]
+  facilities: FacilityData[],
+  facilitiesMeta: FacilityListResponseMeta
+}
+
+export interface FacilityListResponseMeta extends ListMeta {
+  name: string | undefined
+  phone: string | undefined
+  address: string | undefined
+  city: string | undefined
+  postcode: string | undefined
+  state: string | undefined
+  country: string | undefined
+  sort: FacilitySorting
+}
+
+export class Facilities extends UserModelList<Facility, FacilityData, FacilityListResponseMeta> {
+  constructor (facilities: FacilityData[], facilitiesMeta: FacilityListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(Facility, facilities, facilitiesMeta, sessionHandler, userId)
+  }
 }
 
 export class Facility extends Model {

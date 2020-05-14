@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { Session } from '../src/models/session'
+import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -26,9 +26,12 @@ describe('Session', function () {
   })
 
   it('can list latest sessions', async function () {
+    this.timeout(5000)
+
     const sessions = await user.getSessions()
 
     expect(Array.isArray(sessions)).to.equal(true)
+    expect(sessions.meta.sort).to.equal(SessionSorting.StartedAt)
   })
 
   it('can create new session', async function () {

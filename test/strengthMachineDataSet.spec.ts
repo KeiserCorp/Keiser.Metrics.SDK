@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { ForceUnit, ResistancePrecision, StrengthMachineDataSet } from '../src/models/strengthMachineDataSet'
+import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -27,6 +27,7 @@ describe('Strength Machine Data Set', function () {
     const strengthMachineDataSets = await user.getStrengthMachineDataSets()
 
     expect(Array.isArray(strengthMachineDataSets)).to.equal(true)
+    expect(strengthMachineDataSets.meta.sort).to.equal(StrengthMachineDataSetSorting.CompletedAt)
   })
 
   it('can create new Strength Machine data set', async function () {

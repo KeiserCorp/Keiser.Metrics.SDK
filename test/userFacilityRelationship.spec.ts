@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
-import { UserFacilityRelationship } from '../src/models/facilityRelationship'
+import { FacilityUserRelationshipSorting, UserFacilityRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -31,6 +31,7 @@ describe('User to Facility Relationship', function () {
 
     expect(Array.isArray(facilityRelationships)).to.equal(true)
     expect(typeof facilityRelationships[0]).to.equal('object')
+    expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
     facilityRelationship = facilityRelationships[0]
   })
 

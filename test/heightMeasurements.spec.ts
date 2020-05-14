@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { HeightMeasurement } from '../src/models/heightMeasurement'
+import { HeightMeasurement, HeightMeasurementSorting } from '../src/models/heightMeasurement'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -34,7 +34,7 @@ describe('Height Measurement', function () {
     const heightMeasurements = await user.getHeightMeasurements()
 
     expect(Array.isArray(heightMeasurements)).to.equal(true)
-    expect(heightMeasurements.length).to.be.above(0)
+    expect(heightMeasurements.meta.sort).to.equal(HeightMeasurementSorting.TakenAt)
   })
 
   it('can get list of height measurement with parameters', async function () {

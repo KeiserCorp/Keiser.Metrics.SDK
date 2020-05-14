@@ -31,27 +31,24 @@ describe('User', function () {
     user = userSession.user
   })
 
-  it('can access user email address properties', async function () {
-    expect(user.emailAddresses).to.be.an('array')
-    expect(user.emailAddresses.length).to.equal(1)
-    expect(user.emailAddresses[0].email).to.equal(userEmailAddress)
+  it('can access user profile properties', async function () {
+    expect(user.profile).to.be.an('object')
+    expect(user.profile.name).to.be.equal(null)
   })
 
   it('can reload user', async function () {
     await user.reload()
 
-    expect(user.emailAddresses).to.be.an('array')
-    expect(user.emailAddresses.length).to.equal(1)
-    expect(user.emailAddresses[0].email).to.equal(userEmailAddress)
+    expect(user.profile).to.be.an('object')
+    expect(user.profile.name).to.be.equal(null)
   })
 
   it('can change user password', async function () {
     const newPassword = 'p@$$\/\/0r|)'
     await user.changePassword(newPassword)
 
-    expect(user.emailAddresses).to.be.an('array')
-    expect(user.emailAddresses.length).to.equal(1)
-    expect(user.emailAddresses[0].email).to.equal(userEmailAddress)
+    expect(user.profile).to.be.an('object')
+    expect(user.profile.name).to.equal(null)
   })
 
   it('can delete user', async function () {

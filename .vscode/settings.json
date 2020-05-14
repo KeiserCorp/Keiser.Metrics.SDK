@@ -18,5 +18,18 @@
   "typescript.format.insertSpaceAfterConstructor": true,
   "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
   "tslint.jsEnable": true,
-  "tslint.ignoreDefinitionFiles": false
+  "tslint.ignoreDefinitionFiles": false,
+  "cSpell.words": [
+    "backtrace",
+    "echip",
+    "id",
+    "inbody",
+    "oauths",
+    "reauth",
+    "refreshable",
+    "required",
+    "resque",
+    "strava",
+    "trainingpeaks"
+  ]
 }

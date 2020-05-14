@@ -25,7 +25,7 @@ export class Profile extends Model {
   private _profileData: ProfileData
   private _userId: number
 
-  constructor (profileData: ProfileData, userId: number, sessionHandler: SessionHandler) {
+  constructor (profileData: ProfileData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._profileData = profileData
     this._userId = userId

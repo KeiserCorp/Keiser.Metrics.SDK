@@ -1,5 +1,10 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+
+export enum OAuthServiceSorting {
+  ID = 'id',
+  Name = 'name'
+}
 
 export interface OAuthServiceData {
   id: number
@@ -14,13 +19,26 @@ export interface OAuthServiceResponse extends AuthenticatedResponse {
 
 export interface OAuthServiceListResponse extends AuthenticatedResponse {
   oauthServices: OAuthServiceData[]
+  oauthServicesMeta: OAuthServiceListResponseMeta
+}
+
+export interface OAuthServiceListResponseMeta extends ListMeta {
+  source: string
+  machineType: string
+  sort: OAuthServiceSorting
+}
+
+export class OAuthServices extends UserModelList<OAuthService, OAuthServiceData, OAuthServiceListResponseMeta> {
+  constructor (oauthServices: OAuthServiceData[], OAuthServicesMeta: OAuthServiceListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(OAuthService, oauthServices, OAuthServicesMeta, sessionHandler, userId)
+  }
 }
 
 export class OAuthService extends Model {
   private _oauthServiceData: OAuthServiceData
   private _userId: number
 
-  constructor (oauthServiceData: OAuthServiceData, userId: number, sessionHandler: SessionHandler) {
+  constructor (oauthServiceData: OAuthServiceData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._oauthServiceData = oauthServiceData
     this._userId = userId

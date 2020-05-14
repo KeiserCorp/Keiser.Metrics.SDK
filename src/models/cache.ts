@@ -18,23 +18,6 @@ export interface CacheObject {
 }
 
 export class Cache extends Model {
-  async getCacheKeys (options: {filter?: string} = {}) {
-    const { cacheKeys } = await this.action('resque:cache:list') as CacheKeysResponse
-    return cacheKeys.filter(key => key.startsWith('cache:' + (options?.filter ?? ''))).map(key => new CacheKey(key.replace(/$cache:/, ''), this.sessionHandler))
-  }
-
-  async getCacheKey (key: string) {
-    const { cacheObject } = await this.action('resque:cache:show', { key }) as CacheObjectResponse
-    return new CacheKey(cacheObject.key, this.sessionHandler)
-  }
-
-  async createCacheKey (params: {key: string, value: string, expireIn?: number}) {
-    const { cacheObject } = await this.action('resque:cache:create', params) as CacheObjectResponse
-    return new CacheKey(cacheObject.key, this.sessionHandler)
-  }
-}
-
-export class CacheKey extends Model {
   private _key: string
 
   constructor (key: string, sessionHandler: SessionHandler) {

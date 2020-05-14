@@ -1,5 +1,5 @@
 import { DeepReadonly } from '../lib/readonly'
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
 
@@ -20,6 +20,11 @@ export enum StrengthTestType {
   A4206Rep = 'a4206r',
   A42010Rep = 'a42010r',
   A50010Rep = 'a50010r'
+}
+
+export enum StrengthMachineDataSetSorting {
+  ID = 'id',
+  CompletedAt = 'completedAt'
 }
 
 export interface StrengthMachineDataSetData {
@@ -71,13 +76,26 @@ export interface StrengthMachineDataSetResponse extends AuthenticatedResponse {
 
 export interface StrengthMachineDataSetListResponse extends AuthenticatedResponse {
   strengthMachineDataSets: StrengthMachineDataSetData[]
+  strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta
+}
+
+export interface StrengthMachineDataSetListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  sort: StrengthMachineDataSetSorting
+}
+
+export class StrengthMachineDataSets extends UserModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
+  constructor (strengthMachineDataSets: StrengthMachineDataSetData[], strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(StrengthMachineDataSet, strengthMachineDataSets, strengthMachineDataSetsMeta, sessionHandler, userId)
+  }
 }
 
 export class StrengthMachineDataSet extends Model {
   private _strengthMachineDataSetData: StrengthMachineDataSetData
   private _userId: number
 
-  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, userId: number, sessionHandler: SessionHandler) {
+  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._strengthMachineDataSetData = strengthMachineDataSetData
     this._userId = userId
@@ -92,8 +110,6 @@ export class StrengthMachineDataSet extends Model {
     this.setStrengthMachineDataSet(strengthMachineDataSet)
     return this
   }
-
-  // To-Do: Decide if `update` method is necessary
 
   async delete () {
     await this.action('strengthMachineDataSet:delete', { userId: this._userId, id: this.id })
@@ -172,6 +188,6 @@ export class StrengthMachineDataSet extends Model {
   }
 
   get Session () {
-    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this._userId, this.sessionHandler) : undefined
+    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler, this._userId) : undefined
   }
 }

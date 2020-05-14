@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { MSeriesDataSet } from '../src/models/mSeriesDataSet'
+import { MSeriesDataSet, MSeriesDataSetSorting } from '../src/models/mSeriesDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -43,6 +43,7 @@ describe('M Series Data Set', function () {
     const mSeriesDataSets = await user.getMSeriesDataSets()
 
     expect(Array.isArray(mSeriesDataSets)).to.equal(true)
+    expect(mSeriesDataSets.meta.sort).to.equal(MSeriesDataSetSorting.StartedAt)
   })
 
   it('can create new M Series data set', async function () {

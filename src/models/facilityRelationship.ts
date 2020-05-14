@@ -1,7 +1,19 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { User, UserData } from './user'
+
+export enum UserFacilityRelationshipSorting {
+  ID = 'id',
+  EmployeeRole = 'employeeRole'
+}
+
+export enum FacilityUserRelationshipSorting {
+  ID = 'id',
+  Name = 'name',
+  MemberIdentifier = 'memberIdentifier',
+  EmployeeRole = 'employeeRole'
+}
 
 export interface FacilityRelationshipData {
   id: number
@@ -19,8 +31,30 @@ export interface FacilityRelationshipResponse extends AuthenticatedResponse {
   facilityRelationship: FacilityRelationshipData
 }
 
-export interface FacilityRelationshipListResponse extends AuthenticatedResponse {
+export interface UserFacilityRelationshipListResponse extends AuthenticatedResponse {
   facilityRelationships: FacilityRelationshipData[]
+  facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta
+}
+
+export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
+  member: boolean | undefined
+  employee: boolean | undefined
+  employeeRole: string | undefined
+  sort: UserFacilityRelationshipSorting
+}
+
+export interface FacilityUserRelationshipListResponse extends AuthenticatedResponse {
+  facilityRelationships: FacilityRelationshipData[]
+  facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta
+}
+
+export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
+  member: boolean | undefined
+  employee: boolean | undefined
+  name: string | undefined
+  memberIdentifier: string | undefined
+  employeeRole: string | undefined
+  sort: FacilityUserRelationshipSorting
 }
 
 export class FacilityRelationship extends Model {
@@ -64,6 +98,12 @@ export class FacilityRelationship extends Model {
   }
 }
 
+export class UserFacilityRelationships extends UserModelList<UserFacilityRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(UserFacilityRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
+  }
+}
+
 export class UserFacilityRelationship extends FacilityRelationship {
   constructor (facilityRelationshipData: FacilityRelationshipData, sessionHandler: SessionHandler) {
     super(facilityRelationshipData, sessionHandler)
@@ -93,6 +133,12 @@ export class UserFacilityRelationship extends FacilityRelationship {
       return new PrivilegedFacility(this._facilityRelationshipData.facility, this.sessionHandler)
     }
     return new Facility(this._facilityRelationshipData.facility, this.sessionHandler)
+  }
+}
+
+export class FacilityUserRelationships extends UserModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponse> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponse, sessionHandler: SessionHandler, userId: number) {
+    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
   }
 }
 

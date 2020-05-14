@@ -1,5 +1,11 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+
+export enum HeightMeasurementSorting {
+  ID = 'id',
+  Source = 'source',
+  TakenAt = 'takenAt'
+}
 
 export interface HeightMeasurementData {
   id: number
@@ -15,13 +21,26 @@ export interface HeightMeasurementResponse extends AuthenticatedResponse {
 
 export interface HeightMeasurementListResponse extends AuthenticatedResponse {
   heightMeasurements: HeightMeasurementData[]
+  heightMeasurementsMeta: HeightMeasurementListResponseMeta
+}
+
+export interface HeightMeasurementListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  sort: HeightMeasurementSorting
+}
+
+export class HeightMeasurements extends UserModelList<HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponseMeta> {
+  constructor (heightMeasurements: HeightMeasurementData[], heightMeasurementsMeta: HeightMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(HeightMeasurement, heightMeasurements, heightMeasurementsMeta, sessionHandler, userId)
+  }
 }
 
 export class HeightMeasurement extends Model {
   private _heightMeasurementData: HeightMeasurementData
   private _userId: number
 
-  constructor (heightMeasurementData: HeightMeasurementData, userId: number, sessionHandler: SessionHandler) {
+  constructor (heightMeasurementData: HeightMeasurementData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._heightMeasurementData = heightMeasurementData
     this._userId = userId

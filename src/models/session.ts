@@ -1,4 +1,4 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 import { HeartRateDataSet, HeartRateDataSetData } from './heartRateDataSet'
@@ -7,6 +7,12 @@ import { MSeriesDataSet, MSeriesDataSetData } from './mSeriesDataSet'
 import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMachineDataSet'
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
+
+export enum SessionSorting {
+  ID = 'id',
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt'
+}
 
 export interface SessionData {
   id: number
@@ -32,13 +38,27 @@ export interface SessionResponse extends AuthenticatedResponse {
 
 export interface SessionListResponse extends AuthenticatedResponse {
   sessions: SessionData[]
+  sessionsMeta: SessionListResponseMeta
+}
+
+export interface SessionListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  open: boolean | undefined
+  sort: SessionSorting
+}
+
+export class Sessions extends UserModelList<Session, SessionData, SessionListResponseMeta> {
+  constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(Session, sessions, sessionsMeta, sessionHandler, userId)
+  }
 }
 
 export class Session extends Model {
   private _sessionData: SessionData
   private _userId: number
 
-  constructor (sessionData: SessionData, userId: number, sessionHandler: SessionHandler) {
+  constructor (sessionData: SessionData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)
     this._sessionData = sessionData
     this._userId = userId
@@ -93,22 +113,22 @@ export class Session extends Model {
   }
 
   get heartRateDataSets () {
-    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get mSeriesDataSets () {
-    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get strengthMachineDataSets () {
-    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this._userId, this.sessionHandler)) : undefined
+    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler, this._userId)) : undefined
   }
 
   get heightMeasurement () {
-    return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this._userId, this.sessionHandler) : undefined
+    return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this.sessionHandler, this._userId) : undefined
   }
 
   get weightMeasurement () {
-    return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this._userId, this.sessionHandler) : undefined
+    return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler, this._userId) : undefined
   }
 }

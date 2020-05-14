@@ -3,12 +3,12 @@ import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
-import { Cache } from './models/cache'
+import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
-import { FacilityLicenses } from './models/facilityLicense'
-import { Stats } from './models/stats'
-import { Tasks } from './models/task'
-import { OAuthProviders, User, UserResponse, Users } from './models/user'
+import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
+import { StatListResponse, Stats, StatSorting } from './models/stat'
+import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
+import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -200,6 +200,10 @@ export class UserSession {
     this._user = new User(loginResponse.user, this._sessionHandler)
   }
 
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
   get keepAlive () {
     return this._sessionHandler.keepAlive
   }
@@ -231,28 +235,80 @@ export class UserSession {
   get activeFacility () {
     return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
+
+  protected action (action: string, params: Object = {}) {
+    return this.sessionHandler.action(action, params)
+  }
 }
 
 /** @hidden */
 export class AdminSession extends UserSession {
 
-  get stats () {
-    return new Stats(this._sessionHandler)
+  async getStats (options: {from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { stats, statsMeta } = await this.action('stats:list', options) as StatListResponse
+    return new Stats(stats, statsMeta, this.sessionHandler)
   }
 
-  get users () {
-    return new Users(this._sessionHandler)
+  async getUsers (options: {name?: string, email?: string, sort?: UserSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { users, usersMeta } = await this.action('user:list', options) as UserListResponse
+    return new Users(users, usersMeta, this.sessionHandler)
   }
 
-  get cache () {
-    return new Cache(this._sessionHandler)
+  async mergeUsers (params: {fromUserId: number, toUserId: number}) {
+    const { user } = await this.action('user:merge', params) as UserResponse
+    return new User(user, this.sessionHandler)
   }
 
-  get tasks () {
-    return new Tasks(this._sessionHandler)
+  async getCacheKeys (options: {filter?: string} = {}) {
+    const { cacheKeys } = await this.action('resque:cache:list') as CacheKeysResponse
+    return cacheKeys.filter(key => key.startsWith('cache:' + (options?.filter ?? ''))).map(key => new Cache(key.replace(/$cache:/, ''), this.sessionHandler))
   }
 
-  get facilityLicenses () {
-    return new FacilityLicenses(this._sessionHandler)
+  async getCacheKey (key: string) {
+    const { cacheObject } = await this.action('resque:cache:show', { key }) as CacheObjectResponse
+    return new Cache(cacheObject.key, this.sessionHandler)
+  }
+
+  async createCacheKey (params: {key: string, value: string, expireIn?: number}) {
+    const { cacheObject } = await this.action('resque:cache:create', params) as CacheObjectResponse
+    return new Cache(cacheObject.key, this.sessionHandler)
+  }
+
+  async getResqueDetails () {
+    const { details } = await this.action('resque:details') as ResqueDetailsResponse
+    return details
+  }
+
+  async getWorkers () {
+    const { workers } = await this.action('resque:worker:list') as WorkersResponse
+    return Object.keys(workers).map(key => ({ worker: key, status: workers[key] }))
+  }
+
+  async getTasks (options: {queue: Queue, offset?: number, limit?: number}) {
+    const { tasks, tasksMeta } = await this.action('resque:task:queue', options) as TaskQueueResponse
+    return new Tasks(tasks, tasksMeta, this.sessionHandler)
+  }
+
+  async getFailedTasks (options: {offset?: number, limit?: number} = {}) {
+    const { tasks, tasksMeta } = await this.action('resque:task:failures', options) as TaskFailedResponse
+    return new FailedTasks(tasks, tasksMeta, this.sessionHandler)
+  }
+
+  async retryAllFailedTasks (options: {taskName?: string} = {}) {
+    await this.action('resque:task:retryAllFailed', options)
+  }
+
+  async deleteAllFailedTasks (options: {taskName?: string} = {}) {
+    await this.action('resque:task:deleteAllFailed', options)
+  }
+
+  async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
+    const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
+    return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)
+  }
+
+  async createFacilityLicense (params: {accountId?: string, term: number, type: LicenseType, name?: string, email?: string}) {
+    const { facilityLicense } = await this.action('facilityLicense:create', params) as FacilityLicenseResponse
+    return new FacilityLicense(facilityLicense, this.sessionHandler)
   }
 }

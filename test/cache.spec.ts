@@ -24,7 +24,7 @@ describe('Cache', function () {
   })
 
   it('can create cache key', async function () {
-    const cacheKey = await session.cache.createCacheKey({ key: randomKey, value: cacheValue, expireIn: cacheTimeout })
+    const cacheKey = await session.createCacheKey({ key: randomKey, value: cacheValue, expireIn: cacheTimeout })
 
     expect(typeof cacheKey).to.equal('object')
     expect(cacheKey.key).to.be.equal(randomKey)
@@ -38,21 +38,21 @@ describe('Cache', function () {
   })
 
   it('can get cache keys', async function () {
-    const keys = await session.cache.getCacheKeys()
+    const keys = await session.getCacheKeys()
 
     expect(Array.isArray(keys)).to.equal(true)
     expect(keys.length).to.be.above(0)
   })
 
   it('can get filtered cache keys', async function () {
-    const keys = await session.cache.getCacheKeys({ filter: randomKey })
+    const keys = await session.getCacheKeys({ filter: randomKey })
 
     expect(Array.isArray(keys)).to.equal(true)
     expect(keys.length).to.be.equal(1)
   })
 
   it('can get specific cache key', async function () {
-    const cacheKey = await session.cache.getCacheKey(randomKey)
+    const cacheKey = await session.getCacheKey(randomKey)
 
     expect(typeof cacheKey).to.equal('object')
     expect(cacheKey.key).to.be.equal(randomKey)
@@ -67,7 +67,7 @@ describe('Cache', function () {
 
   it('can update cache key', async function () {
     const newValue = 'this i a new value'
-    const cacheKey = await session.cache.getCacheKey(randomKey)
+    const cacheKey = await session.getCacheKey(randomKey)
 
     expect(typeof cacheKey).to.equal('object')
     expect(cacheKey.key).to.be.equal(randomKey)
@@ -81,7 +81,7 @@ describe('Cache', function () {
   })
 
   it('can delete cache key', async function () {
-    const cacheKey = await session.cache.getCacheKey(randomKey)
+    const cacheKey = await session.getCacheKey(randomKey)
 
     expect(typeof cacheKey).to.equal('object')
     expect(cacheKey.key).to.be.equal(randomKey)
@@ -91,7 +91,7 @@ describe('Cache', function () {
     let extError
 
     try {
-      await session.cache.getCacheKey(randomKey)
+      await session.getCacheKey(randomKey)
     } catch (error) {
       extError = error
     }

@@ -1,9 +1,13 @@
-import { Model } from '../model'
+import { BaseModelList, ListMeta, Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum Queue {
   High= 'high',
   Low = 'low'
+}
+
+export enum TaskSorting {
+  ID = 'id'
 }
 
 export interface TaskQueues {
@@ -56,42 +60,23 @@ export interface WorkersResponse extends AuthenticatedResponse {
 }
 
 export interface TaskQueueResponse extends AuthenticatedResponse {
-  length: number
   tasks: TaskPayload[]
+  tasksMeta: TaskQueueResponseMeta
+}
+
+export interface TaskQueueResponseMeta extends ListMeta {
+  queue: string,
+  sort: TaskSorting
 }
 
 export interface TaskFailedResponse extends AuthenticatedResponse {
-  length: number
   tasks: TaskFailure[]
+  tasksMeta: TaskQueueResponseMeta
 }
 
-export class Tasks extends Model {
-  async getDetails () {
-    const { details } = await this.action('resque:details') as ResqueDetailsResponse
-    return details
-  }
-
-  async getWorkers () {
-    const { workers } = await this.action('resque:worker:list') as WorkersResponse
-    return Object.keys(workers).map(key => ({ worker: key, status: workers[key] }))
-  }
-
-  async getQueue (options: {queue: Queue, offset?: number, limit?: number}) {
-    const { length, tasks } = await this.action('resque:task:queue', options) as TaskQueueResponse
-    return { length, tasks: tasks.map(task => new Task(task, this.sessionHandler)) }
-  }
-
-  async getFailed (options: {offset?: number, limit?: number} = {}) {
-    const { length, tasks } = await this.action('resque:task:failures', options) as TaskFailedResponse
-    return { length, tasks: tasks.map(task => new FailedTask(task, this.sessionHandler)) }
-  }
-
-  async retryAllFailed (options: {taskName?: string} = {}) {
-    await this.action('resque:task:retryAllFailed', options)
-  }
-
-  async deleteAllFailed (options: {taskName?: string} = {}) {
-    await this.action('resque:task:deleteAllFailed', options)
+export class Tasks extends BaseModelList<Task, TaskPayload, TaskQueueResponseMeta> {
+  constructor (tasks: TaskPayload[], tasksMeta: TaskQueueResponseMeta, sessionHandler: SessionHandler) {
+    super(Task, tasks, tasksMeta, sessionHandler)
   }
 }
 
@@ -117,6 +102,12 @@ export class Task extends Model {
 
   async delete () {
     await this.action('resque:task:deleteTask', { queue: this.queue, taskName: this.taskName, args: JSON.stringify(this.args) })
+  }
+}
+
+export class FailedTasks extends BaseModelList<FailedTask, TaskFailure, TaskQueueResponseMeta> {
+  constructor (tasks: TaskFailure[], tasksMeta: TaskQueueResponseMeta, sessionHandler: SessionHandler) {
+    super(FailedTask, tasks, tasksMeta, sessionHandler)
   }
 }
 
