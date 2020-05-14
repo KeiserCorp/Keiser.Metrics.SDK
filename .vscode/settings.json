@@ -20,7 +20,9 @@
   "tslint.jsEnable": true,
   "tslint.ignoreDefinitionFiles": false,
   "cSpell.words": [
+    "reauth",
     "refreshable",
+    "required",
     "strava",
     "trainingpeaks"
   ]

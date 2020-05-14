@@ -10,7 +10,7 @@ import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListRespo
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
-import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
+import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { Session, SessionListResponse, SessionResponse } from './session'
@@ -120,8 +120,8 @@ export class User extends Model {
   }
 
   async getOAuthServices (options: { limit?: number, offset?: number } = { }) {
-    const { oauthServices } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
-    return oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler, this.id))
+    const { oauthServices, oauthServicesMeta } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
+    return new OAuthServices(oauthServices, oauthServicesMeta, this.sessionHandler, this.id)
   }
 
   get profile () {
