@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
+import { StatSorting } from '../src/models/stat'
 import { User } from '../src/models/user'
 import { AdminSession } from '../src/session'
 import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -45,9 +46,10 @@ describe('Admin', function () {
   })
 
   it('can get stats', async function () {
-    const stats = await session.stats.getStats()
+    const stats = await session.getStats()
 
     expect(Array.isArray(stats)).to.equal(true)
+    expect(stats.meta.sort).to.equal(StatSorting.CreatedAt)
   })
 
   it('can get users', async function () {

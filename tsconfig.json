@@ -40,7 +40,7 @@
     "exclude": [
       "src/lib/*",
       "src/models/cache.ts",
-      "src/models/stats.ts",
+      "src/models/stat.ts",
       "src/models/task.ts",
       "src/models/facilityLicense.ts"
     ],

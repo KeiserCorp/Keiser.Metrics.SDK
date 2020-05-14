@@ -6,7 +6,7 @@ import { DecodeJWT } from './lib/jwt'
 import { Cache } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
 import { FacilityLicenseAdministration } from './models/facilityLicense'
-import { Stats } from './models/stats'
+import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { Tasks } from './models/task'
 import { OAuthProviders, User, UserResponse, Users } from './models/user'
 
@@ -200,6 +200,10 @@ export class UserSession {
     this._user = new User(loginResponse.user, this._sessionHandler)
   }
 
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
   get keepAlive () {
     return this._sessionHandler.keepAlive
   }
@@ -231,13 +235,18 @@ export class UserSession {
   get activeFacility () {
     return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
+
+  protected action (action: string, params: Object = {}) {
+    return this.sessionHandler.action(action, params)
+  }
 }
 
 /** @hidden */
 export class AdminSession extends UserSession {
 
-  get stats () {
-    return new Stats(this._sessionHandler)
+  async getStats (options: {from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { stats, statsMeta } = await this.action('stats:list', options) as StatListResponse
+    return new Stats(stats, statsMeta, this.sessionHandler)
   }
 
   get users () {
