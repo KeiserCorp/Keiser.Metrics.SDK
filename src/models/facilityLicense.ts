@@ -1,4 +1,4 @@
-import { ListMeta, Model, BaseModelList } from '../model'
+import { BaseModelList, ListMeta, Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 
@@ -104,18 +104,5 @@ export class FacilityLicense extends Model {
 
   get facility () {
     return this._facilityLicenseData.facility ? new Facility(this._facilityLicenseData.facility, this.sessionHandler) : undefined
-  }
-}
-
-/** @hidden */
-export class FacilityLicenseAdministration extends Model {
-  async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string} = {}) {
-    const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
-    return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)
-  }
-
-  async createFacilityLicense (params: {accountId?: string, term: number, type: LicenseType, name?: string, email?: string}) {
-    const { facilityLicense } = await this.action('facilityLicense:create', params) as FacilityLicenseResponse
-    return new FacilityLicense(facilityLicense, this.sessionHandler)
   }
 }

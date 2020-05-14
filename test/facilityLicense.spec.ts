@@ -23,7 +23,7 @@ describe('Facility License', function () {
   })
 
   it('can get facility licenses', async function () {
-    const facilityLicenses = await session.facilityLicenses.getFacilityLicenses()
+    const facilityLicenses = await session.getFacilityLicenses()
 
     expect(Array.isArray(facilityLicenses)).to.equal(true)
     expect(facilityLicenses[0].accountId).to.equal('2568000')
@@ -31,7 +31,7 @@ describe('Facility License', function () {
   })
 
   it('can reload facility licenses', async function () {
-    let facilityLicense = (await session.facilityLicenses.getFacilityLicenses())[0]
+    let facilityLicense = (await session.getFacilityLicenses())[0]
 
     expect(facilityLicense.accountId).to.equal('2568000')
     facilityLicense = await facilityLicense.reload()
@@ -39,7 +39,7 @@ describe('Facility License', function () {
   })
 
   it('can create facility license', async function () {
-    createdFacilityLicense = await session.facilityLicenses.createFacilityLicense({ term: 5, type: LicenseType.Test })
+    createdFacilityLicense = await session.createFacilityLicense({ term: 5, type: LicenseType.Test })
 
     expect(createdFacilityLicense.term).to.equal(5)
     expect(createdFacilityLicense.type).to.equal(LicenseType.Test)

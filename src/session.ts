@@ -5,7 +5,7 @@ import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
-import { FacilityLicenseAdministration } from './models/facilityLicense'
+import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
 import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
@@ -302,7 +302,13 @@ export class AdminSession extends UserSession {
     await this.action('resque:task:deleteAllFailed', options)
   }
 
-  get facilityLicenses () {
-    return new FacilityLicenseAdministration(this._sessionHandler)
+  async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
+    const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
+    return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)
+  }
+
+  async createFacilityLicense (params: {accountId?: string, term: number, type: LicenseType, name?: string, email?: string}) {
+    const { facilityLicense } = await this.action('facilityLicense:create', params) as FacilityLicenseResponse
+    return new FacilityLicense(facilityLicense, this.sessionHandler)
   }
 }
