@@ -1,6 +1,15 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
+
+export enum HeartRateDataSetSorting {
+  ID = 'id',
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt',
+  Source = 'source',
+  MaxHeartRate = 'maxHeartRate',
+  AverageHeartRate = 'averageHeartRate'
+}
 
 export interface HeartRateDataSetData {
   id: number
@@ -19,6 +28,18 @@ export interface HeartRateDataSetResponse extends AuthenticatedResponse {
 
 export interface HeartRateDataSetListResponse extends AuthenticatedResponse {
   heartRateDataSets: HeartRateDataSetData[]
+  heartRateDataSetsMeta: HeartRateDataSetListResponseMeta
+}
+
+export interface HeartRateDataSetListResponseMeta extends ListMeta {
+  source: string | undefined
+  sort: HeartRateDataSetSorting
+}
+
+export class HeartRateDataSets extends UserModelList<HeartRateDataSet, HeartRateDataSetData, HeartRateDataSetListResponseMeta> {
+  constructor (emailAddresses: HeartRateDataSetData[], emailAddressesMeta: HeartRateDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(HeartRateDataSet, emailAddresses, emailAddressesMeta, sessionHandler, userId)
+  }
 }
 
 export class HeartRateDataSet extends Model {

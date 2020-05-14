@@ -4,9 +4,9 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
-import { Facilities, FacilityListResponse } from './facility'
-import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships } from './facilityRelationship'
-import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse } from './heartRateDataSet'
+import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
+import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
@@ -170,17 +170,17 @@ export class User extends Model {
     return new Exercises(exercises, exercisesMeta, this.sessionHandler)
   }
 
-  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, limit?: number, offset?: number} = { }) {
+  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilities ,facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler, this.id)
   }
 
-  async getFacilityMembershipRelationships () {
+  async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = {}) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { userId : this.id, member: true }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 
-  async getFacilityEmploymentRelationships (options: { employeeRole?: string } = {}) {
+  async getFacilityEmploymentRelationships (options: { employeeRole?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = {}) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
@@ -220,9 +220,9 @@ export class User extends Model {
     return new HeartRateDataSet(heartRateDataSet, this.sessionHandler, this.id)
   }
 
-  async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { heartRateDataSets } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
-    return heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler, this.id))
+  async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, sort?: HeartRateDataSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { heartRateDataSets, heartRateDataSetsMeta } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
+    return new HeartRateDataSets(heartRateDataSets, heartRateDataSetsMeta, this.sessionHandler, this.id)
   }
 
   async createStrengthMachineDataSet (params: {sessionId?: number, autoAttachSession?: boolean, strengthMachineId: number, exerciseId?: number, facilityId?: number, version: string, serial: string, completedAt: Date, chest?: number, rom1?: number, rom2?: number, seat?: number, resistance: number, resistancePrecision: ResistancePrecision, repetitionCount: number, forceUnit: ForceUnit, peakPower: number, work: number, distance?: number, addedWeight?: number}) {
