@@ -8,7 +8,7 @@ import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
 import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
-import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
+import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
@@ -201,8 +201,8 @@ export class User extends Model {
   }
 
   async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { mSeriesDataSets } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
-    return mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler, this.id))
+    const { mSeriesDataSets, mSeriesDataSetsMeta } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
+    return new MSeriesDataSets(mSeriesDataSets, mSeriesDataSetsMeta, this.sessionHandler, this.id)
   }
 
   async createMSeriesFtpMeasurement (params: {source: string, takenAt: Date, machineType: string, ftp: number}) {
