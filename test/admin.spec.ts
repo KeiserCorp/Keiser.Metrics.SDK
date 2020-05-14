@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
 import { StatSorting } from '../src/models/stat'
-import { User } from '../src/models/user'
+import { User, UserSorting } from '../src/models/user'
 import { AdminSession } from '../src/session'
 import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -53,18 +53,19 @@ describe('Admin', function () {
   })
 
   it('can get users', async function () {
-    const users = await session.users.getUsers()
+    const users = await session.getUsers()
 
     expect(Array.isArray(users)).to.equal(true)
     expect(users.length).to.be.above(0)
     expect(users[0] instanceof User).to.equal(true)
+    expect(users.meta.sort).to.equal(UserSorting.ID)
   })
 
   it('can merge users', async function () {
     const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
     const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
 
-    const mergedUser = await session.users.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
+    const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
     const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
 
     expect(emailAddresses).to.be.an('array')

@@ -1,5 +1,5 @@
 import { ClientSideActionPrevented } from '../error'
-import { Model } from '../model'
+import { BaseModelList, ListMeta, Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
@@ -24,6 +24,13 @@ export enum OAuthProviders {
   TrainingPeaks = 'trainingpeaks'
 }
 
+/** @hidden */
+export enum UserSorting {
+  ID = 'id',
+  Name = 'name',
+  CreatedAt = 'createdAt'
+}
+
 export interface UserData {
   id: number
   emailAddresses: EmailAddressData[]
@@ -44,6 +51,21 @@ export interface UserResponse extends AuthenticatedResponse {
 /** @hidden */
 export interface UserListResponse extends AuthenticatedResponse {
   users: UserData[]
+  usersMeta: UserListResponseMeta
+}
+
+/** @hidden */
+export interface UserListResponseMeta extends ListMeta {
+  name: string | undefined
+  email: string | undefined
+  sort: UserSorting
+}
+
+/** @hidden */
+export class Users extends BaseModelList<User, UserData, UserListResponseMeta> {
+  constructor (users: UserData[], usersMeta: UserListResponseMeta, sessionHandler: SessionHandler) {
+    super(User, users, usersMeta, sessionHandler)
+  }
 }
 
 export interface OAuthConnectResponse extends AuthenticatedResponse {
@@ -233,18 +255,5 @@ export class User extends Model {
   async getStrengthMachineDataSets (options: {from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler, this.id)
-  }
-}
-
-/** @hidden */
-export class Users extends Model {
-  async getUsers (options: {name?: string, limit?: number, offset?: number} = { limit: 20 }) {
-    const { users } = await this.action('user:list', options) as UserListResponse
-    return users.map(user => new User(user, this.sessionHandler))
-  }
-
-  async mergeUsers (params: {fromUserId: number, toUserId: number}) {
-    const { user } = await this.action('user:merge', params) as UserResponse
-    return new User(user, this.sessionHandler)
   }
 }

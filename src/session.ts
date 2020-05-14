@@ -8,7 +8,7 @@ import { FacilityData, PrivilegedFacility } from './models/facility'
 import { FacilityLicenseAdministration } from './models/facilityLicense'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { Tasks } from './models/task'
-import { OAuthProviders, User, UserResponse, Users } from './models/user'
+import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -249,8 +249,14 @@ export class AdminSession extends UserSession {
     return new Stats(stats, statsMeta, this.sessionHandler)
   }
 
-  get users () {
-    return new Users(this._sessionHandler)
+  async getUsers (options: {name?: string, email?: string, sort?: UserSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { users, usersMeta } = await this.action('user:list', options) as UserListResponse
+    return new Users(users, usersMeta, this.sessionHandler)
+  }
+
+  async mergeUsers (params: {fromUserId: number, toUserId: number}) {
+    const { user } = await this.action('user:merge', params) as UserResponse
+    return new User(user, this.sessionHandler)
   }
 
   get cache () {
