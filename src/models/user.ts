@@ -8,8 +8,8 @@ import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
 import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
-import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets } from './mSeriesDataSet'
-import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
+import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
+import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
@@ -200,7 +200,7 @@ export class User extends Model {
     return new MSeriesDataSet(mSeriesDataSet, this.sessionHandler, this.id)
   }
 
-  async getMSeriesDataSets (options: {source?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
+  async getMSeriesDataSets (options: {source?: string, from?: Date, sort?: MSeriesDataSetSorting, ascending?: boolean, to?: Date, limit?: number, offset?: number} = { }) {
     const { mSeriesDataSets, mSeriesDataSetsMeta } = await this.action('mSeriesDataSet:list', { ...options, userId : this.id }) as MSeriesDataSetListResponse
     return new MSeriesDataSets(mSeriesDataSets, mSeriesDataSetsMeta, this.sessionHandler, this.id)
   }
@@ -210,9 +210,9 @@ export class User extends Model {
     return new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.sessionHandler, this.id)
   }
 
-  async getMSeriesFtpMeasurements (options: {machineType?: string, from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { mSeriesFtpMeasurements } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId : this.id }) as MSeriesFtpMeasurementListResponse
-    return mSeriesFtpMeasurements.map(mSeriesFtpMeasurement => new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.sessionHandler, this.id))
+  async getMSeriesFtpMeasurements (options: {source?: string, machineType?: string, from?: Date, to?: Date, sort?: MSeriesFtpMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId : this.id }) as MSeriesFtpMeasurementListResponse
+    return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler, this.id)
   }
 
   async createHeartRateDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[]}) {

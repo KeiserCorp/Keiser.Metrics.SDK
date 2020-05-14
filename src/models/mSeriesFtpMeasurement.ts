@@ -1,5 +1,11 @@
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+
+export enum MSeriesFtpMeasurementSorting {
+  ID = 'id',
+  TakenAt = 'takenAt',
+  Source = 'source'
+}
 
 export interface MSeriesFtpMeasurementData {
   id: number
@@ -15,6 +21,19 @@ export interface MSeriesFtpMeasurementResponse extends AuthenticatedResponse {
 
 export interface MSeriesFtpMeasurementListResponse extends AuthenticatedResponse {
   mSeriesFtpMeasurements: MSeriesFtpMeasurementData[]
+  mSeriesFtpMeasurementsMeta: MSeriesFtpMeasurementListResponseMeta
+}
+
+export interface MSeriesFtpMeasurementListResponseMeta extends ListMeta {
+  source: string
+  machineType: string
+  sort: MSeriesFtpMeasurementSorting
+}
+
+export class MSeriesFtpMeasurements extends UserModelList<MSeriesFtpMeasurement, MSeriesFtpMeasurementData, MSeriesFtpMeasurementListResponseMeta> {
+  constructor (mSeriesFtpMeasurements: MSeriesFtpMeasurementData[], mSeriesFtpMeasurementsMeta: MSeriesFtpMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(MSeriesFtpMeasurement, mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, sessionHandler, userId)
+  }
 }
 
 export class MSeriesFtpMeasurement extends Model {

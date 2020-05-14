@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { MSeriesFtpMeasurement } from '../src/models/mSeriesFtpMeasurement'
+import { MSeriesFtpMeasurement, MSeriesFtpMeasurementSorting } from '../src/models/mSeriesFtpMeasurement'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -27,6 +27,7 @@ describe('M Series FTP Measurement', function () {
     const mSeriesFtpMeasurements = await user.getMSeriesFtpMeasurements()
 
     expect(Array.isArray(mSeriesFtpMeasurements)).to.equal(true)
+    expect(mSeriesFtpMeasurements.meta.sort).to.equal(MSeriesFtpMeasurementSorting.TakenAt)
   })
 
   it('can create new M Series FTP measurement', async function () {
