@@ -14,7 +14,7 @@ import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServices
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
-import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse } from './strengthMachineDataSet'
+import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
 export enum OAuthProviders {
@@ -190,7 +190,7 @@ export class User extends Model {
     return new Session(session, this.sessionHandler, this.id)
   }
 
-  async getSessions (options: {open?: boolean, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number} = { limit: 20 }) {
+  async getSessions (options: {open?: boolean, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { sessions, sessionsMeta } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
     return new Sessions(sessions, sessionsMeta, this.sessionHandler, this.id)
   }
@@ -230,9 +230,9 @@ export class User extends Model {
     return new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler, this.id)
   }
 
-  async getStrengthMachineDataSets (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { strengthMachineDataSets } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
-    return strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler, this.id))
+  async getStrengthMachineDataSets (options: {from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
+    return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler, this.id)
   }
 }
 

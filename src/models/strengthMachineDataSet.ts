@@ -1,5 +1,5 @@
 import { DeepReadonly } from '../lib/readonly'
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
 
@@ -20,6 +20,11 @@ export enum StrengthTestType {
   A4206Rep = 'a4206r',
   A42010Rep = 'a42010r',
   A50010Rep = 'a50010r'
+}
+
+export enum StrengthMachineDataSetSorting {
+  ID = 'id',
+  CompletedAt = 'completedAt'
 }
 
 export interface StrengthMachineDataSetData {
@@ -71,6 +76,19 @@ export interface StrengthMachineDataSetResponse extends AuthenticatedResponse {
 
 export interface StrengthMachineDataSetListResponse extends AuthenticatedResponse {
   strengthMachineDataSets: StrengthMachineDataSetData[]
+  strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta
+}
+
+export interface StrengthMachineDataSetListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  sort: StrengthMachineDataSetSorting
+}
+
+export class StrengthMachineDataSets extends UserModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
+  constructor (strengthMachineDataSets: StrengthMachineDataSetData[], strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(StrengthMachineDataSet, strengthMachineDataSets, strengthMachineDataSetsMeta, sessionHandler, userId)
+  }
 }
 
 export class StrengthMachineDataSet extends Model {
