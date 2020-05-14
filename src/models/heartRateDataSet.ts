@@ -37,8 +37,8 @@ export interface HeartRateDataSetListResponseMeta extends ListMeta {
 }
 
 export class HeartRateDataSets extends UserModelList<HeartRateDataSet, HeartRateDataSetData, HeartRateDataSetListResponseMeta> {
-  constructor (emailAddresses: HeartRateDataSetData[], emailAddressesMeta: HeartRateDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(HeartRateDataSet, emailAddresses, emailAddressesMeta, sessionHandler, userId)
+  constructor (heartRateDataSets: HeartRateDataSetData[], heartRateDataSetsMeta: HeartRateDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(HeartRateDataSet, heartRateDataSets, heartRateDataSetsMeta, sessionHandler, userId)
   }
 }
 

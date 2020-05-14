@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { HeartRateDataSet } from '../src/models/heartRateDataSet'
+import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -35,6 +35,7 @@ describe('Heart Rate Data Set', function () {
     const heartRateDataSets = await user.getHeartRateDataSets()
 
     expect(Array.isArray(heartRateDataSets)).to.equal(true)
+    expect(heartRateDataSets.meta.sort).to.equal(HeartRateDataSetSorting.StartedAt)
   })
 
   it('can create new heart rate data set', async function () {

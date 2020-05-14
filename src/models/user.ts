@@ -7,7 +7,7 @@ import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from '
 import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
 import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
-import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse } from './heightMeasurement'
+import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse } from './mSeriesFtpMeasurement'
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse } from './oauthService'
@@ -160,9 +160,9 @@ export class User extends Model {
     return new HeightMeasurement(heightMeasurement, this.sessionHandler, this.id)
   }
 
-  async getHeightMeasurements (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { heightMeasurements } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
-    return heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.sessionHandler, this.id))
+  async getHeightMeasurements (options: {from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { limit: 20 }) {
+    const { heightMeasurements, heightMeasurementsMeta } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
+    return new HeightMeasurements(heightMeasurements, heightMeasurementsMeta, this.sessionHandler, this.id)
   }
 
   async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
