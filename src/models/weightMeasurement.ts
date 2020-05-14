@@ -1,6 +1,12 @@
 import { DeepReadonly } from '../lib/readonly'
-import { Model } from '../model'
+import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+
+export enum WeightMeasurementSorting {
+  ID = 'id',
+  Source = 'source',
+  TakenAt = 'takenAt'
+}
 
 export interface WeightMeasurementData {
   id: number
@@ -52,6 +58,17 @@ export interface WeightMeasurementResponse extends AuthenticatedResponse {
 
 export interface WeightMeasurementListResponse extends AuthenticatedResponse {
   weightMeasurements: WeightMeasurementData[]
+  weightMeasurementsMeta: WeightMeasurementListResponseMeta
+}
+
+export interface WeightMeasurementListResponseMeta extends ListMeta {
+  sort: WeightMeasurementSorting
+}
+
+export class WeightMeasurements extends UserModelList<WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponseMeta> {
+  constructor (weightMeasurements: WeightMeasurementData[], weightMeasurementsMeta: WeightMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
+    super(WeightMeasurement, weightMeasurements, weightMeasurementsMeta, sessionHandler, userId)
+  }
 }
 
 export class WeightMeasurement extends Model {

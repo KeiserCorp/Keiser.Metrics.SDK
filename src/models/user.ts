@@ -15,7 +15,7 @@ import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { Session, SessionListResponse, SessionResponse } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse } from './strengthMachineDataSet'
-import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse } from './weightMeasurement'
+import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
 export enum OAuthProviders {
   Google = 'google',
@@ -101,7 +101,7 @@ export class User extends Model {
     return new EmailAddress(emailAddress, this.sessionHandler, this.id)
   }
 
-  async getEmailAddresses (options: {email?: string, sort?: EmailAddressSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
+  async getEmailAddresses (options: {email?: string, sort?: EmailAddressSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { emailAddresses, emailAddressesMeta } = await this.action('emailAddress:list', { ...options, userId : this.id }) as EmailAddressListResponse
     return new EmailAddresses(emailAddresses, emailAddressesMeta, this.sessionHandler, this.id)
   }
@@ -146,9 +146,9 @@ export class User extends Model {
     return new WeightMeasurement(weightMeasurement, this.sessionHandler, this.id)
   }
 
-  async getWeightMeasurements (options: {from?: Date, to?: Date, limit?: number, offset?: number} = { limit: 20 }) {
-    const { weightMeasurements } = await this.action('weightMeasurement:list', { ...options, userId : this.id }) as WeightMeasurementListResponse
-    return weightMeasurements.map(weightMeasurement => new WeightMeasurement(weightMeasurement, this.sessionHandler, this.id))
+  async getWeightMeasurements (options: {from?: Date, to?: Date, sort?: WeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { weightMeasurements, weightMeasurementsMeta } = await this.action('weightMeasurement:list', { ...options, userId : this.id }) as WeightMeasurementListResponse
+    return new WeightMeasurements(weightMeasurements, weightMeasurementsMeta, this.sessionHandler, this.id)
   }
 
   get latestHeightMeasurement () {
@@ -160,7 +160,7 @@ export class User extends Model {
     return new HeightMeasurement(heightMeasurement, this.sessionHandler, this.id)
   }
 
-  async getHeightMeasurements (options: {from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { limit: 20 }) {
+  async getHeightMeasurements (options: {from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { heightMeasurements, heightMeasurementsMeta } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
     return new HeightMeasurements(heightMeasurements, heightMeasurementsMeta, this.sessionHandler, this.id)
   }
@@ -175,12 +175,12 @@ export class User extends Model {
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler, this.id)
   }
 
-  async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = {}) {
+  async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { userId : this.id, member: true }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 
-  async getFacilityEmploymentRelationships (options: { employeeRole?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = {}) {
+  async getFacilityEmploymentRelationships (options: { employeeRole?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }

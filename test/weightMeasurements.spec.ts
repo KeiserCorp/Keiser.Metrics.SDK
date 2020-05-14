@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics from '../src'
 import { User } from '../src/models/user'
-import { WeightMeasurement } from '../src/models/weightMeasurement'
+import { WeightMeasurement, WeightMeasurementSorting } from '../src/models/weightMeasurement'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -35,6 +35,7 @@ describe('Weight Measurement', function () {
 
     expect(Array.isArray(weightMeasurements)).to.equal(true)
     expect(weightMeasurements.length).to.be.above(0)
+    expect(weightMeasurements.meta.sort).to.equal(WeightMeasurementSorting.TakenAt)
   })
 
   it('can get list of weight measurement with parameters', async function () {
