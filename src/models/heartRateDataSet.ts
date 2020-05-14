@@ -93,7 +93,7 @@ export class HeartRateDataSet extends Model {
   }
 
   get graphData () {
-    return this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRadeDataPointData => new HeartRateDataPoint(heartRadeDataPointData)) : undefined
+    return this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   get Session () {
