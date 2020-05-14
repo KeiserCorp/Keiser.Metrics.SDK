@@ -25,6 +25,8 @@ export interface HeightMeasurementListResponse extends AuthenticatedResponse {
 }
 
 export interface HeightMeasurementListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
   sort: HeightMeasurementSorting
 }
 

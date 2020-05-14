@@ -32,6 +32,8 @@ export interface HeartRateDataSetListResponse extends AuthenticatedResponse {
 }
 
 export interface HeartRateDataSetListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
   source: string | undefined
   sort: HeartRateDataSetSorting
 }

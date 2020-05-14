@@ -42,6 +42,9 @@ export interface SessionListResponse extends AuthenticatedResponse {
 }
 
 export interface SessionListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
+  open: boolean | undefined
   sort: SessionSorting
 }
 

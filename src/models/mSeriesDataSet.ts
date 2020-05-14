@@ -44,6 +44,8 @@ export interface MSeriesDataSetListResponse extends AuthenticatedResponse {
 }
 
 export interface MSeriesDataSetListResponseMeta extends ListMeta {
+  from: string | undefined
+  to: string | undefined
   source: string
   sort: MSeriesDataSetSorting
 }
