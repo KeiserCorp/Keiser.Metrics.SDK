@@ -26,8 +26,8 @@ export interface StatListResponse extends AuthenticatedResponse {
 }
 
 export interface StatListResponseMeta extends ListMeta {
-  from: Date | undefined
-  to: Date | undefined
+  from: string | undefined
+  to: string | undefined
   sort: StatSorting
 }
 
