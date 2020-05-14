@@ -7,7 +7,7 @@ import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
 import { FacilityLicenseAdministration } from './models/facilityLicense'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
-import { Tasks } from './models/task'
+import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
 import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
 export interface AuthenticatedResponse {
@@ -274,8 +274,32 @@ export class AdminSession extends UserSession {
     return new Cache(cacheObject.key, this.sessionHandler)
   }
 
-  get tasks () {
-    return new Tasks(this._sessionHandler)
+  async getResqueDetails () {
+    const { details } = await this.action('resque:details') as ResqueDetailsResponse
+    return details
+  }
+
+  async getWorkers () {
+    const { workers } = await this.action('resque:worker:list') as WorkersResponse
+    return Object.keys(workers).map(key => ({ worker: key, status: workers[key] }))
+  }
+
+  async getTasks (options: {queue: Queue, offset?: number, limit?: number}) {
+    const { tasks, tasksMeta } = await this.action('resque:task:queue', options) as TaskQueueResponse
+    return new Tasks(tasks, tasksMeta, this.sessionHandler)
+  }
+
+  async getFailedTasks (options: {offset?: number, limit?: number} = {}) {
+    const { tasks, tasksMeta } = await this.action('resque:task:failures', options) as TaskFailedResponse
+    return new FailedTasks(tasks, tasksMeta, this.sessionHandler)
+  }
+
+  async retryAllFailedTasks (options: {taskName?: string} = {}) {
+    await this.action('resque:task:retryAllFailed', options)
+  }
+
+  async deleteAllFailedTasks (options: {taskName?: string} = {}) {
+    await this.action('resque:task:deleteAllFailed', options)
   }
 
   get facilityLicenses () {

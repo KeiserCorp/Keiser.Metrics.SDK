@@ -20,6 +20,7 @@
   "tslint.jsEnable": true,
   "tslint.ignoreDefinitionFiles": false,
   "cSpell.words": [
+    "backtrace",
     "echip",
     "id",
     "inbody",
