@@ -64,8 +64,6 @@ export class HeartRateDataSet extends Model {
     return this
   }
 
-  // To-Do: Decide if `update` method is necessary
-
   async delete () {
     await this.action('heartRateDataSet:delete', { userId: this._userId, id: this.id })
   }

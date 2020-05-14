@@ -111,8 +111,6 @@ export class StrengthMachineDataSet extends Model {
     return this
   }
 
-  // To-Do: Decide if `update` method is necessary
-
   async delete () {
     await this.action('strengthMachineDataSet:delete', { userId: this._userId, id: this.id })
   }
