@@ -3,7 +3,7 @@ import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
-import { Cache } from './models/cache'
+import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { FacilityData, PrivilegedFacility } from './models/facility'
 import { FacilityLicenseAdministration } from './models/facilityLicense'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
@@ -259,8 +259,19 @@ export class AdminSession extends UserSession {
     return new User(user, this.sessionHandler)
   }
 
-  get cache () {
-    return new Cache(this._sessionHandler)
+  async getCacheKeys (options: {filter?: string} = {}) {
+    const { cacheKeys } = await this.action('resque:cache:list') as CacheKeysResponse
+    return cacheKeys.filter(key => key.startsWith('cache:' + (options?.filter ?? ''))).map(key => new Cache(key.replace(/$cache:/, ''), this.sessionHandler))
+  }
+
+  async getCacheKey (key: string) {
+    const { cacheObject } = await this.action('resque:cache:show', { key }) as CacheObjectResponse
+    return new Cache(cacheObject.key, this.sessionHandler)
+  }
+
+  async createCacheKey (params: {key: string, value: string, expireIn?: number}) {
+    const { cacheObject } = await this.action('resque:cache:create', params) as CacheObjectResponse
+    return new Cache(cacheObject.key, this.sessionHandler)
   }
 
   get tasks () {

@@ -27,6 +27,7 @@
     "reauth",
     "refreshable",
     "required",
+    "resque",
     "strava",
     "trainingpeaks"
   ]
