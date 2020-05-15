@@ -7,7 +7,7 @@ const DIST = path.resolve(__dirname, '../dist')
 const package = Object.assign(require('../package.json'), {
   main: 'index.node.js',
   browser: 'index.browser.js',
-  types: 'types/index.d.ts',
+  types: 'index.d.ts',
   private: false,
   devDependencies: {},
   scripts: {}
