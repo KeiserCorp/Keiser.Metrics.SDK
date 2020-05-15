@@ -1,7 +1,7 @@
 import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum OAuthServiceSorting {
+export const enum OAuthServiceSorting {
   ID = 'id',
   Name = 'name'
 }

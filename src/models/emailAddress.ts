@@ -2,7 +2,7 @@ import { ClientSideActionPrevented } from '../error'
 import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum EmailAddressSorting {
+export const enum EmailAddressSorting {
   ID = 'id',
   Email = 'email'
 }

@@ -8,7 +8,7 @@ import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMa
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 
-export enum SessionSorting {
+export const enum SessionSorting {
   ID = 'id',
   StartedAt = 'startedAt',
   EndedAt = 'endedAt'

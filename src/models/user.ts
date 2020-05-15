@@ -17,7 +17,7 @@ import { Session, SessionListResponse, SessionResponse, Sessions, SessionSorting
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
-export enum OAuthProviders {
+export const enum OAuthProviders {
   Google = 'google',
   Facebook = 'facebook',
   Strava = 'strava',
@@ -25,7 +25,7 @@ export enum OAuthProviders {
 }
 
 /** @hidden */
-export enum UserSorting {
+export const enum UserSorting {
   ID = 'id',
   Name = 'name',
   CreatedAt = 'createdAt'

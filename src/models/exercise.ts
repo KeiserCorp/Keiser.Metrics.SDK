@@ -1,12 +1,12 @@
 import { BaseModelList, ListMeta, Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum ExerciseType {
+export const enum ExerciseType {
   Cardio = 'cardio',
   Strength = 'strength'
 }
 
-export enum ExerciseSorting {
+export const enum ExerciseSorting {
   ID = 'id',
   Name = 'name',
   Type = 'type'

@@ -2,7 +2,7 @@ import { DeepReadonly } from '../lib/readonly'
 import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum WeightMeasurementSorting {
+export const enum WeightMeasurementSorting {
   ID = 'id',
   Source = 'source',
   TakenAt = 'takenAt'

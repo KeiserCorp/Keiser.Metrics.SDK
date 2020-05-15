@@ -3,26 +3,26 @@ import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
 
-export enum ResistancePrecision {
+export const enum ResistancePrecision {
   Integer = 'int',
   Decimal = 'dec'
 }
 
-export enum ForceUnit {
+export const enum ForceUnit {
   Pounds = 'lb',
   Kilograms = 'kg',
   Newtons = 'ne',
   Unknown = 'er'
 }
 
-export enum StrengthTestType {
+export const enum StrengthTestType {
   Power6Rep = 'power6r',
   A4206Rep = 'a4206r',
   A42010Rep = 'a42010r',
   A50010Rep = 'a50010r'
 }
 
-export enum StrengthMachineDataSetSorting {
+export const enum StrengthMachineDataSetSorting {
   ID = 'id',
   CompletedAt = 'completedAt'
 }

@@ -3,12 +3,12 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { User, UserData } from './user'
 
-export enum UserFacilityRelationshipSorting {
+export const enum UserFacilityRelationshipSorting {
   ID = 'id',
   EmployeeRole = 'employeeRole'
 }
 
-export enum FacilityUserRelationshipSorting {
+export const enum FacilityUserRelationshipSorting {
   ID = 'id',
   Name = 'name',
   MemberIdentifier = 'memberIdentifier',

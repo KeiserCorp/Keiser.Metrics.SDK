@@ -1,7 +1,7 @@
 import { ListMeta, Model, UserModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum MSeriesFtpMeasurementSorting {
+export const enum MSeriesFtpMeasurementSorting {
   ID = 'id',
   TakenAt = 'takenAt',
   Source = 'source'

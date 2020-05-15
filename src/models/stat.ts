@@ -1,7 +1,7 @@
 import { BaseModelList, ListMeta, Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export enum StatSorting {
+export const enum StatSorting {
   ID = 'id',
   CreatedAt = 'createdAt'
 }

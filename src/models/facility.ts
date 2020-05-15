@@ -3,7 +3,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
 
-export enum FacilitySorting {
+export const enum FacilitySorting {
   ID = 'id',
   Name = 'name'
 }
