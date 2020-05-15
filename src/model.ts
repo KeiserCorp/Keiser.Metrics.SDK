@@ -24,7 +24,7 @@ export interface UserModelClass<Model> {
   new(x: any, sessionHandler: SessionHandler, userId: number): Model
 }
 
-export class UserModelList<Model, Data, Meta> extends Array<Model> {
+export class UserModelList<Model, Data, Meta extends ListMeta> extends Array<Model> {
   protected _meta: Meta
 
   constructor (type: UserModelClass<Model>, items: Array<Data> | number, meta: Meta, sessionHandler: SessionHandler, userId: number) {

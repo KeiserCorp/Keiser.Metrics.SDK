@@ -136,8 +136,8 @@ export class UserFacilityRelationship extends FacilityRelationship {
   }
 }
 
-export class FacilityUserRelationships extends UserModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponse> {
-  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponse, sessionHandler: SessionHandler, userId: number) {
+export class FacilityUserRelationships extends UserModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
     super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
   }
 }
