@@ -100,8 +100,25 @@ function generateUsername(user: User) {
 }
 ```
 
-## Error Handling
+## Paginated Data
+All plural [`User`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/user.html) data methods (ex: [`user.getEmailAddresses()`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/emailaddresses.html)) will return an ordered array of class instances. These arrays have an extended `meta` property which contains the parameters used to query the array, the sorting properties, and a `totalCount` property which is the total number of instances associated with the parent class. By default these method will limit responses to `20` instances.
 
+```ts
+// Default call will return 20 entities with uncertain sorting
+const emailAddresses = await user.getEmailAddresses()
+
+// Will return 10 entities, sorted by Email property in ascending order, starting at ordered entity 1 (first)
+const firstPageOfEmailAddresses = await user.getEmailAddresses({sort: EmailAddressSorting.Email, ascending: true, limit: 10, offset: 0})
+const totalNumberOfEmailAddresses = emailAddresses.meta.totalCount
+
+// Same sorting as previous call, but now will return the elements starting at ordered entity 31 (3rd page of entities)
+const thirdPageOfEmailAddresses = await user.getEmailAddresses({sort: EmailAddressSorting.Email, ascending: true, limit: 10, offset: 30})
+
+// Will return 10 entities that contain "@gmail.com", sorted and ordered
+const searchResultEmailAddresses = await user.getEmailAddresses({email: '@gmail.com', sort: EmailAddressSorting.Email, ascending: true, limit: 10, offset: 0})
+```
+
+## Error Handling
 All errors are handled by throwing inside the method call with the expectation of a [`try/catch`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch) to catch the error.
 
 All errors will be thrown as a typed error instance corresponding to the reason for the error, with the global [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) as the base instance, and an intermediate category type inheritance (for easier bucketing).
@@ -124,7 +141,6 @@ try {
 ```
 
 ### Error Categories
-
 | Name                                                                                       | Reason                                                       |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | [Request](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/requesterror.html)       | Issue with the parameters provided for the request           |
@@ -133,7 +149,6 @@ try {
 | [Connection](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/connectionerror.html) | Issue with connection to server                              |
 
 ### Common Errors
-
 | Name                    | Category | Reason                                                                     |
 | ----------------------- | -------- | -------------------------------------------------------------------------- |
 | Missing Params          | Request  | Parameters are missing from action (potentially `null` or `undefined`)     |
@@ -146,7 +161,6 @@ try {
 | Facility Access Control | Request  | Request is prevented due to facility access control limitations            |
 
 ## Closing Connection
-
 The base [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html) instance maintains an active connection until it is disposed, so it is recommended to dispose the connection by calling [`dispose()`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#dispose) once the connection is no longer needed.
 
 ```ts
