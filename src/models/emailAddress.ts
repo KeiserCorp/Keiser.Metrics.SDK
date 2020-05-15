@@ -4,7 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum EmailAddressSorting {
   ID = 'id',
-  Name = 'name'
+  Email = 'email'
 }
 
 export interface EmailAddressData {
