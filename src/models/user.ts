@@ -198,7 +198,7 @@ export class User extends Model {
   }
 
   async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
-    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { userId : this.id, member: true }) as UserFacilityRelationshipListResponse
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, member: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 
