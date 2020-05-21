@@ -2,6 +2,7 @@ import { ListMeta, Model, UserModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
+import { FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
 
 export const enum FacilitySorting {
   ID = 'id',
@@ -78,5 +79,15 @@ export class PrivilegedFacility extends Facility {
 
   async setActive () {
     await this.action('auth:setFacility', { facilityId: this.id, refreshable: this.sessionHandler.refreshToken !== null })
+  }
+
+  async getMemberRelationships (options: { name?: string, memberIdentifier?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
+  }
+
+  async getEmployeeRelationships (options: { name?: string, employeeRole?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, employee: true }) as FacilityUserRelationshipListResponse
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
   }
 }
