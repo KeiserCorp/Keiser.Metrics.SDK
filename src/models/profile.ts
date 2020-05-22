@@ -9,6 +9,7 @@ export const enum Gender {
 }
 
 export interface ProfileData {
+  userId: number
   updatedAt: string
   name: string | null
   birthday: string | null
@@ -23,12 +24,10 @@ export interface ProfileResponse extends AuthenticatedResponse {
 
 export class Profile extends Model {
   private _profileData: ProfileData
-  private _userId: number
 
-  constructor (profileData: ProfileData, sessionHandler: SessionHandler, userId: number) {
+  constructor (profileData: ProfileData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._profileData = profileData
-    this._userId = userId
   }
 
   private setProfileData (profileData: ProfileData) {
@@ -36,7 +35,7 @@ export class Profile extends Model {
   }
 
   async reload () {
-    const { profile } = await this.action('profile:show', { userId: this._userId }) as ProfileResponse
+    const { profile } = await this.action('profile:show', { userId: this._profileData.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
   }
@@ -48,7 +47,7 @@ export class Profile extends Model {
     language?: string | null
     units?: Units | null
   }) {
-    const { profile } = await this.action('profile:update', { userId: this._userId, ...params }) as ProfileResponse
+    const { profile } = await this.action('profile:update', { ...params, userId: this._profileData.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
   }

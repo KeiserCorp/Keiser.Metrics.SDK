@@ -1,4 +1,4 @@
-import { BaseModelList, ListMeta, Model } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum ExerciseType {
@@ -33,7 +33,7 @@ export interface ExerciseListResponseMeta extends ListMeta {
   sort: ExerciseSorting
 }
 
-export class Exercises extends BaseModelList<Exercise, ExerciseData, ExerciseListResponseMeta> {
+export class Exercises extends ModelList<Exercise, ExerciseData, ExerciseListResponseMeta> {
   constructor (exercises: ExerciseData[], exercisesMeta: ExerciseListResponseMeta, sessionHandler: SessionHandler) {
     super(Exercise, exercises, exercisesMeta, sessionHandler)
   }

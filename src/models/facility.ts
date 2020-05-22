@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList  } from '../model'
+import { ListMeta, Model, ModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
@@ -37,9 +37,9 @@ export interface FacilityListResponseMeta extends ListMeta {
   sort: FacilitySorting
 }
 
-export class Facilities extends UserModelList<Facility, FacilityData, FacilityListResponseMeta> {
-  constructor (facilities: FacilityData[], facilitiesMeta: FacilityListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(Facility, facilities, facilitiesMeta, sessionHandler, userId)
+export class Facilities extends ModelList<Facility, FacilityData, FacilityListResponseMeta> {
+  constructor (facilities: FacilityData[], facilitiesMeta: FacilityListResponseMeta, sessionHandler: SessionHandler) {
+    super(Facility, facilities, facilitiesMeta, sessionHandler)
   }
 }
 
@@ -83,11 +83,11 @@ export class PrivilegedFacility extends Facility {
 
   async getMemberRelationships (options: { name?: string, memberIdentifier?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
-    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
   async getEmployeeRelationships (options: { name?: string, employeeRole?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, employee: true }) as FacilityUserRelationshipListResponse
-    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler, this.id)
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 }

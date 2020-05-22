@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { User, UserData } from './user'
@@ -98,9 +98,9 @@ export class FacilityRelationship extends Model {
   }
 }
 
-export class UserFacilityRelationships extends UserModelList<UserFacilityRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
-  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(UserFacilityRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
+export class UserFacilityRelationships extends ModelList<UserFacilityRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(UserFacilityRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
 }
 
@@ -136,9 +136,9 @@ export class UserFacilityRelationship extends FacilityRelationship {
   }
 }
 
-export class FacilityUserRelationships extends UserModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
-  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
+export class FacilityUserRelationships extends ModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
 }
 

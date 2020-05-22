@@ -97,6 +97,7 @@ export class SessionHandler {
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
+  private _userId: number | null = null
 
   constructor (connection: MetricsConnection, loginResponse: UserResponse) {
     this._connection = connection
@@ -159,6 +160,10 @@ export class SessionHandler {
 
   get onRefreshTokenChangeEvent () {
     return this._onRefreshTokenChangeEvent.asEvent()
+  }
+
+  get userId () {
+    return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
   }
 
   close () {

@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum MSeriesFtpMeasurementSorting {
@@ -32,20 +32,18 @@ export interface MSeriesFtpMeasurementListResponseMeta extends ListMeta {
   sort: MSeriesFtpMeasurementSorting
 }
 
-export class MSeriesFtpMeasurements extends UserModelList<MSeriesFtpMeasurement, MSeriesFtpMeasurementData, MSeriesFtpMeasurementListResponseMeta> {
-  constructor (mSeriesFtpMeasurements: MSeriesFtpMeasurementData[], mSeriesFtpMeasurementsMeta: MSeriesFtpMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(MSeriesFtpMeasurement, mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, sessionHandler, userId)
+export class MSeriesFtpMeasurements extends ModelList<MSeriesFtpMeasurement, MSeriesFtpMeasurementData, MSeriesFtpMeasurementListResponseMeta> {
+  constructor (mSeriesFtpMeasurements: MSeriesFtpMeasurementData[], mSeriesFtpMeasurementsMeta: MSeriesFtpMeasurementListResponseMeta, sessionHandler: SessionHandler) {
+    super(MSeriesFtpMeasurement, mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, sessionHandler)
   }
 }
 
 export class MSeriesFtpMeasurement extends Model {
   private _mSeriesFtpMeasurement: MSeriesFtpMeasurementData
-  private _userId: number
 
-  constructor (mSeriesFtpMeasurement: MSeriesFtpMeasurementData, sessionHandler: SessionHandler, userId: number) {
+  constructor (mSeriesFtpMeasurement: MSeriesFtpMeasurementData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._mSeriesFtpMeasurement = mSeriesFtpMeasurement
-    this._userId = userId
   }
 
   private setMSeriesFtpMeasurement (mSeriesFtpMeasurement: MSeriesFtpMeasurementData) {
@@ -53,13 +51,13 @@ export class MSeriesFtpMeasurement extends Model {
   }
 
   async reload () {
-    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:show', { userId: this._userId, id: this.id }) as MSeriesFtpMeasurementResponse
+    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:show', { id: this.id }) as MSeriesFtpMeasurementResponse
     this.setMSeriesFtpMeasurement(mSeriesFtpMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('mSeriesFtpMeasurement:delete', { userId: this._userId, id: this.id })
+    await this.action('mSeriesFtpMeasurement:delete', { id: this.id })
   }
 
   get id () {
