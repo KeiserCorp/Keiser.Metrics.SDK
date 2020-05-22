@@ -4,6 +4,7 @@ import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { ActionPreventedError, UnknownEntityError } from '../src/error'
 
 describe('Session', function () {
   let metricsInstance: Metrics
@@ -52,7 +53,7 @@ describe('Session', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(625)
+    expect(extError.code).to.equal(ActionPreventedError.code)
   })
 
   it('can end session', async function () {
@@ -83,7 +84,7 @@ describe('Session', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })

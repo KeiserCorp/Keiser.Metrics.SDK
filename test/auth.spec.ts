@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { DuplicateEntityError, InvalidCredentialsError, UnauthorizedTokenError, BlacklistTokenError } from '../src/error'
 import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Auth', function () {
@@ -53,7 +54,7 @@ describe('Auth', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(603)
+    expect(extError.code).to.equal(InvalidCredentialsError.code)
     expect(session).to.not.be.an('object')
   })
 
@@ -102,7 +103,7 @@ describe('Auth', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(606)
+    expect(extError.code).to.equal(DuplicateEntityError.code)
     expect(session).to.not.be.an('object')
   })
 
@@ -163,7 +164,7 @@ describe('Auth', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(613)
+    expect(extError.code).to.equal(UnauthorizedTokenError.code)
   })
 
   it('cannot make model request after logout', async function () {
@@ -180,7 +181,7 @@ describe('Auth', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(613)
+    expect(extError.code).to.equal(UnauthorizedTokenError.code)
   })
 
   it('cannot start session after logout', async function () {
@@ -197,7 +198,7 @@ describe('Auth', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(615)
+    expect(extError.code).to.equal(BlacklistTokenError.code)
   })
 
   it('can request password reset', async function () {

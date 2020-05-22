@@ -21,7 +21,10 @@
   "tslint.ignoreDefinitionFiles": false,
   "cSpell.words": [
     "backtrace",
+    "csrf",
+    "csrf error",
     "echip",
+    "error",
     "id",
     "inbody",
     "oauths",

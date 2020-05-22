@@ -3,6 +3,7 @@ import Metrics from '../src'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { BlacklistTokenError } from '../src/error'
 
 describe('User', function () {
   let metricsInstance: Metrics
@@ -63,7 +64,7 @@ describe('User', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(615)
+    expect(extError.code).to.equal(BlacklistTokenError.code)
   })
 
 })

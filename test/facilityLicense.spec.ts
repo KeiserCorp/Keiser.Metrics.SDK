@@ -3,6 +3,7 @@ import { MetricsAdmin } from '../src'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
 import { AdminSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { UnknownEntityError } from '../src/error'
 
 describe('Facility License', function () {
   let metricsInstance: MetricsAdmin
@@ -57,6 +58,6 @@ describe('Facility License', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 })

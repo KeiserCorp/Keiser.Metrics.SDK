@@ -4,6 +4,7 @@ import { EmailAddress } from '../src/models/emailAddress'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { UnknownEntityError } from '../src/error'
 
 describe('Email Address', function () {
   let metricsInstance: Metrics
@@ -61,7 +62,7 @@ describe('Email Address', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })

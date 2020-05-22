@@ -3,6 +3,7 @@ import Metrics from '../src'
 import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { UnknownEntityError } from '../src/error'
 
 const generateHeartRateDataSet = () => {
   const startTime = (new Date()).getTime()
@@ -68,7 +69,7 @@ describe('Heart Rate Data Set', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })
