@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityUserRelationshipSorting, UserFacilityRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
@@ -67,7 +68,7 @@ describe('User to Facility Relationship', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(625)
+    expect(extError.code).to.equal(ActionPreventedError.code)
   })
 
 })

@@ -15,6 +15,14 @@ export const enum FacilityUserRelationshipSorting {
   EmployeeRole = 'employeeRole'
 }
 
+export const enum FacilityEmployeeRole {
+  Admin = 'admin',
+  CustomerSupport = 'customerSupport',
+  Trainer = 'trainer',
+  FrontDesk = 'frontDesk',
+  Maintenance = 'maintenance'
+}
+
 export interface FacilityRelationshipData {
   id: number
   userId: number
@@ -22,7 +30,7 @@ export interface FacilityRelationshipData {
   member: boolean
   memberIdentifier: string | null
   hasSecretSet: boolean
-  employeeRole: string | null
+  employeeRole: FacilityEmployeeRole | null
   facility?: FacilityData
   user?: UserData
 }
@@ -39,7 +47,7 @@ export interface UserFacilityRelationshipListResponse extends AuthenticatedRespo
 export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
   member: boolean | undefined
   employee: boolean | undefined
-  employeeRole: string | undefined
+  employeeRole: FacilityEmployeeRole | undefined
   sort: UserFacilityRelationshipSorting
 }
 
@@ -53,7 +61,7 @@ export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
   employee: boolean | undefined
   name: string | undefined
   memberIdentifier: string | undefined
-  employeeRole: string | undefined
+  employeeRole: FacilityEmployeeRole | undefined
   sort: FacilityUserRelationshipSorting
 }
 
@@ -153,7 +161,7 @@ export class FacilityUserRelationship extends FacilityRelationship {
     return this
   }
 
-  async update (params: { memberIdentifier?: string, member?: boolean, employeeRole?: string}) {
+  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null}) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this

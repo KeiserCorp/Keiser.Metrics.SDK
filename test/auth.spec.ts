@@ -87,6 +87,7 @@ describe('Auth', function () {
     expect(session).to.be.an('object')
     expect(session.user).to.be.an('object')
     expect(session.user.id).to.not.equal(DemoUserId)
+    await session.user.delete()
     session.close()
   })
 

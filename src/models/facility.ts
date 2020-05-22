@@ -1,8 +1,10 @@
+import { Units } from '../constants'
 import { ListMeta, Model, ModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
-import { FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
+import { FacilityRelationshipResponse, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
+import { Gender } from './profile'
 
 export const enum FacilitySorting {
   ID = 'id',
@@ -79,6 +81,11 @@ export class PrivilegedFacility extends Facility {
 
   async setActive () {
     await this.action('auth:setFacility', { facilityId: this.id, refreshable: this.sessionHandler.refreshToken !== null })
+  }
+
+  async createFacilityUser (params: {email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, member?: boolean, memberIdentifier?: string, memberSecret?: string, employeeRole?: string | null}) {
+    const { facilityRelationship } = await this.action('facilityRelationship:facilityCreate', params) as FacilityRelationshipResponse
+    return new FacilityUserRelationship(facilityRelationship, this.sessionHandler)
   }
 
   async getMemberRelationships (options: { name?: string, memberIdentifier?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
