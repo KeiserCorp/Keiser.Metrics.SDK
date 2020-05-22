@@ -3,7 +3,8 @@ import { ListMeta, Model, ModelList  } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
-import { FacilityRelationshipResponse, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
+import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
+import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { Gender } from './profile'
 
 export const enum FacilitySorting {
@@ -64,6 +65,11 @@ export class Facility extends Model {
   get facilityProfile () {
     return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
+
+  async createRelationshipRequest (params: {memberIdentifier?: string}) {
+    const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userCreate', { ...params, facilityId: this.id }) as FacilityRelationshipRequestResponse
+    return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
+  }
 }
 
 export class PrivilegedFacility extends Facility {
@@ -88,12 +94,22 @@ export class PrivilegedFacility extends Facility {
     return new FacilityUserRelationship(facilityRelationship, this.sessionHandler)
   }
 
+  async createRelationshipRequest (params: {email: string, member?: boolean, memberIdentifier?: string, employeeRole?: FacilityEmployeeRole | null}) {
+    const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:facilityCreate', params) as FacilityRelationshipRequestResponse
+    return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
+  }
+
+  async getRelationshipRequests (options: {memberIdentifier?: string, name?: string, sort?: UserInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { facilityRelationshipRequests, facilityRelationshipRequestsMeta } = await this.action('facilityRelationshipRequest:facilityList', options) as FacilityRelationshipRequestListResponse
+    return new UserInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
+  }
+
   async getMemberRelationships (options: { name?: string, memberIdentifier?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
     return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getEmployeeRelationships (options: { name?: string, employeeRole?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getEmployeeRelationships (options: { name?: string, employeeRole?: FacilityEmployeeRole | null, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, employee: true }) as FacilityUserRelationshipListResponse
     return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }

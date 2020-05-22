@@ -6,6 +6,7 @@ import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListRespons
 import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
 import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
 import { FacilityRelationshipData, UserFacilityRelationshipListResponse, UserFacilityRelationships, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse } from './facilityRelationshipRequest'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
@@ -201,12 +202,17 @@ export class User extends Model {
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
   }
 
+  async getFacilityRelationshipRequests (options: {memberIdentifier?: string, name?: string, sort?: FacilityInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { facilityRelationshipRequests, facilityRelationshipRequestsMeta } = await this.action('facilityRelationshipRequest:userList', options) as FacilityRelationshipRequestListResponse
+    return new FacilityInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
+  }
+
   async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, member: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getFacilityEmploymentRelationships (options: { employeeRole?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getFacilityEmploymentRelationships (options: { name?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
