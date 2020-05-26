@@ -178,6 +178,16 @@ export class User extends Model {
     return new WeightMeasurements(weightMeasurements, weightMeasurementsMeta, this.sessionHandler)
   }
 
+  async createWeightMeasurementFromInBody (params: {bodyComp: object}) {
+    const { weightMeasurement } = await this.action('weightMeasurement:importInBody', { jsonString: JSON.stringify(params.bodyComp), userId : this.id }) as WeightMeasurementResponse
+    return new WeightMeasurement(weightMeasurement, this.sessionHandler)
+  }
+
+  async createWeightMeasurementsFromInBodyCSV (params: {bodyCompCSV: string}) {
+    const { weightMeasurements, weightMeasurementsMeta } = await this.action('weightMeasurement:importInBodyCSV', { csvString: params.bodyCompCSV, userId : this.id }) as WeightMeasurementListResponse
+    return new WeightMeasurements(weightMeasurements, weightMeasurementsMeta, this.sessionHandler)
+  }
+
   get latestHeightMeasurement () {
     return this._userData.heightMeasurement ? new HeightMeasurement(this._userData.heightMeasurement, this.sessionHandler) : undefined
   }
