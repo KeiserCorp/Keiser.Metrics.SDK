@@ -114,7 +114,7 @@ export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationsh
     return this.update({ approval: false })
   }
 
-  private async update (params: { approval: boolean}) {
+  private async update (params: {approval: boolean}) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipRequestResponse
     this.setFacilityRelationshipRequestData(facilityRelationshipRequest)
     return this

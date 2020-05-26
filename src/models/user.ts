@@ -93,21 +93,21 @@ export class User extends Model {
     return this
   }
 
-  async addBasicLogin (email: string, password: string) {
+  async addBasicLogin (params: {email: string, password: string}) {
     if (!this._isSessionUser) {
       throw new ClientSideActionPrevented({ explanation: 'Cannot set basic login for other users' })
     }
 
-    const { user } = await this.action('auth:connect', { email, password }) as UserResponse
+    const { user } = await this.action('auth:connect', { ...params }) as UserResponse
     this.setUserData(user)
   }
 
-  async changePassword (password: string) {
+  async changePassword (params: {password: string}) {
     if (!this._isSessionUser) {
       throw new ClientSideActionPrevented({ explanation: 'Cannot change password for other users' })
     }
 
-    const { user } = await this.action('auth:update', { password }) as UserResponse
+    const { user } = await this.action('auth:update', { ...params }) as UserResponse
     this.setUserData(user)
   }
 
@@ -146,7 +146,7 @@ export class User extends Model {
     return response.url
   }
 
-  async getOAuthServices (options: { limit?: number, offset?: number } = { }) {
+  async getOAuthServices (options: {limit?: number, offset?: number} = { }) {
     const { oauthServices, oauthServicesMeta } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
     return new OAuthServices(oauthServices, oauthServicesMeta, this.sessionHandler)
   }
@@ -217,12 +217,12 @@ export class User extends Model {
     return new FacilityInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
   }
 
-  async getFacilityMembershipRelationships (options: { sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getFacilityMembershipRelationships (options: {sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, member: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityMemberRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getFacilityEmploymentRelationships (options: { name?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getFacilityEmploymentRelationships (options: {name?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
