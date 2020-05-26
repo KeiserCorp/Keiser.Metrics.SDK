@@ -35,6 +35,15 @@ describe('Facility to User Relationship', function () {
     expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
   })
 
+  it('can get list of member relationships by name', async function () {
+    const facilityRelationships = await facility.getMemberRelationships({ name: 'Moe' })
+
+    expect(Array.isArray(facilityRelationships)).to.equal(true)
+    expect(typeof facilityRelationships[0]).to.equal('object')
+    expect(facilityRelationships[0].member).to.equal(true)
+    expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
+  })
+
   it('can get list of employee relationships', async function () {
     const facilityRelationships = await facility.getEmployeeRelationships()
 
