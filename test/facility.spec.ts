@@ -16,7 +16,7 @@ describe('Facility', function () {
       persistConnection: true
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityMembershipRelationships())[0].facility
+    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
   })
 
   after(function () {

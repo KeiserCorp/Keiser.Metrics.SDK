@@ -18,7 +18,7 @@ describe('Facility to User Relationship', function () {
       persistConnection: true
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityMembershipRelationships())[0].facility as PrivilegedFacility
+    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
     await facility.setActive()
   })
 
