@@ -14,8 +14,9 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
+import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
+import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
 export const enum OAuthProviders {
@@ -276,4 +277,43 @@ export class User extends Model {
     const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId : this.id }) as StrengthMachineDataSetListResponse
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler)
   }
+}
+
+export class FacilityUser extends User {
+  protected _facilityRelationshipId: number
+
+  constructor (userData: UserData, sessionHandler: SessionHandler, facilityRelationshipId: number) {
+    super(userData, sessionHandler)
+    this._facilityRelationshipId = facilityRelationshipId
+  }
+
+  get facilityRelationshipId () {
+    return this._facilityRelationshipId
+  }
+}
+
+export class FacilityMemberUser extends FacilityUser {
+  async startSession (params: {forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number} = { }) {
+    const { session } = await this.action('facilitySession:start', { ...params, userId : this.id }) as SessionResponse
+    return new FacilitySession(session, this.sessionHandler)
+  }
+
+  async getCurrentSessions () {
+    const { sessions, sessionsMeta } = await this.action('facilitySession:status', { userId : this.id }) as SessionListResponse
+    return new FacilitySessions(sessions, sessionsMeta, this.sessionHandler)
+  }
+
+  async getInBodyIntegration () {
+    const { userInBodyIntegration } = await this.action('userInBodyIntegration:show', { userId : this.id }) as UserInBodyIntegrationResponse
+    return new UserInBodyIntegration(userInBodyIntegration, this.sessionHandler, this.facilityRelationshipId)
+  }
+
+  async createInBodyIntegration (params: { userToken: string }) {
+    const { userInBodyIntegration } = await this.action('userInBodyIntegration:create', { ...params, userId : this.id }) as UserInBodyIntegrationResponse
+    return new UserInBodyIntegration(userInBodyIntegration, this.sessionHandler, this.facilityRelationshipId)
+  }
+}
+
+export class FacilityEmployeeUser extends FacilityUser {
+
 }

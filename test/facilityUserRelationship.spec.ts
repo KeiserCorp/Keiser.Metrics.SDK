@@ -2,13 +2,13 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityEmployeeRole, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
+import { FacilityEmployeeRole, FacilityUserMemberRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility to User Relationship', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
-  let facilityRelationship: FacilityUserRelationship
+  let facilityRelationship: FacilityUserMemberRelationship
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
@@ -53,8 +53,8 @@ describe('Facility to User Relationship', function () {
     expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
   })
 
-  it('can create new facility user', async function () {
-    facilityRelationship = await facility.createFacilityUser({ email: newUserEmailAddress, name: 'Tester', member: true, employeeRole: FacilityEmployeeRole.Trainer })
+  it('can create new facility member user', async function () {
+    facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(true)

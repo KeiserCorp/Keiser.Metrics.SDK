@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityUserRelationshipSorting, UserFacilityRelationship } from '../src/models/facilityRelationship'
+import { FacilityUserRelationshipSorting, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -11,7 +11,7 @@ describe('User to Facility Relationship', function () {
   let metricsInstance: Metrics
   let userSession: UserSession
   let user: User
-  let facilityRelationship: UserFacilityRelationship
+  let facilityRelationship: UserFacilityMemberRelationship
 
   before(async function () {
     metricsInstance = new Metrics({

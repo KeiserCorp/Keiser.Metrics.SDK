@@ -2,14 +2,13 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityEmployeeRole, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
+import { FacilityMemberUser } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('User InBody Integration', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
-  let facilityRelationship: FacilityUserRelationship
-  const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+  let user: FacilityMemberUser
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -20,7 +19,7 @@ describe('User InBody Integration', function () {
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
     await facility.setActive()
-    facilityRelationship = (await facility.getMemberRelationships())[0]
+    user = (await facility.getMemberRelationships())[0].user
   })
 
   after(function () {
@@ -31,7 +30,7 @@ describe('User InBody Integration', function () {
     let extError
 
     try {
-      await facilityRelationship.getInBodyIntegration()
+      await user.getInBodyIntegration()
     } catch (error) {
       extError = error
     }
@@ -44,7 +43,7 @@ describe('User InBody Integration', function () {
     let extError
 
     try {
-      await facilityRelationship.createInBodyIntegration({ userToken: '1234567890' })
+      await user.createInBodyIntegration({ userToken: '1234567890' })
     } catch (error) {
       extError = error
     }

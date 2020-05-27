@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
 
 describe('Session', function () {
   let metricsInstance: Metrics

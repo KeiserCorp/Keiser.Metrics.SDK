@@ -1,8 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
-import { User, UserData } from './user'
-import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
+import { FacilityEmployeeUser, FacilityMemberUser, User, UserData } from './user'
 
 export const enum UserFacilityRelationshipSorting {
   ID = 'id',
@@ -159,9 +158,15 @@ export class UserFacilityEmployeeRelationship extends UserFacilityRelationship {
   }
 }
 
-export class FacilityUserRelationships extends ModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+export class FacilityUserMemberRelationships extends ModelList<FacilityUserMemberRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
-    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+    super(FacilityUserMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+}
+
+export class FacilityUserEmployeeRelationships extends ModelList<FacilityUserEmployeeRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityUserEmployeeRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
 }
 
@@ -189,14 +194,16 @@ export class FacilityUserRelationship extends FacilityRelationship {
   get user () {
     return new User(this._facilityRelationshipData.user, this.sessionHandler)
   }
+}
 
-  async getInBodyIntegration () {
-    const { userInBodyIntegration } = await this.action('userInBodyIntegration:show', { userId : this._facilityRelationshipData.user.id }) as UserInBodyIntegrationResponse
-    return new UserInBodyIntegration(userInBodyIntegration, this.sessionHandler, this._facilityRelationshipData.user.id)
+export class FacilityUserMemberRelationship extends FacilityUserRelationship {
+  get user () {
+    return new FacilityMemberUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
   }
+}
 
-  async createInBodyIntegration (params: { userToken: string }) {
-    const { userInBodyIntegration } = await this.action('userInBodyIntegration:create', { ...params, userId : this._facilityRelationshipData.user.id }) as UserInBodyIntegrationResponse
-    return new UserInBodyIntegration(userInBodyIntegration, this.sessionHandler, this._facilityRelationshipData.user.id)
+export class FacilityUserEmployeeRelationship extends FacilityUserRelationship {
+  get user () {
+    return new FacilityEmployeeUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
   }
 }

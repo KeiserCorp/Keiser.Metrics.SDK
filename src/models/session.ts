@@ -62,7 +62,7 @@ export class Session extends Model {
     this._sessionData = sessionData
   }
 
-  private setSessionData (session: SessionData) {
+  protected setSessionData (session: SessionData) {
     this._sessionData = session
   }
 
@@ -128,5 +128,35 @@ export class Session extends Model {
 
   get weightMeasurement () {
     return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler) : undefined
+  }
+}
+
+export class FacilitySessions extends ModelList<FacilitySession, SessionData, SessionListResponseMeta> {
+  constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilitySession, sessions, sessionsMeta, sessionHandler)
+  }
+}
+
+export class FacilitySession extends Session {
+  async end (params: {echipId?: string, echipData?: object} = { }) {
+    const { session } = await this.action('facilitySession:end', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
+    this.setSessionData(session)
+    return this
+  }
+
+  async update (params: {echipId: string, echipData: object}) {
+    const { session } = await this.action('facilitySession:update', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
+    this.setSessionData(session)
+    return this
+  }
+
+  async reload () {
+    const { session } = await this.action('facilitySession:show', { id: this.id }) as SessionResponse
+    this.setSessionData(session)
+    return this
+  }
+
+  async delete () {
+    await this.action('facilitySession:delete', { id: this.id })
   }
 }
