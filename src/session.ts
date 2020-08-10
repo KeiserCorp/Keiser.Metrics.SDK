@@ -302,7 +302,7 @@ export class AdminSession extends UserSession {
     await this.action('resque:task:deleteAllFailed', options)
   }
 
-  async getFacilityLicenses (options: {key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
+  async getFacilityLicenses (options: {name?: string, key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
     const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
     return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)
   }
