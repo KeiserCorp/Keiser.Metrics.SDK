@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { UnknownEntityError } from '../src/error'
 import { MSeriesDataSet, MSeriesDataSetSorting } from '../src/models/mSeriesDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { UnknownEntityError } from '../src/error'
 
 const generateMSeriesDataSet = () => {
   const startTime = (new Date()).getTime()

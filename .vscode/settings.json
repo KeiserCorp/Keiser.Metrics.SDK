@@ -28,12 +28,14 @@
     "error",
     "id",
     "inbody",
+    "keiser",
     "oauths",
     "reauth",
     "refreshable",
     "required",
     "resque",
     "strava",
-    "trainingpeaks"
+    "trainingpeaks",
+    "typedoc"
   ]
 }

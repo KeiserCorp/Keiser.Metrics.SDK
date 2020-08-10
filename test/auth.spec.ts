@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { DuplicateEntityError, InvalidCredentialsError, UnauthorizedTokenError, BlacklistTokenError } from '../src/error'
+import { BlacklistTokenError, DuplicateEntityError, InvalidCredentialsError, UnauthorizedTokenError } from '../src/error'
 import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Auth', function () {

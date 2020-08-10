@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { UnknownEntityError } from '../src/error'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { UnknownEntityError } from '../src/error'
 
 describe('Strength Machine Data Set', function () {
   let metricsInstance: Metrics

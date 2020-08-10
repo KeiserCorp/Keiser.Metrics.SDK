@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { UnknownEntityError } from '../src/error'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementSorting } from '../src/models/mSeriesFtpMeasurement'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { UnknownEntityError } from '../src/error'
 
 describe('M Series FTP Measurement', function () {
   let metricsInstance: Metrics
