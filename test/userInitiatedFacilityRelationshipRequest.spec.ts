@@ -1,13 +1,15 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { PrivilegedFacility } from '../src/models/facility'
+import { Facilities, PrivilegedFacility } from '../src/models/facility'
 import { User } from '../src/models/user'
+import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('User Initiated Facility Relationship Request', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
-  let newUser: User
+  let newUserSession: UserSession
+  let demoUserSession: UserSession
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
   const newUserMemberId = [...Array(30)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
 
@@ -17,10 +19,10 @@ describe('User Initiated Facility Relationship Request', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    newUser = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword })).user
+    newUserSession = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword }))
 
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
+    demoUserSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    facility = (await demoUserSession.user.getFacilityEmploymentRelationships())[0].facility
     await facility.setActive()
   })
 
@@ -29,7 +31,7 @@ describe('User Initiated Facility Relationship Request', function () {
   })
 
   it('can request facility relationship', async function () {
-    const facilityRelationshipRequest = await (await newUser.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberId })
+    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberId })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(true)
@@ -57,7 +59,7 @@ describe('User Initiated Facility Relationship Request', function () {
   })
 
   it('can re-request relationship', async function () {
-    const facilityRelationshipRequest = await (await newUser.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberId })
+    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberId })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(true)
@@ -83,7 +85,7 @@ describe('User Initiated Facility Relationship Request', function () {
     expect(Array.isArray(facilityRelationshipRequests)).to.equal(true)
     expect(facilityRelationshipRequests.length).to.equal(0)
 
-    const facilities = await newUser.getFacilities()
+    const facilities = await newUserSession.getFacilities()
     expect(Array.isArray(facilities)).to.equal(true)
     expect(typeof facilities[0]).to.equal('object')
     expect(facilities[0].id).to.equal(facility.id)

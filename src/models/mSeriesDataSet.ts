@@ -14,7 +14,7 @@ export interface MSeriesDataSetData {
   source: string | null
   startedAt: string
   endedAt: string
-  machineType: string
+  machineType: string // To-Do: Machine Type Model
   ordinalId: number
   buildMajor: number
   buildMinor: number

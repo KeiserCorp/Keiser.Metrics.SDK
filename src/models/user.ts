@@ -3,8 +3,6 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
-import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './exercise'
-import { Facilities, FacilityListResponse, FacilitySorting } from './facility'
 import { FacilityRelationshipData, UserFacilityEmployeeRelationships, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse } from './facilityRelationshipRequest'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
@@ -201,16 +199,6 @@ export class User extends Model {
   async getHeightMeasurements (options: {from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { heightMeasurements, heightMeasurementsMeta } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
     return new HeightMeasurements(heightMeasurements, heightMeasurementsMeta, this.sessionHandler)
-  }
-
-  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
-    return new Exercises(exercises, exercisesMeta, this.sessionHandler)
-  }
-
-  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { facilities ,facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
-    return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
   }
 
   async getFacilityRelationshipRequests (options: {memberIdentifier?: string, name?: string, sort?: FacilityInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {

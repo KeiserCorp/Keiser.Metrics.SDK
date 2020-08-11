@@ -22,7 +22,7 @@ describe('Exercise', function () {
   })
 
   it('can list available exercises', async function () {
-    const exercises = await userSession.user.getExercises()
+    const exercises = await userSession.getExercises()
 
     expect(Array.isArray(exercises)).to.equal(true)
     expect(exercises.length).to.be.above(0)

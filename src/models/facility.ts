@@ -5,6 +5,7 @@ import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
+import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
 
@@ -128,5 +129,23 @@ export class PrivilegedFacility extends Facility {
   async getSessionByEChip (params: {echipId: string}) {
     const { session } = await this.action('facilitySession:checkEchip', params) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
+  }
+
+  async createFacilityStrengthMachine (params: {strengthMachineId: number, model: string, version: string, serial: string, location?: string}) {
+    const { facilityStrengthMachine } = await this.action('facilityStrengthMachine:create', { ...params }) as FacilityStrengthMachineResponse
+    return new FacilityStrengthMachine(facilityStrengthMachine, this.sessionHandler)
+  }
+
+  async createFacilityStrengthMachinesFromEChip (params: {echipData: any}) {
+    const { facilityStrengthMachines, unknownMachines } = await this.action('facilityStrengthMachine:createEchip', { echipData: JSON.stringify(params.echipData) }) as FacilityStrengthMachineBulkCreateResponse
+    return {
+      strengthMachines: facilityStrengthMachines.map(f => new FacilityStrengthMachine(f, this.sessionHandler)),
+      unknownMachines
+    }
+  }
+
+  async getFacilityStrengthMachines (options: {model?: string, sort?: FacilityStrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { facilityStrengthMachines, facilityStrengthMachinesMeta } = await this.action('facilityStrengthMachine:list', { ...options, member: true }) as FacilityStrengthMachineListResponse
+    return new FacilityStrengthMachines(facilityStrengthMachines, facilityStrengthMachinesMeta, this.sessionHandler)
   }
 }

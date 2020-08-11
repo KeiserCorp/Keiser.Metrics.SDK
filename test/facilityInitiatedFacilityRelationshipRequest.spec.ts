@@ -3,12 +3,14 @@ import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
+import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility Initiated Facility Relationship Request', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let newUser: User
+  let userSession: UserSession
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
   const newUserMemberId = [...Array(30)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
 
@@ -20,7 +22,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
     })
     newUser = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword })).user
 
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
     await facility.setActive()
   })
@@ -84,7 +86,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
     expect(Array.isArray(facilityRelationshipRequests)).to.equal(true)
     expect(facilityRelationshipRequests.length).to.equal(0)
 
-    const facilities = await newUser.getFacilities()
+    const facilities = await userSession.getFacilities()
     expect(Array.isArray(facilities)).to.equal(true)
     expect(typeof facilities[0]).to.equal('object')
     expect(facilities[0].id).to.equal(facility.id)

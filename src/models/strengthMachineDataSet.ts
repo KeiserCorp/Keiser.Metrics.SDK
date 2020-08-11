@@ -2,6 +2,7 @@ import { DeepReadonly } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
+import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
 export const enum ResistancePrecision {
   Integer = 'int',
@@ -46,8 +47,8 @@ export interface StrengthMachineDataSetData {
   distance: number | null
   addedWeight: number | null
   test?: StrengthMachineDataSetTestData
+  strengthMachine?: StrengthMachineData
 
-  strengthMachine?: any    // To-Do: Add Strength Machine model
   exercise?: any           // To-Do: Add Exercise model
   a500DataSet?: any        // To-Do: Add A500 Data Set model
 
@@ -185,7 +186,11 @@ export class StrengthMachineDataSet extends Model {
     return this._strengthMachineDataSetData.test ? { ...this._strengthMachineDataSetData.test } as DeepReadonly<StrengthMachineDataSetTestData> : undefined
   }
 
-  get Session () {
+  get session () {
     return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler) : undefined
+  }
+
+  get strengthMachine () {
+    return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
   }
 }

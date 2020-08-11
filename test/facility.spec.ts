@@ -24,7 +24,7 @@ describe('Facility', function () {
   })
 
   it('can list facilities', async function () {
-    const facilities = await userSession.user.getFacilities()
+    const facilities = await userSession.getFacilities()
 
     expect(Array.isArray(facilities)).to.equal(true)
     expect(facilities.length).to.be.above(0)
