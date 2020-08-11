@@ -4,7 +4,7 @@ import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
-import { ExerciseListResponse, Exercises, ExerciseSorting, ExerciseType } from './models/exercise'
+import { ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
 import { Facilities, FacilityData, FacilityListResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
@@ -322,6 +322,16 @@ export class AdminSession extends UserSession {
 
   async deleteAllFailedTasks (options: {taskName?: string} = {}) {
     await this.action('resque:task:deleteAllFailed', options)
+  }
+
+  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
+    return new PrivilegedExercises(exercises, exercisesMeta, this.sessionHandler)
+  }
+
+  async createExercise (params: { name: string, type: ExerciseType, variant?: string, exerciseId?: number }) {
+    const { exercise } = await this.action('exercise:create', params) as ExerciseResponse
+    return new PrivilegedExercise(exercise, this.sessionHandler)
   }
 
   async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {

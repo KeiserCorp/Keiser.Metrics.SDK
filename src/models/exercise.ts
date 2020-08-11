@@ -3,7 +3,8 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum ExerciseType {
   Cardio = 'cardio',
-  Strength = 'strength'
+  Strength = 'strength',
+  Stretch = 'stretch'
 }
 
 export const enum ExerciseSorting {
@@ -51,6 +52,13 @@ export class Exercise extends Model {
     this._exerciseData = exerciseData
   }
 
+  async reload () {
+    const { exercise } = await this.action('exercise:show', { id: this._exerciseData.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
+
+
   get id () {
     return this._exerciseData.id
   }
@@ -65,10 +73,27 @@ export class Exercise extends Model {
 }
 
 /** @hidden */
+export class PrivilegedExercises extends ModelList<PrivilegedExercise, ExerciseData, ExerciseListResponseMeta> {
+  constructor (exercises: ExerciseData[], exercisesMeta: ExerciseListResponseMeta, sessionHandler: SessionHandler) {
+    super(PrivilegedExercise, exercises, exercisesMeta, sessionHandler)
+  }
+}
+
+/** @hidden */
 export class PrivilegedExercise extends Exercise {
   constructor (exerciseData: ExerciseData, sessionHandler: SessionHandler) {
     super(exerciseData, sessionHandler)
   }
 
-  // To-Do: Add admin methods
+  async update (params: { name: string, type: ExerciseType }) {
+    const { exercise } = await this.action('exercise:update', { ...params, id: this.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
+
+  async delete () {
+    await this.action('exercise:delete', { id : this.id })
+  }
+
+  // To-Do: Add muscle methods
 }

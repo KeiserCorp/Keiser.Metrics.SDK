@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
+import { UnknownEntityError } from '../src/error'
 import { PrivilegedStrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -74,6 +75,22 @@ describe('Strength Machine', function () {
     await newMachine.update({ name: newName, line: newMachine.line })
     expect(newMachine).to.be.an('object')
     expect(newMachine.name).to.equal(newName)
+  })
+
+  it('can delete strength machine', async function () {
+    this.timeout(5000)
+    let extError
+
+    await newMachine.delete()
+
+    try {
+      await newMachine.reload()
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })
