@@ -1,0 +1,131 @@
+import { expect } from 'chai'
+import Metrics from '../src'
+import { UnauthorizedTokenError } from '../src/error'
+import { PrivilegedFacility } from '../src/models/facility'
+import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
+import { KioskSession, UserSession } from '../src/session'
+import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+
+describe('Facility Kiosk Token', function () {
+  let metricsInstance: Metrics
+  let facility: PrivilegedFacility
+  let kioskSession: KioskSession
+  let userSession: UserSession
+  const echipId = [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
+  const echipData = {
+    1621: {
+      position: {
+        chest: null,
+        rom2: null,
+        rom1: null,
+        seat: null
+      },
+      sets: [
+        {
+          version: '4D2C55A5',
+          serial: '0730 2015 1323 2541',
+          time: new Date(),
+          resistance: 41,
+          precision: 'int',
+          units: 'lb',
+          repetitions: 3,
+          peak: 154,
+          work: 90.56,
+          distance: null,
+          seat: null,
+          rom2: null,
+          rom1: null,
+          chest: null,
+          test: null
+        }
+      ]
+    }
+  }
+
+  before(async function () {
+    metricsInstance = new Metrics({
+      restEndpoint: DevRestEndpoint,
+      socketEndpoint: DevSocketEndpoint,
+      persistConnection: true
+    })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
+    await facility.setActive()
+    await (await facility.getAccessControl()).facilityAccessControlKiosk.update({
+      kioskModeAllowed: true,
+      primaryIdentification: PrimaryIdentification.UUID,
+      secondaryIdentification: SecondaryIdentification.None
+    })
+  })
+
+  after(function () {
+    metricsInstance?.dispose()
+  })
+
+  it('can start kiosk session', async function () {
+    kioskSession = await facility.createKioskSession()
+
+    expect(typeof kioskSession).to.not.equal('undefined')
+    expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
+    expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
+  })
+
+  it('can use kiosk session to login user', async function () {
+    userSession = await kioskSession.userLogin({ primaryIdentification: 1 })
+
+    expect(typeof userSession).to.not.equal('undefined')
+    expect(typeof userSession.user).to.not.equal('undefined')
+    expect(userSession.user.id).to.equal(1)
+  })
+
+  it('can use kiosk session to start workout session', async function () {
+    const { session, echipData } = await userSession.user.startSessionFromKiosk({ kioskSession, echipId, forceEndPrevious: true })
+
+    expect(typeof session).to.not.equal('undefined')
+    expect(typeof echipData).to.not.equal('undefined')
+    expect(session.echipId).to.equal(echipId)
+    expect(session.startedAt).to.not.equal(null)
+    expect(session.endedAt).to.equal(null)
+  })
+
+  it('can use kiosk session to update workout session', async function () {
+    const session = await kioskSession.sessionUpdate({ echipId, echipData })
+
+    expect(typeof session).to.not.equal('undefined')
+    expect(session.echipId).to.equal(echipId)
+    expect(session.startedAt).to.not.equal(null)
+    expect(session.endedAt).to.equal(null)
+  })
+
+  it('can use kiosk session to end workout session', async function () {
+    const session = await kioskSession.sessionEnd({ echipId, echipData })
+
+    expect(typeof session).to.not.equal('undefined')
+    expect(session.echipId).to.equal(echipId)
+    expect(session.startedAt).to.not.equal(null)
+    expect(session.endedAt).to.not.equal(null)
+  })
+
+  it('can end kiosk session', async function () {
+    await kioskSession.logout()
+
+    expect(typeof kioskSession).to.not.equal('undefined')
+    expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
+    expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
+    expect(kioskSession.sessionHandler.kioskToken).to.equal('')
+  })
+
+  it('cannot use kiosk session after logout', async function () {
+    let extError
+
+    try {
+      const userSession = await kioskSession.userLogin({ primaryIdentification: 1 })
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(UnauthorizedTokenError.code)
+  })
+
+})

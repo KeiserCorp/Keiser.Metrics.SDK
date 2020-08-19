@@ -54,6 +54,67 @@ export class Sessions extends ModelList<Session, SessionData, SessionListRespons
   }
 }
 
+export interface KioskSessionResponse extends AuthenticatedResponse {
+  session: SessionData
+  echipData?: object
+}
+
+export class StaticSession {
+  private _sessionData: SessionData
+
+  constructor (sessionData: SessionData) {
+    this._sessionData = sessionData
+  }
+
+  get id () {
+    return this._sessionData.id
+  }
+
+  get echipId () {
+    return this._sessionData.echipId
+  }
+
+  get hash () {
+    return this._sessionData.hash
+  }
+
+  get startedAt () {
+    return new Date(this._sessionData.startedAt)
+  }
+
+  get endedAt () {
+    return this._sessionData.endedAt ? new Date(this._sessionData.endedAt) : null
+  }
+
+  get user () {
+    return this._sessionData.user
+  }
+
+  get facility () {
+    return this._sessionData.facility
+  }
+
+  get heartRateDataSets () {
+    return this._sessionData.heartRateDataSets
+  }
+
+  get mSeriesDataSets () {
+    return this._sessionData.mSeriesDataSets
+  }
+
+  get strengthMachineDataSets () {
+    return this._sessionData.strengthMachineDataSets
+  }
+
+  get heightMeasurement () {
+    return this._sessionData.heightMeasurement
+  }
+
+  get weightMeasurement () {
+    return this._sessionData.weightMeasurement
+  }
+}
+
 export class Session extends Model {
   private _sessionData: SessionData
 

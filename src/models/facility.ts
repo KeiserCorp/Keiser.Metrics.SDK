@@ -1,6 +1,9 @@
 import { Units } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
-import { AuthenticatedResponse, SessionHandler } from '../session'
+import { AuthenticatedResponse, KioskSession, SessionHandler } from '../session'
+import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
+import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
+import { FacilityKioskTokenResponse } from './facilityKioskToken'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
@@ -91,6 +94,11 @@ export class PrivilegedFacility extends Facility {
     await this.action('auth:setFacility', { facilityId: this.id, refreshable: this.sessionHandler.refreshToken !== null })
   }
 
+  async createKioskSession () {
+    const response = await this.action('facilityKioskToken:create') as FacilityKioskTokenResponse
+    return new KioskSession(response, this.sessionHandler.connection)
+  }
+
   async createFacilityMemberUser (params: {email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, memberIdentifier?: string, memberSecret?: string, employeeRole?: string | null}) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityCreate', { ...params, member: true }) as FacilityRelationshipResponse
     return new FacilityUserMemberRelationship(facilityRelationship, this.sessionHandler)
@@ -147,5 +155,15 @@ export class PrivilegedFacility extends Facility {
   async getFacilityStrengthMachines (options: {model?: string, sort?: FacilityStrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityStrengthMachines, facilityStrengthMachinesMeta } = await this.action('facilityStrengthMachine:list', { ...options, member: true }) as FacilityStrengthMachineListResponse
     return new FacilityStrengthMachines(facilityStrengthMachines, facilityStrengthMachinesMeta, this.sessionHandler)
+  }
+
+  async getAccessControl () {
+    const { facilityAccessControl } = await this.action('facilityAccessControl:show') as FacilityAccessControlResponse
+    return new FacilityAccessControl(facilityAccessControl, this.sessionHandler)
+  }
+
+  async getConfiguration () {
+    const { facilityConfiguration } = await this.action('facilityConfiguration:show') as FacilityConfigurationResponse
+    return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
   }
 }
