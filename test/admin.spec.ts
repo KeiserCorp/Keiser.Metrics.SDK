@@ -70,7 +70,9 @@ describe('Admin', function () {
 
     expect(emailAddresses).to.be.an('array')
     expect(emailAddresses.length).to.above(1)
-    expect(emailAddresses.filter(e => e.email === userEmailAddress).length).to.equal(1)
+    const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
+    expect(addedEmailAddresses.length).to.equal(1)
+    await Promise.all(addedEmailAddresses.map(e => e.delete()))
   })
 
 })

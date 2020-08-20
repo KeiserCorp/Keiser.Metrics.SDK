@@ -4,9 +4,13 @@ import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
-import { FacilityData, PrivilegedFacility } from './models/facility'
+import { ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
+import { Facilities, FacilityData, FacilityListResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
+import { FacilityKioskTokenResponse } from './models/facilityKioskToken'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
+import { KioskSessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
+import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
 import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
@@ -21,6 +25,10 @@ export interface OAuthLoginResponse {
 
 export interface RefreshTokenChangeEvent {
   refreshToken: string
+}
+
+export interface KioskTokenChangeEvent {
+  kioskToken: string
 }
 
 export interface JWTToken {
@@ -43,6 +51,15 @@ export interface RefreshToken extends JWTToken {
   type: 'refresh'
 }
 
+export interface KioskToken {
+  facility: FacilityData
+  type: 'kiosk'
+  iat: number
+  exp: number
+  iss: string
+  jti: string
+}
+
 export class Authentication {
   static async useCredentials (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean}) {
     const response = await connection.action('auth:login', params) as UserResponse
@@ -56,6 +73,11 @@ export class Authentication {
 
   static async useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean}) {
     const response = await connection.action('auth:resetFulfillment', params) as UserResponse
+    return new UserSession(response, connection)
+  }
+
+  static async useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean}) {
+    const response = await connection.action('auth:facilityWelcomeFulfillment', params) as UserResponse
     return new UserSession(response, connection)
   }
 
@@ -97,6 +119,7 @@ export class SessionHandler {
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
+  private _userId: number | null = null
 
   constructor (connection: MetricsConnection, loginResponse: UserResponse) {
     this._connection = connection
@@ -134,6 +157,10 @@ export class SessionHandler {
     }
   }
 
+  get connection () {
+    return this._connection
+  }
+
   get keepAlive () {
     return this._keepAlive
   }
@@ -159,6 +186,10 @@ export class SessionHandler {
 
   get onRefreshTokenChangeEvent () {
     return this._onRefreshTokenChangeEvent.asEvent()
+  }
+
+  get userId () {
+    return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
   }
 
   close () {
@@ -191,9 +222,96 @@ export class SessionHandler {
   }
 }
 
+export class KioskSessionHandler {
+  private _connection: MetricsConnection
+  private _kioskToken: string = ''
+  private _onKioskTokenChangeEvent = new SimpleEventDispatcher<KioskTokenChangeEvent>()
+
+  constructor (connection: MetricsConnection, facilityKioskTokenResponse: FacilityKioskTokenResponse) {
+    this._connection = connection
+    this._connection.onDisposeEvent.one(() => this.close())
+    this.updateToken(facilityKioskTokenResponse.kioskToken)
+  }
+
+  private updateToken (kioskToken: string) {
+    this._kioskToken = kioskToken
+    this._onKioskTokenChangeEvent.dispatchAsync({ kioskToken: this._kioskToken })
+  }
+
+  get connection () {
+    return this._connection
+  }
+
+  get decodedKioskToken () {
+    return DecodeJWT(this._kioskToken) as KioskToken
+  }
+
+  get kioskToken () {
+    return this._kioskToken
+  }
+
+  get onKioskTokenChangeEvent () {
+    return this._onKioskTokenChangeEvent.asEvent()
+  }
+
+  close () {
+    this._kioskToken = ''
+  }
+
+  async logout () {
+    const authParams = { authorization: this._kioskToken }
+    await this._connection.action('facilityKioskToken:delete', authParams)
+    this.close()
+  }
+
+  async action (action: string, params: Object = {}) {
+    const authParams = { authorization: this._kioskToken, ...params }
+    return await this._connection.action(action, authParams) as AuthenticatedResponse
+  }
+}
+
+export class KioskSession {
+  private _sessionHandler: KioskSessionHandler
+
+  constructor (facilityKioskTokenResponse: FacilityKioskTokenResponse, connection: MetricsConnection) {
+    this._sessionHandler = new KioskSessionHandler(connection, facilityKioskTokenResponse)
+  }
+
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
+  close () {
+    this._sessionHandler.close()
+  }
+
+  async logout () {
+    await this._sessionHandler.logout()
+  }
+
+  private action (action: string, params: Object = {}) {
+    return this.sessionHandler.action(action, params)
+  }
+
+  async userLogin (params: {primaryIdentification: string | number, secondaryIdentification?: string | number}) {
+    const response = await this.action('facilityKiosk:userLogin', params) as UserResponse
+    return new UserSession(response, this.sessionHandler.connection)
+  }
+
+  async sessionUpdate (params: {echipId: string, echipData: object}) {
+    const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
+    return new StaticSession(session)
+  }
+
+  async sessionEnd (params: {echipId: string, echipData: object}) {
+    const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
+    return new StaticSession(session)
+  }
+}
+
 export class UserSession {
-  protected _sessionHandler: SessionHandler
-  protected _user: User
+  private _sessionHandler: SessionHandler
+  private _user: User
 
   constructor (loginResponse: UserResponse, connection: MetricsConnection) {
     this._sessionHandler = new SessionHandler(connection, loginResponse)
@@ -238,6 +356,21 @@ export class UserSession {
 
   protected action (action: string, params: Object = {}) {
     return this.sessionHandler.action(action, params)
+  }
+
+  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
+    return new Exercises(exercises, exercisesMeta, this.sessionHandler)
+  }
+
+  async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
+    return new StrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
+  }
+
+  async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { facilities ,facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
+    return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
   }
 }
 
@@ -300,6 +433,26 @@ export class AdminSession extends UserSession {
 
   async deleteAllFailedTasks (options: {taskName?: string} = {}) {
     await this.action('resque:task:deleteAllFailed', options)
+  }
+
+  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
+    return new PrivilegedExercises(exercises, exercisesMeta, this.sessionHandler)
+  }
+
+  async createExercise (params: { name: string, type: ExerciseType, variant?: string, exerciseId?: number }) {
+    const { exercise } = await this.action('exercise:create', params) as ExerciseResponse
+    return new PrivilegedExercise(exercise, this.sessionHandler)
+  }
+
+  async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
+    return new PrivilegedStrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
+  }
+
+  async createStrengthMachine (params: { name: string, line: string, variant?: string, exerciseId?: number }) {
+    const { strengthMachine } = await this.action('strengthMachine:create', params) as StrengthMachineResponse
+    return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
   }
 
   async getFacilityLicenses (options: {name?: string, key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {

@@ -1,4 +1,4 @@
-import { BaseModelList, ListMeta, Model } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum StatSorting {
@@ -31,7 +31,7 @@ export interface StatListResponseMeta extends ListMeta {
   sort: StatSorting
 }
 
-export class Stats extends BaseModelList<Stat, StatData, StatListResponseMeta> {
+export class Stats extends ModelList<Stat, StatData, StatListResponseMeta> {
   constructor (stats: StatData[], statsMeta: StatListResponseMeta, sessionHandler: SessionHandler) {
     super(Stat, stats, statsMeta, sessionHandler)
   }

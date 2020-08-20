@@ -2,6 +2,7 @@ import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface AcceptedTermsVersionData {
+  userId: number
   updatedAt: string
   revision: string
 }
@@ -12,12 +13,10 @@ export interface AcceptedTermsVersionResponse extends AuthenticatedResponse {
 
 export class AcceptedTermsVersion extends Model {
   private _acceptedTermsVersionData: AcceptedTermsVersionData
-  private _userId: number
 
-  constructor (acceptedTermsVersion: AcceptedTermsVersionData, sessionHandler: SessionHandler, userId: number) {
+  constructor (acceptedTermsVersion: AcceptedTermsVersionData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._acceptedTermsVersionData = acceptedTermsVersion
-    this._userId = userId
   }
 
   private setAcceptedTermsVersionData (acceptedTermsVersion: AcceptedTermsVersionData) {
@@ -25,13 +24,13 @@ export class AcceptedTermsVersion extends Model {
   }
 
   async reload () {
-    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:show', { userId: this._userId }) as AcceptedTermsVersionResponse
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:show', { userId: this._acceptedTermsVersionData.userId }) as AcceptedTermsVersionResponse
     this.setAcceptedTermsVersionData(acceptedTermsVersion)
     return this
   }
 
   async update (params: {revision: string}) {
-    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { userId: this._userId, ...params }) as AcceptedTermsVersionResponse
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { ...params, userId: this._acceptedTermsVersionData.userId }) as AcceptedTermsVersionResponse
     this.setAcceptedTermsVersionData(acceptedTermsVersion)
     return this
   }

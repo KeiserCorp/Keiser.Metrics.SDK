@@ -93,7 +93,7 @@ describe('Connection', function () {
 
     })
 
-    describe('Socket (Prod Server)', function () {
+    describe.skip('Socket (Prod Server)', function () {
       let metricsInstance: Metrics
 
       beforeEach(function () {
@@ -185,7 +185,7 @@ describe('Connection', function () {
 
   })
 
-  describe('REST (Prod Server)', function () {
+  describe.skip('REST (Prod Server)', function () {
     let metricsInstance: Metrics
 
     beforeEach(function () {

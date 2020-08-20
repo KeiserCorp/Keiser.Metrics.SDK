@@ -20,16 +20,22 @@
   "tslint.jsEnable": true,
   "tslint.ignoreDefinitionFiles": false,
   "cSpell.words": [
+    "actionhero",
     "backtrace",
+    "csrf",
+    "csrf error",
     "echip",
+    "error",
     "id",
     "inbody",
+    "keiser",
     "oauths",
     "reauth",
     "refreshable",
     "required",
     "resque",
     "strava",
-    "trainingpeaks"
+    "trainingpeaks",
+    "typedoc"
   ]
 }

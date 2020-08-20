@@ -1,7 +1,7 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
-import { User, UserData } from './user'
+import { FacilityEmployeeUser, FacilityMemberUser, User, UserData } from './user'
 
 export const enum UserFacilityRelationshipSorting {
   ID = 'id',
@@ -15,6 +15,14 @@ export const enum FacilityUserRelationshipSorting {
   EmployeeRole = 'employeeRole'
 }
 
+export const enum FacilityEmployeeRole {
+  Admin = 'admin',
+  CustomerSupport = 'customerSupport',
+  Trainer = 'trainer',
+  FrontDesk = 'frontDesk',
+  Maintenance = 'maintenance'
+}
+
 export interface FacilityRelationshipData {
   id: number
   userId: number
@@ -22,9 +30,9 @@ export interface FacilityRelationshipData {
   member: boolean
   memberIdentifier: string | null
   hasSecretSet: boolean
-  employeeRole: string | null
+  employeeRole: FacilityEmployeeRole | null
   facility?: FacilityData
-  user?: UserData
+  user: UserData
 }
 
 export interface FacilityRelationshipResponse extends AuthenticatedResponse {
@@ -39,7 +47,7 @@ export interface UserFacilityRelationshipListResponse extends AuthenticatedRespo
 export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
   member: boolean | undefined
   employee: boolean | undefined
-  employeeRole: string | undefined
+  employeeRole: FacilityEmployeeRole | undefined
   sort: UserFacilityRelationshipSorting
 }
 
@@ -53,7 +61,7 @@ export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
   employee: boolean | undefined
   name: string | undefined
   memberIdentifier: string | undefined
-  employeeRole: string | undefined
+  employeeRole: FacilityEmployeeRole | undefined
   sort: FacilityUserRelationshipSorting
 }
 
@@ -98,9 +106,15 @@ export class FacilityRelationship extends Model {
   }
 }
 
-export class UserFacilityRelationships extends UserModelList<UserFacilityRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
-  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(UserFacilityRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
+export class UserFacilityMemberRelationships extends ModelList<UserFacilityMemberRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(UserFacilityMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+}
+
+export class UserFacilityEmployeeRelationships extends ModelList<UserFacilityEmployeeRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(UserFacilityEmployeeRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
 }
 
@@ -115,7 +129,7 @@ export class UserFacilityRelationship extends FacilityRelationship {
     return this
   }
 
-  async update (params: { memberSecret: string}) {
+  async update (params: { memberSecret: string }) {
     const { facilityRelationship } = await this.action('facilityRelationship:userUpdate', { ...params, userId: this.userId, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this
@@ -124,21 +138,35 @@ export class UserFacilityRelationship extends FacilityRelationship {
   async delete () {
     await this.action('facilityRelationship:userDelete', { userId: this.userId, id: this.id })
   }
+}
 
+export class UserFacilityMemberRelationship extends UserFacilityRelationship {
   get facility () {
     if (typeof this._facilityRelationshipData.facility === 'undefined') {
       return undefined
-    }
-    if (this._facilityRelationshipData.employeeRole !== null) {
-      return new PrivilegedFacility(this._facilityRelationshipData.facility, this.sessionHandler)
     }
     return new Facility(this._facilityRelationshipData.facility, this.sessionHandler)
   }
 }
 
-export class FacilityUserRelationships extends UserModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
-  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler, userId)
+export class UserFacilityEmployeeRelationship extends UserFacilityRelationship {
+  get facility () {
+    if (typeof this._facilityRelationshipData.facility === 'undefined') {
+      return undefined
+    }
+    return new PrivilegedFacility(this._facilityRelationshipData.facility, this.sessionHandler)
+  }
+}
+
+export class FacilityUserMemberRelationships extends ModelList<FacilityUserMemberRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityUserMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+}
+
+export class FacilityUserEmployeeRelationships extends ModelList<FacilityUserEmployeeRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityUserEmployeeRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
 }
 
@@ -153,7 +181,7 @@ export class FacilityUserRelationship extends FacilityRelationship {
     return this
   }
 
-  async update (params: { memberIdentifier?: string, member?: boolean, employeeRole?: string}) {
+  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null}) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this
@@ -164,6 +192,18 @@ export class FacilityUserRelationship extends FacilityRelationship {
   }
 
   get user () {
-    return this._facilityRelationshipData.user ? new User(this._facilityRelationshipData.user, this.sessionHandler) : undefined
+    return new User(this._facilityRelationshipData.user, this.sessionHandler)
+  }
+}
+
+export class FacilityUserMemberRelationship extends FacilityUserRelationship {
+  get user () {
+    return new FacilityMemberUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
+  }
+}
+
+export class FacilityUserEmployeeRelationship extends FacilityUserRelationship {
+  get user () {
+    return new FacilityEmployeeUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
   }
 }

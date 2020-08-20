@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum OAuthServiceSorting {
@@ -28,20 +28,18 @@ export interface OAuthServiceListResponseMeta extends ListMeta {
   sort: OAuthServiceSorting
 }
 
-export class OAuthServices extends UserModelList<OAuthService, OAuthServiceData, OAuthServiceListResponseMeta> {
-  constructor (oauthServices: OAuthServiceData[], OAuthServicesMeta: OAuthServiceListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(OAuthService, oauthServices, OAuthServicesMeta, sessionHandler, userId)
+export class OAuthServices extends ModelList<OAuthService, OAuthServiceData, OAuthServiceListResponseMeta> {
+  constructor (oauthServices: OAuthServiceData[], OAuthServicesMeta: OAuthServiceListResponseMeta, sessionHandler: SessionHandler) {
+    super(OAuthService, oauthServices, OAuthServicesMeta, sessionHandler)
   }
 }
 
 export class OAuthService extends Model {
   private _oauthServiceData: OAuthServiceData
-  private _userId: number
 
-  constructor (oauthServiceData: OAuthServiceData, sessionHandler: SessionHandler, userId: number) {
+  constructor (oauthServiceData: OAuthServiceData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._oauthServiceData = oauthServiceData
-    this._userId = userId
   }
 
   private setOAuthServiceData (oauthServiceData: OAuthServiceData) {
@@ -49,13 +47,13 @@ export class OAuthService extends Model {
   }
 
   async reload () {
-    const { oauthService } = await this.action('oauthService:show', { userId: this._userId, id: this.id }) as OAuthServiceResponse
+    const { oauthService } = await this.action('oauthService:show', { id: this.id }) as OAuthServiceResponse
     this.setOAuthServiceData(oauthService)
     return this
   }
 
   async delete () {
-    await this.action('oauthService:delete', { userId: this._userId, id: this.id })
+    await this.action('oauthService:delete', { id: this.id })
   }
 
   get id () {

@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementData } from './mSeriesFtpMeasurement'
 import { Session, SessionData } from './session'
@@ -14,7 +14,7 @@ export interface MSeriesDataSetData {
   source: string | null
   startedAt: string
   endedAt: string
-  machineType: string
+  machineType: string // To-Do: Machine Type Model
   ordinalId: number
   buildMajor: number
   buildMinor: number
@@ -50,20 +50,18 @@ export interface MSeriesDataSetListResponseMeta extends ListMeta {
   sort: MSeriesDataSetSorting
 }
 
-export class MSeriesDataSets extends UserModelList<MSeriesDataSet, MSeriesDataSetData, MSeriesDataSetListResponseMeta> {
-  constructor (mSeriesDataSets: MSeriesDataSetData[], mSeriesDataSetsMeta: MSeriesDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(MSeriesDataSet, mSeriesDataSets, mSeriesDataSetsMeta, sessionHandler, userId)
+export class MSeriesDataSets extends ModelList<MSeriesDataSet, MSeriesDataSetData, MSeriesDataSetListResponseMeta> {
+  constructor (mSeriesDataSets: MSeriesDataSetData[], mSeriesDataSetsMeta: MSeriesDataSetListResponseMeta, sessionHandler: SessionHandler) {
+    super(MSeriesDataSet, mSeriesDataSets, mSeriesDataSetsMeta, sessionHandler)
   }
 }
 
 export class MSeriesDataSet extends Model {
   private _mSeriesDataSetData: MSeriesDataSetData
-  private _userId: number
 
-  constructor (mSeriesDataSetData: MSeriesDataSetData, sessionHandler: SessionHandler, userId: number) {
+  constructor (mSeriesDataSetData: MSeriesDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._mSeriesDataSetData = mSeriesDataSetData
-    this._userId = userId
   }
 
   private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
@@ -71,7 +69,7 @@ export class MSeriesDataSet extends Model {
   }
 
   async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
-    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { userId: this._userId, id: this.id, graph: options.graphResolution }) as MSeriesDataSetResponse
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { id: this.id, graph: options.graphResolution }) as MSeriesDataSetResponse
     this.setMSeriesDataSet(mSeriesDataSet)
     return this
   }
@@ -79,7 +77,7 @@ export class MSeriesDataSet extends Model {
   // To-Do: Decide if `update` method is necessary
 
   async delete () {
-    await this.action('mSeriesDataSet:delete', { userId: this._userId, id: this.id })
+    await this.action('mSeriesDataSet:delete', { id: this.id })
   }
 
   get id () {
@@ -159,7 +157,7 @@ export class MSeriesDataSet extends Model {
   }
 
   get mSeriesFtpMeasurement () {
-    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler, this._userId) : undefined
+    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler) : undefined
   }
 
   get graphData () {
@@ -167,7 +165,7 @@ export class MSeriesDataSet extends Model {
   }
 
   get Session () {
-    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this.sessionHandler, this._userId) : undefined
+    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this.sessionHandler) : undefined
   }
 
 }

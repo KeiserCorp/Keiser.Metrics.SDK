@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
+import { UnknownEntityError } from '../src/error'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
 import { AdminSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -57,6 +58,6 @@ describe('Facility License', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 })

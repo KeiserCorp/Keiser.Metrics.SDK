@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
@@ -52,7 +53,7 @@ describe('Session', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(625)
+    expect(extError.code).to.equal(ActionPreventedError.code)
   })
 
   it('can end session', async function () {
@@ -83,7 +84,7 @@ describe('Session', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })

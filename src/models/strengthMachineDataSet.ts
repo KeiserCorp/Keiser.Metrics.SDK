@@ -1,7 +1,8 @@
 import { DeepReadonly } from '../lib/readonly'
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
+import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
 export const enum ResistancePrecision {
   Integer = 'int',
@@ -46,8 +47,8 @@ export interface StrengthMachineDataSetData {
   distance: number | null
   addedWeight: number | null
   test?: StrengthMachineDataSetTestData
+  strengthMachine?: StrengthMachineData
 
-  strengthMachine?: any    // To-Do: Add Strength Machine model
   exercise?: any           // To-Do: Add Exercise model
   a500DataSet?: any        // To-Do: Add A500 Data Set model
 
@@ -85,20 +86,18 @@ export interface StrengthMachineDataSetListResponseMeta extends ListMeta {
   sort: StrengthMachineDataSetSorting
 }
 
-export class StrengthMachineDataSets extends UserModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
-  constructor (strengthMachineDataSets: StrengthMachineDataSetData[], strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(StrengthMachineDataSet, strengthMachineDataSets, strengthMachineDataSetsMeta, sessionHandler, userId)
+export class StrengthMachineDataSets extends ModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
+  constructor (strengthMachineDataSets: StrengthMachineDataSetData[], strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta, sessionHandler: SessionHandler) {
+    super(StrengthMachineDataSet, strengthMachineDataSets, strengthMachineDataSetsMeta, sessionHandler)
   }
 }
 
 export class StrengthMachineDataSet extends Model {
   private _strengthMachineDataSetData: StrengthMachineDataSetData
-  private _userId: number
 
-  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler, userId: number) {
+  constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineDataSetData = strengthMachineDataSetData
-    this._userId = userId
   }
 
   private setStrengthMachineDataSet (strengthMachineDataSetData: StrengthMachineDataSetData) {
@@ -106,13 +105,13 @@ export class StrengthMachineDataSet extends Model {
   }
 
   async reload () {
-    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:show', { userId: this._userId, id: this.id }) as StrengthMachineDataSetResponse
+    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:show', { id: this.id }) as StrengthMachineDataSetResponse
     this.setStrengthMachineDataSet(strengthMachineDataSet)
     return this
   }
 
   async delete () {
-    await this.action('strengthMachineDataSet:delete', { userId: this._userId, id: this.id })
+    await this.action('strengthMachineDataSet:delete', { id: this.id })
   }
 
   get id () {
@@ -187,7 +186,11 @@ export class StrengthMachineDataSet extends Model {
     return this._strengthMachineDataSetData.test ? { ...this._strengthMachineDataSetData.test } as DeepReadonly<StrengthMachineDataSetTestData> : undefined
   }
 
-  get Session () {
-    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler, this._userId) : undefined
+  get session () {
+    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler) : undefined
+  }
+
+  get strengthMachine () {
+    return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
   }
 }

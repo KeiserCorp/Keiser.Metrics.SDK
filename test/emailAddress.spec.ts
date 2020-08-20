@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
+import { UnknownEntityError } from '../src/error'
 import { EmailAddress } from '../src/models/emailAddress'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
@@ -61,7 +62,7 @@ describe('Email Address', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(605)
+    expect(extError.code).to.equal(UnknownEntityError.code)
   })
 
 })

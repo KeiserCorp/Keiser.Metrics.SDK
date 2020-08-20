@@ -1,4 +1,4 @@
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum HeightMeasurementSorting {
@@ -30,20 +30,18 @@ export interface HeightMeasurementListResponseMeta extends ListMeta {
   sort: HeightMeasurementSorting
 }
 
-export class HeightMeasurements extends UserModelList<HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponseMeta> {
-  constructor (heightMeasurements: HeightMeasurementData[], heightMeasurementsMeta: HeightMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(HeightMeasurement, heightMeasurements, heightMeasurementsMeta, sessionHandler, userId)
+export class HeightMeasurements extends ModelList<HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponseMeta> {
+  constructor (heightMeasurements: HeightMeasurementData[], heightMeasurementsMeta: HeightMeasurementListResponseMeta, sessionHandler: SessionHandler) {
+    super(HeightMeasurement, heightMeasurements, heightMeasurementsMeta, sessionHandler)
   }
 }
 
 export class HeightMeasurement extends Model {
   private _heightMeasurementData: HeightMeasurementData
-  private _userId: number
 
-  constructor (heightMeasurementData: HeightMeasurementData, sessionHandler: SessionHandler, userId: number) {
+  constructor (heightMeasurementData: HeightMeasurementData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._heightMeasurementData = heightMeasurementData
-    this._userId = userId
   }
 
   private setHeightMeasurementData (heightMeasurementData: HeightMeasurementData) {
@@ -51,13 +49,13 @@ export class HeightMeasurement extends Model {
   }
 
   async reload () {
-    const { heightMeasurement } = await this.action('heightMeasurement:show', { userId: this._userId, id: this.id }) as HeightMeasurementResponse
+    const { heightMeasurement } = await this.action('heightMeasurement:show', { id: this.id }) as HeightMeasurementResponse
     this.setHeightMeasurementData(heightMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('heightMeasurement:delete', { userId: this._userId, id: this.id })
+    await this.action('heightMeasurement:delete', { id: this.id })
   }
 
   get id () {

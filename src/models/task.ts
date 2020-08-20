@@ -1,4 +1,4 @@
-import { BaseModelList, ListMeta, Model } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum Queue {
@@ -74,7 +74,7 @@ export interface TaskFailedResponse extends AuthenticatedResponse {
   tasksMeta: TaskQueueResponseMeta
 }
 
-export class Tasks extends BaseModelList<Task, TaskPayload, TaskQueueResponseMeta> {
+export class Tasks extends ModelList<Task, TaskPayload, TaskQueueResponseMeta> {
   constructor (tasks: TaskPayload[], tasksMeta: TaskQueueResponseMeta, sessionHandler: SessionHandler) {
     super(Task, tasks, tasksMeta, sessionHandler)
   }
@@ -105,7 +105,7 @@ export class Task extends Model {
   }
 }
 
-export class FailedTasks extends BaseModelList<FailedTask, TaskFailure, TaskQueueResponseMeta> {
+export class FailedTasks extends ModelList<FailedTask, TaskFailure, TaskQueueResponseMeta> {
   constructor (tasks: TaskFailure[], tasksMeta: TaskQueueResponseMeta, sessionHandler: SessionHandler) {
     super(FailedTask, tasks, tasksMeta, sessionHandler)
   }

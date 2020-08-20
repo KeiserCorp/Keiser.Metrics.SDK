@@ -1,5 +1,5 @@
 import { DeepReadonly } from '../lib/readonly'
-import { ListMeta, Model, UserModelList } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum WeightMeasurementSorting {
@@ -65,20 +65,18 @@ export interface WeightMeasurementListResponseMeta extends ListMeta {
   sort: WeightMeasurementSorting
 }
 
-export class WeightMeasurements extends UserModelList<WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponseMeta> {
-  constructor (weightMeasurements: WeightMeasurementData[], weightMeasurementsMeta: WeightMeasurementListResponseMeta, sessionHandler: SessionHandler, userId: number) {
-    super(WeightMeasurement, weightMeasurements, weightMeasurementsMeta, sessionHandler, userId)
+export class WeightMeasurements extends ModelList<WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponseMeta> {
+  constructor (weightMeasurements: WeightMeasurementData[], weightMeasurementsMeta: WeightMeasurementListResponseMeta, sessionHandler: SessionHandler) {
+    super(WeightMeasurement, weightMeasurements, weightMeasurementsMeta, sessionHandler)
   }
 }
 
 export class WeightMeasurement extends Model {
   private _weightMeasurementData: WeightMeasurementData
-  private _userId: number
 
-  constructor (weightMeasurementData: WeightMeasurementData, sessionHandler: SessionHandler, userId: number) {
+  constructor (weightMeasurementData: WeightMeasurementData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._weightMeasurementData = weightMeasurementData
-    this._userId = userId
   }
 
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
@@ -86,13 +84,13 @@ export class WeightMeasurement extends Model {
   }
 
   async reload () {
-    const { weightMeasurement } = await this.action('weightMeasurement:show', { userId: this._userId, id: this.id }) as WeightMeasurementResponse
+    const { weightMeasurement } = await this.action('weightMeasurement:show', { id: this.id }) as WeightMeasurementResponse
     this.setWeightMeasurementData(weightMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('weightMeasurement:delete', { userId: this._userId, id: this.id })
+    await this.action('weightMeasurement:delete', { id: this.id })
   }
 
   get id () {
