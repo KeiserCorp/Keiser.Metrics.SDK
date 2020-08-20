@@ -111,7 +111,11 @@ export class User extends Model {
   }
 
   async delete () {
-    await this.action('user:delete', { userId: this.id })
+    if(!this._isSessionUser && this.id !== this._userData.id) {
+      throw new ClientSideActionPrevented({ explanation: 'Cannot delete other user without admin privileges'})
+    }
+
+      await this.action('user:delete', { userId: this.id })
   }
 
   get id () {
