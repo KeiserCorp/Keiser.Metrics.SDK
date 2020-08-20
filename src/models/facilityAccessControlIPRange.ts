@@ -47,13 +47,13 @@ export class FacilityAccessControlIPRange extends Model {
   }
 
   async reload () {
-    const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:show') as FacilityAccessControlIPRangeResponse
+    const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:show', { id: this.id }) as FacilityAccessControlIPRangeResponse
     this.setFacilityAccessControlIPRangeData(facilityAccessControlIPRange)
     return this
   }
 
   async update (params: { cidr: string }) {
-    const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:update', { ...params, userId: this.id }) as FacilityAccessControlIPRangeResponse
+    const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:update', { ...params, id: this.id }) as FacilityAccessControlIPRangeResponse
     this.setFacilityAccessControlIPRangeData(facilityAccessControlIPRange)
     return this
   }
