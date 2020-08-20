@@ -76,6 +76,11 @@ export class Authentication {
     return new UserSession(response, connection)
   }
 
+  static async useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean}) {
+    const response = await connection.action('auth:facilityWelcomeFulfillment', params) as UserResponse
+    return new UserSession(response, connection)
+  }
+
   static async useOAuth (connection: MetricsConnection, params: {service: OAuthProviders, redirect: string}) {
     const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
     return response.url
