@@ -38,8 +38,12 @@ const browserConfig = {
       cleanOnceBeforeBuildPatterns: [DIST],
       cleanAfterEveryBuildPatterns: []
     }),
-    new CopyWebpackPlugin([{ from: 'README.md', to: 'README.md' }]),
-    new CopyWebpackPlugin([{ from: 'LICENSE.md', to: 'LICENSE.md' }]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'README.md', to: 'README.md' },
+        { from: 'LICENSE.md', to: 'LICENSE.md' }
+      ]
+    }),
     new CreateFileWebpack({
       path: './dist',
       fileName: '.npmrc',
