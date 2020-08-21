@@ -24,6 +24,14 @@ import Metrics from '@keiser/metrics-sdk'
 const metrics = new Metrics()
 ```
 
+When developing against a local deployment, or a mocking endpoint, configure the Metrics connection from the initial Metrics instantiation.
+
+```ts
+import Metrics from '@keiser/metrics-sdk'
+
+const metrics = new Metrics({restEndpoint: 'http://localhost:8000/api', socketEndpoint: 'ws://localhost:8000/ws'})
+```
+
 ## Authentication
 The base [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html) instance is a connection handler with access to only limited information. To access user specific information a [`UserSession`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/usersession.html) must be created by authenticating through one of the available mechanisms:
 
