@@ -28,6 +28,7 @@ export class BaseMetricsError extends Error {
   }
 }
 
+/** @hidden */
 export function GetErrorInstance (errorProperties: ActionErrorProperties) {
   const errorType = [
     MissingParamsError,
