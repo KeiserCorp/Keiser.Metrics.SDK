@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -24,7 +24,7 @@
     "test": "ts-mocha test/index.ts",
     "lint": "tslint --project tsconfig.json",
     "dev": "webpack-dev-server --config webpack/dev.config.js",
-    "build": "compile:browser && npm run compile:node",
+    "build": "npm run compile:browser && npm run compile:node",
     "compile:browser": "webpack --config webpack/prod.config.js",
     "compile:node": "tsc --sourceMap false --module es6",
     "release": "npm run build && node ./scripts/release.js",
