@@ -5,7 +5,7 @@ const WriteJsonPlugin = require('write-json-webpack-plugin')
 const CreateFileWebpack = require('create-file-webpack')
 const DIST = path.resolve(__dirname, '../dist')
 const package = Object.assign(require('../package.json'), {
-  main: 'index.node.js',
+  main: 'index.js',
   browser: 'index.browser.js',
   types: 'index.d.ts',
   private: false,
@@ -20,7 +20,15 @@ const baseConfig = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              declaration: false,
+              sourceMap: false
+            }
+          }
+        },
         exclude: /node_modules/
       }
     ]
@@ -63,15 +71,4 @@ const browserConfig = {
   }
 }
 
-const nodeConfig = {
-  ...baseConfig,
-  target: 'node',
-  output: {
-    filename: 'index.node.js',
-    path: DIST,
-    libraryTarget: 'umd',
-    library: 'Metrics'
-  }
-}
-
-module.exports = [browserConfig, nodeConfig]
+module.exports = [browserConfig]

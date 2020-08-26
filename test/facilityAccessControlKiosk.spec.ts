@@ -18,9 +18,15 @@ describe('Facility Access Control Kiosk', function () {
       persistConnection: true
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
-    await facility.setActive()
-    facilityAccessControlKiosk = (await facility.getAccessControl()).facilityAccessControlKiosk
+    const facilities = await userSession.user.getFacilityEmploymentRelationships()
+    if (typeof facilities[0]?.facility !== 'undefined') {
+      facility = facilities[0].facility
+      await facility.setActive()
+      const accessControl = await facility.getAccessControl()
+      if (typeof accessControl.facilityAccessControlKiosk !== 'undefined') {
+        facilityAccessControlKiosk = accessControl.facilityAccessControlKiosk
+      }
+    }
   })
 
   after(function () {

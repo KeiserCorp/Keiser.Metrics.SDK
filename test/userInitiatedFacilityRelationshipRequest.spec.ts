@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { Facilities, PrivilegedFacility } from '../src/models/facility'
-import { User } from '../src/models/user'
+import { PrivilegedFacility } from '../src/models/facility'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -22,8 +21,11 @@ describe('User Initiated Facility Relationship Request', function () {
     newUserSession = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword }))
 
     demoUserSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await demoUserSession.user.getFacilityEmploymentRelationships())[0].facility
-    await facility.setActive()
+    const facilities = await demoUserSession.user.getFacilityEmploymentRelationships()
+    if (typeof facilities[0]?.facility !== 'undefined') {
+      facility = facilities[0].facility
+      await facility.setActive()
+    }
   })
 
   after(function () {

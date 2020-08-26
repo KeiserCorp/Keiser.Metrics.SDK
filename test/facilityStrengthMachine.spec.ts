@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachine, FacilityStrengthMachineSorting } from '../src/models/facilityStrengthMachine'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -46,8 +46,11 @@ describe('Facility Strength Machine', function () {
       persistConnection: true
     })
     let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
-    await facility.setActive()
+    const facilities = await userSession.user.getFacilityEmploymentRelationships()
+    if (typeof facilities[0]?.facility !== 'undefined') {
+      facility = facilities[0].facility
+      await facility.setActive()
+    }
   })
 
   after(function () {
@@ -66,7 +69,7 @@ describe('Facility Strength Machine', function () {
     expect(addedMachine).to.be.an('object')
     expect(addedMachine.model).to.equal('001121')
     expect(addedMachine.strengthMachine).to.be.an('object')
-    expect(addedMachine.strengthMachine.id).to.equal(1000)
+    expect(addedMachine.strengthMachine?.id).to.equal(1000)
   })
 
   it('can list facility strength machines', async function () {

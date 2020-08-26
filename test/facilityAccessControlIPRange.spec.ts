@@ -19,8 +19,11 @@ describe('Facility Access Control IP Range', function () {
       persistConnection: true
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
-    await facility.setActive()
+    const facilities = await userSession.user.getFacilityEmploymentRelationships()
+    if (typeof facilities[0]?.facility !== 'undefined') {
+      facility = facilities[0].facility
+      await facility.setActive()
+    }
   })
 
   after(function () {

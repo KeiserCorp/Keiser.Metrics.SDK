@@ -49,13 +49,19 @@ describe('Facility Kiosk Token', function () {
       persistConnection: true
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
-    await facility.setActive()
-    await (await facility.getAccessControl()).facilityAccessControlKiosk.update({
-      kioskModeAllowed: true,
-      primaryIdentification: PrimaryIdentification.UUID,
-      secondaryIdentification: SecondaryIdentification.None
-    })
+    const facilities = await userSession.user.getFacilityEmploymentRelationships()
+    if (typeof facilities[0]?.facility !== 'undefined') {
+      facility = facilities[0].facility
+      await facility.setActive()
+      const accessControl = await facility.getAccessControl()
+      if (typeof accessControl.facilityAccessControlKiosk !== 'undefined') {
+        await accessControl.facilityAccessControlKiosk.update({
+          kioskModeAllowed: true,
+          primaryIdentification: PrimaryIdentification.UUID,
+          secondaryIdentification: SecondaryIdentification.None
+        })
+      }
+    }
   })
 
   after(function () {
@@ -119,7 +125,7 @@ describe('Facility Kiosk Token', function () {
     let extError
 
     try {
-      const userSession = await kioskSession.userLogin({ primaryIdentification: 1 })
+      await kioskSession.userLogin({ primaryIdentification: 1 })
     } catch (error) {
       extError = error
     }
