@@ -5,7 +5,7 @@ import { FacilityAccessControl, FacilityAccessControlResponse } from './facility
 import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityKioskTokenResponse } from './facilityKioskToken'
 import { FacilityLicenseData } from './facilityLicense'
-import { FacilityProfile, FacilityProfileData } from './facilityProfile'
+import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
@@ -63,6 +63,12 @@ export class Facility extends Model {
     this._facilityData = facilityData
   }
 
+  async reload () {
+    const { facility } = await this.action('facility:show', { id: this._facilityData.id }) as FacilityResponse
+    this.setFacilityData(facility)
+    return this
+  }
+
   get id () {
     return this._facilityData.id
   }
@@ -88,6 +94,10 @@ export class PrivilegedFacility extends Facility {
 
   get isActive () {
     return this.id === this.sessionHandler.decodedAccessToken?.facility?.id
+  }
+
+  get facilityProfile () {
+    return this._facilityData.facilityProfile ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
   async setActive () {

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
+import { PrivilegedStrengthMachine, StrengthMachineSorting, StrengthMachine } from '../src/models/strengthMachine'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -13,6 +13,7 @@ describe('Strength Machine', function () {
   let userSession: UserSession
   let adminSession: AdminSession
   let newMachine: PrivilegedStrengthMachine
+  let existingMachine: StrengthMachine
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -36,6 +37,7 @@ describe('Strength Machine', function () {
 
   it('can list strength machines', async function () {
     const strengthMachines = await userSession.getStrengthMachines()
+    existingMachine = strengthMachines[0]
 
     expect(Array.isArray(strengthMachines)).to.equal(true)
     expect(strengthMachines.length).to.be.above(0)
@@ -43,11 +45,21 @@ describe('Strength Machine', function () {
   })
 
   it('can reload strength machine', async function () {
-    const strengthMachine = (await userSession.getStrengthMachines())[0]
+    expect(existingMachine).to.be.an('object')
+    if (typeof existingMachine !== 'undefined') {
+      await existingMachine.reload()
+      expect(existingMachine).to.be.an('object')
+    }
+  })
 
-    expect(strengthMachine).to.be.an('object')
-    await strengthMachine.reload()
-    expect(strengthMachine).to.be.an('object')
+  it('can get specific strength machine', async function () {
+    expect(existingMachine).to.be.an('object')
+    if (typeof existingMachine !== 'undefined') {
+      const strengthMachine = await userSession.getStrengthMachine({ id: existingMachine.id })
+
+      expect(strengthMachine).to.be.an('object')
+      expect(strengthMachine.id).to.equal(existingMachine.id)
+    }
   })
 
   it('can list strength machines with privileges', async function () {

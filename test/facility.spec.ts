@@ -8,6 +8,7 @@ describe('Facility', function () {
   let metricsInstance: Metrics
   let userSession: UserSession
   let facility: Facility | undefined
+  let existingFacility: Facility
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -25,10 +26,29 @@ describe('Facility', function () {
 
   it('can list facilities', async function () {
     const facilities = await userSession.getFacilities()
+    existingFacility = facilities[0]
 
     expect(Array.isArray(facilities)).to.equal(true)
     expect(facilities.length).to.be.above(0)
     expect(facilities.meta.sort).to.equal(FacilitySorting.ID)
+  })
+
+  it('can reload facility', async function () {
+    expect(existingFacility).to.be.an('object')
+    if (typeof existingFacility !== 'undefined') {
+      await existingFacility.reload()
+      expect(existingFacility).to.be.an('object')
+    }
+  })
+
+  it('can get specific facility', async function () {
+    expect(existingFacility).to.be.an('object')
+    if (typeof existingFacility !== 'undefined') {
+      const facility = await userSession.getFacility({ id: existingFacility.id })
+
+      expect(facility).to.be.an('object')
+      expect(facility.id).to.equal(existingFacility.id)
+    }
   })
 
   it('has facility properties', async function () {
@@ -82,8 +102,8 @@ describe('Facility', function () {
   })
 
   it('can update facility profile with active', async function () {
-    if (facility?.facilityProfile) {
-      const facilityProfile = await facility.facilityProfile.update({ name: '_test_' })
+    if (userSession.activeFacility?.facilityProfile) {
+      const facilityProfile = await userSession.activeFacility.facilityProfile.update({ name: '_test_' })
 
       expect(typeof facilityProfile).to.equal('object')
       expect(facilityProfile.name).to.equal('_test_')

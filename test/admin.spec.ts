@@ -61,6 +61,13 @@ describe('Admin', function () {
     expect(users.meta.sort).to.equal(UserSorting.ID)
   })
 
+  it('can get specific user', async function () {
+    const user = await session.getUser({ userId: 1 })
+
+    expect(typeof user).to.equal('object')
+    expect(user.id).to.equal(1)
+  })
+
   it('can merge users', async function () {
     const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
     const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
