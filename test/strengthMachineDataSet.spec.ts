@@ -8,7 +8,7 @@ import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './c
 describe('Strength Machine Data Set', function () {
   let metricsInstance: Metrics
   let user: User
-  let strengthMachineDataSet: StrengthMachineDataSet
+  let createdStrengthMachineDataSet: StrengthMachineDataSet
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -32,7 +32,7 @@ describe('Strength Machine Data Set', function () {
   })
 
   it('can create new Strength Machine data set', async function () {
-    strengthMachineDataSet = await user.createStrengthMachineDataSet({
+    const strengthMachineDataSet = await user.createStrengthMachineDataSet({
       strengthMachineId: 1000,
       version: '3EC8495A',
       serial: '0124 2013 0858 4743',
@@ -51,22 +51,31 @@ describe('Strength Machine Data Set', function () {
 
     expect(typeof strengthMachineDataSet).to.equal('object')
     expect(strengthMachineDataSet.repetitionCount).to.equal(12)
+    createdStrengthMachineDataSet = strengthMachineDataSet
   })
 
   it('can reload Strength Machine data set', async function () {
-    strengthMachineDataSet = await strengthMachineDataSet.reload()
+    const strengthMachineDataSet = await createdStrengthMachineDataSet.reload()
 
     expect(typeof strengthMachineDataSet).to.equal('object')
     expect(strengthMachineDataSet.repetitionCount).to.equal(12)
   })
 
+  it('can get specific Strength Machine data set', async function () {
+    const strengthMachineDataSet = await user.getStrengthMachineDataSet({ id: createdStrengthMachineDataSet.id })
+
+    expect(typeof strengthMachineDataSet).to.equal('object')
+    expect(strengthMachineDataSet.id).to.equal(createdStrengthMachineDataSet.id)
+    expect(strengthMachineDataSet.repetitionCount).to.equal(createdStrengthMachineDataSet.repetitionCount)
+  })
+
   it('can delete Strength Machine data set', async function () {
-    await strengthMachineDataSet.delete()
+    await createdStrengthMachineDataSet.delete()
 
     let extError
 
     try {
-      await strengthMachineDataSet.reload()
+      await createdStrengthMachineDataSet.reload()
     } catch (error) {
       extError = error
     }

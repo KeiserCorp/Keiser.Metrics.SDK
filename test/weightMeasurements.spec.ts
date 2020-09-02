@@ -66,6 +66,16 @@ describe('Weight Measurement', function () {
     createdWeightMeasurement = weightMeasurements[0]
   })
 
+  it('can get specific weight measurement', async function () {
+    const weightMeasurement = await user.getWeightMeasurement({ id: createdWeightMeasurement.id })
+
+    expect(typeof weightMeasurement).to.equal('object')
+    expect(weightMeasurement.source).to.equal('test')
+    expect(weightMeasurement.id).to.equal(createdWeightMeasurement.id)
+    expect(weightMeasurement.source).to.equal(createdWeightMeasurement.source)
+    expect(weightMeasurement.metricWeight).to.equal(createdWeightMeasurement.metricWeight)
+  })
+
   it('can reload new weight measurement', async function () {
     const weightMeasurement = await createdWeightMeasurement.reload()
 

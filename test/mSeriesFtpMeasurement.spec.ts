@@ -8,7 +8,7 @@ import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './c
 describe('M Series FTP Measurement', function () {
   let metricsInstance: Metrics
   let user: User
-  let mSeriesFtpMeasurement: MSeriesFtpMeasurement
+  let createdMSeriesFtpMeasurement: MSeriesFtpMeasurement
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -32,7 +32,7 @@ describe('M Series FTP Measurement', function () {
   })
 
   it('can create new M Series FTP measurement', async function () {
-    mSeriesFtpMeasurement = await user.createMSeriesFtpMeasurement({
+    const mSeriesFtpMeasurement = await user.createMSeriesFtpMeasurement({
       source: 'test',
       takenAt: new Date(),
       machineType: 'm3i',
@@ -41,22 +41,31 @@ describe('M Series FTP Measurement', function () {
 
     expect(typeof mSeriesFtpMeasurement).to.equal('object')
     expect(mSeriesFtpMeasurement.ftp).to.equal(150)
+    createdMSeriesFtpMeasurement = mSeriesFtpMeasurement
   })
 
   it('can reload M Series FTP measurement', async function () {
-    mSeriesFtpMeasurement = await mSeriesFtpMeasurement.reload()
+    const mSeriesFtpMeasurement = await createdMSeriesFtpMeasurement.reload()
 
     expect(typeof mSeriesFtpMeasurement).to.equal('object')
     expect(mSeriesFtpMeasurement.ftp).to.equal(150)
   })
 
+  it('can get specific M Series FTP measurement', async function () {
+    const mSeriesFtpMeasurement = await user.getMSeriesFtpMeasurement({ id: createdMSeriesFtpMeasurement.id })
+
+    expect(typeof mSeriesFtpMeasurement).to.equal('object')
+    expect(mSeriesFtpMeasurement.id).to.equal(createdMSeriesFtpMeasurement.id)
+    expect(mSeriesFtpMeasurement.ftp).to.equal(createdMSeriesFtpMeasurement.ftp)
+  })
+
   it('can delete M Series FTP measurement', async function () {
-    await mSeriesFtpMeasurement.delete()
+    await createdMSeriesFtpMeasurement.delete()
 
     let extError
 
     try {
-      await mSeriesFtpMeasurement.reload()
+      await createdMSeriesFtpMeasurement.reload()
     } catch (error) {
       extError = error
     }

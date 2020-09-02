@@ -24,7 +24,7 @@ const generateMSeriesDataSet = () => {
 describe('M Series Data Set', function () {
   let metricsInstance: Metrics
   let user: User
-  let mSeriesDataSet: MSeriesDataSet
+  let createdMSeriesDataSet: MSeriesDataSet
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -49,7 +49,7 @@ describe('M Series Data Set', function () {
 
   it('can create new M Series data set', async function () {
     const genDataSet = generateMSeriesDataSet()
-    mSeriesDataSet = await user.createMSeriesDataSet({
+    const mSeriesDataSet = await user.createMSeriesDataSet({
       source: 'test',
       machineType: 'm3i',
       ordinalId: 0,
@@ -60,22 +60,31 @@ describe('M Series Data Set', function () {
 
     expect(typeof mSeriesDataSet).to.equal('object')
     expect(mSeriesDataSet.buildMajor).to.equal(6)
+    createdMSeriesDataSet = mSeriesDataSet
   })
 
   it('can reload M Series data set', async function () {
-    mSeriesDataSet = await mSeriesDataSet.reload()
+    const mSeriesDataSet = await createdMSeriesDataSet.reload()
 
     expect(typeof mSeriesDataSet).to.equal('object')
     expect(mSeriesDataSet.buildMajor).to.equal(6)
   })
 
+  it('can get specific M Series data set', async function () {
+    const mSeriesDataSet = await user.getMSeriesDataSet({ id: createdMSeriesDataSet.id })
+
+    expect(typeof mSeriesDataSet).to.equal('object')
+    expect(mSeriesDataSet.id).to.equal(createdMSeriesDataSet.id)
+    expect(mSeriesDataSet.buildMajor).to.equal(createdMSeriesDataSet.buildMajor)
+  })
+
   it('can delete M Series data set', async function () {
-    await mSeriesDataSet.delete()
+    await createdMSeriesDataSet.delete()
 
     let extError
 
     try {
-      await mSeriesDataSet.reload()
+      await createdMSeriesDataSet.reload()
     } catch (error) {
       extError = error
     }
