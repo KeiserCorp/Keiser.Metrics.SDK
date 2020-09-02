@@ -358,6 +358,11 @@ export class FacilityMemberUser extends FacilityUser {
     return new FacilitySession(session, this.sessionHandler)
   }
 
+  async getSession (params: {id: number}) {
+    const { session } = await this.action('facilitySession:show', { ...params, userId : this.id }) as SessionResponse
+    return new FacilitySession(session, this.sessionHandler)
+  }
+
   async getCurrentSessions () {
     const { sessions, sessionsMeta } = await this.action('facilitySession:status', { userId : this.id }) as SessionListResponse
     return new FacilitySessions(sessions, sessionsMeta, this.sessionHandler)
