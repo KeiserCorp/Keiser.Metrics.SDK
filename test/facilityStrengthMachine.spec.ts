@@ -94,6 +94,14 @@ describe('Facility Strength Machine', function () {
     expect(addedMachine.model).to.equal('001121')
   })
 
+  it('can get specific facility strength machine', async function () {
+    const machine = await facility.getFacilityStrengthMachine({id: addedMachine.id})
+
+    expect(machine).to.be.an('object')
+    expect(machine.id).to.equal(addedMachine.id)
+    expect(machine.model).to.equal(addedMachine.model)
+  })
+
   it('can update facility strength machine', async function () {
     addedMachine = await addedMachine.update({ location: 'Next to spin studio' })
 

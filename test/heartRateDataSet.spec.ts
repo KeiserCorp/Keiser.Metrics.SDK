@@ -16,7 +16,7 @@ const generateHeartRateDataSet = () => {
 describe('Heart Rate Data Set', function () {
   let metricsInstance: Metrics
   let user: User
-  let heartRateDataSet: HeartRateDataSet
+  let createdHeartRateDataSet: HeartRateDataSet
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -41,29 +41,38 @@ describe('Heart Rate Data Set', function () {
 
   it('can create new heart rate data set', async function () {
     const genDataSet = generateHeartRateDataSet()
-    heartRateDataSet = await user.createHeartRateDataSet({
+    const heartRateDataSet = await user.createHeartRateDataSet({
       source: 'test',
       heartRateDataPoints: genDataSet
     })
 
     expect(typeof heartRateDataSet).to.equal('object')
     expect(heartRateDataSet.maxHeartRate).to.be.above(0)
+    createdHeartRateDataSet = heartRateDataSet
   })
 
   it('can reload heart rate data set', async function () {
-    heartRateDataSet = await heartRateDataSet.reload()
+    const heartRateDataSet = await createdHeartRateDataSet.reload()
 
     expect(typeof heartRateDataSet).to.equal('object')
     expect(heartRateDataSet.maxHeartRate).to.be.above(0)
   })
 
+  it('can get specific heart rate data set', async function () {
+    const heartRateDataSet = await user.getHeartRateDataSet({ id: createdHeartRateDataSet.id })
+
+    expect(typeof heartRateDataSet).to.equal('object')
+    expect(heartRateDataSet.id).to.equal(createdHeartRateDataSet.id)
+    expect(heartRateDataSet.maxHeartRate).to.equal(createdHeartRateDataSet.maxHeartRate)
+  })
+
   it('can delete heart rate data set', async function () {
-    await heartRateDataSet.delete()
+    await createdHeartRateDataSet.delete()
 
     let extError
 
     try {
-      await heartRateDataSet.reload()
+      await createdHeartRateDataSet.reload()
     } catch (error) {
       extError = error
     }

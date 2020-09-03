@@ -24,7 +24,7 @@ export interface FacilityProfileListResponse extends AuthenticatedResponse {
 
 export class FacilityProfile extends Model {
   protected _facilityProfileData: FacilityProfileData
-  private _facility: Facility
+  protected _facility: Facility
 
   constructor (facilityProfileData: FacilityProfileData, facility: Facility, sessionHandler: SessionHandler) {
     super(sessionHandler)
@@ -36,38 +36,7 @@ export class FacilityProfile extends Model {
     this._facilityProfileData = facilityProfileData
   }
 
-  async update (params: {
-    name: string | null,
-    phone?: string | null,
-    address?: string | null,
-    city?: string | null,
-    postcode?: string | null,
-    state?: string | null,
-    country?: string | null,
-    website?: string | null
-  }) {
-    if (!(this._facility instanceof PrivilegedFacility)) {
-      throw new ClientSideActionPrevented({ explanation: 'cannot update facility without privilege' })
-    }
-
-    if (!this._facility.isActive) {
-      throw new ClientSideActionPrevented({ explanation: 'can only update profile of active facility' })
-    }
-
-    const { facilityProfile } = await this.action('facilityProfile:update', params) as FacilityProfileResponse
-    this.setFacilityProfileData(facilityProfile)
-    return facilityProfile
-  }
-
   async reload () {
-    if (!(this._facility instanceof PrivilegedFacility)) {
-      throw new ClientSideActionPrevented({ explanation: 'cannot reload facility with privilege' })
-    }
-
-    if (!this._facility.isActive) {
-      throw new ClientSideActionPrevented({ explanation: 'can only reload profile of active facility' })
-    }
-
     const { facilityProfile } = await this.action('facilityProfile:show') as FacilityProfileResponse
     this.setFacilityProfileData(facilityProfile)
     return facilityProfile
@@ -103,5 +72,37 @@ export class FacilityProfile extends Model {
 
   get website () {
     return this._facilityProfileData.website
+  }
+}
+
+export class PrivilegedFacilityProfile extends FacilityProfile {
+  protected _facility: PrivilegedFacility
+
+  constructor (facilityProfileData: FacilityProfileData, facility: PrivilegedFacility, sessionHandler: SessionHandler) {
+    super(facilityProfileData, facility, sessionHandler)
+    this._facility = facility
+  }
+
+  protected setFacilityProfileData (facilityProfileData: FacilityProfileData) {
+    this._facilityProfileData = facilityProfileData
+  }
+
+  async update (params: {
+    name: string | null,
+    phone?: string | null,
+    address?: string | null,
+    city?: string | null,
+    postcode?: string | null,
+    state?: string | null,
+    country?: string | null,
+    website?: string | null
+  }) {
+    if (!this._facility.isActive) {
+      throw new ClientSideActionPrevented({ explanation: 'can only update profile of active facility' })
+    }
+
+    const { facilityProfile } = await this.action('facilityProfile:update', params) as FacilityProfileResponse
+    this.setFacilityProfileData(facilityProfile)
+    return facilityProfile
   }
 }

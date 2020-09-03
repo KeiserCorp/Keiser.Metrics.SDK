@@ -58,7 +58,6 @@ export class Exercise extends Model {
     return this
   }
 
-
   get id () {
     return this._exerciseData.id
   }

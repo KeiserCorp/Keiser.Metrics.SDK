@@ -56,6 +56,14 @@ describe('Session', function () {
     expect(extError.code).to.equal(ActionPreventedError.code)
   })
 
+  it('can get specific session', async function () {
+    const session = await user.getSession({ id: createdSession.id })
+
+    expect(typeof session).to.equal('object')
+    expect(session.id).to.equal(createdSession.id)
+    expect(session.startedAt.toISOString()).to.equal(createdSession.startedAt.toISOString())
+  })
+
   it('can end session', async function () {
     createdSession = await createdSession.end()
 

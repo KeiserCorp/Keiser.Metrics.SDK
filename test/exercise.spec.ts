@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { ExerciseSorting, ExerciseType, PrivilegedExercise } from '../src/models/exercise'
+import { Exercise, ExerciseSorting, ExerciseType, PrivilegedExercise } from '../src/models/exercise'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -13,6 +13,7 @@ describe('Exercise', function () {
   let userSession: UserSession
   let adminSession: AdminSession
   let newExercise: PrivilegedExercise
+  let existingExercise: Exercise
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -36,6 +37,7 @@ describe('Exercise', function () {
 
   it('can list available exercises', async function () {
     const exercises = await userSession.getExercises()
+    existingExercise = exercises[0]
 
     expect(Array.isArray(exercises)).to.equal(true)
     expect(exercises.length).to.be.above(0)
@@ -43,11 +45,21 @@ describe('Exercise', function () {
   })
 
   it('can reload exercise', async function () {
-    const exercise = (await userSession.getExercises())[0]
+    expect(existingExercise).to.be.an('object')
+    if (typeof existingExercise !== 'undefined') {
+      await existingExercise.reload()
+      expect(existingExercise).to.be.an('object')
+    }
+  })
 
-    expect(exercise).to.be.an('object')
-    await exercise.reload()
-    expect(exercise).to.be.an('object')
+  it('can get specific exercise', async function () {
+    expect(existingExercise).to.be.an('object')
+    if (typeof existingExercise !== 'undefined') {
+      const exercise = await userSession.getExercise({ id: existingExercise.id })
+
+      expect(exercise).to.be.an('object')
+      expect(exercise.id).to.equal(existingExercise.id)
+    }
   })
 
   it('can list exercises with privileges', async function () {

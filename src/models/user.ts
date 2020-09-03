@@ -3,13 +3,13 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, KioskSession, SessionHandler } from '../session'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
-import { FacilityRelationshipData, UserFacilityEmployeeRelationships, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
-import { FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse } from './facilityRelationshipRequest'
+import { FacilityRelationship, FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse } from './facilityRelationshipRequest'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
-import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServices } from './oauthService'
+import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessions, KioskSessionResponse, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
@@ -111,11 +111,11 @@ export class User extends Model {
   }
 
   async delete () {
-    if(!this._isSessionUser && this.id !== this._userData.id) {
-      throw new ClientSideActionPrevented({ explanation: 'Cannot delete other user without admin privileges'})
+    if (!this._isSessionUser && this.id !== this._userData.id) {
+      throw new ClientSideActionPrevented({ explanation: 'Cannot delete other user without admin privileges' })
     }
 
-      await this.action('user:delete', { userId: this.id })
+    await this.action('user:delete', { userId: this.id })
   }
 
   get id () {
@@ -149,6 +149,11 @@ export class User extends Model {
     return response.url
   }
 
+  async getOAuthService (params: {id: number}) {
+    const { oauthService } = await this.action('oauthService:show', { ...params, userId : this.id }) as OAuthServiceResponse
+    return new OAuthService(oauthService, this.sessionHandler)
+  }
+
   async getOAuthServices (options: {limit?: number, offset?: number} = { }) {
     const { oauthServices, oauthServicesMeta } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
     return new OAuthServices(oauthServices, oauthServicesMeta, this.sessionHandler)
@@ -176,6 +181,11 @@ export class User extends Model {
     return new WeightMeasurement(weightMeasurement, this.sessionHandler)
   }
 
+  async getWeightMeasurement (params: {id: number}) {
+    const { weightMeasurement } = await this.action('weightMeasurement:show', { ...params, userId : this.id }) as WeightMeasurementResponse
+    return new WeightMeasurement(weightMeasurement, this.sessionHandler)
+  }
+
   async getWeightMeasurements (options: {from?: Date, to?: Date, sort?: WeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { weightMeasurements, weightMeasurementsMeta } = await this.action('weightMeasurement:list', { ...options, userId : this.id }) as WeightMeasurementListResponse
     return new WeightMeasurements(weightMeasurements, weightMeasurementsMeta, this.sessionHandler)
@@ -200,9 +210,19 @@ export class User extends Model {
     return new HeightMeasurement(heightMeasurement, this.sessionHandler)
   }
 
+  async getHeightMeasurement (params: {id: number}) {
+    const { heightMeasurement } = await this.action('heightMeasurement:show', { ...params, userId : this.id }) as HeightMeasurementResponse
+    return new HeightMeasurement(heightMeasurement, this.sessionHandler)
+  }
+
   async getHeightMeasurements (options: {from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { heightMeasurements, heightMeasurementsMeta } = await this.action('heightMeasurement:list', { ...options, userId : this.id }) as HeightMeasurementListResponse
     return new HeightMeasurements(heightMeasurements, heightMeasurementsMeta, this.sessionHandler)
+  }
+
+  async getFacilityRelationshipRequest (params: {id: number}) {
+    const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userShow', { ...params, userId : this.id }) as FacilityRelationshipRequestResponse
+    return new FacilityInitiatedFacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 
   async getFacilityRelationshipRequests (options: {memberIdentifier?: string, name?: string, sort?: FacilityInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
@@ -210,9 +230,24 @@ export class User extends Model {
     return new FacilityInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
   }
 
+  async getFacilityRelationship (params: {id: number}) {
+    const { facilityRelationship } = await this.action('facilityRelationship:userShow', { ...params, userId : this.id }) as FacilityRelationshipResponse
+    return new FacilityRelationship(facilityRelationship, this.sessionHandler)
+  }
+
+  async getFacilityMembershipRelationship (params: {id: number}) {
+    const { facilityRelationship } = await this.action('facilityRelationship:userShow', { ...params, userId : this.id }) as FacilityRelationshipResponse
+    return new UserFacilityMemberRelationship(facilityRelationship, this.sessionHandler)
+  }
+
   async getFacilityMembershipRelationships (options: {sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, member: true, userId : this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityMemberRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
+  }
+
+  async getFacilityEmployeeRelationship (params: {id: number}) {
+    const { facilityRelationship } = await this.action('facilityRelationship:userShow', { ...params, userId : this.id }) as FacilityRelationshipResponse
+    return new UserFacilityEmployeeRelationship(facilityRelationship, this.sessionHandler)
   }
 
   async getFacilityEmploymentRelationships (options: {name?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
@@ -233,6 +268,11 @@ export class User extends Model {
     }
   }
 
+  async getSession (params: {id: number}) {
+    const { session } = await this.action('session:show', { ...params, userId : this.id }) as SessionResponse
+    return new Session(session, this.sessionHandler)
+  }
+
   async getSessions (options: {open?: boolean, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { sessions, sessionsMeta } = await this.action('session:list', { ...options, userId : this.id }) as SessionListResponse
     return new Sessions(sessions, sessionsMeta, this.sessionHandler)
@@ -240,6 +280,11 @@ export class User extends Model {
 
   async createMSeriesDataSet (params: {sessionId?: number, autoAttachSession?: boolean, source: string, machineType: string, ordinalId: number, buildMajor: number, buildMinor: number, mSeriesDataPoints: MSeriesCapturedDataPoint[]}) {
     const { mSeriesDataSet } = await this.action('mSeriesDataSet:create', { ...params, mSeriesDataPoints: JSON.stringify(params.mSeriesDataPoints), userId : this.id }) as MSeriesDataSetResponse
+    return new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)
+  }
+
+  async getMSeriesDataSet (params: {id: number}) {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { ...params, userId : this.id }) as MSeriesDataSetResponse
     return new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)
   }
 
@@ -253,6 +298,11 @@ export class User extends Model {
     return new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.sessionHandler)
   }
 
+  async getMSeriesFtpMeasurement (params: {id: number}) {
+    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:show', { ...params, userId : this.id }) as MSeriesFtpMeasurementResponse
+    return new MSeriesFtpMeasurement(mSeriesFtpMeasurement, this.sessionHandler)
+  }
+
   async getMSeriesFtpMeasurements (options: {source?: string, machineType?: string, from?: Date, to?: Date, sort?: MSeriesFtpMeasurementSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId : this.id }) as MSeriesFtpMeasurementListResponse
     return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler)
@@ -263,6 +313,11 @@ export class User extends Model {
     return new HeartRateDataSet(heartRateDataSet, this.sessionHandler)
   }
 
+  async getHeartRateDataSet (params: {id: number}) {
+    const { heartRateDataSet } = await this.action('heartRateDataSet:show', { ...params, userId : this.id }) as HeartRateDataSetResponse
+    return new HeartRateDataSet(heartRateDataSet, this.sessionHandler)
+  }
+
   async getHeartRateDataSets (options: {source?: string, from?: Date, to?: Date, sort?: HeartRateDataSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { heartRateDataSets, heartRateDataSetsMeta } = await this.action('heartRateDataSet:list', { ...options, userId : this.id }) as HeartRateDataSetListResponse
     return new HeartRateDataSets(heartRateDataSets, heartRateDataSetsMeta, this.sessionHandler)
@@ -270,6 +325,11 @@ export class User extends Model {
 
   async createStrengthMachineDataSet (params: {sessionId?: number, autoAttachSession?: boolean, strengthMachineId: number, exerciseId?: number, facilityId?: number, version: string, serial: string, completedAt: Date, chest?: number, rom1?: number, rom2?: number, seat?: number, resistance: number, resistancePrecision: ResistancePrecision, repetitionCount: number, forceUnit: ForceUnit, peakPower: number, work: number, distance?: number, addedWeight?: number}) {
     const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:create', { ...params, userId : this.id }) as StrengthMachineDataSetResponse
+    return new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)
+  }
+
+  async getStrengthMachineDataSet (params: {id: number}) {
+    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:show', { ...params, userId : this.id }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)
   }
 
@@ -295,6 +355,11 @@ export class FacilityUser extends User {
 export class FacilityMemberUser extends FacilityUser {
   async startSession (params: {forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number} = { }) {
     const { session } = await this.action('facilitySession:start', { ...params, userId : this.id }) as SessionResponse
+    return new FacilitySession(session, this.sessionHandler)
+  }
+
+  async getSession (params: {id: number}) {
+    const { session } = await this.action('facilitySession:show', { ...params, userId : this.id }) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
   }
 

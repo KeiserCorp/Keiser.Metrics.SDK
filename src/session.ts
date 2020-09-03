@@ -4,13 +4,13 @@ import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
-import { ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
-import { Facilities, FacilityData, FacilityListResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
+import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
+import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityKioskTokenResponse } from './models/facilityKioskToken'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { KioskSessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
-import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
+import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
 import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
@@ -358,14 +358,29 @@ export class UserSession {
     return this.sessionHandler.action(action, params)
   }
 
+  async getExercise (params: {id: number}) {
+    const { exercise } = await this.action('exercise:show', params) as ExerciseResponse
+    return new Exercise(exercise, this.sessionHandler)
+  }
+
   async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
     return new Exercises(exercises, exercisesMeta, this.sessionHandler)
   }
 
+  async getStrengthMachine (params: {id: number}) {
+    const { strengthMachine } = await this.action('strengthMachine:show', params) as StrengthMachineResponse
+    return new StrengthMachine(strengthMachine, this.sessionHandler)
+  }
+
   async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
     return new StrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
+  }
+
+  async getFacility (params: {id: number}) {
+    const { facility } = await this.action('facility:show', params) as FacilityResponse
+    return new Facility(facility, this.sessionHandler)
   }
 
   async getFacilities (options: {name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
@@ -380,6 +395,11 @@ export class AdminSession extends UserSession {
   async getStats (options: {from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { stats, statsMeta } = await this.action('stats:list', options) as StatListResponse
     return new Stats(stats, statsMeta, this.sessionHandler)
+  }
+
+  async getUser (params: {userId: number}) {
+    const { user } = await this.action('user:show', params) as UserResponse
+    return new User(user, this.sessionHandler)
   }
 
   async getUsers (options: {name?: string, email?: string, sort?: UserSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
@@ -435,6 +455,11 @@ export class AdminSession extends UserSession {
     await this.action('resque:task:deleteAllFailed', options)
   }
 
+  async getExercise (params: {id: number}) {
+    const { exercise } = await this.action('exercise:show', params) as ExerciseResponse
+    return new PrivilegedExercise(exercise, this.sessionHandler)
+  }
+
   async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
     return new PrivilegedExercises(exercises, exercisesMeta, this.sessionHandler)
@@ -445,6 +470,11 @@ export class AdminSession extends UserSession {
     return new PrivilegedExercise(exercise, this.sessionHandler)
   }
 
+  async getStrengthMachine (params: {id: number}) {
+    const { strengthMachine } = await this.action('strengthMachine:show', params) as StrengthMachineResponse
+    return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
+  }
+
   async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
     return new PrivilegedStrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
@@ -453,6 +483,11 @@ export class AdminSession extends UserSession {
   async createStrengthMachine (params: { name: string, line: string, variant?: string, exerciseId?: number }) {
     const { strengthMachine } = await this.action('strengthMachine:create', params) as StrengthMachineResponse
     return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
+  }
+
+  async getFacilityLicense (params: {id: number}) {
+    const { facilityLicense } = await this.action('facilityLicense:show', params) as FacilityLicenseResponse
+    return new FacilityLicense(facilityLicense, this.sessionHandler)
   }
 
   async getFacilityLicenses (options: {name?: string, key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {

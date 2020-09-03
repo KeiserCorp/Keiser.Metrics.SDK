@@ -115,6 +115,14 @@ describe('Facility Session', function () {
     expect(createdSession.endedAt).to.not.equal(null)
   })
 
+  it('can get specific session', async function () {
+    const session = await facility.getSession({ id: createdSession.id })
+
+    expect(typeof session).to.equal('object')
+    expect(session.id).to.equal(createdSession.id)
+    expect(session.startedAt.toISOString()).to.equal(createdSession.startedAt.toISOString())
+  })
+
   it('can delete session', async function () {
     await createdSession.delete()
 
