@@ -108,6 +108,17 @@ function generateUsername(user: User) {
 }
 ```
 
+## Model Association Structure
+All model data is nested under it's parent associations in an tree structure stemming from the base session object (`UserSession`, `FacilitySession`). All model references are generated at access and will not be persisted in memory by the SDK so local references are necessary to persist data. Most associated data models will be accessed through `async` method calls with the prefix `get` for single model instantiations, and `list` for multiple model instantiations.
+
+```ts
+// Variable `exercises` will be an array containing up to 20 instances of exercises of the type 'strength' with 'back' in the exercise name
+const exercises = await userSession.getExercises({ type: ExerciseType.Strength, name: 'back', limit: 20 })
+
+// Variable `exercise` will contain a single exercise instance with 'id' equal to 1000
+const exercise = await userSession.getExercise({ id: 1000 })
+```
+
 ## Paginated Data
 All plural [`User`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/user.html) data methods (ex: [`user.getEmailAddresses()`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/emailaddresses.html)) will return an ordered array of class instances. These arrays have an extended `meta` property which contains the parameters used to query the array, the sorting properties, and a `totalCount` property which is the total number of instances associated with the parent class. By default these method will limit responses to `20` instances.
 
@@ -124,6 +135,41 @@ const thirdPageOfEmailAddresses = await user.getEmailAddresses({sort: EmailAddre
 
 // Will return 10 entities that contain "@gmail.com", sorted and ordered
 const searchResultEmailAddresses = await user.getEmailAddresses({email: '@gmail.com', sort: EmailAddressSorting.Email, ascending: true, limit: 10, offset: 0})
+```
+
+## Updating Data
+All data models and properties are externally immutable and act as functional data structures (_though the implementation is not purely functional_). Properties will change with calls to methods on the model (`update`, `reload`, `delete`). These mutating methods will always return a mutated instance of the model, but the existing model instance will also be mutated in place. There are no events emitted on mutation.
+
+This restriction on direct property mutation preserves the integrity of the data within the SDK by ensuring the data always represents the actual data in the Metrics server.
+
+```ts
+// This will result in an error
+user.profile.name = 'Rick Sanchez'
+
+// Instead, issue an update
+console.log(user.profile.name) // Outputs: 'Richard Sanchez'
+
+await user.profile.update({ ...user.profile, name: 'Rick Sanchez' })
+
+console.log(user.profile.name) // Outputs: 'Rick Sanchez'
+```
+
+Update calls are always full replacements of the model, so properties not included in the `update` parameters will be cast to `null` in the data model. Best practice is to expand the model and then override the property changes in the new model instance to ensure there is no unintended data loss.
+
+```ts
+// Performing an update with a partial property will result in loss of other properties.
+console.log(user.profile.language) // Outputs: 'en'
+
+await user.profile.update({ name: 'Rick Sanchez' })
+
+console.log(user.profile.language) // Outputs: null
+
+// Instead, expand the model to ensure that data is not lost
+console.log(user.profile.language) // Outputs: 'en'
+
+await user.profile.update({ ...user.profile, name: 'Rick Sanchez' })
+
+console.log(user.profile.language) // Outputs: 'en'
 ```
 
 ## Error Handling
