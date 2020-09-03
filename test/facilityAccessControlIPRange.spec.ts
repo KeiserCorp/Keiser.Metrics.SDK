@@ -10,7 +10,7 @@ describe('Facility Access Control IP Range', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let accessControl: FacilityAccessControl
-  let accessControlIPRange: FacilityAccessControlIPRange
+  let createdAccessControlIPRange: FacilityAccessControlIPRange
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -38,9 +38,9 @@ describe('Facility Access Control IP Range', function () {
   })
 
   it('can create facility access control IP range', async function () {
-    accessControlIPRange = await accessControl.createFacilityAccessControlIPRange({ cidr: '192.168.0.0/32' })
+    createdAccessControlIPRange = await accessControl.createFacilityAccessControlIPRange({ cidr: '192.168.0.0/32' })
 
-    expect(accessControlIPRange.cidr).to.equal('192.168.0.0/32')
+    expect(createdAccessControlIPRange.cidr).to.equal('192.168.0.0/32')
   })
 
   it('can get facility access control IP ranges dynamically', async function () {
@@ -51,17 +51,24 @@ describe('Facility Access Control IP Range', function () {
   })
 
   it('can reload facility access control IP range', async function () {
-    accessControlIPRange = await accessControlIPRange.reload()
+    createdAccessControlIPRange = await createdAccessControlIPRange.reload()
 
-    expect(accessControlIPRange.cidr).to.equal('192.168.0.0/32')
+    expect(createdAccessControlIPRange.cidr).to.equal('192.168.0.0/32')
+  })
+
+  it('can get specific facility access control IP range', async function () {
+    const accessControlRange = await accessControl.getFacilityAccessControlIPRange({ id: createdAccessControlIPRange.id })
+
+    expect(accessControlRange.id).to.equal(createdAccessControlIPRange.id)
+    expect(accessControlRange.cidr).to.equal(createdAccessControlIPRange.cidr)
   })
 
   it('can delete facility access control IP range', async function () {
-    await accessControlIPRange.delete()
+    await createdAccessControlIPRange.delete()
 
     let extError
     try {
-      await accessControlIPRange.reload()
+      await createdAccessControlIPRange.reload()
     } catch (error) {
       extError = error
     }

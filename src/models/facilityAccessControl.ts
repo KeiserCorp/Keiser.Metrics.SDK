@@ -39,6 +39,11 @@ export class FacilityAccessControl extends Model {
     return new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)
   }
 
+  async getFacilityAccessControlIPRange (params: {id: number}) {
+    const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:show', params) as FacilityAccessControlIPRangeResponse
+    return new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)
+  }
+
   async getFacilityAccessControlIPRanges (options: {cidr?: string, sort?: FacilityAccessControlIPRangeSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityAccessControlIPRanges, facilityAccessControlIPRangesMeta } = await this.action('facilityAccessControlIPRange:list', options) as FacilityAccessControlIPRangeListResponse
     return new FacilityAccessControlIPRanges(facilityAccessControlIPRanges, facilityAccessControlIPRangesMeta, this.sessionHandler)

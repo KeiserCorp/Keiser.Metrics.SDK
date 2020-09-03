@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityUserRelationshipSorting, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
+import { FacilityUserRelationshipSorting, UserFacilityEmployeeRelationship, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -63,6 +63,8 @@ describe('User to Facility Relationship', function () {
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
     expect(facilityRelationship.employeeRole).to.equal(existingFacilityRelationship.employeeRole)
+    expect(facilityRelationship instanceof UserFacilityMemberRelationship).to.equal(false)
+    expect(facilityRelationship instanceof UserFacilityEmployeeRelationship).to.equal(false)
   })
 
   it('can get specific facility membership relationship', async function () {
@@ -70,6 +72,8 @@ describe('User to Facility Relationship', function () {
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
+    expect(facilityRelationship instanceof UserFacilityMemberRelationship).to.equal(true)
+    expect(facilityRelationship instanceof UserFacilityEmployeeRelationship).to.equal(false)
     expect(facilityRelationship.facility instanceof PrivilegedFacility).to.equal(false)
   })
 
@@ -78,6 +82,8 @@ describe('User to Facility Relationship', function () {
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
+    expect(facilityRelationship instanceof UserFacilityMemberRelationship).to.equal(false)
+    expect(facilityRelationship instanceof UserFacilityEmployeeRelationship).to.equal(true)
     expect(facilityRelationship.facility instanceof PrivilegedFacility).to.equal(true)
   })
 

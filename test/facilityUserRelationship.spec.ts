@@ -2,13 +2,13 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityEmployeeRole, FacilityUserMemberRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
+import { FacilityEmployeeRole, FacilityUserEmployeeRelationship, FacilityUserMemberRelationship, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility to User Relationship', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
-  let facilityRelationship: FacilityUserMemberRelationship
+  let existingFacilityRelationship: FacilityUserMemberRelationship
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
@@ -57,36 +57,71 @@ describe('Facility to User Relationship', function () {
   })
 
   it('can create new facility member user', async function () {
-    facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
+    const facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(true)
     expect(facilityRelationship.employeeRole).to.equal(FacilityEmployeeRole.Trainer)
+    existingFacilityRelationship = facilityRelationship
   })
 
-  it('can update facility relationships', async function () {
-    facilityRelationship = await facilityRelationship.update({ member: false, employeeRole: FacilityEmployeeRole.CustomerSupport })
+  it('can update facility relationship', async function () {
+    const facilityRelationship = await existingFacilityRelationship.update({ member: false, employeeRole: FacilityEmployeeRole.CustomerSupport })
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(false)
     expect(facilityRelationship.employeeRole).to.equal(FacilityEmployeeRole.CustomerSupport)
   })
 
-  it('can reload facility relationships', async function () {
-    facilityRelationship = await facilityRelationship.reload()
+  it('can reload facility relationship', async function () {
+    const facilityRelationship = await existingFacilityRelationship.reload()
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(false)
     expect(facilityRelationship.employeeRole).to.equal(FacilityEmployeeRole.CustomerSupport)
+  })
+
+  it('can get specific facility relationship', async function () {
+    const facilityRelationship = await facility.getRelationship({ id: existingFacilityRelationship.id })
+
+    expect(typeof facilityRelationship).to.equal('object')
+    expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
+    expect(facilityRelationship.member).to.equal(existingFacilityRelationship.member)
+    expect(facilityRelationship.employeeRole).to.equal(existingFacilityRelationship.employeeRole)
+    expect(facilityRelationship instanceof FacilityUserRelationship).to.equal(true)
+    expect(facilityRelationship instanceof FacilityUserMemberRelationship).to.equal(false)
+    expect(facilityRelationship instanceof FacilityUserEmployeeRelationship).to.equal(false)
+  })
+
+  it('can get specific facility member relationship', async function () {
+    const facilityRelationship = await facility.getMemberRelationship({ id: existingFacilityRelationship.id })
+
+    expect(typeof facilityRelationship).to.equal('object')
+    expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
+    expect(facilityRelationship.member).to.equal(existingFacilityRelationship.member)
+    expect(facilityRelationship.employeeRole).to.equal(existingFacilityRelationship.employeeRole)
+    expect(facilityRelationship instanceof FacilityUserMemberRelationship).to.equal(true)
+    expect(facilityRelationship instanceof FacilityUserEmployeeRelationship).to.equal(false)
+  })
+
+  it('can get specific facility employee relationship', async function () {
+    const facilityRelationship = await facility.getEmployeeRelationship({ id: existingFacilityRelationship.id })
+
+    expect(typeof facilityRelationship).to.equal('object')
+    expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
+    expect(facilityRelationship.member).to.equal(existingFacilityRelationship.member)
+    expect(facilityRelationship.employeeRole).to.equal(existingFacilityRelationship.employeeRole)
+    expect(facilityRelationship instanceof FacilityUserMemberRelationship).to.equal(false)
+    expect(facilityRelationship instanceof FacilityUserEmployeeRelationship).to.equal(true)
   })
 
   it('can delete facility relationship', async function () {
     let extError
 
-    await facilityRelationship.delete()
+    await existingFacilityRelationship.delete()
 
     try {
-      await facilityRelationship.reload()
+      await existingFacilityRelationship.reload()
     } catch (error) {
       extError = error
     }

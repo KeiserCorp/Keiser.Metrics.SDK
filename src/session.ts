@@ -485,6 +485,11 @@ export class AdminSession extends UserSession {
     return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
   }
 
+  async getFacilityLicense (params: {id: number}) {
+    const { facilityLicense } = await this.action('facilityLicense:show', params) as FacilityLicenseResponse
+    return new FacilityLicense(facilityLicense, this.sessionHandler)
+  }
+
   async getFacilityLicenses (options: {name?: string, key?: string, type?: LicenseType, accountId?: string, sort?: FacilityLicenseSorting, ascending?: boolean, limit?: number, offset?: number} = {}) {
     const { facilityLicenses, facilityLicensesMeta } = await this.action('facilityLicense:list', options) as FacilityLicenseListResponse
     return new FacilityLicenses(facilityLicenses, facilityLicensesMeta, this.sessionHandler)

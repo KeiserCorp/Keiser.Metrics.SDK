@@ -46,6 +46,13 @@ describe('Facility License', function () {
     expect(createdFacilityLicense.type).to.equal(LicenseType.Test)
   })
 
+  it('can get specific facility license', async function () {
+    const facilityLicense = await session.getFacilityLicense({ id: createdFacilityLicense.id })
+
+    expect(facilityLicense.id).to.equal(createdFacilityLicense.id)
+    expect(facilityLicense.term).to.equal(createdFacilityLicense.term)
+  })
+
   it('can delete facility license', async function () {
     let extError
 
