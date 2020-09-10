@@ -49,7 +49,7 @@ describe('Email Address', function () {
     expect(emailAddresses.length).to.equal(2)
     expect(emailAddresses.meta.totalCount).to.equal(2)
   })
-
+  
   it('can delete email address', async function () {
     let extError
 
