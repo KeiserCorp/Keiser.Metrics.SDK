@@ -99,5 +99,15 @@ export class PrivilegedExercise extends Exercise {
     await this.action('exercise:delete', { id : this.id })
   }
 
-  // To-Do: Add muscle methods
+  async attachMuscle (params: { muscleId: number }) {
+    const { exercise } = await this.action('exercise:attachMuscle', { ...params, id: this.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
+
+  async detachMuscle (params: { muscleId: number }) {
+    const { exercise } = await this.action('exercise:detachMuscle', { ...params, id: this.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
 }
