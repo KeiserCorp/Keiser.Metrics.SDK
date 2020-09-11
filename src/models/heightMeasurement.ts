@@ -70,10 +70,16 @@ export class HeightMeasurement extends Model {
     return new Date(this._heightMeasurementData.takenAt)
   }
 
+  /**
+   * @returns Height in centimeters
+   */
   get metricHeight () {
     return this._heightMeasurementData.metricHeight
   }
 
+  /**
+   * @returns Height in inches
+   */
   get imperialHeight () {
     return this._heightMeasurementData.imperialHeight
   }

@@ -75,8 +75,6 @@ export class MSeriesDataSet extends Model {
     return this
   }
 
-  // To-Do: Decide if `update` method is necessary
-
   async delete () {
     await this.action('mSeriesDataSet:delete', { id: this.id })
   }
@@ -101,50 +99,86 @@ export class MSeriesDataSet extends Model {
     return this._mSeriesDataSetData.machineType
   }
 
+  /**
+   * @returns Number unique to local set of equipment (not universally unique)
+   */
   get ordinalId () {
     return this._mSeriesDataSetData.ordinalId
   }
 
+  /**
+   * @returns Major portion of firmware's SemVer
+   */
   get buildMajor () {
     return this._mSeriesDataSetData.buildMajor
   }
 
+  /**
+   * @returns Minor portion of firmware's SemVer
+   */
   get buildMinor () {
     return this._mSeriesDataSetData.buildMinor
   }
 
+  /**
+   * @returns Maximum cadence in BPM
+   */
   get maxCadence () {
     return this._mSeriesDataSetData.maxCadence
   }
 
+  /**
+   * @returns Average cadence in BPM
+   */
   get averageCadence () {
     return this._mSeriesDataSetData.averageCadence
   }
 
+  /**
+   * @returns Maximum power in Watts
+   */
   get maxPower () {
     return this._mSeriesDataSetData.maxPower
   }
 
+  /**
+   * @returns Average power in Watts
+   */
   get averagePower () {
     return this._mSeriesDataSetData.averagePower
   }
 
+  /**
+   * @returns Energy produced Joules
+   */
   get energyOutput () {
     return this._mSeriesDataSetData.energyOutput
   }
 
+  /**
+   * @returns Calories burn in cal (derived from power using simulated flat road ride)
+   */
   get caloricBurn () {
     return this._mSeriesDataSetData.caloricBurn
   }
 
+  /**
+   * @returns Distance in meters (derived from power using simulated flat road ride)
+   */
   get distance () {
     return this._mSeriesDataSetData.distance
   }
 
+  /**
+   * @returns Average MET (only valid for M7i data)
+   */
   get averageMetabolicEquivalent () {
     return this._mSeriesDataSetData.averageMetabolicEquivalent
   }
 
+  /**
+   * @returns Number of steps counted (only valid for M7i data)
+   */
   get stepCount () {
     return this._mSeriesDataSetData.stepCount
   }

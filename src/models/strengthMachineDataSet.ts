@@ -1,4 +1,3 @@
-import { DeepReadonly } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Exercise, ExerciseData } from './exercise'
@@ -58,18 +57,15 @@ export interface StrengthMachineDataSetData {
 
 export interface StrengthMachineDataSetTestData {
   testType: StrengthTestType
-  high: {
-    power: number
-    velocity: number
-    force: number
-    position: number
-  }
-  low: {
-    power: number
-    velocity: number
-    force: number
-    position: number
-  }
+  high: StrengthMachineDataSetTestSubsetData
+  low: StrengthMachineDataSetTestSubsetData
+}
+
+export interface StrengthMachineDataSetTestSubsetData {
+  power: number
+  velocity: number
+  force: number
+  position: number
 }
 
 export interface StrengthMachineDataSetResponse extends AuthenticatedResponse {
@@ -123,10 +119,16 @@ export class StrengthMachineDataSet extends Model {
     return new Date(this._strengthMachineDataSetData.updatedAt)
   }
 
+  /**
+   * @returns Machine's firmware version string
+   */
   get version () {
     return this._strengthMachineDataSetData.version
   }
 
+  /**
+   * @returns Machine's serial number string (for electronics only)
+   */
   get serial () {
     return this._strengthMachineDataSetData.serial
   }
@@ -151,40 +153,64 @@ export class StrengthMachineDataSet extends Model {
     return this._strengthMachineDataSetData.seat
   }
 
+  /**
+   * @returns Dimensionless number for resistance (unit based on forceUnit property)
+   */
   get resistance () {
     return this._strengthMachineDataSetData.resistance
   }
 
+  /**
+   * @returns Precision of resistance measurement (decimal or integer)
+   */
   get resistancePrecision () {
     return this._strengthMachineDataSetData.resistancePrecision
   }
 
+  /**
+   * @returns Number of repetitions performed
+   */
   get repetitionCount () {
     return this._strengthMachineDataSetData.repetitionCount
   }
 
+  /**
+   * @returns Unit to assign to resistance property
+   */
   get forceUnit () {
     return this._strengthMachineDataSetData.forceUnit
   }
 
+  /**
+   * @returns Peak power in Watts
+   */
   get peakPower () {
     return this._strengthMachineDataSetData.peakPower
   }
 
+  /**
+   * @returns Work for entire set in Joules
+   */
   get work () {
     return this._strengthMachineDataSetData.work
   }
 
+  /**
+   * @returns Number of complete step cycles (for Runner only)
+   */
   get distance () {
     return this._strengthMachineDataSetData.distance
   }
 
+  /**
+   * @returns Dimensionless number for additional mass added to rack bar (assumed to be in same unit as resistance)
+   */
   get addedWeight () {
     return this._strengthMachineDataSetData.addedWeight
   }
 
   get test () {
-    return this._strengthMachineDataSetData.test ? { ...this._strengthMachineDataSetData.test } as DeepReadonly<StrengthMachineDataSetTestData> : undefined
+    return this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
   }
 
   get session () {
@@ -197,5 +223,67 @@ export class StrengthMachineDataSet extends Model {
 
   get exercise () {
     return this._strengthMachineDataSetData.exercise ? new Exercise(this._strengthMachineDataSetData.exercise, this.sessionHandler) : undefined
+  }
+}
+
+export class StrengthMachineDataSetTest {
+  private _strengthMachineDataSetTestData: StrengthMachineDataSetTestData
+
+  constructor (strengthMachineDataSetTestData: StrengthMachineDataSetTestData) {
+    this._strengthMachineDataSetTestData = strengthMachineDataSetTestData
+  }
+
+  get testType () {
+    return this._strengthMachineDataSetTestData.testType
+  }
+
+  /**
+   * @returns Values relative to the rep with the highest power generated in the low resistance set
+   */
+  get low () {
+    return new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.low)
+  }
+
+  /**
+   * @returns Values relative to the rep with the highest power generated in the high resistance set
+   */
+  get high () {
+    return new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.high)
+  }
+}
+
+export class StrengthMachineDataSetTestSubset {
+  private _strengthMachineDataSetTestSubsetData: StrengthMachineDataSetTestSubsetData
+
+  constructor (strengthMachineDataSetTestSubsetData: StrengthMachineDataSetTestSubsetData) {
+    this._strengthMachineDataSetTestSubsetData = strengthMachineDataSetTestSubsetData
+  }
+
+  /**
+   * @returns Power in Watts
+   */
+  get power () {
+    return this._strengthMachineDataSetTestSubsetData.power
+  }
+
+  /**
+   * @returns Velocity at cylinder in meters per second (untranslated)
+   */
+  get velocity () {
+    return this._strengthMachineDataSetTestSubsetData.velocity
+  }
+
+  /**
+   * @returns Dimensionless resistance (unit based on forceUnit property)
+   */
+  get force () {
+    return this._strengthMachineDataSetTestSubsetData.force
+  }
+
+  /**
+   * @returns Point in the range of motion relative to the cylinder in meters (untranslated)
+   */
+  get position () {
+    return this._strengthMachineDataSetTestSubsetData.position
   }
 }

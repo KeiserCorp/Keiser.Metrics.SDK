@@ -82,10 +82,16 @@ export class HeartRateDataSet extends Model {
     return new Date(this._heartRateDataSetData.endedAt)
   }
 
+  /**
+   * @returns Maximum heart rate in BPM
+   */
   get maxHeartRate () {
     return this._heartRateDataSetData.maxHeartRate
   }
 
+  /**
+   * @returns Average heart rate in BPM
+   */
   get averageHeartRate () {
     return this._heartRateDataSetData.averageHeartRate
   }
@@ -121,6 +127,9 @@ export class HeartRateDataPoint {
     return new Date(this._heartRateDataPointData.takenAt)
   }
 
+  /**
+   * @returns Heart rate in BPM
+   */
   get heartRate () {
     return this._heartRateDataPointData.heartRate
   }

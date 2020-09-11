@@ -76,6 +76,9 @@ export class MSeriesFtpMeasurement extends Model {
     return this._mSeriesFtpMeasurement.machineType
   }
 
+  /**
+   * @returns Functional Threshold Power in Watts
+   */
   get ftp () {
     return this._mSeriesFtpMeasurement.ftp
   }

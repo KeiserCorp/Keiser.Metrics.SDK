@@ -105,10 +105,16 @@ export class WeightMeasurement extends Model {
     return new Date(this._weightMeasurementData.takenAt)
   }
 
+  /**
+   * @returns Weight in kilograms
+   */
   get metricWeight () {
     return this._weightMeasurementData.metricWeight
   }
 
+  /**
+   * @returns Weight in pounds
+   */
   get imperialWeight () {
     return this._weightMeasurementData.imperialWeight
   }
@@ -117,6 +123,7 @@ export class WeightMeasurement extends Model {
     return this._weightMeasurementData.bodyFatPercentage
   }
 
+  // To-Do: Remove `Readonly` shim and implement full class with typedocs for units on properties
   get bodyCompositionMeasurement () {
     return this._weightMeasurementData.bodyCompositionMeasurement ? { ...this._weightMeasurementData.bodyCompositionMeasurement } as DeepReadonly<BodyCompositionMeasurementData> : undefined
   }
