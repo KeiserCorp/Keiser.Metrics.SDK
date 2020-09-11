@@ -8,6 +8,7 @@ import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSo
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityKioskTokenResponse } from './models/facilityKioskToken'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
+import { Muscle, MuscleBodyPart, MuscleGroup, MuscleListResponse, MuscleResponse, Muscles, MuscleSorting, PrivilegedMuscle, PrivilegedMuscles } from './models/muscle'
 import { KioskSessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
@@ -368,6 +369,16 @@ export class UserSession {
     return new Exercises(exercises, exercisesMeta, this.sessionHandler)
   }
 
+  async getMuscle (params: {id: number}) {
+    const { muscle } = await this.action('muscle:show', params) as MuscleResponse
+    return new Muscle(muscle, this.sessionHandler)
+  }
+
+  async getMuscles (options: {name?: string, group?: MuscleGroup, part?: MuscleBodyPart, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { muscles, musclesMeta } = await this.action('muscle:list', options) as MuscleListResponse
+    return new Muscles(muscles, musclesMeta, this.sessionHandler)
+  }
+
   async getStrengthMachine (params: {id: number}) {
     const { strengthMachine } = await this.action('strengthMachine:show', params) as StrengthMachineResponse
     return new StrengthMachine(strengthMachine, this.sessionHandler)
@@ -468,6 +479,21 @@ export class AdminSession extends UserSession {
   async createExercise (params: { name: string, type: ExerciseType, variant?: string, exerciseId?: number }) {
     const { exercise } = await this.action('exercise:create', params) as ExerciseResponse
     return new PrivilegedExercise(exercise, this.sessionHandler)
+  }
+
+  async getMuscle (params: {id: number}) {
+    const { muscle } = await this.action('muscle:show', params) as MuscleResponse
+    return new PrivilegedMuscle(muscle, this.sessionHandler)
+  }
+
+  async getMuscles (options: {name?: string, group?: MuscleGroup, part?: MuscleBodyPart, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { muscles, musclesMeta } = await this.action('muscle:list', options) as MuscleListResponse
+    return new PrivilegedMuscles(muscles, musclesMeta, this.sessionHandler)
+  }
+
+  async createMuscle (params: { name: string, group: MuscleGroup, part: MuscleBodyPart }) {
+    const { muscle } = await this.action('muscle:create', params) as MuscleResponse
+    return new PrivilegedMuscle(muscle, this.sessionHandler)
   }
 
   async getStrengthMachine (params: {id: number}) {

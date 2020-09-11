@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Muscle, MuscleData } from './muscle'
 
 export const enum ExerciseType {
   Cardio = 'cardio',
@@ -17,7 +18,7 @@ export interface ExerciseData {
   id: number
   name: string
   type: ExerciseType
-  muscle: any // To-Do: Add muscle model
+  muscles?: MuscleData[]
 }
 
 export interface ExerciseResponse extends AuthenticatedResponse {
@@ -68,6 +69,10 @@ export class Exercise extends Model {
 
   get type () {
     return this._exerciseData.type
+  }
+
+  get muscles () {
+    return this._exerciseData.muscles ? this._exerciseData.muscles.map(muscleData => new Muscle(muscleData, this.sessionHandler)) : undefined
   }
 }
 
