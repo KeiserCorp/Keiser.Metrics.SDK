@@ -292,8 +292,8 @@ export class User extends Model {
     return new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)
   }
 
-  async getMSeriesDataSet (params: {id: number}) {
-    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { ...params, userId : this.id }) as MSeriesDataSetResponse
+  async getMSeriesDataSet (params: {id: number, graphResolution?: number}) {
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { id: params.id, graph: params.graphResolution ?? 200, userId : this.id }) as MSeriesDataSetResponse
     return new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)
   }
 
