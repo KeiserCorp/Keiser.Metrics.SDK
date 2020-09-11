@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { Exercise, ExerciseSorting, ExerciseType, PrivilegedExercise } from '../src/models/exercise'
+import { MuscleBodyPart, MuscleGroup, PrivilegedMuscle } from '../src/models/muscle'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -14,6 +15,7 @@ describe('Exercise', function () {
   let adminSession: AdminSession
   let newExercise: PrivilegedExercise
   let existingExercise: Exercise
+  let newMuscle: PrivilegedMuscle
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -28,11 +30,15 @@ describe('Exercise', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    newMuscle = await adminSession.createMuscle({ name: newNameGen(), group: MuscleGroup.Biceps, part: MuscleBodyPart.Arms })
   })
 
-  after(function () {
+  after(async function () {
     metricsInstance?.dispose()
     metricsAdminInstance?.dispose()
+    if (typeof newMuscle !== 'undefined') {
+      await newMuscle.delete()
+    }
   })
 
   it('can list available exercises', async function () {
@@ -84,11 +90,31 @@ describe('Exercise', function () {
   })
 
   it('can update exercise', async function () {
-    const newName = newNameGen()
-    await newExercise.update({ name: newName, type: ExerciseType.Stretch })
-    expect(newExercise).to.be.an('object')
-    expect(newExercise.name).to.equal(newName)
-    expect(newExercise.type).to.equal(ExerciseType.Stretch)
+    if (typeof newExercise !== 'undefined') {
+      const newName = newNameGen()
+      await newExercise.update({ name: newName, type: ExerciseType.Stretch })
+      expect(newExercise).to.be.an('object')
+      expect(newExercise.name).to.equal(newName)
+      expect(newExercise.type).to.equal(ExerciseType.Stretch)
+    }
+  })
+
+  it('can attach muscle to exercise', async function () {
+    if (typeof newExercise !== 'undefined') {
+      const muscleCount = newExercise.muscles?.length ?? 0
+      await newExercise.attachMuscle({ muscleId: newMuscle.id })
+      expect(newExercise).to.be.an('object')
+      expect(newExercise.muscles?.length).to.equal(muscleCount + 1)
+    }
+  })
+
+  it('can detach muscle to exercise', async function () {
+    if (typeof newExercise !== 'undefined') {
+      const muscleCount = newExercise.muscles?.length ?? 0
+      await newExercise.detachMuscle({ muscleId: newMuscle.id })
+      expect(newExercise).to.be.an('object')
+      expect(newExercise.muscles?.length).to.equal(muscleCount - 1)
+    }
   })
 
   it('can delete exercise', async function () {

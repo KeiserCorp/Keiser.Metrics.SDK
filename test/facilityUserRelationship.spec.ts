@@ -47,6 +47,18 @@ describe('Facility to User Relationship', function () {
     expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
   })
 
+  it('can get list of member relationships with active sessions', async function () {
+    await (await facility.getMemberRelationships())[0].user.startSession({ forceEndPrevious: true })
+    const facilityRelationships = await facility.getMemberRelationships({ includeSession: true })
+
+    expect(Array.isArray(facilityRelationships)).to.equal(true)
+    expect(typeof facilityRelationships[0]).to.equal('object')
+    expect(facilityRelationships[0].member).to.equal(true)
+    expect(typeof facilityRelationships[0].activeSession).to.equal('object')
+    expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
+    expect(facilityRelationships.meta.includeSession).to.equal(true)
+  })
+
   it('can get list of employee relationships', async function () {
     const facilityRelationships = await facility.getEmployeeRelationships()
 

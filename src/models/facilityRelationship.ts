@@ -1,6 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
+import { Session, SessionData } from './session'
 import { FacilityEmployeeUser, FacilityMemberUser, User, UserData } from './user'
 
 export const enum UserFacilityRelationshipSorting {
@@ -23,6 +24,10 @@ export const enum FacilityEmployeeRole {
   Maintenance = 'maintenance'
 }
 
+export interface FacilitySessionUserData extends UserData {
+  sessions?: SessionData[]
+}
+
 export interface FacilityRelationshipData {
   id: number
   userId: number
@@ -32,7 +37,7 @@ export interface FacilityRelationshipData {
   hasSecretSet: boolean
   employeeRole: FacilityEmployeeRole | null
   facility?: FacilityData
-  user: UserData
+  user: FacilitySessionUserData
 }
 
 export interface FacilityRelationshipResponse extends AuthenticatedResponse {
@@ -47,7 +52,7 @@ export interface UserFacilityRelationshipListResponse extends AuthenticatedRespo
 export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
   member: boolean | undefined
   employee: boolean | undefined
-  employeeRole: FacilityEmployeeRole | undefined
+  employeeRole?: FacilityEmployeeRole
   sort: UserFacilityRelationshipSorting
 }
 
@@ -57,11 +62,12 @@ export interface FacilityUserRelationshipListResponse extends AuthenticatedRespo
 }
 
 export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
-  member: boolean | undefined
-  employee: boolean | undefined
-  name: string | undefined
-  memberIdentifier: string | undefined
-  employeeRole: FacilityEmployeeRole | undefined
+  member?: boolean
+  employee?: boolean
+  name?: string
+  memberIdentifier?: string
+  employeeRole?: FacilityEmployeeRole
+  includeSession?: boolean
   sort: FacilityUserRelationshipSorting
 }
 
@@ -199,6 +205,10 @@ export class FacilityUserRelationship extends FacilityRelationship {
 export class FacilityUserMemberRelationship extends FacilityUserRelationship {
   get user () {
     return new FacilityMemberUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
+  }
+
+  get activeSession () {
+    return this._facilityRelationshipData.user.sessions && this._facilityRelationshipData.user.sessions.length > 0 ? new Session(this._facilityRelationshipData.user.sessions[0], this.sessionHandler) : undefined
   }
 }
 

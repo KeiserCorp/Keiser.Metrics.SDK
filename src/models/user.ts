@@ -10,7 +10,7 @@ import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
-import { PrimaryEmailAddressResponse } from './primaryEmailAddress'
+import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessions, KioskSessionResponse, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
@@ -34,7 +34,7 @@ export const enum UserSorting {
 export interface UserData {
   id: number
   emailAddresses: EmailAddressData[]
-  primaryEmailAddress: PrimaryEmailAddressResponse
+  primaryEmailAddress: PrimaryEmailAddressData
   basicCredential?: boolean
   oauthServices?: OAuthServiceData[]
   profile: ProfileData,
@@ -130,6 +130,15 @@ export class User extends Model {
   async getEmailAddresses (options: {email?: string, sort?: EmailAddressSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { emailAddresses, emailAddressesMeta } = await this.action('emailAddress:list', { ...options, userId : this.id }) as EmailAddressListResponse
     return new EmailAddresses(emailAddresses, emailAddressesMeta, this.sessionHandler)
+  }
+
+  get primaryEmailAddress () {
+    return new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler)
+  }
+
+  async getPrimaryEmailAddress () {
+    const { primaryEmailAddress } = await this.action('primaryEmailAddress:show', { userId : this.id }) as PrimaryEmailAddressResponse
+    return new PrimaryEmailAddress(primaryEmailAddress, this.sessionHandler)
   }
 
   get basicCredential () {

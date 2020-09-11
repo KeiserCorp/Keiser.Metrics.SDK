@@ -1,3 +1,4 @@
+import { durationToSeconds } from '../lib/time'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementData } from './mSeriesFtpMeasurement'
@@ -27,7 +28,7 @@ export interface MSeriesDataSetData {
   distance: number
   averageMetabolicEquivalent: number | null
   stepCount: number | null
-  duration: number
+  duration: string
   initialOffset: number
   mSeriesFtpMeasurement?: MSeriesFtpMeasurementData
   graphData?: MSeriesDataPointData[]
@@ -148,8 +149,11 @@ export class MSeriesDataSet extends Model {
     return this._mSeriesDataSetData.stepCount
   }
 
+  /**
+   * @returns Duration in number of seconds since start
+   */
   get duration () {
-    return this._mSeriesDataSetData.duration
+    return durationToSeconds(this._mSeriesDataSetData.duration)
   }
 
   get initialOffset () {
@@ -177,7 +181,7 @@ export interface MSeriesDataPointData {
   cadence: number
   power: number
   caloricBurn: number
-  duration: number
+  duration: string
   distance: number
   gear: number | null
   metabolicEquivalent: number | null
@@ -191,7 +195,7 @@ export interface MSeriesCapturedDataPoint {
   cadence: number
   power: number
   caloricBurn: number
-  duration: number
+  duration: string | number
   distance: number
   gear?: number
   metabolicEquivalent?: number
@@ -233,8 +237,11 @@ export class MSeriesDataPoint {
     return this._mSeriesDataPointData.caloricBurn
   }
 
+  /**
+   * @returns Duration in number of seconds since start
+   */
   get duration () {
-    return this._mSeriesDataPointData.duration
+    return durationToSeconds(this._mSeriesDataPointData.duration)
   }
 
   get distance () {

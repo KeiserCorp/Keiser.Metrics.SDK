@@ -1,11 +1,12 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthMachine, StrengthMachineSorting, StrengthMachine } from '../src/models/strengthMachine'
+import { PrivilegedStrengthMachine, StrengthMachine, StrengthMachineLine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+const newModel = [...Array(6)].map(i => (~~(Math.random() * 16)).toString(16)).join('')
 
 describe('Strength Machine', function () {
   let metricsInstance: Metrics
@@ -74,12 +75,13 @@ describe('Strength Machine', function () {
   it('can create strength machine', async function () {
     const machine = {
       name: newNameGen(),
-      line: 'a250'
+      line: StrengthMachineLine.A250
     }
     newMachine = await adminSession.createStrengthMachine(machine)
 
     expect(newMachine).to.be.an('object')
     expect(newMachine.name).to.equal(newMachine.name)
+    expect(newMachine.line).to.equal(StrengthMachineLine.A250)
   })
 
   it('can update strength machine', async function () {
@@ -87,6 +89,20 @@ describe('Strength Machine', function () {
     await newMachine.update({ name: newName, line: newMachine.line })
     expect(newMachine).to.be.an('object')
     expect(newMachine.name).to.equal(newName)
+  })
+
+  it('can add strength machine model', async function () {
+    const modelLength = newMachine.models?.length ?? 0
+    await newMachine.addModel({ model: newModel })
+    expect(newMachine).to.be.an('object')
+    expect(newMachine.models?.length).to.equal(modelLength + 1)
+  })
+
+  it('can delete strength machine model', async function () {
+    const modelLength = newMachine.models?.length ?? 0
+    await newMachine.deleteModel({ model: newModel })
+    expect(newMachine).to.be.an('object')
+    expect(newMachine.models?.length).to.equal(modelLength - 1)
   })
 
   it('can delete strength machine', async function () {

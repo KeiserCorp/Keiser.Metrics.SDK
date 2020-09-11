@@ -1,6 +1,7 @@
 import { DeepReadonly } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Exercise, ExerciseData } from './exercise'
 import { Session, SessionData } from './session'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
@@ -49,7 +50,7 @@ export interface StrengthMachineDataSetData {
   test?: StrengthMachineDataSetTestData
   strengthMachine?: StrengthMachineData
 
-  exercise?: any           // To-Do: Add Exercise model
+  exercise?: ExerciseData
   a500DataSet?: any        // To-Do: Add A500 Data Set model
 
   session?: SessionData
@@ -192,5 +193,9 @@ export class StrengthMachineDataSet extends Model {
 
   get strengthMachine () {
     return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
+  }
+
+  get exercise () {
+    return this._strengthMachineDataSetData.exercise ? new Exercise(this._strengthMachineDataSetData.exercise, this.sessionHandler) : undefined
   }
 }

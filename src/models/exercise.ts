@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Muscle, MuscleData } from './muscle'
 
 export const enum ExerciseType {
   Cardio = 'cardio',
@@ -17,7 +18,7 @@ export interface ExerciseData {
   id: number
   name: string
   type: ExerciseType
-  muscle: any // To-Do: Add muscle model
+  muscles?: MuscleData[]
 }
 
 export interface ExerciseResponse extends AuthenticatedResponse {
@@ -69,6 +70,10 @@ export class Exercise extends Model {
   get type () {
     return this._exerciseData.type
   }
+
+  get muscles () {
+    return this._exerciseData.muscles ? this._exerciseData.muscles.map(muscleData => new Muscle(muscleData, this.sessionHandler)) : undefined
+  }
 }
 
 /** @hidden */
@@ -94,5 +99,15 @@ export class PrivilegedExercise extends Exercise {
     await this.action('exercise:delete', { id : this.id })
   }
 
-  // To-Do: Add muscle methods
+  async attachMuscle (params: { muscleId: number }) {
+    const { exercise } = await this.action('exercise:attachMuscle', { ...params, id: this.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
+
+  async detachMuscle (params: { muscleId: number }) {
+    const { exercise } = await this.action('exercise:detachMuscle', { ...params, id: this.id }) as ExerciseResponse
+    this.setExerciseData(exercise)
+    return this
+  }
 }
