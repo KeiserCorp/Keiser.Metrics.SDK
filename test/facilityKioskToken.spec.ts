@@ -76,6 +76,15 @@ describe('Facility Kiosk Token', function () {
     expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
   })
 
+  it('can restore kiosk session from token', async function () {
+    const token = kioskSession.sessionHandler.kioskToken
+    const restoredKioskSession = await metricsInstance.authenticateWithKioskToken({ kioskToken: token })
+
+    expect(typeof restoredKioskSession).to.not.equal('undefined')
+    expect(typeof restoredKioskSession.sessionHandler).to.not.equal('undefined')
+    expect(restoredKioskSession.sessionHandler.kioskToken).to.equal(token)
+  })
+
   it('can use kiosk session to login user', async function () {
     userSession = await kioskSession.userLogin({ primaryIdentification: 1 })
 
