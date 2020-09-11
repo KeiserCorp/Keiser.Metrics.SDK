@@ -1,3 +1,4 @@
+import { DeepReadonlyArray } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Exercise, ExerciseData } from './exercise'
@@ -17,6 +18,10 @@ export const enum StrengthMachineSorting {
   Line = 'line'
 }
 
+export interface StrengthMachineModelData {
+  model: string
+}
+
 export interface StrengthMachineData {
   id: number
   name: string
@@ -24,6 +29,7 @@ export interface StrengthMachineData {
   variant: string
   dualSided: boolean
   exercise?: ExerciseData
+  models?: StrengthMachineModelData[]
 }
 
 export interface StrengthMachineResponse extends AuthenticatedResponse {
@@ -89,6 +95,10 @@ export class StrengthMachine extends Model {
   get exercise () {
     return this._strengthMachineData.exercise ? new Exercise(this._strengthMachineData.exercise, this.sessionHandler) : undefined
   }
+
+  get models () {
+    return this._strengthMachineData.models ? [...this._strengthMachineData.models] as DeepReadonlyArray<StrengthMachineModelData> : undefined
+  }
 }
 
 /** @hidden */
@@ -114,5 +124,15 @@ export class PrivilegedStrengthMachine extends StrengthMachine {
     await this.action('strengthMachine:delete', { id : this.id })
   }
 
-  // To-Do: Add model methods (add/delete)
+  async addModel (params: { model: string }) {
+    const { strengthMachine } = await this.action('strengthMachine:addModel', { ...params, id: this.id }) as StrengthMachineResponse
+    this.setStrengthMachineData(strengthMachine)
+    return this
+  }
+
+  async deleteModel (params: { model: string }) {
+    const { strengthMachine } = await this.action('strengthMachine:deleteModel', { ...params, id: this.id }) as StrengthMachineResponse
+    this.setStrengthMachineData(strengthMachine)
+    return this
+  }
 }
