@@ -6,7 +6,6 @@ import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
-import { FacilityKioskTokenResponse } from './models/facilityKioskToken'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { Muscle, MuscleBodyPart, MuscleGroup, MuscleListResponse, MuscleResponse, Muscles, MuscleSorting, PrivilegedMuscle, PrivilegedMuscles } from './models/muscle'
 import { KioskSessionResponse, StaticSession } from './models/session'
@@ -18,6 +17,10 @@ import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSortin
 export interface AuthenticatedResponse {
   accessToken: string
   refreshToken?: string
+}
+
+export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
+  kioskToken: string
 }
 
 export interface OAuthLoginResponse {
@@ -80,6 +83,11 @@ export class Authentication {
   static async useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean}) {
     const response = await connection.action('auth:facilityWelcomeFulfillment', params) as UserResponse
     return new UserSession(response, connection)
+  }
+
+  static async useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
+    await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
+    return new KioskSession(params, connection)
   }
 
   static async useOAuth (connection: MetricsConnection, params: {service: OAuthProviders, redirect: string}) {
@@ -228,10 +236,10 @@ export class KioskSessionHandler {
   private _kioskToken: string = ''
   private _onKioskTokenChangeEvent = new SimpleEventDispatcher<KioskTokenChangeEvent>()
 
-  constructor (connection: MetricsConnection, facilityKioskTokenResponse: FacilityKioskTokenResponse) {
+  constructor (connection: MetricsConnection, { kioskToken }: { kioskToken: string }) {
     this._connection = connection
     this._connection.onDisposeEvent.one(() => this.close())
-    this.updateToken(facilityKioskTokenResponse.kioskToken)
+    this.updateToken(kioskToken)
   }
 
   private updateToken (kioskToken: string) {
@@ -274,8 +282,8 @@ export class KioskSessionHandler {
 export class KioskSession {
   private _sessionHandler: KioskSessionHandler
 
-  constructor (facilityKioskTokenResponse: FacilityKioskTokenResponse, connection: MetricsConnection) {
-    this._sessionHandler = new KioskSessionHandler(connection, facilityKioskTokenResponse)
+  constructor ({ kioskToken }: { kioskToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new KioskSessionHandler(connection, { kioskToken })
   }
 
   get sessionHandler () {

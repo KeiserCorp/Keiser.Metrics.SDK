@@ -48,8 +48,16 @@ export default class Metrics {
     return Authentication.useToken(this._connection, params)
   }
 
-  async authenticateWithResetToken (params: {resetToken: string, password: string, refreshable?: boolean }) {
+  async authenticateWithResetToken (params: {resetToken: string, password: string, refreshable?: boolean}) {
     return Authentication.useResetToken(this._connection, { refreshable: true, ...params })
+  }
+
+  async authenticateWithWelcomeToken (params: {welcomeToken: string, password: string, refreshable?: boolean}) {
+    return Authentication.useWelcomeToken(this._connection, { refreshable: true, ...params })
+  }
+
+  async authenticateWithKioskToken (params: {kioskToken: string}) {
+    return Authentication.useKioskToken(this._connection, params)
   }
 
   async authenticateWithFacebook (params: {redirect: string}) {
