@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthMachine, StrengthMachineSorting, StrengthMachine } from '../src/models/strengthMachine'
+import { PrivilegedStrengthMachine, StrengthMachine, StrengthMachineLine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -74,12 +74,13 @@ describe('Strength Machine', function () {
   it('can create strength machine', async function () {
     const machine = {
       name: newNameGen(),
-      line: 'a250'
+      line: StrengthMachineLine.A250
     }
     newMachine = await adminSession.createStrengthMachine(machine)
 
     expect(newMachine).to.be.an('object')
     expect(newMachine.name).to.equal(newMachine.name)
+    expect(newMachine.line).to.equal(StrengthMachineLine.A250)
   })
 
   it('can update strength machine', async function () {

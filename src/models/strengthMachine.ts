@@ -2,6 +2,15 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Exercise, ExerciseData } from './exercise'
 
+export const enum StrengthMachineLine {
+  A250 = 'a250',
+  A300 = 'a300',
+  A350 = 'a350',
+  Infinity = 'infinity',
+  PowerRack = 'powerRack',
+  A500 = 'a500'
+}
+
 export const enum StrengthMachineSorting {
   ID = 'id',
   Name = 'name',
@@ -11,7 +20,7 @@ export const enum StrengthMachineSorting {
 export interface StrengthMachineData {
   id: number
   name: string
-  line: string // To-Do: Enum Line
+  line: StrengthMachineLine
   variant: string
   dualSided: boolean
   exercise?: ExerciseData
@@ -95,7 +104,7 @@ export class PrivilegedStrengthMachine extends StrengthMachine {
     super(strengthMachineData, sessionHandler)
   }
 
-  async update (params: { name: string, line: string, variant?: string, exerciseId?: number }) {
+  async update (params: { name: string, line: StrengthMachineLine, variant?: string, exerciseId?: number }) {
     const { strengthMachine } = await this.action('strengthMachine:update', { ...params, id: this.id }) as StrengthMachineResponse
     this.setStrengthMachineData(strengthMachine)
     return this
