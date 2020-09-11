@@ -144,7 +144,7 @@ export class PrivilegedFacility extends Facility {
     return new FacilityUserMemberRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async getMemberRelationships (options: {name?: string, memberIdentifier?: string, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getMemberRelationships (options: {name?: string, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
     return new FacilityUserMemberRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
