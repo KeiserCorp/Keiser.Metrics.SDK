@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { UnknownEntityError } from '../src/error'
 import { EmailAddress } from '../src/models/emailAddress'
 import { PrimaryEmailAddress } from '../src/models/primaryEmailAddress'
 import { User } from '../src/models/user'
