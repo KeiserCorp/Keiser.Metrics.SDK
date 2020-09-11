@@ -56,7 +56,7 @@ describe('Primary Email Address', function () {
   })
 
   it('can get updated primary email addresses', async function () {
-    await existingPrimaryEmailAddress.update(addedEmailAddress)
+    await existingPrimaryEmailAddress.update({ emailAddressId: addedEmailAddress.id })
 
     expect(existingPrimaryEmailAddress.emailAddressId).to.not.equal(existingEmailAddressId)
     expect(existingPrimaryEmailAddress.emailAddressId).to.equal(addedEmailAddress.id)

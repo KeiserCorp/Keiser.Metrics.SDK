@@ -29,8 +29,8 @@ export class PrimaryEmailAddress extends Model {
     return this
   }
 
-  async update (emailAddress: EmailAddress) {
-    const { primaryEmailAddress } = await this.action('primaryEmailAddress:update', { userId: this._primaryEmailAddressData.userId, emailAddressId: emailAddress.id }) as PrimaryEmailAddressResponse
+  async update (params: { emailAddressId: number }) {
+    const { primaryEmailAddress } = await this.action('primaryEmailAddress:update', { ...params, userId: this._primaryEmailAddressData.userId }) as PrimaryEmailAddressResponse
     this.setPrimaryEmailAddressData(primaryEmailAddress)
     return this
   }
