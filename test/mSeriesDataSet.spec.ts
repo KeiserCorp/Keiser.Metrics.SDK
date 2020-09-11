@@ -14,7 +14,7 @@ const generateMSeriesDataSet = () => {
     cadence: (Math.random() * 20) + 80,
     power: (Math.random() * 150) + 100,
     caloricBurn: (index / 10),
-    duration: (index / 3) * 1000,
+    duration: ((index / 3) * 1000) + 8000,
     distance: (index / 300),
     heartRate: 60 + (index % 100),
     gear: (Math.random() * 10) + 10
@@ -77,6 +77,7 @@ describe('M Series Data Set', function () {
     expect(mSeriesDataSet.id).to.equal(createdMSeriesDataSet.id)
     expect(mSeriesDataSet.buildMajor).to.equal(createdMSeriesDataSet.buildMajor)
     expect(mSeriesDataSet.duration).to.equal(333)
+    expect(mSeriesDataSet.initialOffset).to.equal(8)
   })
 
   it('can delete M Series data set', async function () {

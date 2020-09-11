@@ -29,7 +29,7 @@ export interface MSeriesDataSetData {
   averageMetabolicEquivalent: number | null
   stepCount: number | null
   duration: string
-  initialOffset: number
+  initialOffset: string
   mSeriesFtpMeasurement?: MSeriesFtpMeasurementData
   graphData?: MSeriesDataPointData[]
   session?: SessionData
@@ -156,8 +156,11 @@ export class MSeriesDataSet extends Model {
     return durationToSeconds(this._mSeriesDataSetData.duration)
   }
 
+  /**
+   * @returns Offset in number of seconds between broadcast start and first packet reception
+   */
   get initialOffset () {
-    return this._mSeriesDataSetData.initialOffset
+    return durationToSeconds(this._mSeriesDataSetData.initialOffset)
   }
 
   get mSeriesFtpMeasurement () {
