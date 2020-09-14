@@ -72,11 +72,12 @@ describe('Facility Session', function () {
   })
 
   it('can create new session', async function () {
-    createdSession = await user.startSession({ forceEndPrevious: true })
+    const { session } = await user.startSession({ forceEndPrevious: true })
 
-    expect(typeof createdSession).to.equal('object')
-    expect(Date.now() - createdSession.startedAt.getTime() < 1000).to.equal(true)
-    expect(createdSession.endedAt).to.equal(null)
+    expect(typeof session).to.equal('object')
+    expect(Date.now() - session.startedAt.getTime() < 1000).to.equal(true)
+    expect(session.endedAt).to.equal(null)
+    createdSession = session
   })
 
   it('can catch error when creating another new session without ending', async function () {
@@ -146,12 +147,14 @@ describe('Facility Session', function () {
   })
 
   it('can create new session using eChip', async function () {
-    createdSession = await user.startSession({ forceEndPrevious: true, echipId })
+    const { session, echipData } = await user.startSession({ forceEndPrevious: true, echipId })
 
-    expect(typeof createdSession).to.equal('object')
-    expect(Date.now() - createdSession.startedAt.getTime() < 1000).to.equal(true)
-    expect(createdSession.endedAt).to.equal(null)
-    expect(createdSession.strengthMachineDataSets?.length).to.equal(0)
+    expect(typeof echipData).to.equal('object')
+    expect(typeof session).to.equal('object')
+    expect(Date.now() - session.startedAt.getTime() < 1000).to.equal(true)
+    expect(session.endedAt).to.equal(null)
+    expect(session.strengthMachineDataSets?.length).to.equal(0)
+    createdSession = session
   })
 
   it('can get session using eChip', async function () {

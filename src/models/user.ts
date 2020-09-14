@@ -12,7 +12,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { FacilitySession, FacilitySessions, KioskSessionResponse, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
+import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
@@ -266,11 +266,13 @@ export class User extends Model {
 
   async startSession (params: {forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number} = {}) {
     const { session } = await this.action('session:start', { ...params, userId : this.id }) as SessionResponse
-    return new Session(session, this.sessionHandler)
+    return {
+      session: new Session(session, this.sessionHandler)
+    }
   }
 
   async startSessionFromKiosk (params: {kioskSession: KioskSession, forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number}) {
-    const { session, echipData } = await this.action('facilityKiosk:sessionStart', { forceEndPrevious: params.forceEndPrevious, echipId: params.echipId,sessionPlanSequenceAssignmentId: params.sessionPlanSequenceAssignmentId, kioskToken: params.kioskSession.sessionHandler.kioskToken }) as KioskSessionResponse
+    const { session, echipData } = await this.action('facilityKiosk:sessionStart', { forceEndPrevious: params.forceEndPrevious, echipId: params.echipId,sessionPlanSequenceAssignmentId: params.sessionPlanSequenceAssignmentId, kioskToken: params.kioskSession.sessionHandler.kioskToken }) as SessionResponse
     return {
       session: new Session(session, this.sessionHandler),
       echipData
@@ -363,8 +365,11 @@ export class FacilityUser extends User {
 
 export class FacilityMemberUser extends FacilityUser {
   async startSession (params: {forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number} = { }) {
-    const { session } = await this.action('facilitySession:start', { ...params, userId : this.id }) as SessionResponse
-    return new FacilitySession(session, this.sessionHandler)
+    const { session, echipData } = await this.action('facilitySession:start', { ...params, userId : this.id }) as SessionResponse
+    return {
+      session: new FacilitySession(session, this.sessionHandler),
+      echipData
+    }
   }
 
   async getSession (params: {id: number}) {

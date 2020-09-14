@@ -8,7 +8,7 @@ import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSo
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { Muscle, MuscleBodyPart, MuscleGroup, MuscleListResponse, MuscleResponse, Muscles, MuscleSorting, PrivilegedMuscle, PrivilegedMuscles } from './models/muscle'
-import { KioskSessionResponse, StaticSession } from './models/session'
+import { SessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachine, StrengthMachineLine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
@@ -308,12 +308,12 @@ export class KioskSession {
   }
 
   async sessionUpdate (params: {echipId: string, echipData: object}) {
-    const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
+    const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as SessionResponse
     return new StaticSession(session)
   }
 
   async sessionEnd (params: {echipId: string, echipData: object}) {
-    const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
+    const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as SessionResponse
     return new StaticSession(session)
   }
 }

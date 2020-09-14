@@ -34,6 +34,7 @@ export interface SessionData {
 
 export interface SessionResponse extends AuthenticatedResponse {
   session: SessionData
+  echipData?: object // To-Do: Define struct for echipData
 }
 
 export interface SessionListResponse extends AuthenticatedResponse {
@@ -52,11 +53,6 @@ export class Sessions extends ModelList<Session, SessionData, SessionListRespons
   constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler) {
     super(Session, sessions, sessionsMeta, sessionHandler)
   }
-}
-
-export interface KioskSessionResponse extends AuthenticatedResponse {
-  session: SessionData
-  echipData?: object
 }
 
 export class StaticSession {
