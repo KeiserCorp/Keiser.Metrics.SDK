@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { ExerciseAlias, ExerciseAliasData } from './exerciseAlias'
 import { Muscle, MuscleData } from './muscle'
 
 export const enum ExerciseType {
@@ -19,6 +20,7 @@ export interface ExerciseData {
   name: string
   type: ExerciseType
   muscles?: MuscleData[]
+  exerciseAliases?: ExerciseAliasData[]
 }
 
 export interface ExerciseResponse extends AuthenticatedResponse {
@@ -73,6 +75,10 @@ export class Exercise extends Model {
 
   get muscles () {
     return this._exerciseData.muscles ? this._exerciseData.muscles.map(muscleData => new Muscle(muscleData, this.sessionHandler)) : undefined
+  }
+
+  get exerciseAliases () {
+    return this._exerciseData.exerciseAliases ? this._exerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 }
 
