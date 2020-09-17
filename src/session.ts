@@ -373,7 +373,7 @@ export class UserSession {
     return new Exercise(exercise, this.sessionHandler)
   }
 
-  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExercises (options: {name?: string, searchAlias?: boolean, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
     return new Exercises(exercises, exercisesMeta, this.sessionHandler)
   }

@@ -34,6 +34,7 @@ export interface ExerciseListResponse extends AuthenticatedResponse {
 
 export interface ExerciseListResponseMeta extends ListMeta {
   name: string | undefined
+  searchAlias: boolean | undefined
   sort: ExerciseSorting
 }
 
