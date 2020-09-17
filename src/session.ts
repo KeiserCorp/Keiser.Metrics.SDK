@@ -6,6 +6,7 @@ import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
 import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './models/exerciseAlias'
+import { ExerciseLaterality, ExerciseMovement, ExercisePlane, ExerciseVariant, ExerciseVariantListResponse, ExerciseVariantResponse, ExerciseVariants, ExerciseVariantSorting, ExerciseVariantType, PrivilegedExerciseVariant, PrivilegedExerciseVariants } from './models/exerciseVariant'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { Muscle, MuscleBodyPart, MuscleGroup, MuscleListResponse, MuscleResponse, Muscles, MuscleSorting, PrivilegedMuscle, PrivilegedMuscles } from './models/muscle'
@@ -388,6 +389,16 @@ export class UserSession {
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
+  async getExerciseVariant (params: {id: number}) {
+    const { exerciseVariant } = await this.action('exerciseVariant:show', params) as ExerciseVariantResponse
+    return new ExerciseVariant(exerciseVariant, this.sessionHandler)
+  }
+
+  async getExerciseVariants (options: { variant?: ExerciseVariantType, laterality?: ExerciseLaterality, movement?: ExerciseMovement, plane?: ExercisePlane, sort?: ExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exerciseVariants, exerciseVariantsMeta } = await this.action('exerciseVariant:list', options) as ExerciseVariantListResponse
+    return new ExerciseVariants(exerciseVariants, exerciseVariantsMeta, this.sessionHandler)
+  }
+
   async getMuscle (params: {id: number}) {
     const { muscle } = await this.action('muscle:show', params) as MuscleResponse
     return new Muscle(muscle, this.sessionHandler)
@@ -513,6 +524,21 @@ export class AdminSession extends UserSession {
   async createExerciseAlias (params: { alias: string, exerciseVariantId?: number }) {
     const { exerciseAlias } = await this.action('exerciseAlias:create', params) as ExerciseAliasResponse
     return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
+  }
+
+  async getExerciseVariant (params: {id: number}) {
+    const { exerciseVariant } = await this.action('exerciseVariant:show', params) as ExerciseVariantResponse
+    return new PrivilegedExerciseVariant(exerciseVariant, this.sessionHandler)
+  }
+
+  async getExerciseVariants (options: { variant?: ExerciseVariantType, laterality?: ExerciseLaterality, movement?: ExerciseMovement, plane?: ExercisePlane, sort?: ExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exerciseVariants, exerciseVariantsMeta } = await this.action('exerciseVariant:list', options) as ExerciseVariantListResponse
+    return new PrivilegedExerciseVariants(exerciseVariants, exerciseVariantsMeta, this.sessionHandler)
+  }
+
+  async createExerciseVariant (params: { exerciseId: number, variant: ExerciseVariantType, laterality: ExerciseLaterality, movement: ExerciseMovement, plane: ExercisePlane }) {
+    const { exerciseVariant } = await this.action('exerciseVariant:create', params) as ExerciseVariantResponse
+    return new PrivilegedExerciseVariant(exerciseVariant, this.sessionHandler)
   }
 
   async getMuscle (params: {id: number}) {
