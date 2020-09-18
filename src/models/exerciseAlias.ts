@@ -1,6 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Exercise, ExerciseData } from './exercise'
+import { ExerciseVariant, ExerciseVariantData } from './exerciseVariant'
 
 export const enum ExerciseAliasSorting {
   ID = 'id',
@@ -11,7 +12,7 @@ export interface ExerciseAliasData {
   id: number
   alias: string
   exercise?: ExerciseData
-  exerciseVariant?: object // To-Do: Add ExerciseVariant
+  exerciseVariant?: ExerciseVariantData
 }
 
 export interface ExerciseAliasResponse extends AuthenticatedResponse {
@@ -64,9 +65,9 @@ export class ExerciseAlias extends Model {
     return this._exerciseAliasData.exercise ? new Exercise(this._exerciseAliasData.exercise, this.sessionHandler) : undefined
   }
 
-  // get exerciseVariant () {
-  //   return this._exerciseAliasData.exerciseVariant ? new ExerciseVariant(this._exerciseAliasData.exerciseVariant, this.sessionHandler) : undefined
-  // }
+  get exerciseVariant () {
+    return this._exerciseAliasData.exerciseVariant ? new ExerciseVariant(this._exerciseAliasData.exerciseVariant, this.sessionHandler) : undefined
+  }
 }
 
 /** @hidden */
