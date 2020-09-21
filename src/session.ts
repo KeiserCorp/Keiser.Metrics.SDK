@@ -4,6 +4,8 @@ import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
+import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
+import { CardioMachine, CardioMachineLine, CardioMachineListResponse, CardioMachineParseCode, CardioMachineResponse, CardioMachines, CardioMachineSorting, PrivilegedCardioMachine, PrivilegedCardioMachines } from './models/cardioMachine'
 import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
 import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './models/exerciseAlias'
 import { ExerciseLaterality, ExerciseMovement, ExercisePlane, ExerciseVariant, ExerciseVariantListResponse, ExerciseVariantResponse, ExerciseVariants, ExerciseVariantSorting, ExerciseVariantType, PrivilegedExerciseVariant, PrivilegedExerciseVariants } from './models/exerciseVariant'
@@ -410,6 +412,16 @@ export class UserSession {
     return new StretchExercises(stretchExercises, stretchExercisesMeta, this.sessionHandler)
   }
 
+  async getCardioExercise (params: {id: number}) {
+    const { cardioExercise } = await this.action('cardioExercise:show', params) as CardioExerciseResponse
+    return new CardioExercise(cardioExercise, this.sessionHandler)
+  }
+
+  async getCardioExercises (options: { imageUri?: string, instructionalVideoUri?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { cardioExercises, cardioExercisesMeta } = await this.action('cardioExercise:list', options) as CardioExerciseListResponse
+    return new CardioExercises(cardioExercises, cardioExercisesMeta, this.sessionHandler)
+  }
+
   async getMuscle (params: {id: number}) {
     const { muscle } = await this.action('muscle:show', params) as MuscleResponse
     return new Muscle(muscle, this.sessionHandler)
@@ -428,6 +440,16 @@ export class UserSession {
   async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
     return new StrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
+  }
+
+  async getCardioMachine (params: {id: number}) {
+    const { cardioMachine } = await this.action('cardioMachine:show', params) as CardioMachineResponse
+    return new CardioMachine(cardioMachine, this.sessionHandler)
+  }
+
+  async getCardioMachines (options: {name?: string, sort?: CardioMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { cardioMachines, cardioMachinesMeta } = await this.action('cardioMachine:list', options) as CardioMachineListResponse
+    return new CardioMachines(cardioMachines, cardioMachinesMeta, this.sessionHandler)
   }
 
   async getFacility (params: {id: number}) {
@@ -567,6 +589,21 @@ export class AdminSession extends UserSession {
     return new PrivilegedStretchExercise(stretchExercise, this.sessionHandler)
   }
 
+  async getCardioExercise (params: {id: number}) {
+    const { cardioExercise } = await this.action('cardioExercise:show', params) as CardioExerciseResponse
+    return new PrivilegedCardioExercise(cardioExercise, this.sessionHandler)
+  }
+
+  async getCardioExercises (options: { imageUri?: string, instructionalVideoUri?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { cardioExercises, cardioExercisesMeta } = await this.action('cardioExercise:list', options) as CardioExerciseListResponse
+    return new PrivilegedCardioExercises(cardioExercises, cardioExercisesMeta, this.sessionHandler)
+  }
+
+  async createCardioExercise (params: { exerciseVariantId: number, cardioMachineId: number, imageUri?: string, instructionalVideoUri?: string }) {
+    const { cardioExercise } = await this.action('cardioExercise:create', params) as CardioExerciseResponse
+    return new PrivilegedCardioExercise(cardioExercise, this.sessionHandler)
+  }
+
   async getMuscle (params: {id: number}) {
     const { muscle } = await this.action('muscle:show', params) as MuscleResponse
     return new PrivilegedMuscle(muscle, this.sessionHandler)
@@ -595,6 +632,21 @@ export class AdminSession extends UserSession {
   async createStrengthMachine (params: { name: string, line: StrengthMachineLine, variant?: string, exerciseId?: number }) {
     const { strengthMachine } = await this.action('strengthMachine:create', params) as StrengthMachineResponse
     return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
+  }
+
+  async getCardioMachine (params: {id: number}) {
+    const { cardioMachine } = await this.action('cardioMachine:show', params) as CardioMachineResponse
+    return new PrivilegedCardioMachine(cardioMachine, this.sessionHandler)
+  }
+
+  async getCardioMachines (options: {name?: string, sort?: CardioMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { cardioMachines, cardioMachinesMeta } = await this.action('cardioMachine:list', options) as CardioMachineListResponse
+    return new PrivilegedCardioMachines(cardioMachines, cardioMachinesMeta, this.sessionHandler)
+  }
+
+  async createCardioMachine (params: { name: string, line: CardioMachineLine, parseCode: CardioMachineParseCode, exerciseId?: number }) {
+    const { cardioMachine } = await this.action('cardioMachine:create', params) as CardioMachineResponse
+    return new PrivilegedCardioMachine(cardioMachine, this.sessionHandler)
   }
 
   async getFacilityLicense (params: {id: number}) {
