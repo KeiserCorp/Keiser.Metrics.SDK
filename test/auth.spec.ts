@@ -81,6 +81,11 @@ describe('Auth', function () {
     expect(redirectUrl).to.be.a('string')
   })
 
+  it('can authenticate using Apple', async function () {
+    const redirectUrl = await metricsInstance.authenticateWithApple({ redirect: 'localhost:8080' })
+    expect(redirectUrl).to.be.a('string')
+  })
+
   it('can create a new user with basic authentication', async function () {
     const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
     const session = await metricsInstance.createUser({ email: emailAddress, password: DemoPassword })

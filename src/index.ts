@@ -68,6 +68,10 @@ export default class Metrics {
     return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
   }
 
+  async authenticateWithApple (params: {redirect: string}) {
+    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
+  }
+
   async createUser (params: {email: string, password: string, refreshable?: boolean}) {
     return Authentication.createUser(this._connection, { refreshable: true, ...params })
   }

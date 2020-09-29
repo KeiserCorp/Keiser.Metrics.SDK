@@ -38,6 +38,7 @@ The base [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/met
 - [`authenticateWithCredentials`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticatewithcredentials) - Use email and password
 - [`authenticateWithFacebook`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticateWithFacebook) - Use Facebook OAuth flow
 - [`authenticateWithGoogle`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticateWithGoogle) - Use Google OAuth flow
+- [`authenticateWithApple`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticateWithApple) - Use Apple OAuth flow
 - [`authenticateWithToken`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticateWithToken) - Use a stored refresh token string
 
 ```ts

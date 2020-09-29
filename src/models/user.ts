@@ -18,6 +18,7 @@ import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBo
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
 export const enum OAuthProviders {
+  Apple = 'apple',
   Google = 'google',
   Facebook = 'facebook',
   Strava = 'strava',
