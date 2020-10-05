@@ -41,6 +41,12 @@ describe('OAuth Service', function () {
     expect(typeof oauthServiceUrl).to.equal('string')
   })
 
+  it('can create Apple OAuth service', async function () {
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Apple , redirect: 'localhost:8080' })
+
+    expect(typeof oauthServiceUrl).to.equal('string')
+  })
+
   it('can create Google OAuth service', async function () {
     const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Google , redirect: 'localhost:8080' })
 

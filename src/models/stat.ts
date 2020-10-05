@@ -15,6 +15,7 @@ export interface StatData {
   oauths: number
   facebook: number
   google: number
+  apple: number
   trainingpeaks: number
   strava: number
   inbody: number
@@ -79,6 +80,10 @@ export class Stat extends Model {
 
   get google () {
     return this._statData.google
+  }
+
+  get apple () {
+    return this._statData.apple
   }
 
   get trainingpeaks () {
