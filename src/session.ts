@@ -416,6 +416,10 @@ export class AdminSession extends UserSession {
     return new Stats(stats, statsMeta, this.sessionHandler)
   }
 
+  async deleteUser (options: {userId?: number} = { }) {
+    await this.action('user:delete', options)
+  }
+
   async getUser (params: {userId: number}) {
     const { user } = await this.action('user:show', params) as UserResponse
     return new User(user, this.sessionHandler)
