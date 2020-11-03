@@ -1,9 +1,7 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { CardioExercise, CardioExerciseSorting } from '../src/models/cardioExercise'
-import { CardioMachineLine, CardioMachineParseCode, PrivilegedCardioMachine } from '../src/models/cardioMachine'
-import { ExerciseLaterality, ExerciseMovement, ExercisePlane, ExerciseVariantType, PrivilegedExerciseVariant } from '../src/models/exerciseVariant'
+import { CardioExerciseSorting, PrivilegedCardioExercise } from '../src/models/cardioExercise'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -14,9 +12,8 @@ describe('Cardio Exercise', function () {
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
   let adminSession: AdminSession
-  let createdExerciseVariant: PrivilegedExerciseVariant
-  let newCardioExercise: CardioExercise
-  let createdCardioMachine: PrivilegedCardioMachine
+  let createdCardioExercise: PrivilegedCardioExercise
+  const newExerciseName = newNameGen()
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -31,39 +28,23 @@ describe('Cardio Exercise', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    const existingExercise = (await userSession.getExercises({ limit: 1 }))[0]
-    createdCardioMachine = await adminSession.createCardioMachine({ name: newNameGen(), line: CardioMachineLine.MSeries, parseCode: CardioMachineParseCode.MSeries6 })
-    const exerciseVariantParams = {
-      exerciseId: existingExercise.id,
-      variant: ExerciseVariantType.Normal,
-      laterality: ExerciseLaterality.Combination,
-      movement: ExerciseMovement.Compound,
-      plane: ExercisePlane.Frontal
-    }
-    createdExerciseVariant = await adminSession.createExerciseVariant(exerciseVariantParams)
   })
 
   after(async function () {
-    await createdExerciseVariant.delete()
-    await createdCardioMachine.delete()
     metricsInstance?.dispose()
     metricsAdminInstance?.dispose()
   })
 
   it('can create cardio exercise', async function () {
     const cardioExerciseParams = {
-      exerciseVariantId: createdExerciseVariant.id,
-      cardioMachineId: createdCardioMachine.id,
-      imageUri: 'http://static.keiser.com/img1.png',
-      instructionalVideoUri: 'http://static.keiser.com/mov1.avi'
+      defaultExerciseAlias: newExerciseName
     }
     const cardioExercise = await adminSession.createCardioExercise(cardioExerciseParams)
 
     expect(cardioExercise).to.be.an('object')
-    expect(cardioExercise.exerciseVariant).to.be.an('object')
-    expect(cardioExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-    expect(cardioExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
-    newCardioExercise = cardioExercise
+    expect(cardioExercise.defaultExerciseAlias).to.be.an('object')
+    expect(cardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+    createdCardioExercise = cardioExercise
   })
 
   it('can list available cardio exercises', async function () {
@@ -75,25 +56,22 @@ describe('Cardio Exercise', function () {
   })
 
   it('can reload cardio exercise', async function () {
-    expect(newCardioExercise).to.be.an('object')
-    if (typeof newCardioExercise !== 'undefined') {
-      await newCardioExercise.reload()
-      expect(newCardioExercise).to.be.an('object')
-      expect(newCardioExercise.exerciseVariant).to.be.an('object')
-      expect(newCardioExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-      expect(newCardioExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
+    expect(createdCardioExercise).to.be.an('object')
+    if (typeof createdCardioExercise !== 'undefined') {
+      await createdCardioExercise.reload()
+      expect(createdCardioExercise).to.be.an('object')
+      expect(createdCardioExercise.defaultExerciseAlias).to.be.an('object')
+      expect(createdCardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
   it('can get specific cardio exercise', async function () {
-    expect(newCardioExercise).to.be.an('object')
-    if (typeof newCardioExercise !== 'undefined') {
-      const cardioExercise = await userSession.getCardioExercise({ id: newCardioExercise.id })
+    expect(createdCardioExercise).to.be.an('object')
+    if (typeof createdCardioExercise !== 'undefined') {
+      const cardioExercise = await userSession.getCardioExercise({ id: createdCardioExercise.id })
 
-      expect(cardioExercise).to.be.an('object')
-      expect(cardioExercise.exerciseVariant).to.be.an('object')
-      expect(cardioExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-      expect(cardioExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
+      expect(cardioExercise.defaultExerciseAlias).to.be.an('object')
+      expect(cardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
@@ -103,28 +81,13 @@ describe('Cardio Exercise', function () {
     expect(Array.isArray(cardioExercises)).to.equal(true)
     expect(cardioExercises.length).to.be.above(0)
     expect(cardioExercises.meta.sort).to.equal(CardioExerciseSorting.ID)
-    expect(typeof cardioExercises[0].update).to.equal('function')
-  })
-
-  it('can update cardio exercise', async function () {
-    if (typeof newCardioExercise !== 'undefined') {
-      const cardioExercise = await adminSession.getCardioExercise({ id: newCardioExercise.id })
-      const cardioExerciseParams = {
-        imageUri: 'http://static.keiser.com/img2.png',
-        instructionalVideoUri: 'http://static.keiser.com/mov2.avi'
-      }
-      await cardioExercise.update(cardioExerciseParams)
-      expect(cardioExercise).to.be.an('object')
-      expect(cardioExercise.exerciseVariant).to.be.an('object')
-      expect(cardioExercise.imageUri).to.equal('http://static.keiser.com/img2.png')
-      expect(cardioExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov2.avi')
-    }
+    expect(typeof cardioExercises[0].delete).to.equal('function')
   })
 
   it('can delete exercise', async function () {
     let extError
 
-    const cardioExercise = await adminSession.getCardioExercise({ id: newCardioExercise.id })
+    const cardioExercise = await adminSession.getCardioExercise({ id: createdCardioExercise.id })
     await cardioExercise.delete()
 
     try {

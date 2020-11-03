@@ -1,18 +1,19 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { ExerciseLaterality, ExerciseMovement, ExercisePlane, ExerciseVariantType, PrivilegedExerciseVariant } from '../src/models/exerciseVariant'
-import { StretchExercise, StretchExerciseSorting } from '../src/models/stretchExercise'
+import { PrivilegedStretchExercise, StretchExerciseSorting } from '../src/models/stretchExercise'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+
+const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
 
 describe('Stretch Exercise', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
   let adminSession: AdminSession
-  let existingExerciseVariant: PrivilegedExerciseVariant
-  let newStretchExercise: StretchExercise
+  let createdStretchExercise: PrivilegedStretchExercise
+  const newExerciseName = newNameGen()
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -27,36 +28,23 @@ describe('Stretch Exercise', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    const existingExercise = (await userSession.getExercises({ limit: 1 }))[0]
-    const exerciseVariantParams = {
-      exerciseId: existingExercise.id,
-      variant: ExerciseVariantType.Normal,
-      laterality: ExerciseLaterality.Combination,
-      movement: ExerciseMovement.Compound,
-      plane: ExercisePlane.Frontal
-    }
-    existingExerciseVariant = await adminSession.createExerciseVariant(exerciseVariantParams)
   })
 
   after(async function () {
-    await existingExerciseVariant.delete()
     metricsInstance?.dispose()
     metricsAdminInstance?.dispose()
   })
 
   it('can create stretch exercise', async function () {
     const stretchExerciseParams = {
-      exerciseVariantId: existingExerciseVariant.id,
-      imageUri: 'http://static.keiser.com/img1.png',
-      instructionalVideoUri: 'http://static.keiser.com/mov1.avi'
+      defaultExerciseAlias: newExerciseName
     }
     const stretchExercise = await adminSession.createStretchExercise(stretchExerciseParams)
 
     expect(stretchExercise).to.be.an('object')
-    expect(stretchExercise.exerciseVariant).to.be.an('object')
-    expect(stretchExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-    expect(stretchExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
-    newStretchExercise = stretchExercise
+    expect(stretchExercise.defaultExerciseAlias).to.be.an('object')
+    expect(stretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+    createdStretchExercise = stretchExercise
   })
 
   it('can list available stretch exercises', async function () {
@@ -68,25 +56,22 @@ describe('Stretch Exercise', function () {
   })
 
   it('can reload stretch exercise', async function () {
-    expect(newStretchExercise).to.be.an('object')
-    if (typeof newStretchExercise !== 'undefined') {
-      await newStretchExercise.reload()
-      expect(newStretchExercise).to.be.an('object')
-      expect(newStretchExercise.exerciseVariant).to.be.an('object')
-      expect(newStretchExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-      expect(newStretchExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
+    expect(createdStretchExercise).to.be.an('object')
+    if (typeof createdStretchExercise !== 'undefined') {
+      await createdStretchExercise.reload()
+      expect(createdStretchExercise).to.be.an('object')
+      expect(createdStretchExercise.defaultExerciseAlias).to.be.an('object')
+      expect(createdStretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
   it('can get specific stretch exercise', async function () {
-    expect(newStretchExercise).to.be.an('object')
-    if (typeof newStretchExercise !== 'undefined') {
-      const stretchExercise = await userSession.getStretchExercise({ id: newStretchExercise.id })
+    expect(createdStretchExercise).to.be.an('object')
+    if (typeof createdStretchExercise !== 'undefined') {
+      const stretchExercise = await userSession.getStretchExercise({ id: createdStretchExercise.id })
 
-      expect(stretchExercise).to.be.an('object')
-      expect(stretchExercise.exerciseVariant).to.be.an('object')
-      expect(stretchExercise.imageUri).to.equal('http://static.keiser.com/img1.png')
-      expect(stretchExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov1.avi')
+      expect(stretchExercise.defaultExerciseAlias).to.be.an('object')
+      expect(stretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
@@ -96,28 +81,13 @@ describe('Stretch Exercise', function () {
     expect(Array.isArray(stretchExercises)).to.equal(true)
     expect(stretchExercises.length).to.be.above(0)
     expect(stretchExercises.meta.sort).to.equal(StretchExerciseSorting.ID)
-    expect(typeof stretchExercises[0].update).to.equal('function')
-  })
-
-  it('can update stretch exercise', async function () {
-    if (typeof newStretchExercise !== 'undefined') {
-      const stretchExercise = await adminSession.getStretchExercise({ id: newStretchExercise.id })
-      const stretchExerciseParams = {
-        imageUri: 'http://static.keiser.com/img2.png',
-        instructionalVideoUri: 'http://static.keiser.com/mov2.avi'
-      }
-      await stretchExercise.update(stretchExerciseParams)
-      expect(stretchExercise).to.be.an('object')
-      expect(stretchExercise.exerciseVariant).to.be.an('object')
-      expect(stretchExercise.imageUri).to.equal('http://static.keiser.com/img2.png')
-      expect(stretchExercise.instructionalVideoUri).to.equal('http://static.keiser.com/mov2.avi')
-    }
+    expect(typeof stretchExercises[0].delete).to.equal('function')
   })
 
   it('can delete exercise', async function () {
     let extError
 
-    const stretchExercise = await adminSession.getStretchExercise({ id: newStretchExercise.id })
+    const stretchExercise = await adminSession.getStretchExercise({ id: createdStretchExercise.id })
     await stretchExercise.delete()
 
     try {

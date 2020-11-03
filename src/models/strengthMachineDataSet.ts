@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { Exercise, ExerciseData } from './exercise'
 import { Session, SessionData } from './session'
+import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
 export const enum ResistancePrecision {
@@ -48,8 +48,7 @@ export interface StrengthMachineDataSetData {
   addedWeight: number | null
   test?: StrengthMachineDataSetTestData
   strengthMachine?: StrengthMachineData
-
-  exercise?: ExerciseData
+  strengthExercise?: StrengthExerciseData
   a500DataSet?: any        // To-Do: Add A500 Data Set model
 
   session?: SessionData
@@ -221,8 +220,8 @@ export class StrengthMachineDataSet extends Model {
     return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
   }
 
-  get exercise () {
-    return this._strengthMachineDataSetData.exercise ? new Exercise(this._strengthMachineDataSetData.exercise, this.sessionHandler) : undefined
+  get strengthExercise () {
+    return this._strengthMachineDataSetData.strengthExercise ? new StrengthExercise(this._strengthMachineDataSetData.strengthExercise, this.sessionHandler) : undefined
   }
 }
 

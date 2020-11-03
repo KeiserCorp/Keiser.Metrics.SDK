@@ -1,8 +1,9 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { Exercise } from '../src/models/exercise'
 import { ExerciseAlias, ExerciseAliasSorting } from '../src/models/exerciseAlias'
+import { StrengthExercise } from '../src/models/strengthExercise'
+import { PrivilegedStretchExercise } from '../src/models/stretchExercise'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -14,7 +15,7 @@ describe('Exercise Alias', function () {
   let userSession: UserSession
   let adminSession: AdminSession
   let newExerciseAlias: ExerciseAlias
-  let existingExercise: Exercise
+  const newAlias = newNameGen()
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -29,25 +30,12 @@ describe('Exercise Alias', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    existingExercise = (await userSession.getExercises({ limit: 1 }))[0]
+    newExerciseAlias = await (await adminSession.getStrengthExercises({ limit: 1 }))[0].createExerciseAlias({ alias: newAlias })
   })
 
   after(async function () {
     metricsInstance?.dispose()
     metricsAdminInstance?.dispose()
-  })
-
-  it('can create exercise alias', async function () {
-    const exerciseAliasParams = {
-      exerciseId: existingExercise.id,
-      alias: newNameGen()
-    }
-    const exerciseAlias = await adminSession.createExerciseAlias(exerciseAliasParams)
-
-    expect(exerciseAlias).to.be.an('object')
-    expect(exerciseAlias.exercise).to.be.an('object')
-    expect(exerciseAlias.alias).to.equal(exerciseAlias.alias)
-    newExerciseAlias = exerciseAlias
   })
 
   it('can list available exercise aliases', async function () {
@@ -59,21 +47,16 @@ describe('Exercise Alias', function () {
   })
 
   it('can reload exercise alias', async function () {
+    await newExerciseAlias.reload()
     expect(newExerciseAlias).to.be.an('object')
-    if (typeof newExerciseAlias !== 'undefined') {
-      await newExerciseAlias.reload()
-      expect(newExerciseAlias).to.be.an('object')
-    }
   })
 
   it('can get specific exercise alias', async function () {
     expect(newExerciseAlias).to.be.an('object')
-    if (typeof newExerciseAlias !== 'undefined') {
-      const exerciseAlias = await userSession.getExerciseAlias({ id: newExerciseAlias.id })
+    const exerciseAlias = await userSession.getExerciseAlias({ id: newExerciseAlias.id })
 
-      expect(exerciseAlias).to.be.an('object')
-      expect(exerciseAlias.id).to.equal(newExerciseAlias.id)
-    }
+    expect(exerciseAlias).to.be.an('object')
+    expect(exerciseAlias.id).to.equal(newExerciseAlias.id)
   })
 
   it('can list exercise aliases with privileges', async function () {
@@ -86,16 +69,14 @@ describe('Exercise Alias', function () {
   })
 
   it('can update exercise alias', async function () {
-    if (typeof newExerciseAlias !== 'undefined') {
-      const newName = newNameGen()
-      const exerciseAlias = await adminSession.getExerciseAlias({ id: newExerciseAlias.id })
-      await exerciseAlias.update({ alias: newName })
-      expect(exerciseAlias).to.be.an('object')
-      expect(exerciseAlias.alias).to.equal(newName)
-    }
+    const newName = newNameGen()
+    const exerciseAlias = await adminSession.getExerciseAlias({ id: newExerciseAlias.id })
+    await exerciseAlias.update({ alias: newName })
+    expect(exerciseAlias).to.be.an('object')
+    expect(exerciseAlias.alias).to.equal(newName)
   })
 
-  it('can delete exercise', async function () {
+  it('can delete exercise alias', async function () {
     let extError
 
     const exerciseAlias = await adminSession.getExerciseAlias({ id: newExerciseAlias.id })

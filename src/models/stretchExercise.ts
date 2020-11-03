@@ -1,19 +1,18 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { ExerciseVariant, ExerciseVariantData } from './exerciseVariant'
+import { ExerciseAlias, ExerciseAliasData, ExerciseAliasResponse } from './exerciseAlias'
 
 export const enum StretchExerciseSorting {
   ID = 'id',
-  ImageUri = 'imageUri',
-  InstructionalVideoUri = 'instructionalVideoUri'
+  DefaultAlias = 'defaultAlias'
 }
 
 export interface StretchExerciseData {
   id: number
-  imageUri: string | null
-  instructionalVideoUri: string | null
-  exerciseVariant?: ExerciseVariantData
-  exerciseOrdinalSetAssignments?: object[] // To-Do: Add Ordinal Set Assignment Model
+  defaultExerciseAlias: ExerciseAliasData
+  exerciseAliases?: ExerciseAliasData[]
+  stretchExerciseVariants?: any[] // To-Do: Add stretchExerciseVariants
+  stretchExerciseMuscles?: any[] // To-Do: Add stretchExerciseMuscles
 }
 
 export interface StretchExerciseResponse extends AuthenticatedResponse {
@@ -26,8 +25,7 @@ export interface StretchExerciseListResponse extends AuthenticatedResponse {
 }
 
 export interface StretchExerciseListResponseMeta extends ListMeta {
-  imageUri?: string
-  instructionalVideoUri?: string
+  defaultAlias?: string
   sort: StretchExerciseSorting
 }
 
@@ -59,20 +57,16 @@ export class StretchExercise extends Model {
     return this._stretchExerciseData.id
   }
 
-  get imageUri () {
-    return this._stretchExerciseData.imageUri
+  get defaultExerciseAlias () {
+    return new ExerciseAlias(this._stretchExerciseData.defaultExerciseAlias, this.sessionHandler)
   }
 
-  get instructionalVideoUri () {
-    return this._stretchExerciseData.instructionalVideoUri
+  get exerciseAliases () {
+    return this._stretchExerciseData.exerciseAliases ? this._stretchExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
-  get exerciseVariant () {
-    return this._stretchExerciseData.exerciseVariant ? new ExerciseVariant(this._stretchExerciseData.exerciseVariant, this.sessionHandler) : undefined
-  }
-
-  // get exerciseOrdinalSetAssignments () {
-  //   return this._stretchExerciseData.exerciseVariant ? new ExerciseVariant(this._stretchExerciseData.exerciseVariant, this.sessionHandler) : undefined
+  // get stretchExercises () {
+  //   return this._stretchExerciseData.stretchExercise ? new StretchExercise(this._stretchExerciseData.stretchExercise, this.sessionHandler) : undefined
   // }
 }
 
@@ -89,13 +83,18 @@ export class PrivilegedStretchExercise extends StretchExercise {
     super(stretchExerciseData, sessionHandler)
   }
 
-  async update (params: { imageUri: string, instructionalVideoUri: string }) {
-    const { stretchExercise } = await this.action('stretchExercise:update', { ...params, id: this.id }) as StretchExerciseResponse
-    this.setStretchExerciseData(stretchExercise)
-    return this
-  }
+  // async update (params: { }) {
+  //   const { stretchExercise } = await this.action('stretchExercise:update', { ...params, id: this.id }) as StretchExerciseResponse
+  //   this.setStretchExerciseData(stretchExercise)
+  //   return this
+  // }
 
   async delete () {
     await this.action('stretchExercise:delete', { id : this.id })
+  }
+
+  async createExerciseAlias (params: {alias: string}) {
+    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, stretchExerciseId: this.id }) as ExerciseAliasResponse
+    return new ExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 }

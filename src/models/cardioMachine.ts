@@ -1,6 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { Exercise, ExerciseData } from './exercise'
+import { CardioExercise, CardioExerciseData, CardioExerciseResponse } from './cardioExercise'
 
 export const enum CardioMachineLine {
   MSeries = 'mSeries'
@@ -25,7 +25,8 @@ export interface CardioMachineData {
   name: string
   line: CardioMachineLine
   parseCode: CardioMachineParseCode
-  exercise?: ExerciseData
+  defaultCardioExerciseId: number
+  defaultCardioExercise?: CardioExerciseData
 }
 
 export interface CardioMachineResponse extends AuthenticatedResponse {
@@ -82,31 +83,12 @@ export class CardioMachine extends Model {
     return this._cardioMachineData.parseCode
   }
 
-  get exercise () {
-    return this._cardioMachineData.exercise ? new Exercise(this._cardioMachineData.exercise, this.sessionHandler) : undefined
-  }
-}
-
-/** @hidden */
-export class PrivilegedCardioMachines extends ModelList<PrivilegedCardioMachine, CardioMachineData, CardioMachineListResponseMeta> {
-  constructor (cardioMachines: CardioMachineData[], cardioMachinesMeta: CardioMachineListResponseMeta, sessionHandler: SessionHandler) {
-    super(PrivilegedCardioMachine, cardioMachines, cardioMachinesMeta, sessionHandler)
-  }
-}
-
-/** @hidden */
-export class PrivilegedCardioMachine extends CardioMachine {
-  constructor (cardioMachineData: CardioMachineData, sessionHandler: SessionHandler) {
-    super(cardioMachineData, sessionHandler)
+  get defaultCardioExercise () {
+    return this._cardioMachineData.defaultCardioExercise ? new CardioExercise(this._cardioMachineData.defaultCardioExercise, this.sessionHandler) : undefined
   }
 
-  async update (params: { name: string, line: CardioMachineLine, parseCode: CardioMachineParseCode, exerciseId?: number }) {
-    const { cardioMachine } = await this.action('cardioMachine:update', { ...params, id: this.id }) as CardioMachineResponse
-    this.setCardioMachineData(cardioMachine)
-    return this
-  }
-
-  async delete () {
-    await this.action('cardioMachine:delete', { id : this.id })
+  async getDefaultCardioExercise () {
+    const { cardioExercise } = await this.action('cardioExercise:show' , { id: this._cardioMachineData.defaultCardioExerciseId }) as CardioExerciseResponse
+    return new CardioExercise(cardioExercise, this.sessionHandler)
   }
 }

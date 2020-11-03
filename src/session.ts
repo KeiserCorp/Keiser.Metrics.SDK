@@ -5,16 +5,14 @@ import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
-import { CardioMachine, CardioMachineLine, CardioMachineListResponse, CardioMachineParseCode, CardioMachineResponse, CardioMachines, CardioMachineSorting, PrivilegedCardioMachine, PrivilegedCardioMachines } from './models/cardioMachine'
-import { Exercise, ExerciseListResponse, ExerciseResponse, Exercises, ExerciseSorting, ExerciseType, PrivilegedExercise, PrivilegedExercises } from './models/exercise'
-import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './models/exerciseAlias'
-import { ExerciseLaterality, ExerciseMovement, ExercisePlane, ExerciseVariant, ExerciseVariantListResponse, ExerciseVariantResponse, ExerciseVariants, ExerciseVariantSorting, ExerciseVariantType, PrivilegedExerciseVariant, PrivilegedExerciseVariants } from './models/exerciseVariant'
+import { CardioMachine, CardioMachineListResponse, CardioMachineResponse, CardioMachines, CardioMachineSorting } from './models/cardioMachine'
+import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, ExerciseAliasType, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './models/exerciseAlias'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
-import { Muscle, MuscleBodyPart, MuscleGroup, MuscleListResponse, MuscleResponse, Muscles, MuscleSorting, PrivilegedMuscle, PrivilegedMuscles } from './models/muscle'
 import { SessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
-import { PrivilegedStrengthMachine, PrivilegedStrengthMachines, StrengthMachine, StrengthMachineLine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
+import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
+import { StrengthMachine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
 import { PrivilegedStretchExercise, PrivilegedStretchExercises, StretchExercise, StretchExerciseListResponse, StretchExerciseResponse, StretchExercises, StretchExerciseSorting } from './models/stretchExercise'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
 import { OAuthProviders, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
@@ -372,34 +370,14 @@ export class UserSession {
     return this.sessionHandler.action(action, params)
   }
 
-  async getExercise (params: {id: number}) {
-    const { exercise } = await this.action('exercise:show', params) as ExerciseResponse
-    return new Exercise(exercise, this.sessionHandler)
-  }
-
-  async getExercises (options: {name?: string, searchAlias?: boolean, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
-    return new Exercises(exercises, exercisesMeta, this.sessionHandler)
-  }
-
   async getExerciseAlias (params: {id: number}) {
     const { exerciseAlias } = await this.action('exerciseAlias:show', params) as ExerciseAliasResponse
     return new ExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 
-  async getExerciseAliases (options: {alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseAliases (options: {alias?: string, type?: ExerciseAliasType, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exerciseAliases, exerciseAliasesMeta } = await this.action('exerciseAlias:list', options) as ExerciseAliasListResponse
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
-  }
-
-  async getExerciseVariant (params: {id: number}) {
-    const { exerciseVariant } = await this.action('exerciseVariant:show', params) as ExerciseVariantResponse
-    return new ExerciseVariant(exerciseVariant, this.sessionHandler)
-  }
-
-  async getExerciseVariants (options: { variant?: ExerciseVariantType, laterality?: ExerciseLaterality, movement?: ExerciseMovement, plane?: ExercisePlane, sort?: ExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { exerciseVariants, exerciseVariantsMeta } = await this.action('exerciseVariant:list', options) as ExerciseVariantListResponse
-    return new ExerciseVariants(exerciseVariants, exerciseVariantsMeta, this.sessionHandler)
   }
 
   async getStretchExercise (params: {id: number}) {
@@ -412,24 +390,14 @@ export class UserSession {
     return new StretchExercises(stretchExercises, stretchExercisesMeta, this.sessionHandler)
   }
 
-  async getCardioExercise (params: {id: number}) {
-    const { cardioExercise } = await this.action('cardioExercise:show', params) as CardioExerciseResponse
-    return new CardioExercise(cardioExercise, this.sessionHandler)
+  async getStrengthExercise (params: {id: number}) {
+    const { strengthExercise } = await this.action('strengthExercise:show', params) as StrengthExerciseResponse
+    return new StrengthExercise(strengthExercise, this.sessionHandler)
   }
 
-  async getCardioExercises (options: { imageUri?: string, instructionalVideoUri?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { cardioExercises, cardioExercisesMeta } = await this.action('cardioExercise:list', options) as CardioExerciseListResponse
-    return new CardioExercises(cardioExercises, cardioExercisesMeta, this.sessionHandler)
-  }
-
-  async getMuscle (params: {id: number}) {
-    const { muscle } = await this.action('muscle:show', params) as MuscleResponse
-    return new Muscle(muscle, this.sessionHandler)
-  }
-
-  async getMuscles (options: {name?: string, group?: MuscleGroup, part?: MuscleBodyPart, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { muscles, musclesMeta } = await this.action('muscle:list', options) as MuscleListResponse
-    return new Muscles(muscles, musclesMeta, this.sessionHandler)
+  async getStrengthExercises (options: {defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovement, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { strengthExercises, strengthExercisesMeta } = await this.action('strengthExercise:list', options) as StrengthExerciseListResponse
+    return new StrengthExercises(strengthExercises, strengthExercisesMeta, this.sessionHandler)
   }
 
   async getStrengthMachine (params: {id: number}) {
@@ -440,6 +408,16 @@ export class UserSession {
   async getStrengthMachines (options: {name?: string, line?: string, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
     return new StrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
+  }
+
+  async getCardioExercise (params: {id: number}) {
+    const { cardioExercise } = await this.action('cardioExercise:show', params) as CardioExerciseResponse
+    return new CardioExercise(cardioExercise, this.sessionHandler)
+  }
+
+  async getCardioExercises (options: {defaultAlias?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { cardioExercises, cardioExercisesMeta } = await this.action('cardioExercise:list', options) as CardioExerciseListResponse
+    return new CardioExercises(cardioExercises, cardioExercisesMeta, this.sessionHandler)
   }
 
   async getCardioMachine (params: {id: number}) {
@@ -529,49 +507,29 @@ export class AdminSession extends UserSession {
     await this.action('resque:task:deleteAllFailed', options)
   }
 
-  async getExercise (params: {id: number}) {
-    const { exercise } = await this.action('exercise:show', params) as ExerciseResponse
-    return new PrivilegedExercise(exercise, this.sessionHandler)
-  }
-
-  async getExercises (options: {name?: string, type?: ExerciseType, sort?: ExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { exercises, exercisesMeta } = await this.action('exercise:list', options) as ExerciseListResponse
-    return new PrivilegedExercises(exercises, exercisesMeta, this.sessionHandler)
-  }
-
-  async createExercise (params: { name: string, type: ExerciseType, variant?: string, exerciseId?: number }) {
-    const { exercise } = await this.action('exercise:create', params) as ExerciseResponse
-    return new PrivilegedExercise(exercise, this.sessionHandler)
-  }
-
   async getExerciseAlias (params: {id: number}) {
     const { exerciseAlias } = await this.action('exerciseAlias:show', params) as ExerciseAliasResponse
     return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 
-  async getExerciseAliases (options: {alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseAliases (options: {alias?: string, type?: ExerciseAliasType, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exerciseAliases, exerciseAliasesMeta } = await this.action('exerciseAlias:list', options) as ExerciseAliasListResponse
     return new PrivilegedExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
-  async createExerciseAlias (params: { alias: string, exerciseVariantId?: number }) {
-    const { exerciseAlias } = await this.action('exerciseAlias:create', params) as ExerciseAliasResponse
-    return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
+  async getStrengthExercise (params: {id: number}) {
+    const { strengthExercise } = await this.action('strengthExercise:show', params) as StrengthExerciseResponse
+    return new PrivilegedStrengthExercise(strengthExercise, this.sessionHandler)
   }
 
-  async getExerciseVariant (params: {id: number}) {
-    const { exerciseVariant } = await this.action('exerciseVariant:show', params) as ExerciseVariantResponse
-    return new PrivilegedExerciseVariant(exerciseVariant, this.sessionHandler)
+  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovement, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { strengthExercises, strengthExercisesMeta } = await this.action('strengthExercise:list', options) as StrengthExerciseListResponse
+    return new PrivilegedStrengthExercises(strengthExercises, strengthExercisesMeta, this.sessionHandler)
   }
 
-  async getExerciseVariants (options: { variant?: ExerciseVariantType, laterality?: ExerciseLaterality, movement?: ExerciseMovement, plane?: ExercisePlane, sort?: ExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { exerciseVariants, exerciseVariantsMeta } = await this.action('exerciseVariant:list', options) as ExerciseVariantListResponse
-    return new PrivilegedExerciseVariants(exerciseVariants, exerciseVariantsMeta, this.sessionHandler)
-  }
-
-  async createExerciseVariant (params: { exerciseId: number, variant: ExerciseVariantType, laterality: ExerciseLaterality, movement: ExerciseMovement, plane: ExercisePlane }) {
-    const { exerciseVariant } = await this.action('exerciseVariant:create', params) as ExerciseVariantResponse
-    return new PrivilegedExerciseVariant(exerciseVariant, this.sessionHandler)
+  async createStrengthExercise (params: { defaultExerciseAlias: string, category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane }) {
+    const { strengthExercise } = await this.action('strengthExercise:create', params) as StrengthExerciseResponse
+    return new PrivilegedStrengthExercise(strengthExercise, this.sessionHandler)
   }
 
   async getStretchExercise (params: {id: number}) {
@@ -579,12 +537,12 @@ export class AdminSession extends UserSession {
     return new PrivilegedStretchExercise(stretchExercise, this.sessionHandler)
   }
 
-  async getStretchExercises (options: { imageUri?: string, instructionalVideoUri?: string, sort?: StretchExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getStretchExercises (options: { defaultAlias?: string, sort?: StretchExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { stretchExercises, stretchExercisesMeta } = await this.action('stretchExercise:list', options) as StretchExerciseListResponse
     return new PrivilegedStretchExercises(stretchExercises, stretchExercisesMeta, this.sessionHandler)
   }
 
-  async createStretchExercise (params: { exerciseVariantId: number, imageUri?: string, instructionalVideoUri?: string }) {
+  async createStretchExercise (params: { defaultExerciseAlias: string }) {
     const { stretchExercise } = await this.action('stretchExercise:create', params) as StretchExerciseResponse
     return new PrivilegedStretchExercise(stretchExercise, this.sessionHandler)
   }
@@ -594,59 +552,14 @@ export class AdminSession extends UserSession {
     return new PrivilegedCardioExercise(cardioExercise, this.sessionHandler)
   }
 
-  async getCardioExercises (options: { imageUri?: string, instructionalVideoUri?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getCardioExercises (options: { defaultAlias?: string, sort?: CardioExerciseSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { cardioExercises, cardioExercisesMeta } = await this.action('cardioExercise:list', options) as CardioExerciseListResponse
     return new PrivilegedCardioExercises(cardioExercises, cardioExercisesMeta, this.sessionHandler)
   }
 
-  async createCardioExercise (params: { exerciseVariantId: number, cardioMachineId: number, imageUri?: string, instructionalVideoUri?: string }) {
+  async createCardioExercise (params: { defaultExerciseAlias: string }) {
     const { cardioExercise } = await this.action('cardioExercise:create', params) as CardioExerciseResponse
     return new PrivilegedCardioExercise(cardioExercise, this.sessionHandler)
-  }
-
-  async getMuscle (params: {id: number}) {
-    const { muscle } = await this.action('muscle:show', params) as MuscleResponse
-    return new PrivilegedMuscle(muscle, this.sessionHandler)
-  }
-
-  async getMuscles (options: {name?: string, group?: MuscleGroup, part?: MuscleBodyPart, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { muscles, musclesMeta } = await this.action('muscle:list', options) as MuscleListResponse
-    return new PrivilegedMuscles(muscles, musclesMeta, this.sessionHandler)
-  }
-
-  async createMuscle (params: { name: string, group: MuscleGroup, part: MuscleBodyPart }) {
-    const { muscle } = await this.action('muscle:create', params) as MuscleResponse
-    return new PrivilegedMuscle(muscle, this.sessionHandler)
-  }
-
-  async getStrengthMachine (params: {id: number}) {
-    const { strengthMachine } = await this.action('strengthMachine:show', params) as StrengthMachineResponse
-    return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
-  }
-
-  async getStrengthMachines (options: {name?: string, line?: StrengthMachineLine, variant?: string, sort?: StrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { strengthMachines, strengthMachinesMeta } = await this.action('strengthMachine:list', options) as StrengthMachineListResponse
-    return new PrivilegedStrengthMachines(strengthMachines, strengthMachinesMeta, this.sessionHandler)
-  }
-
-  async createStrengthMachine (params: { name: string, line: StrengthMachineLine, variant?: string, exerciseId?: number }) {
-    const { strengthMachine } = await this.action('strengthMachine:create', params) as StrengthMachineResponse
-    return new PrivilegedStrengthMachine(strengthMachine, this.sessionHandler)
-  }
-
-  async getCardioMachine (params: {id: number}) {
-    const { cardioMachine } = await this.action('cardioMachine:show', params) as CardioMachineResponse
-    return new PrivilegedCardioMachine(cardioMachine, this.sessionHandler)
-  }
-
-  async getCardioMachines (options: {name?: string, sort?: CardioMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
-    const { cardioMachines, cardioMachinesMeta } = await this.action('cardioMachine:list', options) as CardioMachineListResponse
-    return new PrivilegedCardioMachines(cardioMachines, cardioMachinesMeta, this.sessionHandler)
-  }
-
-  async createCardioMachine (params: { name: string, line: CardioMachineLine, parseCode: CardioMachineParseCode, exerciseId?: number }) {
-    const { cardioMachine } = await this.action('cardioMachine:create', params) as CardioMachineResponse
-    return new PrivilegedCardioMachine(cardioMachine, this.sessionHandler)
   }
 
   async getFacilityLicense (params: {id: number}) {

@@ -1,21 +1,20 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { CardioMachine, CardioMachineData } from './cardioMachine'
-import { ExerciseVariant, ExerciseVariantData } from './exerciseVariant'
+import { CardioMachineData } from './cardioMachine'
+import { ExerciseAlias, ExerciseAliasData, ExerciseAliasResponse } from './exerciseAlias'
 
 export const enum CardioExerciseSorting {
   ID = 'id',
-  ImageUri = 'imageUri',
-  InstructionalVideoUri = 'instructionalVideoUri'
+  DefaultAlias = 'defaultAlias'
 }
 
 export interface CardioExerciseData {
   id: number
-  imageUri: string | null
-  instructionalVideoUri: string | null
-  exerciseVariant?: ExerciseVariantData
-  cardioMachine?: CardioMachineData
-  exerciseOrdinalSetAssignments?: object[] // To-Do: Add Ordinal Set Assignment Model
+  defaultExerciseAlias: ExerciseAliasData
+  exerciseAliases?: ExerciseAliasData[]
+  cardioExerciseVariants?: any[] // To-Do: Add cardioExerciseVariants
+  cardioExerciseMuscles?: any[] // To-Do: Add cardioExerciseMuscles
+  cardioMachines?: CardioMachineData[] // To-Do: Add strengthMachines
 }
 
 export interface CardioExerciseResponse extends AuthenticatedResponse {
@@ -28,9 +27,7 @@ export interface CardioExerciseListResponse extends AuthenticatedResponse {
 }
 
 export interface CardioExerciseListResponseMeta extends ListMeta {
-  cardioMachineId?: number
-  imageUri?: string
-  instructionalVideoUri?: string
+  defaultAlias?: string
   sort: CardioExerciseSorting
 }
 
@@ -62,24 +59,16 @@ export class CardioExercise extends Model {
     return this._cardioExerciseData.id
   }
 
-  get imageUri () {
-    return this._cardioExerciseData.imageUri
+  get defaultExerciseAlias () {
+    return new ExerciseAlias(this._cardioExerciseData.defaultExerciseAlias, this.sessionHandler)
   }
 
-  get instructionalVideoUri () {
-    return this._cardioExerciseData.instructionalVideoUri
+  get exerciseAliases () {
+    return this._cardioExerciseData.exerciseAliases ? this._cardioExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
-  get exerciseVariant () {
-    return this._cardioExerciseData.exerciseVariant ? new ExerciseVariant(this._cardioExerciseData.exerciseVariant, this.sessionHandler) : undefined
-  }
-
-  get cardioMachine () {
-    return this._cardioExerciseData.cardioMachine ? new CardioMachine(this._cardioExerciseData.cardioMachine, this.sessionHandler) : undefined
-  }
-
-  // get exerciseOrdinalSetAssignments () {
-  //   return this._cardioExerciseData.exerciseVariant ? new ExerciseVariant(this._cardioExerciseData.exerciseVariant, this.sessionHandler) : undefined
+  // get cardioExercises () {
+  //   return this._cardioExerciseData.cardioExercise ? new CardioExercise(this._cardioExerciseData.cardioExercise, this.sessionHandler) : undefined
   // }
 }
 
@@ -96,13 +85,18 @@ export class PrivilegedCardioExercise extends CardioExercise {
     super(cardioExerciseData, sessionHandler)
   }
 
-  async update (params: { imageUri: string, instructionalVideoUri: string }) {
-    const { cardioExercise } = await this.action('cardioExercise:update', { ...params, id: this.id }) as CardioExerciseResponse
-    this.setCardioExerciseData(cardioExercise)
-    return this
-  }
+  // async update (params: { }) {
+  //   const { cardioExercise } = await this.action('cardioExercise:update', { ...params, id: this.id }) as CardioExerciseResponse
+  //   this.setCardioExerciseData(cardioExercise)
+  //   return this
+  // }
 
   async delete () {
     await this.action('cardioExercise:delete', { id : this.id })
+  }
+
+  async createExerciseAlias (params: {alias: string}) {
+    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, cardioExerciseId: this.id }) as ExerciseAliasResponse
+    return new ExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 }

@@ -1,7 +1,12 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { Exercise, ExerciseData } from './exercise'
-import { ExerciseVariant, ExerciseVariantData } from './exerciseVariant'
+import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
+
+export const enum ExerciseAliasType {
+  Cardio = 'cardio',
+  Strength = 'strength',
+  Stretch = 'stretch'
+}
 
 export const enum ExerciseAliasSorting {
   ID = 'id',
@@ -11,8 +16,9 @@ export const enum ExerciseAliasSorting {
 export interface ExerciseAliasData {
   id: number
   alias: string
-  exercise?: ExerciseData
-  exerciseVariant?: ExerciseVariantData
+  strengthExercise?: StrengthExerciseData
+  cardioExercise?: any // To-Do: Add cardioExercise
+  stretchExercise?: any // To-Do: Add stretchExercise
 }
 
 export interface ExerciseAliasResponse extends AuthenticatedResponse {
@@ -61,13 +67,27 @@ export class ExerciseAlias extends Model {
     return this._exerciseAliasData.alias
   }
 
-  get exercise () {
-    return this._exerciseAliasData.exercise ? new Exercise(this._exerciseAliasData.exercise, this.sessionHandler) : undefined
+  get type () {
+    if (this._exerciseAliasData.strengthExercise) {
+      return ExerciseAliasType.Strength
+    }
+    if (this._exerciseAliasData.cardioExercise) {
+      return ExerciseAliasType.Cardio
+    }
+    return ExerciseAliasType.Stretch
   }
 
-  get exerciseVariant () {
-    return this._exerciseAliasData.exerciseVariant ? new ExerciseVariant(this._exerciseAliasData.exerciseVariant, this.sessionHandler) : undefined
+  get strengthExercise () {
+    return this._exerciseAliasData.strengthExercise ? new StrengthExercise(this._exerciseAliasData.strengthExercise, this.sessionHandler) : undefined
   }
+
+  // get cardioExercise () {
+  //   return this._exerciseAliasData.cardioExercise ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
+  // }
+
+  // get stretchExercise () {
+  //   return this._exerciseAliasData.stretchExercise ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
+  // }
 }
 
 /** @hidden */
