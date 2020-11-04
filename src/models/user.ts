@@ -146,7 +146,7 @@ export class User extends Model {
   }
 
   get oauthServices () {
-    return (this._userData.oauthServices || []).map(oauthService => new OAuthService(oauthService, this.sessionHandler))
+    return this._userData.oauthServices ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
   }
 
   async createOAuthService (params: {service: OAuthProviders, redirect: string}) {
