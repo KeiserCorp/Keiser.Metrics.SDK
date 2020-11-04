@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
@@ -36,7 +37,7 @@ export interface StrengthExerciseVariantData {
   instructionalVideo: string
   strengthExercise?: StrengthExerciseData
   strengthMachine?: StrengthMachineData
-  exerciseOrdinalSetAssignments?: any[] // To-Do: Add OrdinalSetAssignment
+  exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
 }
 
 export interface StrengthExerciseVariantResponse extends AuthenticatedResponse {
@@ -106,6 +107,10 @@ export class StrengthExerciseVariant extends Model {
 
   get strengthMachine () {
     return this._strengthExerciseVariantData.strengthMachine ? new StrengthMachine(this._strengthExerciseVariantData.strengthMachine, this.sessionHandler) : undefined
+  }
+
+  get exerciseOrdinalSetAssignments () {
+    return this._strengthExerciseVariantData.exerciseOrdinalSetAssignments ? this._strengthExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 

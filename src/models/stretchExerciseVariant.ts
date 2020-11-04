@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
 import { StretchExercise, StretchExerciseData } from './stretchExercise'
 
 export const enum StretchExerciseVariantType {
@@ -17,7 +18,7 @@ export interface StretchExerciseVariantData {
   instructionalImage: string
   instructionalVideo: string
   stretchExercise?: StretchExerciseData
-  exerciseOrdinalSetAssignments?: any[] // To-Do: Add OrdinalSetAssignment
+  exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
 }
 
 export interface StretchExerciseVariantResponse extends AuthenticatedResponse {
@@ -78,6 +79,10 @@ export class StretchExerciseVariant extends Model {
 
   get stretchExercise () {
     return this._stretchExerciseVariantData.stretchExercise ? new StretchExercise(this._stretchExerciseVariantData.stretchExercise, this.sessionHandler) : undefined
+  }
+
+  get exerciseOrdinalSetAssignments () {
+    return this._stretchExerciseVariantData.exerciseOrdinalSetAssignments ? this._stretchExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 

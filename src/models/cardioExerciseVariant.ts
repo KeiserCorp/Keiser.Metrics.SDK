@@ -2,6 +2,7 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { CardioExercise, CardioExerciseData } from './cardioExercise'
 import { CardioMachine, CardioMachineData } from './cardioMachine'
+import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
 
 export const enum CardioExerciseVariantType {
   Normal = 'normal'
@@ -19,7 +20,7 @@ export interface CardioExerciseVariantData {
   instructionalVideo: string
   cardioExercise?: CardioExerciseData
   cardioMachine?: CardioMachineData
-  exerciseOrdinalSetAssignments?: any[] // To-Do: Add OrdinalSetAssignment
+  exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
 }
 
 export interface CardioExerciseVariantResponse extends AuthenticatedResponse {
@@ -84,6 +85,10 @@ export class CardioExerciseVariant extends Model {
 
   get cardioMachine () {
     return this._cardioExerciseVariantData.cardioMachine ? new CardioMachine(this._cardioExerciseVariantData.cardioMachine, this.sessionHandler) : undefined
+  }
+
+  get exerciseOrdinalSetAssignments () {
+    return this._cardioExerciseVariantData.exerciseOrdinalSetAssignments ? this._cardioExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 

@@ -9,6 +9,8 @@ import { CardioExerciseMuscle, CardioExerciseMuscleResponse, PrivilegedCardioExe
 import { CardioExerciseVariant, CardioExerciseVariantResponse, PrivilegedCardioExerciseVariant } from './models/cardioExerciseVariant'
 import { CardioMachine, CardioMachineListResponse, CardioMachineResponse, CardioMachines, CardioMachineSorting } from './models/cardioMachine'
 import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, ExerciseAliasType, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './models/exerciseAlias'
+import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet, PrivilegedExerciseOrdinalSets } from './models/exerciseOrdinalSet'
+import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
 import { SessionResponse, StaticSession } from './models/session'
@@ -386,6 +388,21 @@ export class UserSession {
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
+  async getExerciseOrdinalSetAssignment (params: {id: number}) {
+    const { exerciseOrdinalSetAssignment } = await this.action('exerciseOrdinalSetAssignment:show', params) as ExerciseOrdinalSetAssignmentResponse
+    return new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)
+  }
+
+  async getExerciseOrdinalSet (params: {id: number}) {
+    const { exerciseOrdinalSet } = await this.action('exerciseOrdinalSet:show', params) as ExerciseOrdinalSetResponse
+    return new ExerciseOrdinalSet(exerciseOrdinalSet, this.sessionHandler)
+  }
+
+  async getExerciseOrdinalSets (options: {code?: string, name?: string, sort?: ExerciseOrdinalSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exerciseOrdinalSets, exerciseOrdinalSetsMeta } = await this.action('exerciseOrdinalSet:list', options) as ExerciseOrdinalSetListResponse
+    return new ExerciseOrdinalSets(exerciseOrdinalSets, exerciseOrdinalSetsMeta, this.sessionHandler)
+  }
+
   async getStrengthExercise (params: {id: number}) {
     const { strengthExercise } = await this.action('strengthExercise:show', params) as StrengthExerciseResponse
     return new StrengthExercise(strengthExercise, this.sessionHandler)
@@ -551,6 +568,26 @@ export class AdminSession extends UserSession {
   async getExerciseAliases (options: {alias?: string, type?: ExerciseAliasType, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
     const { exerciseAliases, exerciseAliasesMeta } = await this.action('exerciseAlias:list', options) as ExerciseAliasListResponse
     return new PrivilegedExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
+  }
+
+  async getExerciseOrdinalSetAssignment (params: {id: number}) {
+    const { exerciseOrdinalSetAssignment } = await this.action('exerciseOrdinalSetAssignment:show', params) as ExerciseOrdinalSetAssignmentResponse
+    return new PrivilegedExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)
+  }
+
+  async getExerciseOrdinalSet (params: {id: number}) {
+    const { exerciseOrdinalSet } = await this.action('exerciseOrdinalSet:show', params) as ExerciseOrdinalSetResponse
+    return new PrivilegedExerciseOrdinalSet(exerciseOrdinalSet, this.sessionHandler)
+  }
+
+  async getExerciseOrdinalSets (options: {code?: string, name?: string, sort?: ExerciseOrdinalSetSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+    const { exerciseOrdinalSets, exerciseOrdinalSetsMeta } = await this.action('exerciseOrdinalSet:list', options) as ExerciseOrdinalSetListResponse
+    return new PrivilegedExerciseOrdinalSets(exerciseOrdinalSets, exerciseOrdinalSetsMeta, this.sessionHandler)
+  }
+
+  async createExerciseOrdinalSet (params: {code: string, name: string, description: string}) {
+    const { exerciseOrdinalSet } = await this.action('exerciseOrdinalSet:create', params) as ExerciseOrdinalSetResponse
+    return new PrivilegedExerciseOrdinalSet(exerciseOrdinalSet, this.sessionHandler)
   }
 
   async getStrengthExercise (params: {id: number}) {
