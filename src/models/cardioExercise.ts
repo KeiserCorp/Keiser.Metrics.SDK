@@ -2,6 +2,7 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { CardioMachineData } from './cardioMachine'
 import { ExerciseAlias, ExerciseAliasData, ExerciseAliasResponse } from './exerciseAlias'
+import { CardioExerciseMuscle, CardioExerciseMuscleResponse, MuscleData, MuscleIdentifier, MuscleTargetLevel, PrivilegedCardioExerciseMuscle } from './muscle'
 
 export const enum CardioExerciseSorting {
   ID = 'id',
@@ -13,8 +14,8 @@ export interface CardioExerciseData {
   defaultExerciseAlias: ExerciseAliasData
   exerciseAliases?: ExerciseAliasData[]
   cardioExerciseVariants?: any[] // To-Do: Add cardioExerciseVariants
-  cardioExerciseMuscles?: any[] // To-Do: Add cardioExerciseMuscles
-  cardioMachines?: CardioMachineData[] // To-Do: Add strengthMachines
+  cardioExerciseMuscles?: MuscleData[]
+  cardioMachines?: CardioMachineData[]
 }
 
 export interface CardioExerciseResponse extends AuthenticatedResponse {
@@ -67,9 +68,9 @@ export class CardioExercise extends Model {
     return this._cardioExerciseData.exerciseAliases ? this._cardioExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
-  // get cardioExercises () {
-  //   return this._cardioExerciseData.cardioExercise ? new CardioExercise(this._cardioExerciseData.cardioExercise, this.sessionHandler) : undefined
-  // }
+  get cardioExerciseMuscles () {
+    return this._cardioExerciseData.cardioExerciseMuscles ? this._cardioExerciseData.cardioExerciseMuscles.map(cardioExerciseMuscles => new CardioExerciseMuscle(cardioExerciseMuscles, this.sessionHandler)) : undefined
+  }
 }
 
 /** @hidden */
@@ -81,16 +82,6 @@ export class PrivilegedCardioExercises extends ModelList<PrivilegedCardioExercis
 
 /** @hidden */
 export class PrivilegedCardioExercise extends CardioExercise {
-  constructor (cardioExerciseData: CardioExerciseData, sessionHandler: SessionHandler) {
-    super(cardioExerciseData, sessionHandler)
-  }
-
-  // async update (params: { }) {
-  //   const { cardioExercise } = await this.action('cardioExercise:update', { ...params, id: this.id }) as CardioExerciseResponse
-  //   this.setCardioExerciseData(cardioExercise)
-  //   return this
-  // }
-
   async delete () {
     await this.action('cardioExercise:delete', { id : this.id })
   }
@@ -98,5 +89,15 @@ export class PrivilegedCardioExercise extends CardioExercise {
   async createExerciseAlias (params: {alias: string}) {
     const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, cardioExerciseId: this.id }) as ExerciseAliasResponse
     return new ExerciseAlias(exerciseAlias, this.sessionHandler)
+  }
+
+  async createCardioExerciseMuscle (params: {muscle: MuscleIdentifier, targetLevel: MuscleTargetLevel}) {
+    const { cardioExerciseMuscle } = await this.action('cardioExerciseMuscle:create', { ...params, cardioExerciseId: this.id }) as CardioExerciseMuscleResponse
+    return new PrivilegedCardioExerciseMuscle(cardioExerciseMuscle, this.sessionHandler)
+  }
+
+  async getCardioExerciseMuscle (params: {id: number}) {
+    const { cardioExerciseMuscle } = await this.action('cardioExerciseMuscle:show', { ...params }) as CardioExerciseMuscleResponse
+    return new PrivilegedCardioExerciseMuscle(cardioExerciseMuscle, this.sessionHandler)
   }
 }

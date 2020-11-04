@@ -1,18 +1,13 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
-import { UnknownEntityError } from '../src/error'
-import { CardioMachine, CardioMachineLine, CardioMachineParseCode, CardioMachineSorting, PrivilegedCardioMachine } from '../src/models/cardioMachine'
-import { AdminSession, UserSession } from '../src/session'
+import { CardioMachine, CardioMachineSorting } from '../src/models/cardioMachine'
+import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
 
 describe('Cardio Machine', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
-  let adminSession: AdminSession
-  let newMachine: PrivilegedCardioMachine
   let existingMachine: CardioMachine
 
   before(async function () {
@@ -27,7 +22,6 @@ describe('Cardio Machine', function () {
       persistConnection: true
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
   })
 
   after(function () {

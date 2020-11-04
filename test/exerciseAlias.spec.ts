@@ -2,8 +2,6 @@ import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { ExerciseAlias, ExerciseAliasSorting } from '../src/models/exerciseAlias'
-import { StrengthExercise } from '../src/models/strengthExercise'
-import { PrivilegedStretchExercise } from '../src/models/stretchExercise'
 import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 

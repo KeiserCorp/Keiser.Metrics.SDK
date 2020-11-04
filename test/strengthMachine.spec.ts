@@ -1,19 +1,13 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
-import { UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthMachine, StrengthMachine, StrengthMachineLine, StrengthMachineSorting } from '../src/models/strengthMachine'
-import { AdminSession, UserSession } from '../src/session'
+import { StrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
+import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
-const newModel = [...Array(6)].map(i => (~~(Math.random() * 16)).toString(16)).join('')
 
 describe('Strength Machine', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
-  let adminSession: AdminSession
-  let newMachine: PrivilegedStrengthMachine
   let existingMachine: StrengthMachine
 
   before(async function () {
@@ -28,7 +22,6 @@ describe('Strength Machine', function () {
       persistConnection: true
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
   })
 
   after(function () {

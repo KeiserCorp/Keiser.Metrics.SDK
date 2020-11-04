@@ -1,6 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { ExerciseAlias, ExerciseAliasData, ExerciseAliasResponse } from './exerciseAlias'
+import { ExerciseAlias, ExerciseAliasData, ExerciseAliasResponse, PrivilegedExerciseAlias } from './exerciseAlias'
+import { MuscleData, MuscleIdentifier, MuscleTargetLevel, PrivilegedStrengthExerciseMuscle, StrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './muscle'
 import { StrengthMachineData } from './strengthMachine'
 
 export const enum StrengthExerciseCategory {
@@ -38,7 +39,7 @@ export interface StrengthExerciseData {
   defaultExerciseAlias: ExerciseAliasData
   exerciseAliases?: ExerciseAliasData[]
   strengthExerciseVariants?: any[] // To-Do: Add strengthExerciseVariants
-  strengthExerciseMuscles?: any[] // To-Do: Add strengthExerciseMuscles
+  strengthExerciseMuscles?: MuscleData[]
   strengthMachines?: StrengthMachineData[]
 }
 
@@ -107,9 +108,9 @@ export class StrengthExercise extends Model {
     return this._strengthExerciseData.exerciseAliases ? this._strengthExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
-  // get strengthExercises () {
-  //   return this._strengthExerciseData.strengthExercise ? new StrengthExercise(this._strengthExerciseData.strengthExercise, this.sessionHandler) : undefined
-  // }
+  get strengthExerciseMuscles () {
+    return this._strengthExerciseData.strengthExerciseMuscles ? this._strengthExerciseData.strengthExerciseMuscles.map(strengthExerciseMuscle => new StrengthExerciseMuscle(strengthExerciseMuscle, this.sessionHandler)) : undefined
+  }
 }
 
 /** @hidden */
@@ -121,10 +122,6 @@ export class PrivilegedStrengthExercises extends ModelList<PrivilegedStrengthExe
 
 /** @hidden */
 export class PrivilegedStrengthExercise extends StrengthExercise {
-  constructor (strengthExerciseData: StrengthExerciseData, sessionHandler: SessionHandler) {
-    super(strengthExerciseData, sessionHandler)
-  }
-
   async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane }) {
     const { strengthExercise } = await this.action('strengthExercise:update', { ...params, id: this.id }) as StrengthExerciseResponse
     this.setStrengthExerciseData(strengthExercise)
@@ -137,6 +134,16 @@ export class PrivilegedStrengthExercise extends StrengthExercise {
 
   async createExerciseAlias (params: {alias: string}) {
     const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, strengthExerciseId: this.id }) as ExerciseAliasResponse
-    return new ExerciseAlias(exerciseAlias, this.sessionHandler)
+    return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
+  }
+
+  async createStrengthExerciseMuscle (params: {muscle: MuscleIdentifier, targetLevel: MuscleTargetLevel}) {
+    const { strengthExerciseMuscle } = await this.action('strengthExerciseMuscle:create', { ...params, strengthExerciseId: this.id }) as StrengthExerciseMuscleResponse
+    return new PrivilegedStrengthExerciseMuscle(strengthExerciseMuscle, this.sessionHandler)
+  }
+
+  async getStrengthExerciseMuscle (params: {id: number}) {
+    const { strengthExerciseMuscle } = await this.action('strengthExerciseMuscle:show', { ...params }) as StrengthExerciseMuscleResponse
+    return new PrivilegedStrengthExerciseMuscle(strengthExerciseMuscle, this.sessionHandler)
   }
 }
