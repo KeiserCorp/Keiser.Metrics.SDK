@@ -2,8 +2,9 @@ import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedCardioExercise } from '../src/models/cardioExercise'
-import { MuscleIdentifier, MuscleTargetLevel, PrivilegedCardioExerciseMuscle } from '../src/models/muscle'
-import { AdminSession } from '../src/session'
+import { PrivilegedCardioExerciseMuscle } from '../src/models/cardioExerciseMuscle'
+import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
+import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
@@ -11,6 +12,7 @@ const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toStri
 describe('Cardio Exercise Muscle', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
+  let userSession: UserSession
   let adminSession: AdminSession
   let createdCardioExercise: PrivilegedCardioExercise
   let createdCardioExerciseMuscle: PrivilegedCardioExerciseMuscle
@@ -26,6 +28,7 @@ describe('Cardio Exercise Muscle', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
     createdCardioExercise = await adminSession.createCardioExercise({
       defaultExerciseAlias: newNameGen()
@@ -61,10 +64,18 @@ describe('Cardio Exercise Muscle', function () {
     }
   })
 
+  it('can list cardio exercise muscles', async function () {
+    const cardioExerciseMuscles = await createdCardioExercise.getCardioExerciseMuscles()
+
+    expect(Array.isArray(cardioExerciseMuscles)).to.equal(true)
+    expect(cardioExerciseMuscles.length).to.be.above(0)
+    expect(cardioExerciseMuscles.meta.sort).to.equal(MuscleSorting.ID)
+  })
+
   it('can get specific cardio exercise muscle', async function () {
     expect(createdCardioExerciseMuscle).to.be.an('object')
     if (typeof createdCardioExerciseMuscle !== 'undefined') {
-      const cardioExerciseMuscle = await createdCardioExercise.getCardioExerciseMuscle({ id: createdCardioExerciseMuscle.id })
+      const cardioExerciseMuscle = await userSession.getCardioExerciseMuscle({ id: createdCardioExerciseMuscle.id })
 
       expect(cardioExerciseMuscle).to.be.an('object')
       expect(cardioExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)

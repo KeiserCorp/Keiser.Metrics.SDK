@@ -1,8 +1,8 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { CardioExercise } from './cardioExercise'
+import { CardioExercise, CardioExerciseData } from './cardioExercise'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
-import { StretchExercise } from './stretchExercise'
+import { StretchExercise, StretchExerciseData } from './stretchExercise'
 
 export const enum ExerciseAliasType {
   Cardio = 'cardio',
@@ -19,8 +19,8 @@ export interface ExerciseAliasData {
   id: number
   alias: string
   strengthExercise?: StrengthExerciseData
-  cardioExercise?: any // To-Do: Add cardioExercise
-  stretchExercise?: any // To-Do: Add stretchExercise
+  cardioExercise?: CardioExerciseData
+  stretchExercise?: StretchExerciseData
 }
 
 export interface ExerciseAliasResponse extends AuthenticatedResponse {
@@ -33,7 +33,10 @@ export interface ExerciseAliasListResponse extends AuthenticatedResponse {
 }
 
 export interface ExerciseAliasListResponseMeta extends ListMeta {
-  alias: string | undefined
+  strengthExerciseId?: number
+  cardioExerciseId?: number
+  stretchExerciseId?: number
+  alias?: string
   sort: ExerciseAliasSorting
 }
 

@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
-import { MuscleIdentifier, MuscleTargetLevel, PrivilegedStrengthExerciseMuscle } from '../src/models/muscle'
+import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
-import { AdminSession } from '../src/session'
+import { PrivilegedStrengthExerciseMuscle } from '../src/models/strengthExerciseMuscle'
+import { AdminSession, UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
@@ -11,6 +12,7 @@ const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toStri
 describe('Strength Exercise Muscle', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
+  let userSession: UserSession
   let adminSession: AdminSession
   let createdStrengthExercise: PrivilegedStrengthExercise
   let createdStrengthExerciseMuscle: PrivilegedStrengthExerciseMuscle
@@ -26,6 +28,7 @@ describe('Strength Exercise Muscle', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
+    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
     createdStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: newNameGen(),
@@ -64,10 +67,18 @@ describe('Strength Exercise Muscle', function () {
     }
   })
 
+  it('can list strength exercise muscles', async function () {
+    const strengthExerciseMuscles = await createdStrengthExercise.getStrengthExerciseMuscles()
+
+    expect(Array.isArray(strengthExerciseMuscles)).to.equal(true)
+    expect(strengthExerciseMuscles.length).to.be.above(0)
+    expect(strengthExerciseMuscles.meta.sort).to.equal(MuscleSorting.ID)
+  })
+
   it('can get specific strength exercise muscle', async function () {
     expect(createdStrengthExerciseMuscle).to.be.an('object')
     if (typeof createdStrengthExerciseMuscle !== 'undefined') {
-      const strengthExerciseMuscle = await createdStrengthExercise.getStrengthExerciseMuscle({ id: createdStrengthExerciseMuscle.id })
+      const strengthExerciseMuscle = await userSession.getStrengthExerciseMuscle({ id: createdStrengthExerciseMuscle.id })
 
       expect(strengthExerciseMuscle).to.be.an('object')
       expect(strengthExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)
