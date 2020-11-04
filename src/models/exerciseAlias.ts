@@ -1,6 +1,8 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { CardioExercise } from './cardioExercise'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
+import { StretchExercise } from './stretchExercise'
 
 export const enum ExerciseAliasType {
   Cardio = 'cardio',
@@ -81,13 +83,13 @@ export class ExerciseAlias extends Model {
     return this._exerciseAliasData.strengthExercise ? new StrengthExercise(this._exerciseAliasData.strengthExercise, this.sessionHandler) : undefined
   }
 
-  // get cardioExercise () {
-  //   return this._exerciseAliasData.cardioExercise ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
-  // }
+  get cardioExercise () {
+    return this._exerciseAliasData.cardioExercise ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
+  }
 
-  // get stretchExercise () {
-  //   return this._exerciseAliasData.stretchExercise ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
-  // }
+  get stretchExercise () {
+    return this._exerciseAliasData.stretchExercise ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
+  }
 }
 
 /** @hidden */
@@ -99,10 +101,6 @@ export class PrivilegedExerciseAliases extends ModelList<PrivilegedExerciseAlias
 
 /** @hidden */
 export class PrivilegedExerciseAlias extends ExerciseAlias {
-  constructor (exerciseAliasData: ExerciseAliasData, sessionHandler: SessionHandler) {
-    super(exerciseAliasData, sessionHandler)
-  }
-
   async update (params: { alias: string }) {
     const { exerciseAlias } = await this.action('exerciseAlias:update', { ...params, id: this.id }) as ExerciseAliasResponse
     this.setExerciseAliasData(exerciseAlias)
