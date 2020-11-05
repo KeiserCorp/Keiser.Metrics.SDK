@@ -6,9 +6,18 @@ export const enum OAuthServiceSorting {
   Name = 'name'
 }
 
+export const enum OAuthProviders {
+  Apple = 'apple',
+  Google = 'google',
+  Facebook = 'facebook',
+  Strava = 'strava',
+  TrainingPeaks = 'trainingpeaks'
+}
+
 export interface OAuthServiceData {
   id: number
-  name: string
+  service: OAuthProviders
+  remoteUserId: string
   lastTransaction: string | null
   reauthRequired: boolean
 }
@@ -60,8 +69,12 @@ export class OAuthService extends Model {
     return this._oauthServiceData.id
   }
 
-  get name () {
-    return this._oauthServiceData.name
+  get service () {
+    return this._oauthServiceData.service
+  }
+
+  get remoteUserId () {
+    return this._oauthServiceData.remoteUserId
   }
 
   get lastTransaction () {
