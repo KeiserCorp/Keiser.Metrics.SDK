@@ -9,21 +9,13 @@ import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListRespo
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
-import { OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
+import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
-
-export const enum OAuthProviders {
-  Apple = 'apple',
-  Google = 'google',
-  Facebook = 'facebook',
-  Strava = 'strava',
-  TrainingPeaks = 'trainingpeaks'
-}
 
 /** @hidden */
 export const enum UserSorting {
@@ -164,7 +156,7 @@ export class User extends Model {
     return new OAuthService(oauthService, this.sessionHandler)
   }
 
-  async getOAuthServices (options: {limit?: number, offset?: number} = { }) {
+  async getOAuthServices (options: {service?: OAuthProviders, limit?: number, offset?: number} = { }) {
     const { oauthServices, oauthServicesMeta } = await this.action('oauthService:list', { ...options, userId : this.id }) as OAuthServiceListResponse
     return new OAuthServices(oauthServices, oauthServicesMeta, this.sessionHandler)
   }
