@@ -1,5 +1,73 @@
-import { ListMeta, Model, ModelList } from '../model'
-import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Model } from '../model'
+import { SessionHandler } from '../session'
+
+export const enum MuscleIdentifier {
+  Omohyoid = 'omohyoid',
+  LevatorScapulae = 'levatorScapulae',
+  Sternohyoid = 'sternohyoid',
+  Sternocleidomastoid = 'sternocleidomastoid',
+  PectoralisMajor = 'pectoralisMajor',
+  PectoralisMinor = 'pectoralisMinor',
+  Deltoid = 'deltoid',
+  Brachialis = 'brachialis',
+  BicepsBrachii = 'bicepsBrachii',
+  TricepsBrachii = 'tricepsBrachii',
+  PronatorTeres = 'pronatorTeres',
+  PalmarisLongus = 'palmarisLongus',
+  ExtensorPollicisBrevis = 'extensorPollicisBrevis',
+  ExtensorPollicisLongus = 'extensorPollicisLongus',
+  AbductorPollicisLongus = 'abductorPollicisLongus',
+  FlexorCarpiRadialis = 'flexorCarpiRadialis',
+  Brachioradialis = 'brachioradialis',
+  FlexorCarpiUlnaris = 'flexorCarpiUlnaris',
+  ExtensorCarpiUlnaris = 'extensorCarpiUlnaris',
+  SerratusAnterior = 'serratusAnterior',
+  InternalOblique = 'internalOblique',
+  ExternalOblique = 'externalOblique',
+  RectusAdbominis = 'rectusAdbominis',
+  Transversalis = 'transversalis',
+  Sartorius = 'sartorius',
+  Piriformis = 'piriformis',
+  Pectineus = 'pectineus',
+  AdductorLongus = 'adductorLongus',
+  AdductorBrevis = 'adductorBrevis',
+  Gracilis = 'gracilis',
+  TensorFasciaeLatae = 'tensorFasciaeLatae',
+  VastusMedialis = 'vastusMedialis',
+  RectusFemoris = 'rectusFemoris',
+  VastusIntermedius = 'vastusIntermedius',
+  VastusLateralis = 'vastusLateralis',
+  Gastrocnemius = 'gastrocnemius',
+  Soleius = 'soleius',
+  TibialisAnterior = 'tibialisAnterior',
+  TibialisPosterior = 'tibialisPosterior',
+  PeroneusLongus = 'peroneusLongus',
+  PeroneusBrevis = 'peroneusBrevis',
+  ExtensorDigitorumLongus = 'extensorDigitorumLongus',
+  FlexorHallucisLongus = 'flexorHallucisLongus',
+  FlexorDigitorumLongus = 'flexorDigitorumLongus',
+  Plantaris = 'plantaris',
+  BicepsFemoris = 'bicepsFemoris',
+  AdductorMagnus = 'adductorMagnus',
+  Semitendinosus = 'semitendinosus',
+  Semimembranosus = 'semimembranosus',
+  GluteusMinimus = 'gluteusMinimus',
+  GluteusMedius = 'gluteusMedius',
+  GluteusMaximus = 'gluteusMaximus',
+  PsoasMinor = 'psoasMinor',
+  PsoasMajor = 'psoasMajor',
+  Iliacus = 'iliacus',
+  TeresMinor = 'teresMinor',
+  TeresMajor = 'teresMajor',
+  Infraspinatus = 'infraspinatus',
+  RhomboidMinor = 'rhomboidMinor',
+  RhomboidMajor = 'rhomboidMajor',
+  Trapezius = 'trapezius',
+  LatissimusDorsi = 'latissimusDorsi',
+  Semispinalis = 'semispinalis',
+  ErectorSpinae = 'erectorSpinae',
+  Multifidus = 'multifidus'
+}
 
 export const enum MuscleGroup {
   Abs = 'abs',
@@ -10,56 +78,37 @@ export const enum MuscleGroup {
   Forearms = 'forearms',
   Glutes = 'glutes',
   Hamstrings = 'hamstrings',
-  LowerBack = 'lowerBack',
+  HipFlexors = 'hipFlexors',
   Neck = 'neck',
   Shoulders = 'shoulders',
-  Thighs = 'thighs',
   Triceps = 'triceps',
   UpperBack = 'upperBack'
 }
 
-export const enum MuscleBodyPart {
-  Abs = 'abs',
-  Arms = 'arms',
-  Back = 'back',
-  Chest = 'chest',
-  Legs = 'legs',
-  Neck = 'neck',
-  Shoulders = 'shoulders'
+export const enum MuscleArea {
+  LowerBody = 'lowerBody',
+  UpperBody = 'upperBody',
+  Core = 'core'
+}
+
+export const enum MuscleTargetLevel {
+  Primary = 'primary',
+  Secondary = 'secondary',
+  Stabilizer = 'stabilizer'
 }
 
 export const enum MuscleSorting {
   ID = 'id',
-  Name = 'name',
-  Group = 'group',
-  Part = 'part'
+  Muscle = 'muscle',
+  TargetLevel = 'targetLevel'
 }
 
 export interface MuscleData {
   id: number
-  name: string
+  muscle: MuscleIdentifier
   group: MuscleGroup
-  part: MuscleBodyPart
-}
-
-export interface MuscleResponse extends AuthenticatedResponse {
-  muscle: MuscleData
-}
-
-export interface MuscleListResponse extends AuthenticatedResponse {
-  muscles: MuscleData[]
-  musclesMeta: MuscleListResponseMeta
-}
-
-export interface MuscleListResponseMeta extends ListMeta {
-  name: string | undefined
-  sort: MuscleSorting
-}
-
-export class Muscles extends ModelList<Muscle, MuscleData, MuscleListResponseMeta> {
-  constructor (muscles: MuscleData[], musclesMeta: MuscleListResponseMeta, sessionHandler: SessionHandler) {
-    super(Muscle, muscles, musclesMeta, sessionHandler)
-  }
+  area: MuscleArea
+  targetLevel: MuscleTargetLevel
 }
 
 export class Muscle extends Model {
@@ -74,49 +123,23 @@ export class Muscle extends Model {
     this._muscleData = muscleData
   }
 
-  async reload () {
-    const { muscle } = await this.action('muscle:show', { id: this._muscleData.id }) as MuscleResponse
-    this.setMuscleData(muscle)
-    return this
-  }
-
   get id () {
     return this._muscleData.id
   }
 
-  get name () {
-    return this._muscleData.name
+  get muscle () {
+    return this._muscleData.muscle
   }
 
   get group () {
     return this._muscleData.group
   }
 
-  get part () {
-    return this._muscleData.part
-  }
-}
-
-/** @hidden */
-export class PrivilegedMuscles extends ModelList<PrivilegedMuscle, MuscleData, MuscleListResponseMeta> {
-  constructor (muscles: MuscleData[], musclesMeta: MuscleListResponseMeta, sessionHandler: SessionHandler) {
-    super(PrivilegedMuscle, muscles, musclesMeta, sessionHandler)
-  }
-}
-
-/** @hidden */
-export class PrivilegedMuscle extends Muscle {
-  constructor (muscleData: MuscleData, sessionHandler: SessionHandler) {
-    super(muscleData, sessionHandler)
+  get area () {
+    return this._muscleData.area
   }
 
-  async update (params: { name: string, group: MuscleGroup, part: MuscleBodyPart }) {
-    const { muscle } = await this.action('muscle:update', { ...params, id: this.id }) as MuscleResponse
-    this.setMuscleData(muscle)
-    return this
-  }
-
-  async delete () {
-    await this.action('muscle:delete', { id : this.id })
+  get targetLevel () {
+    return this._muscleData.targetLevel
   }
 }

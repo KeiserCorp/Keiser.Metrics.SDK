@@ -1,14 +1,14 @@
 import { expect } from 'chai'
 import Metrics, { MetricsAdmin } from '../src'
-import { StrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
+import { CardioMachine, CardioMachineSorting } from '../src/models/cardioMachine'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
-describe('Strength Machine', function () {
+describe('Cardio Machine', function () {
   let metricsInstance: Metrics
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
-  let existingMachine: StrengthMachine
+  let existingMachine: CardioMachine
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -29,16 +29,16 @@ describe('Strength Machine', function () {
     metricsAdminInstance?.dispose()
   })
 
-  it('can list strength machines', async function () {
-    const strengthMachines = await userSession.getStrengthMachines()
-    existingMachine = strengthMachines[0]
+  it('can list cardio machines', async function () {
+    const cardioMachines = await userSession.getCardioMachines()
+    existingMachine = cardioMachines[0]
 
-    expect(Array.isArray(strengthMachines)).to.equal(true)
-    expect(strengthMachines.length).to.be.above(0)
-    expect(strengthMachines.meta.sort).to.equal(StrengthMachineSorting.ID)
+    expect(Array.isArray(cardioMachines)).to.equal(true)
+    expect(cardioMachines.length).to.be.above(0)
+    expect(cardioMachines.meta.sort).to.equal(CardioMachineSorting.ID)
   })
 
-  it('can reload strength machine', async function () {
+  it('can reload cardio machine', async function () {
     expect(existingMachine).to.be.an('object')
     if (typeof existingMachine !== 'undefined') {
       await existingMachine.reload()
@@ -46,13 +46,13 @@ describe('Strength Machine', function () {
     }
   })
 
-  it('can get specific strength machine', async function () {
+  it('can get specific cardio machine', async function () {
     expect(existingMachine).to.be.an('object')
     if (typeof existingMachine !== 'undefined') {
-      const strengthMachine = await userSession.getStrengthMachine({ id: existingMachine.id })
+      const cardioMachine = await userSession.getCardioMachine({ id: existingMachine.id })
 
-      expect(strengthMachine).to.be.an('object')
-      expect(strengthMachine.id).to.equal(existingMachine.id)
+      expect(cardioMachine).to.be.an('object')
+      expect(cardioMachine.id).to.equal(existingMachine.id)
     }
   })
 })
