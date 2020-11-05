@@ -113,11 +113,11 @@ function generateUsername(user: User) {
 All model data is nested under it's parent associations in an tree structure stemming from the base session object (`UserSession`, `FacilitySession`). All model references are generated at access and will not be persisted in memory by the SDK so local references are necessary to persist data. Most associated data models will be accessed through `async` method calls with the prefix `get` for single model instantiations, and `list` for multiple model instantiations.
 
 ```ts
-// Variable `exercises` will be an array containing up to 20 instances of exercises of the type 'strength' with 'back' in the exercise name
-const exercises = await userSession.getExercises({ type: ExerciseType.Strength, name: 'back', limit: 20 })
+// Variable `strengthExercises` will be an array containing up to 20 instances of strength exercises with 'back' in the exercise alias (name)
+const strengthExercises = await userSession.getStrengthExercises({ defaultAlias: 'back', limit: 20 })
 
-// Variable `exercise` will contain a single exercise instance with 'id' equal to 1000
-const exercise = await userSession.getExercise({ id: 1000 })
+// Variable `strengthExercise` will contain a single strength exercise instance with 'id' equal to 1000
+const strengthExercise = await userSession.getStrengthExercise({ id: 1000 })
 ```
 
 ## Paginated Data

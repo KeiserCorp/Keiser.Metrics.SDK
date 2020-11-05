@@ -1,7 +1,7 @@
 import { DeepReadonlyArray } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { Exercise, ExerciseData } from './exercise'
+import { StrengthExercise, StrengthExerciseData, StrengthExerciseResponse } from './strengthExercise'
 
 export const enum StrengthMachineLine {
   A250 = 'a250',
@@ -28,7 +28,8 @@ export interface StrengthMachineData {
   line: StrengthMachineLine
   variant: string
   dualSided: boolean
-  exercise?: ExerciseData
+  defaultStrengthExerciseId: number
+  defaultStrengthExercise?: StrengthExerciseData
   models?: StrengthMachineModelData[]
 }
 
@@ -92,47 +93,16 @@ export class StrengthMachine extends Model {
     return this._strengthMachineData.dualSided
   }
 
-  get exercise () {
-    return this._strengthMachineData.exercise ? new Exercise(this._strengthMachineData.exercise, this.sessionHandler) : undefined
+  get defaultStrengthExercise () {
+    return this._strengthMachineData.defaultStrengthExercise ? new StrengthExercise(this._strengthMachineData.defaultStrengthExercise, this.sessionHandler) : undefined
   }
 
   get models () {
     return this._strengthMachineData.models ? [...this._strengthMachineData.models] as DeepReadonlyArray<StrengthMachineModelData> : undefined
   }
-}
 
-/** @hidden */
-export class PrivilegedStrengthMachines extends ModelList<PrivilegedStrengthMachine, StrengthMachineData, StrengthMachineListResponseMeta> {
-  constructor (strengthMachines: StrengthMachineData[], strengthMachinesMeta: StrengthMachineListResponseMeta, sessionHandler: SessionHandler) {
-    super(PrivilegedStrengthMachine, strengthMachines, strengthMachinesMeta, sessionHandler)
-  }
-}
-
-/** @hidden */
-export class PrivilegedStrengthMachine extends StrengthMachine {
-  constructor (strengthMachineData: StrengthMachineData, sessionHandler: SessionHandler) {
-    super(strengthMachineData, sessionHandler)
-  }
-
-  async update (params: { name: string, line: StrengthMachineLine, variant?: string, exerciseId?: number }) {
-    const { strengthMachine } = await this.action('strengthMachine:update', { ...params, id: this.id }) as StrengthMachineResponse
-    this.setStrengthMachineData(strengthMachine)
-    return this
-  }
-
-  async delete () {
-    await this.action('strengthMachine:delete', { id : this.id })
-  }
-
-  async addModel (params: { model: string }) {
-    const { strengthMachine } = await this.action('strengthMachine:addModel', { ...params, id: this.id }) as StrengthMachineResponse
-    this.setStrengthMachineData(strengthMachine)
-    return this
-  }
-
-  async deleteModel (params: { model: string }) {
-    const { strengthMachine } = await this.action('strengthMachine:deleteModel', { ...params, id: this.id }) as StrengthMachineResponse
-    this.setStrengthMachineData(strengthMachine)
-    return this
+  async getDefaultStrengthExercise () {
+    const { strengthExercise } = await this.action('strengthExercise:show' , { id: this._strengthMachineData.defaultStrengthExerciseId }) as StrengthExerciseResponse
+    return new StrengthExercise(strengthExercise, this.sessionHandler)
   }
 }
