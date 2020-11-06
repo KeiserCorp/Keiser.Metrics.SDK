@@ -1,6 +1,6 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Core } from './models/core'
-import { OAuthProviders } from './models/user'
+import { OAuthProviders } from './models/oauthService'
 import { Authentication } from './session'
 
 export default class Metrics {
