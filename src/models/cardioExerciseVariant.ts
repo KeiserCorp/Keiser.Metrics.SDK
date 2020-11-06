@@ -16,8 +16,8 @@ export const enum CardioExerciseVariantSorting {
 export interface CardioExerciseVariantData {
   id: number
   variant: CardioExerciseVariantType
-  instructionalImage: string
-  instructionalVideo: string
+  instructionalImage: string | null
+  instructionalVideo: string | null
   cardioExercise?: CardioExerciseData
   cardioMachine?: CardioMachineData
   exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
@@ -101,7 +101,7 @@ export class PrivilegedCardioExerciseVariants extends ModelList<PrivilegedCardio
 
 /** @hidden */
 export class PrivilegedCardioExerciseVariant extends CardioExerciseVariant {
-  async update (params: { variant: CardioExerciseVariantType, instructionalImage?: string, instructionalVideo?: string }) {
+  async update (params: { variant: CardioExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { cardioExerciseVariant } = await this.action('cardioExerciseVariant:update', { ...params, id: this.id }) as CardioExerciseVariantResponse
     this.setCardioExerciseVariant(cardioExerciseVariant)
     return this

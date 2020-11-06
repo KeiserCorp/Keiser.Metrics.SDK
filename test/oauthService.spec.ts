@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { OAuthServiceSorting } from '../src/models/oauthService'
-import { OAuthProviders, User } from '../src/models/user'
+import { OAuthProviders, OAuthServiceSorting } from '../src/models/oauthService'
+import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 

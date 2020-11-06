@@ -176,7 +176,7 @@ export class PrivilegedStrengthExercise extends StrengthExercise {
     return new PrivilegedStrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createStrengthExerciseVariant (params: {strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string, instructionalVideo?: string }) {
+  async createStrengthExerciseVariant (params: {strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { strengthExerciseVariant } = await this.action('strengthExerciseVariant:create', { ...params, strengthExerciseId: this.id }) as StrengthExerciseVariantResponse
     return new PrivilegedStrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)
   }

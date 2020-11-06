@@ -130,7 +130,7 @@ export class PrivilegedCardioExercise extends CardioExercise {
     return new PrivilegedCardioExerciseVariants(cardioExerciseVariants, cardioExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createCardioExerciseVariant (params: {cardioMachineId?: number, variant: CardioExerciseVariantType, instructionalImage?: string, instructionalVideo?: string }) {
+  async createCardioExerciseVariant (params: {cardioMachineId?: number, variant: CardioExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { cardioExerciseVariant } = await this.action('cardioExerciseVariant:create', { ...params, cardioExerciseId: this.id }) as CardioExerciseVariantResponse
     return new PrivilegedCardioExerciseVariant(cardioExerciseVariant, this.sessionHandler)
   }

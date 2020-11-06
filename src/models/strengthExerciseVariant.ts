@@ -33,8 +33,8 @@ export interface StrengthExerciseVariantData {
   id: number
   variant: StrengthExerciseVariantType
   attachment: StrengthExerciseVariantAttachment | null
-  instructionalImage: string
-  instructionalVideo: string
+  instructionalImage: string | null
+  instructionalVideo: string | null
   strengthExercise?: StrengthExerciseData
   strengthMachine?: StrengthMachineData
   exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
@@ -123,7 +123,7 @@ export class PrivilegedStrengthExerciseVariants extends ModelList<PrivilegedStre
 
 /** @hidden */
 export class PrivilegedStrengthExerciseVariant extends StrengthExerciseVariant {
-  async update (params: { variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string, instructionalVideo?: string }) {
+  async update (params: { variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { strengthExerciseVariant } = await this.action('strengthExerciseVariant:update', { ...params, id: this.id }) as StrengthExerciseVariantResponse
     this.setStrengthExerciseVariant(strengthExerciseVariant)
     return this

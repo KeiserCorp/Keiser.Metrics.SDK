@@ -84,6 +84,18 @@ describe('Stretch Exercise Variant', function () {
     expect(createdStretchExerciseVariant.instructionalVideo).to.equal('https://cdn.keiser.com/test.avi')
   })
 
+  it('can update stretch exercise variants again (null states)', async function () {
+    await createdStretchExerciseVariant.update({
+      variant: StretchExerciseVariantType.Normal,
+      instructionalVideo: null
+    })
+
+    expect(createdStretchExerciseVariant).to.be.an('object')
+    expect(createdStretchExerciseVariant.variant).to.equal(StretchExerciseVariantType.Normal)
+    expect(createdStretchExerciseVariant.instructionalImage).to.equal(null)
+    expect(createdStretchExerciseVariant.instructionalVideo).to.equal(null)
+  })
+
   it('can delete stretch exercise variants', async function () {
     let extError
 

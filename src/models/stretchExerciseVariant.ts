@@ -15,8 +15,8 @@ export const enum StretchExerciseVariantSorting {
 export interface StretchExerciseVariantData {
   id: number
   variant: StretchExerciseVariantType
-  instructionalImage: string
-  instructionalVideo: string
+  instructionalImage: string | null
+  instructionalVideo: string | null
   stretchExercise?: StretchExerciseData
   exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
 }
@@ -95,7 +95,7 @@ export class PrivilegedStretchExerciseVariants extends ModelList<PrivilegedStret
 
 /** @hidden */
 export class PrivilegedStretchExerciseVariant extends StretchExerciseVariant {
-  async update (params: { variant: StretchExerciseVariantType, instructionalImage?: string, instructionalVideo?: string }) {
+  async update (params: { variant: StretchExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { stretchExerciseVariant } = await this.action('stretchExerciseVariant:update', { ...params, id: this.id }) as StretchExerciseVariantResponse
     this.setStretchExerciseVariant(stretchExerciseVariant)
     return this

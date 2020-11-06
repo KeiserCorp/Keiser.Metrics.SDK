@@ -84,6 +84,18 @@ describe('Cardio Exercise Variant', function () {
     expect(createdCardioExerciseVariant.instructionalVideo).to.equal('https://cdn.keiser.com/test.avi')
   })
 
+  it('can update cardio exercise variants again (null states)', async function () {
+    await createdCardioExerciseVariant.update({
+      variant: CardioExerciseVariantType.Normal,
+      instructionalVideo: null
+    })
+
+    expect(createdCardioExerciseVariant).to.be.an('object')
+    expect(createdCardioExerciseVariant.variant).to.equal(CardioExerciseVariantType.Normal)
+    expect(createdCardioExerciseVariant.instructionalImage).to.equal(null)
+    expect(createdCardioExerciseVariant.instructionalVideo).to.equal(null)
+  })
+
   it('can delete cardio exercise variants', async function () {
     let extError
 

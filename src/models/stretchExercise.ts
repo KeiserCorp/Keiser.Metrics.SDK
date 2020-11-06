@@ -130,7 +130,7 @@ export class PrivilegedStretchExercise extends StretchExercise {
     return new PrivilegedStretchExerciseVariants(stretchExerciseVariants, stretchExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createStretchExerciseVariant (params: {stretchMachineId?: number, variant: StretchExerciseVariantType, instructionalImage?: string, instructionalVideo?: string }) {
+  async createStretchExerciseVariant (params: {stretchMachineId?: number, variant: StretchExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { stretchExerciseVariant } = await this.action('stretchExerciseVariant:create', { ...params, stretchExerciseId: this.id }) as StretchExerciseVariantResponse
     return new PrivilegedStretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)
   }
