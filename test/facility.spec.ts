@@ -83,13 +83,13 @@ describe('Facility', function () {
     if (facility) {
       expect(facility instanceof PrivilegedFacility).to.equal(true)
       if (facility instanceof PrivilegedFacility) {
-        expect(typeof userSession.activeFacility).to.equal('undefined')
+        expect(typeof userSession.eagerActiveFacility()).to.equal('undefined')
         expect(facility.isActive).to.equal(false)
 
         await facility.setActive()
 
         expect(facility.isActive).to.equal(true)
-        expect(userSession.activeFacility instanceof PrivilegedFacility).to.equal(true)
+        expect(userSession.eagerActiveFacility() instanceof PrivilegedFacility).to.equal(true)
       }
     }
   })
@@ -105,7 +105,7 @@ describe('Facility', function () {
   })
 
   it('can update facility profile with active', async function () {
-    const profile = userSession.activeFacility?.eagerFacilityProfile()
+    const profile = userSession.eagerActiveFacility()?.eagerFacilityProfile()
     if (profile) {
       const facilityProfile = await profile.update({ name: '_test_' })
 
