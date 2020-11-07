@@ -28,7 +28,7 @@ describe('Accepted Terms Version', function () {
   })
 
   it('is not populated on first load', async function () {
-    expect(typeof user.acceptedTermsVersion).to.equal('undefined')
+    expect(typeof user.eagerAcceptedTermsVersion()).to.equal('undefined')
   })
 
   it('can create accepted terms version', async function () {

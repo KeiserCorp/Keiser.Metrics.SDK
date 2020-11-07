@@ -1,13 +1,11 @@
 import { expect } from 'chai'
 import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
-import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityMemberUser } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('User InBody Integration', function () {
   let metricsInstance: Metrics
-  let facility: PrivilegedFacility
   let user: FacilityMemberUser
 
   before(async function () {
@@ -18,10 +16,10 @@ describe('User InBody Integration', function () {
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const facility = facilities[0]?.eagerFacility()
+    if (typeof facility !== 'undefined') {
       await facility.setActive()
-      user = (await facility.getMemberRelationships())[0].user
+      user = (await facility.getMemberRelationships())[0].eagerUser()
     }
   })
 

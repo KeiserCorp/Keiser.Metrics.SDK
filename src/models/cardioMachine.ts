@@ -83,7 +83,7 @@ export class CardioMachine extends Model {
     return this._cardioMachineData.parseCode
   }
 
-  get defaultCardioExercise () {
+  eagerDefaultCardioExercise () {
     return this._cardioMachineData.defaultCardioExercise ? new CardioExercise(this._cardioMachineData.defaultCardioExercise, this.sessionHandler) : undefined
   }
 

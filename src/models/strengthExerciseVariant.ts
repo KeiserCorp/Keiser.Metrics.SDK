@@ -101,15 +101,15 @@ export class StrengthExerciseVariant extends Model {
     return this._strengthExerciseVariantData.instructionalVideo
   }
 
-  get strengthExercise () {
+  eagerStrengthExercise () {
     return this._strengthExerciseVariantData.strengthExercise ? new StrengthExercise(this._strengthExerciseVariantData.strengthExercise, this.sessionHandler) : undefined
   }
 
-  get strengthMachine () {
+  eagerStrengthMachine () {
     return this._strengthExerciseVariantData.strengthMachine ? new StrengthMachine(this._strengthExerciseVariantData.strengthMachine, this.sessionHandler) : undefined
   }
 
-  get exerciseOrdinalSetAssignments () {
+  eagerExerciseOrdinalSetAssignments () {
     return this._strengthExerciseVariantData.exerciseOrdinalSetAssignments ? this._strengthExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }

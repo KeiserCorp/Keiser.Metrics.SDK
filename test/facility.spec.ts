@@ -17,7 +17,7 @@ describe('Facility', function () {
       persistConnection: true
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].facility
+    facility = (await userSession.user.getFacilityEmploymentRelationships())[0].eagerFacility()
   })
 
   after(function () {
@@ -59,17 +59,19 @@ describe('Facility', function () {
   it('facility has facility profile', async function () {
     if (facility) {
       expect(typeof facility).to.equal('object')
-      expect(typeof facility.facilityProfile).to.equal('object')
-      expect(typeof facility.facilityProfile?.name).to.equal('string')
+      const profile = facility.eagerFacilityProfile()
+      expect(typeof profile).to.equal('object')
+      expect(typeof profile?.name).to.equal('string')
     }
   })
 
   it('cannot reload facility profile without active', async function () {
-    if (facility?.facilityProfile) {
+    const profile = facility?.eagerFacilityProfile()
+    if (profile) {
       let extError
 
       try {
-        await facility.facilityProfile.reload()
+        await profile.reload()
       } catch (error) {
         extError = error
       }
@@ -93,8 +95,9 @@ describe('Facility', function () {
   })
 
   it('can reload facility profile with active', async function () {
-    if (facility?.facilityProfile) {
-      const facilityProfile = await facility.facilityProfile.reload()
+    const profile = facility?.eagerFacilityProfile()
+    if (profile) {
+      const facilityProfile = await profile.reload()
 
       expect(typeof facilityProfile).to.equal('object')
       expect(typeof facilityProfile.name).to.equal('string')
@@ -102,8 +105,9 @@ describe('Facility', function () {
   })
 
   it('can update facility profile with active', async function () {
-    if (userSession.activeFacility?.facilityProfile) {
-      const facilityProfile = await userSession.activeFacility.facilityProfile.update({ name: '_test_' })
+    const profile = userSession.activeFacility?.eagerFacilityProfile()
+    if (profile) {
+      const facilityProfile = await profile.update({ name: '_test_' })
 
       expect(typeof facilityProfile).to.equal('object')
       expect(facilityProfile.name).to.equal('_test_')

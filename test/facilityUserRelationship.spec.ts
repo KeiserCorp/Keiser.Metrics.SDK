@@ -19,8 +19,9 @@ describe('Facility to User Relationship', function () {
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
     }
   })
@@ -48,13 +49,13 @@ describe('Facility to User Relationship', function () {
   })
 
   it('can get list of member relationships with active sessions', async function () {
-    await (await facility.getMemberRelationships())[0].user.startSession({ forceEndPrevious: true })
+    await (await facility.getMemberRelationships())[0].eagerUser().startSession({ forceEndPrevious: true })
     const facilityRelationships = await facility.getMemberRelationships({ includeSession: true })
 
     expect(Array.isArray(facilityRelationships)).to.equal(true)
     expect(typeof facilityRelationships[0]).to.equal('object')
     expect(facilityRelationships[0].member).to.equal(true)
-    expect(typeof facilityRelationships[0].activeSession).to.equal('object')
+    expect(typeof facilityRelationships[0].eagerActiveSession()).to.equal('object')
     expect(facilityRelationships.meta.sort).to.equal(FacilityUserRelationshipSorting.ID)
     expect(facilityRelationships.meta.includeSession).to.equal(true)
   })

@@ -19,8 +19,9 @@ describe('Facility Access Control', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
     }
   })
@@ -33,16 +34,16 @@ describe('Facility Access Control', function () {
     accessControl = await facility.getAccessControl()
 
     expect(typeof accessControl).to.not.equal('undefined')
-    expect(Array.isArray(accessControl.facilityAccessControlIPRanges)).to.equal(true)
-    expect(typeof accessControl.facilityAccessControlKiosk).to.equal('object')
+    expect(Array.isArray(accessControl.eagerFacilityAccessControlIPRanges())).to.equal(true)
+    expect(typeof accessControl.eagerFacilityAccessControlKiosk()).to.equal('object')
   })
 
   it('can reload facility access control', async function () {
     accessControl = await accessControl.reload()
 
     expect(typeof accessControl).to.not.equal('undefined')
-    expect(Array.isArray(accessControl.facilityAccessControlIPRanges)).to.equal(true)
-    expect(typeof accessControl.facilityAccessControlKiosk).to.equal('object')
+    expect(Array.isArray(accessControl.eagerFacilityAccessControlIPRanges())).to.equal(true)
+    expect(typeof accessControl.eagerFacilityAccessControlKiosk()).to.equal('object')
   })
 
 })

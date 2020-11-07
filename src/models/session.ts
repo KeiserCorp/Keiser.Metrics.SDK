@@ -159,31 +159,31 @@ export class Session extends Model {
     return this._sessionData.endedAt ? new Date(this._sessionData.endedAt) : null
   }
 
-  get user () {
+  eagerUser () {
     return this._sessionData.user ? new User(this._sessionData.user, this.sessionHandler) : undefined
   }
 
-  get facility () {
+  eagerFacility () {
     return this._sessionData.facility ? new Facility(this._sessionData.facility, this.sessionHandler) : undefined
   }
 
-  get heartRateDataSets () {
+  eagerHeartRateDataSets () {
     return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler)) : undefined
   }
 
-  get mSeriesDataSets () {
+  eagerMSeriesDataSets () {
     return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)) : undefined
   }
 
-  get strengthMachineDataSets () {
+  eagerStrengthMachineDataSets () {
     return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)) : undefined
   }
 
-  get heightMeasurement () {
+  eagerHeightMeasurement () {
     return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this.sessionHandler) : undefined
   }
 
-  get weightMeasurement () {
+  eagerWeightMeasurement () {
     return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler) : undefined
   }
 }

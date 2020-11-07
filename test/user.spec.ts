@@ -33,23 +33,21 @@ describe('User', function () {
   })
 
   it('can access user profile properties', async function () {
-    expect(user.profile).to.be.an('object')
-    expect(user.profile.name).to.be.equal(null)
+    const profile = user.eagerProfile()
+    expect(profile).to.be.an('object')
+    expect(profile.name).to.be.equal(null)
   })
 
   it('can reload user', async function () {
-    await user.reload()
+    const profile = (await user.reload()).eagerProfile()
 
-    expect(user.profile).to.be.an('object')
-    expect(user.profile.name).to.be.equal(null)
+    expect(profile).to.be.an('object')
+    expect(profile.name).to.be.equal(null)
   })
 
   it('can change user password', async function () {
     const newPassword = 'p@$$\/\/0r|)'
     await user.changePassword({ password: newPassword })
-
-    expect(user.profile).to.be.an('object')
-    expect(user.profile.name).to.equal(null)
   })
 
   it('can delete user', async function () {

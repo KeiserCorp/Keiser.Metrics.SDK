@@ -1,4 +1,3 @@
-import { DeepReadonly } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
@@ -73,14 +72,17 @@ export class WeightMeasurements extends ModelList<WeightMeasurement, WeightMeasu
 
 export class WeightMeasurement extends Model {
   private _weightMeasurementData: WeightMeasurementData
+  private _bodyCompositionMeasurement?: BodyCompositionMeasurement
 
   constructor (weightMeasurementData: WeightMeasurementData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._weightMeasurementData = weightMeasurementData
+    this._bodyCompositionMeasurement = this._weightMeasurementData.bodyCompositionMeasurement ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
   }
 
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
     this._weightMeasurementData = weightMeasurementData
+    this._bodyCompositionMeasurement = this._weightMeasurementData.bodyCompositionMeasurement ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
   }
 
   async reload () {
@@ -123,8 +125,139 @@ export class WeightMeasurement extends Model {
     return this._weightMeasurementData.bodyFatPercentage
   }
 
-  // To-Do: Remove `Readonly` shim and implement full class with typedocs for units on properties
   get bodyCompositionMeasurement () {
-    return this._weightMeasurementData.bodyCompositionMeasurement ? { ...this._weightMeasurementData.bodyCompositionMeasurement } as DeepReadonly<BodyCompositionMeasurementData> : undefined
+    return this._bodyCompositionMeasurement
+  }
+}
+
+export class BodyCompositionMeasurement {
+  private _bodyCompositionMeasurementData: BodyCompositionMeasurementData
+
+  constructor (bodyCompositionMeasurementData: BodyCompositionMeasurementData) {
+    this._bodyCompositionMeasurementData = bodyCompositionMeasurementData
+  }
+
+  get totalBodyWater () {
+    return this._bodyCompositionMeasurementData.totalBodyWater
+  }
+
+  get intracellularWater () {
+    return this._bodyCompositionMeasurementData.intracellularWater
+  }
+
+  get extracellularWater () {
+    return this._bodyCompositionMeasurementData.extracellularWater
+  }
+
+  get extracellularWaterToTotalBodyWaterRatio () {
+    return this._bodyCompositionMeasurementData.extracellularWaterToTotalBodyWaterRatio
+  }
+
+  get dryLeanMass () {
+    return this._bodyCompositionMeasurementData.dryLeanMass
+  }
+
+  get bodyFatMass () {
+    return this._bodyCompositionMeasurementData.bodyFatMass
+  }
+
+  get leanBodyMass () {
+    return this._bodyCompositionMeasurementData.leanBodyMass
+  }
+
+  get skeletalMuscleMass () {
+    return this._bodyCompositionMeasurementData.skeletalMuscleMass
+  }
+
+  get bodyMassIndex () {
+    return this._bodyCompositionMeasurementData.bodyMassIndex
+  }
+
+  get visceralFatLevel () {
+    return this._bodyCompositionMeasurementData.visceralFatLevel
+  }
+
+  get basalMetabolicRate () {
+    return this._bodyCompositionMeasurementData.basalMetabolicRate
+  }
+
+  get leanBodyMassOfRightArm () {
+    return this._bodyCompositionMeasurementData.leanBodyMassOfRightArm
+  }
+
+  get leanBodyMassPercentageOfRightArm () {
+    return this._bodyCompositionMeasurementData.leanBodyMassPercentageOfRightArm
+  }
+
+  get leanBodyMassOfLeftArm () {
+    return this._bodyCompositionMeasurementData.leanBodyMassOfLeftArm
+  }
+
+  get leanBodyMassPercentageOfLeftArm () {
+    return this._bodyCompositionMeasurementData.leanBodyMassPercentageOfLeftArm
+  }
+
+  get leanBodyMassOfTrunk () {
+    return this._bodyCompositionMeasurementData.leanBodyMassOfTrunk
+  }
+
+  get leanBodyMassPercentageOfTrunk () {
+    return this._bodyCompositionMeasurementData.leanBodyMassPercentageOfTrunk
+  }
+
+  get leanBodyMassOfRightLeg () {
+    return this._bodyCompositionMeasurementData.leanBodyMassOfRightLeg
+  }
+
+  get leanBodyMassPercentageOfRightLeg () {
+    return this._bodyCompositionMeasurementData.leanBodyMassPercentageOfRightLeg
+  }
+
+  get leanBodyMassOfLeftLeg () {
+    return this._bodyCompositionMeasurementData.leanBodyMassOfLeftLeg
+  }
+
+  get leanBodyMassPercentageOfLeftLeg () {
+    return this._bodyCompositionMeasurementData.leanBodyMassPercentageOfLeftLeg
+  }
+
+  get bodyFatMassOfRightArm () {
+    return this._bodyCompositionMeasurementData.bodyFatMassOfRightArm
+  }
+
+  get bodyFatMassPercentageOfRightArm () {
+    return this._bodyCompositionMeasurementData.bodyFatMassPercentageOfRightArm
+  }
+
+  get bodyFatMassOfLeftArm () {
+    return this._bodyCompositionMeasurementData.bodyFatMassOfLeftArm
+  }
+
+  get bodyFatMassPercentageOfLeftArm () {
+    return this._bodyCompositionMeasurementData.bodyFatMassPercentageOfLeftArm
+  }
+
+  get bodyFatMassOfTrunk () {
+    return this._bodyCompositionMeasurementData.bodyFatMassOfTrunk
+  }
+
+  get bodyFatMassPercentageOfTrunk () {
+    return this._bodyCompositionMeasurementData.bodyFatMassPercentageOfTrunk
+  }
+
+  get bodyFatMassOfRightLeg () {
+    return this._bodyCompositionMeasurementData.bodyFatMassOfRightLeg
+  }
+
+  get bodyFatMassPercentageOfRightLeg () {
+    return this._bodyCompositionMeasurementData.bodyFatMassPercentageOfRightLeg
+  }
+
+  get bodyFatMassOfLeftLeg () {
+    return this._bodyCompositionMeasurementData.bodyFatMassOfLeftLeg
+  }
+
+  get bodyFatMassPercentageOfLeftLeg () {
+    return this._bodyCompositionMeasurementData.bodyFatMassPercentageOfLeftLeg
   }
 }

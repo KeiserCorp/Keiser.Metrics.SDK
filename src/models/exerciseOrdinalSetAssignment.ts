@@ -66,19 +66,19 @@ export class ExerciseOrdinalSetAssignment extends Model {
     return this._exerciseOrdinalSetAssignmentData.ordinalIdentifier
   }
 
-  get exerciseOrdinalSet () {
+  eagerExerciseOrdinalSet () {
     return this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet ? new ExerciseOrdinalSet(this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet, this.sessionHandler) : undefined
   }
 
-  get strengthExerciseVariant () {
+  eagerStrengthExerciseVariant () {
     return this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant ? new StrengthExerciseVariant(this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant, this.sessionHandler) : undefined
   }
 
-  get cardioExerciseVariant () {
+  eagerCardioExerciseVariant () {
     return this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant ? new CardioExerciseVariant(this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant, this.sessionHandler) : undefined
   }
 
-  get stretchExerciseVariant () {
+  eagerStretchExerciseVariant () {
     return this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant ? new StretchExerciseVariant(this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant, this.sessionHandler) : undefined
   }
 }

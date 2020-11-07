@@ -50,12 +50,14 @@ describe('Facility Kiosk Token', function () {
     })
     const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
       const accessControl = await facility.getAccessControl()
-      if (typeof accessControl.facilityAccessControlKiosk !== 'undefined') {
-        await accessControl.facilityAccessControlKiosk.update({
+      const facilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
+      if (typeof facilityAccessControlKiosk !== 'undefined') {
+        await facilityAccessControlKiosk.update({
           kioskModeAllowed: true,
           primaryIdentification: PrimaryIdentification.UUID,
           secondaryIdentification: SecondaryIdentification.None

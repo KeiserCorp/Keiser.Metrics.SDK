@@ -32,8 +32,8 @@ export interface UserData {
   oauthServices?: OAuthServiceData[]
   profile: ProfileData,
   acceptedTermsVersion?: AcceptedTermsVersionData
-  weightMeasurement?: WeightMeasurementData
-  heightMeasurement?: HeightMeasurementData
+  weightMeasurements?: WeightMeasurementData[]
+  heightMeasurements?: HeightMeasurementData[]
   facilityRelationships?: FacilityRelationshipData[]
 }
 
@@ -125,7 +125,7 @@ export class User extends Model {
     return new EmailAddresses(emailAddresses, emailAddressesMeta, this.sessionHandler)
   }
 
-  get primaryEmailAddress () {
+  eagerPrimaryEmailAddress () {
     return new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler)
   }
 
@@ -138,7 +138,7 @@ export class User extends Model {
     return this._userData.basicCredential === true
   }
 
-  get oauthServices () {
+  eagerOAuthServices () {
     return this._userData.oauthServices ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
   }
 
@@ -161,11 +161,11 @@ export class User extends Model {
     return new OAuthServices(oauthServices, oauthServicesMeta, this.sessionHandler)
   }
 
-  get profile () {
+  eagerProfile () {
     return new Profile(this._userData.profile, this.sessionHandler)
   }
 
-  get acceptedTermsVersion () {
+  eagerAcceptedTermsVersion () {
     return this._userData.acceptedTermsVersion ? new AcceptedTermsVersion(this._userData.acceptedTermsVersion, this.sessionHandler) : undefined
   }
 
@@ -174,8 +174,8 @@ export class User extends Model {
     return new AcceptedTermsVersion(acceptedTermsVersion, this.sessionHandler)
   }
 
-  get latestWeightMeasurement () {
-    return this._userData.weightMeasurement ? new WeightMeasurement(this._userData.weightMeasurement, this.sessionHandler) : undefined
+  eagerWeightMeasurements () {
+    return this._userData.weightMeasurements ? this._userData.weightMeasurements.map(weightMeasurement => new WeightMeasurement(weightMeasurement, this.sessionHandler)) : undefined
   }
 
   async createWeightMeasurement (params: {source: string, takenAt: Date, metricWeight?: number, imperialWeight?: number, bodyFatPercentage?: number}) {
@@ -203,8 +203,8 @@ export class User extends Model {
     return new WeightMeasurements(weightMeasurements, weightMeasurementsMeta, this.sessionHandler)
   }
 
-  get latestHeightMeasurement () {
-    return this._userData.heightMeasurement ? new HeightMeasurement(this._userData.heightMeasurement, this.sessionHandler) : undefined
+  eagerHeightMeasurements () {
+    return this._userData.heightMeasurements ? this._userData.heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.sessionHandler)) : undefined
   }
 
   async createHeightMeasurement (params: {source: string, takenAt: Date, metricHeight?: number, imperialHeight?: number, bodyFatPercentage?: number}) {

@@ -42,8 +42,9 @@ describe('Cardio Exercise', function () {
     const cardioExercise = await adminSession.createCardioExercise(cardioExerciseParams)
 
     expect(cardioExercise).to.be.an('object')
-    expect(cardioExercise.defaultExerciseAlias).to.be.an('object')
-    expect(cardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+    const defaultExerciseAlias = cardioExercise.eagerDefaultExerciseAlias()
+    expect(defaultExerciseAlias).to.be.an('object')
+    expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     createdCardioExercise = cardioExercise
   })
 
@@ -60,8 +61,9 @@ describe('Cardio Exercise', function () {
     if (typeof createdCardioExercise !== 'undefined') {
       await createdCardioExercise.reload()
       expect(createdCardioExercise).to.be.an('object')
-      expect(createdCardioExercise.defaultExerciseAlias).to.be.an('object')
-      expect(createdCardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = createdCardioExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
@@ -69,9 +71,9 @@ describe('Cardio Exercise', function () {
     expect(createdCardioExercise).to.be.an('object')
     if (typeof createdCardioExercise !== 'undefined') {
       const cardioExercise = await userSession.getCardioExercise({ id: createdCardioExercise.id })
-
-      expect(cardioExercise.defaultExerciseAlias).to.be.an('object')
-      expect(cardioExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = cardioExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 

@@ -102,7 +102,7 @@ export class FacilityLicense extends Model {
     return this.effectiveDate ? new Date(this.effectiveDate.getTime() + (this.term * msPerDay)) : null
   }
 
-  get facility () {
+  eagerFacility () {
     return this._facilityLicenseData.facility ? new Facility(this._facilityLicenseData.facility, this.sessionHandler) : undefined
   }
 }

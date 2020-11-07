@@ -79,15 +79,15 @@ export class CardioExerciseVariant extends Model {
     return this._cardioExerciseVariantData.instructionalVideo
   }
 
-  get cardioExercise () {
+  eagerCardioExercise () {
     return this._cardioExerciseVariantData.cardioExercise ? new CardioExercise(this._cardioExerciseVariantData.cardioExercise, this.sessionHandler) : undefined
   }
 
-  get cardioMachine () {
+  eagerCardioMachine () {
     return this._cardioExerciseVariantData.cardioMachine ? new CardioMachine(this._cardioExerciseVariantData.cardioMachine, this.sessionHandler) : undefined
   }
 
-  get exerciseOrdinalSetAssignments () {
+  eagerExerciseOrdinalSetAssignments () {
     return this._cardioExerciseVariantData.exerciseOrdinalSetAssignments ? this._cardioExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }

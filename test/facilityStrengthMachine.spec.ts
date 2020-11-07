@@ -47,8 +47,9 @@ describe('Facility Strength Machine', function () {
     })
     let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
     }
   })
@@ -68,8 +69,9 @@ describe('Facility Strength Machine', function () {
 
     expect(addedMachine).to.be.an('object')
     expect(addedMachine.model).to.equal('001121')
-    expect(addedMachine.strengthMachine).to.be.an('object')
-    expect(addedMachine.strengthMachine?.id).to.equal(1000)
+    const strengthMachine = addedMachine.eagerStrengthMachine()
+    expect(strengthMachine).to.be.an('object')
+    expect(strengthMachine?.id).to.equal(1000)
   })
 
   it('can list facility strength machines', async function () {
@@ -95,7 +97,7 @@ describe('Facility Strength Machine', function () {
   })
 
   it('can get specific facility strength machine', async function () {
-    const machine = await facility.getFacilityStrengthMachine({id: addedMachine.id})
+    const machine = await facility.getFacilityStrengthMachine({ id: addedMachine.id })
 
     expect(machine).to.be.an('object')
     expect(machine.id).to.equal(addedMachine.id)

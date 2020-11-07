@@ -60,11 +60,11 @@ export class StretchExercise extends Model {
     return this._stretchExerciseData.id
   }
 
-  get defaultExerciseAlias () {
+  eagerDefaultExerciseAlias () {
     return new ExerciseAlias(this._stretchExerciseData.defaultExerciseAlias, this.sessionHandler)
   }
 
-  get exerciseAliases () {
+  eagerExerciseAliases () {
     return this._stretchExerciseData.exerciseAliases ? this._stretchExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
@@ -73,7 +73,7 @@ export class StretchExercise extends Model {
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
-  get stretchExerciseMuscles () {
+  eagerStretchExerciseMuscles () {
     return this._stretchExerciseData.stretchExerciseMuscles ? this._stretchExerciseData.stretchExerciseMuscles.map(stretchExerciseMuscle => new StretchExerciseMuscle(stretchExerciseMuscle, this.sessionHandler)) : undefined
   }
 
@@ -82,7 +82,7 @@ export class StretchExercise extends Model {
     return new StretchExerciseMuscles(stretchExerciseMuscles, stretchExerciseMusclesMeta, this.sessionHandler)
   }
 
-  get stretchExerciseVariants () {
+  eagerStretchExerciseVariants () {
     return this._stretchExerciseData.stretchExerciseVariants ? this._stretchExerciseData.stretchExerciseVariants.map(stretchExerciseVariant => new StretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)) : undefined
   }
 

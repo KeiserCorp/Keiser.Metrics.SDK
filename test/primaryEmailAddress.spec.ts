@@ -32,7 +32,7 @@ describe('Primary Email Address', function () {
   })
 
   it('can get static primary email address', async function () {
-    const primaryEmailAddress = user.primaryEmailAddress
+    const primaryEmailAddress = user.eagerPrimaryEmailAddress()
 
     expect(primaryEmailAddress).to.be.an('object')
     expect(primaryEmailAddress.emailAddressId).to.be.a('number')

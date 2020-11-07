@@ -25,9 +25,13 @@ describe('Weight Measurement', function () {
     metricsInstance?.dispose()
   })
 
-  it('has latest weight measurement on first load', async function () {
-    expect(typeof user.latestWeightMeasurement).to.not.equal('undefined')
-    expect(typeof user.latestWeightMeasurement?.metricWeight).to.equal('number')
+  it('has weight measurements on first load', async function () {
+    const weightMeasurements = user.eagerWeightMeasurements()
+    expect(Array.isArray(weightMeasurements)).to.equal(true)
+    if (Array.isArray(weightMeasurements)) {
+      expect(weightMeasurements.length).to.equal(1)
+      expect(typeof weightMeasurements[0]).to.equal('object')
+    }
   })
 
   it('can get list of weight measurement', async function () {

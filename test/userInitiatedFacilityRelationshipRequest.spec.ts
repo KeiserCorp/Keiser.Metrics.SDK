@@ -22,8 +22,9 @@ describe('User Initiated Facility Relationship Request', function () {
 
     demoUserSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await demoUserSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
     }
   })
