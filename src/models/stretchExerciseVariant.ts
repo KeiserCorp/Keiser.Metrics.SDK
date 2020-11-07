@@ -77,11 +77,11 @@ export class StretchExerciseVariant extends Model {
     return this._stretchExerciseVariantData.instructionalVideo
   }
 
-  get stretchExercise () {
+  eagerStretchExercise () {
     return this._stretchExerciseVariantData.stretchExercise ? new StretchExercise(this._stretchExerciseVariantData.stretchExercise, this.sessionHandler) : undefined
   }
 
-  get exerciseOrdinalSetAssignments () {
+  eagerExerciseOrdinalSetAssignments () {
     return this._stretchExerciseVariantData.exerciseOrdinalSetAssignments ? this._stretchExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }

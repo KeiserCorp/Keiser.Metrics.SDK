@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import Metrics from '../src'
-import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControlKiosk, PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -8,7 +7,6 @@ import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './c
 describe('Facility Access Control Kiosk', function () {
   let metricsInstance: Metrics
   let userSession: UserSession
-  let facility: PrivilegedFacility
   let facilityAccessControlKiosk: FacilityAccessControlKiosk
 
   before(async function () {
@@ -19,12 +17,13 @@ describe('Facility Access Control Kiosk', function () {
     })
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const facility = facilities[0]?.eagerFacility()
+    if (typeof facility !== 'undefined') {
       await facility.setActive()
       const accessControl = await facility.getAccessControl()
-      if (typeof accessControl.facilityAccessControlKiosk !== 'undefined') {
-        facilityAccessControlKiosk = accessControl.facilityAccessControlKiosk
+      const tmpFacilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
+      if (typeof tmpFacilityAccessControlKiosk !== 'undefined') {
+        facilityAccessControlKiosk = tmpFacilityAccessControlKiosk
       }
     }
   })

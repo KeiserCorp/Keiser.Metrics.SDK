@@ -59,14 +59,17 @@ export class MSeriesDataSets extends ModelList<MSeriesDataSet, MSeriesDataSetDat
 
 export class MSeriesDataSet extends Model {
   private _mSeriesDataSetData: MSeriesDataSetData
+  private _graphData?: MSeriesDataPoint[]
 
   constructor (mSeriesDataSetData: MSeriesDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._mSeriesDataSetData = mSeriesDataSetData
+    this._graphData = this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
   }
 
   private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
     this._mSeriesDataSetData = mSeriesDataSetData
+    this._graphData = this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
   }
 
   async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
@@ -197,15 +200,15 @@ export class MSeriesDataSet extends Model {
     return durationToSeconds(this._mSeriesDataSetData.initialOffset)
   }
 
-  get mSeriesFtpMeasurement () {
+  get graphData () {
+    return this._graphData
+  }
+
+  eagerMSeriesFtpMeasurement () {
     return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler) : undefined
   }
 
-  get graphData () {
-    return this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
-  }
-
-  get Session () {
+  eagerSession () {
     return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this.sessionHandler) : undefined
   }
 

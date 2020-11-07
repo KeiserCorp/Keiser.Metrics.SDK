@@ -62,8 +62,8 @@ describe('Exercise Ordinal Set Assignment', function () {
 
     expect(exerciseOrdinalSetAssignment).to.be.an('object')
     expect(exerciseOrdinalSetAssignment.ordinalIdentifier).to.equal(identifier)
-    expect(exerciseOrdinalSetAssignment.exerciseOrdinalSet).to.be.an('object')
-    expect(exerciseOrdinalSetAssignment.exerciseOrdinalSet?.id).to.equal(createdExerciseOrdinalSet.id)
+    expect(exerciseOrdinalSetAssignment.eagerExerciseOrdinalSet()).to.be.an('object')
+    expect(exerciseOrdinalSetAssignment.eagerExerciseOrdinalSet()?.id).to.equal(createdExerciseOrdinalSet.id)
     createdExerciseOrdinalSetAssignment = exerciseOrdinalSetAssignment
   })
 
@@ -71,8 +71,9 @@ describe('Exercise Ordinal Set Assignment', function () {
     await createdExerciseOrdinalSetAssignment.reload()
     expect(createdExerciseOrdinalSetAssignment).to.be.an('object')
     expect(createdExerciseOrdinalSetAssignment.ordinalIdentifier).to.equal(identifier)
-    expect(createdExerciseOrdinalSetAssignment.exerciseOrdinalSet).to.be.an('object')
-    expect(createdExerciseOrdinalSetAssignment.exerciseOrdinalSet?.id).to.equal(createdExerciseOrdinalSet.id)
+    const exerciseOrdinalSet = createdExerciseOrdinalSetAssignment.eagerExerciseOrdinalSet()
+    expect(exerciseOrdinalSet).to.be.an('object')
+    expect(exerciseOrdinalSet?.id).to.equal(createdExerciseOrdinalSet.id)
   })
 
   it('can list exercise ordinal set assignments', async function () {
@@ -90,8 +91,9 @@ describe('Exercise Ordinal Set Assignment', function () {
     expect(exerciseOrdinalSetAssignment).to.be.an('object')
     expect(exerciseOrdinalSetAssignment.id).to.equal(createdExerciseOrdinalSetAssignment.id)
     expect(exerciseOrdinalSetAssignment.ordinalIdentifier).to.equal(identifier)
-    expect(exerciseOrdinalSetAssignment.exerciseOrdinalSet).to.be.an('object')
-    expect(exerciseOrdinalSetAssignment.exerciseOrdinalSet?.id).to.equal(createdExerciseOrdinalSet.id)
+    const exerciseOrdinalSet = exerciseOrdinalSetAssignment.eagerExerciseOrdinalSet()
+    expect(exerciseOrdinalSet).to.be.an('object')
+    expect(exerciseOrdinalSet?.id).to.equal(createdExerciseOrdinalSet.id)
   })
 
   it('can delete exercise ordinal set assignment', async function () {

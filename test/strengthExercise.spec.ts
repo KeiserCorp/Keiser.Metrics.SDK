@@ -45,8 +45,9 @@ describe('Strength Exercise', function () {
     const strengthExercise = await adminSession.createStrengthExercise(strengthExerciseParams)
 
     expect(strengthExercise).to.be.an('object')
-    expect(strengthExercise.defaultExerciseAlias).to.be.an('object')
-    expect(strengthExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+    const defaultExerciseAlias = strengthExercise.eagerDefaultExerciseAlias()
+    expect(defaultExerciseAlias).to.be.an('object')
+    expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     expect(strengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
     expect(strengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
     expect(strengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)
@@ -66,8 +67,9 @@ describe('Strength Exercise', function () {
     if (typeof createdStrengthExercise !== 'undefined') {
       await createdStrengthExercise.reload()
       expect(createdStrengthExercise).to.be.an('object')
-      expect(createdStrengthExercise.defaultExerciseAlias).to.be.an('object')
-      expect(createdStrengthExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = createdStrengthExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
       expect(createdStrengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
       expect(createdStrengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
       expect(createdStrengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)
@@ -78,9 +80,9 @@ describe('Strength Exercise', function () {
     expect(createdStrengthExercise).to.be.an('object')
     if (typeof createdStrengthExercise !== 'undefined') {
       const strengthExercise = await userSession.getStrengthExercise({ id: createdStrengthExercise.id })
-
-      expect(strengthExercise.defaultExerciseAlias).to.be.an('object')
-      expect(strengthExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = strengthExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
       expect(strengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
       expect(strengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
       expect(strengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)

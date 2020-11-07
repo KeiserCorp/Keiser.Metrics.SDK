@@ -72,7 +72,7 @@ export class Facility extends Model {
     return this._facilityData.id
   }
 
-  get facilityProfile () {
+  eagerFacilityProfile () {
     return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
@@ -95,7 +95,7 @@ export class PrivilegedFacility extends Facility {
     return this.id === this.sessionHandler.decodedAccessToken?.facility?.id
   }
 
-  get facilityProfile () {
+  eagerFacilityProfile () {
     return this._facilityData.facilityProfile ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 

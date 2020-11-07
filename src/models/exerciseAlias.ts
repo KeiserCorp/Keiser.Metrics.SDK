@@ -82,15 +82,15 @@ export class ExerciseAlias extends Model {
     return ExerciseAliasType.Stretch
   }
 
-  get strengthExercise () {
+  eagerStrengthExercise () {
     return this._exerciseAliasData.strengthExercise ? new StrengthExercise(this._exerciseAliasData.strengthExercise, this.sessionHandler) : undefined
   }
 
-  get cardioExercise () {
+  eagerCardioExercise () {
     return this._exerciseAliasData.cardioExercise ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
   }
 
-  get stretchExercise () {
+  eagerStretchExercise () {
     return this._exerciseAliasData.stretchExercise ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
   }
 }

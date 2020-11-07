@@ -71,7 +71,7 @@ export class ExerciseOrdinalSet extends Model {
     return this._exerciseOrdinalSetData.description
   }
 
-  get exerciseOrdinalSetAssignments () {
+  eagerExerciseOrdinalSetAssignments () {
     return this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments ? this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 

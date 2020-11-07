@@ -42,8 +42,9 @@ describe('Stretch Exercise', function () {
     const stretchExercise = await adminSession.createStretchExercise(stretchExerciseParams)
 
     expect(stretchExercise).to.be.an('object')
-    expect(stretchExercise.defaultExerciseAlias).to.be.an('object')
-    expect(stretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+    const defaultExerciseAlias = stretchExercise.eagerDefaultExerciseAlias()
+    expect(defaultExerciseAlias).to.be.an('object')
+    expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     createdStretchExercise = stretchExercise
   })
 
@@ -60,8 +61,9 @@ describe('Stretch Exercise', function () {
     if (typeof createdStretchExercise !== 'undefined') {
       await createdStretchExercise.reload()
       expect(createdStretchExercise).to.be.an('object')
-      expect(createdStretchExercise.defaultExerciseAlias).to.be.an('object')
-      expect(createdStretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = createdStretchExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 
@@ -69,9 +71,9 @@ describe('Stretch Exercise', function () {
     expect(createdStretchExercise).to.be.an('object')
     if (typeof createdStretchExercise !== 'undefined') {
       const stretchExercise = await userSession.getStretchExercise({ id: createdStretchExercise.id })
-
-      expect(stretchExercise.defaultExerciseAlias).to.be.an('object')
-      expect(stretchExercise.defaultExerciseAlias.alias).to.equal(newExerciseName)
+      const defaultExerciseAlias = stretchExercise.eagerDefaultExerciseAlias()
+      expect(defaultExerciseAlias).to.be.an('object')
+      expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     }
   })
 

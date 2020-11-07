@@ -90,14 +90,17 @@ export class StrengthMachineDataSets extends ModelList<StrengthMachineDataSet, S
 
 export class StrengthMachineDataSet extends Model {
   private _strengthMachineDataSetData: StrengthMachineDataSetData
+  private _test?: StrengthMachineDataSetTest
 
   constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineDataSetData = strengthMachineDataSetData
+    this._test = this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
   }
 
   private setStrengthMachineDataSet (strengthMachineDataSetData: StrengthMachineDataSetData) {
     this._strengthMachineDataSetData = strengthMachineDataSetData
+    this._test = this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
   }
 
   async reload () {
@@ -209,27 +212,31 @@ export class StrengthMachineDataSet extends Model {
   }
 
   get test () {
-    return this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
+    return this._test
   }
 
-  get session () {
+  eagerSession () {
     return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler) : undefined
   }
 
-  get strengthMachine () {
+  eagerStrengthMachine () {
     return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
   }
 
-  get strengthExercise () {
+  eagerStrengthExercise () {
     return this._strengthMachineDataSetData.strengthExercise ? new StrengthExercise(this._strengthMachineDataSetData.strengthExercise, this.sessionHandler) : undefined
   }
 }
 
 export class StrengthMachineDataSetTest {
   private _strengthMachineDataSetTestData: StrengthMachineDataSetTestData
+  private readonly _low: StrengthMachineDataSetTestSubset
+  private readonly _high: StrengthMachineDataSetTestSubset
 
   constructor (strengthMachineDataSetTestData: StrengthMachineDataSetTestData) {
     this._strengthMachineDataSetTestData = strengthMachineDataSetTestData
+    this._low = new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.low)
+    this._high = new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.high)
   }
 
   get testType () {
@@ -240,14 +247,14 @@ export class StrengthMachineDataSetTest {
    * @returns Values relative to the rep with the highest power generated in the low resistance set
    */
   get low () {
-    return new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.low)
+    return this._low
   }
 
   /**
    * @returns Values relative to the rep with the highest power generated in the high resistance set
    */
   get high () {
-    return new StrengthMachineDataSetTestSubset(this._strengthMachineDataSetTestData.high)
+    return this._high
   }
 }
 

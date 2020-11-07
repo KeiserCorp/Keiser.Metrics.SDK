@@ -100,11 +100,11 @@ export class StrengthExercise extends Model {
     return this._strengthExerciseData.plane
   }
 
-  get defaultExerciseAlias () {
+  eagerDefaultExerciseAlias () {
     return new ExerciseAlias(this._strengthExerciseData.defaultExerciseAlias, this.sessionHandler)
   }
 
-  get exerciseAliases () {
+  eagerExerciseAliases () {
     return this._strengthExerciseData.exerciseAliases ? this._strengthExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
@@ -122,7 +122,7 @@ export class StrengthExercise extends Model {
     return new StrengthExerciseMuscles(strengthExerciseMuscles, strengthExerciseMusclesMeta, this.sessionHandler)
   }
 
-  get strengthExerciseVariants () {
+  eagerStrengthExerciseVariants () {
     return this._strengthExerciseData.strengthExerciseVariants ? this._strengthExerciseData.strengthExerciseVariants.map(strengthExerciseVariant => new StrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)) : undefined
   }
 

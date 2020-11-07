@@ -30,7 +30,7 @@ export class FacilityAccessControl extends Model {
     return this
   }
 
-  get facilityAccessControlIPRanges () {
+  eagerFacilityAccessControlIPRanges () {
     return this._facilityAccessControlData.facilityAccessControlIPRanges ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
   }
 
@@ -49,7 +49,7 @@ export class FacilityAccessControl extends Model {
     return new FacilityAccessControlIPRanges(facilityAccessControlIPRanges, facilityAccessControlIPRangesMeta, this.sessionHandler)
   }
 
-  get facilityAccessControlKiosk () {
+  eagerFacilityAccessControlKiosk () {
     return this._facilityAccessControlData.facilityAccessControlKiosk ? new FacilityAccessControlKiosk(this._facilityAccessControlData.facilityAccessControlKiosk, this.sessionHandler) : undefined
   }
 }

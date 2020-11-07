@@ -86,7 +86,7 @@ export class FacilityStrengthMachine extends Model {
     return this._facilityStrengthMachineData.location
   }
 
-  get strengthMachine () {
+  eagerStrengthMachine () {
     return this._facilityStrengthMachineData.strengthMachine ? new StrengthMachine(this._facilityStrengthMachineData.strengthMachine, this.sessionHandler) : undefined
   }
 }

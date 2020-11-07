@@ -50,12 +50,13 @@ describe('Facility Session', function () {
     })
     let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    if (typeof facilities[0]?.facility !== 'undefined') {
-      facility = facilities[0].facility
+    const tmpFacility = facilities[0]?.eagerFacility()
+    if (typeof tmpFacility !== 'undefined') {
+      facility = tmpFacility
       await facility.setActive()
     }
 
-    user = (await facility.getMemberRelationships())[0].user
+    user = ((await facility?.getMemberRelationships()) || [])[0]?.eagerUser()
   })
 
   after(function () {
@@ -153,7 +154,7 @@ describe('Facility Session', function () {
     expect(typeof session).to.equal('object')
     expect(Date.now() - session.startedAt.getTime() < 1000).to.equal(true)
     expect(session.endedAt).to.equal(null)
-    expect(session.strengthMachineDataSets?.length).to.equal(0)
+    expect(session.eagerStrengthMachineDataSets()?.length).to.equal(0)
     createdSession = session
   })
 
@@ -169,7 +170,7 @@ describe('Facility Session', function () {
 
     expect(typeof createdSession).to.equal('object')
     expect(createdSession.endedAt).to.equal(null)
-    expect(createdSession.strengthMachineDataSets?.length).to.equal(1)
+    expect(createdSession.eagerStrengthMachineDataSets()?.length).to.equal(1)
   })
 
   it('can end session using eChip', async function () {
@@ -197,7 +198,7 @@ describe('Facility Session', function () {
 
     expect(typeof createdSession).to.equal('object')
     expect(createdSession.endedAt).to.not.equal(null)
-    expect(createdSession.strengthMachineDataSets?.length).to.equal(2)
+    expect(createdSession.eagerStrengthMachineDataSets()?.length).to.equal(2)
     await createdSession.delete()
   })
 

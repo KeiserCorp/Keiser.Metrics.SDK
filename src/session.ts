@@ -371,7 +371,7 @@ export class UserSession {
     return this._user
   }
 
-  get activeFacility () {
+  eagerActiveFacility () {
     return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 

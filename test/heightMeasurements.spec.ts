@@ -25,9 +25,13 @@ describe('Height Measurement', function () {
     metricsInstance?.dispose()
   })
 
-  it('has latest height measurement on first load', async function () {
-    expect(typeof user.latestHeightMeasurement).to.not.equal('undefined')
-    expect(typeof user.latestHeightMeasurement?.metricHeight).to.equal('number')
+  it('has height measurements on first load', async function () {
+    const heightMeasurements = user.eagerHeightMeasurements()
+    expect(Array.isArray(heightMeasurements)).to.equal(true)
+    if (Array.isArray(heightMeasurements)) {
+      expect(heightMeasurements.length).to.equal(1)
+      expect(typeof heightMeasurements[0]).to.equal('object')
+    }
   })
 
   it('can get list of height measurement', async function () {

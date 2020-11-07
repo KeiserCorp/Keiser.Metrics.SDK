@@ -60,11 +60,11 @@ export class CardioExercise extends Model {
     return this._cardioExerciseData.id
   }
 
-  get defaultExerciseAlias () {
+  eagerDefaultExerciseAlias () {
     return new ExerciseAlias(this._cardioExerciseData.defaultExerciseAlias, this.sessionHandler)
   }
 
-  get exerciseAliases () {
+  eagerExerciseAliases () {
     return this._cardioExerciseData.exerciseAliases ? this._cardioExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
@@ -73,7 +73,7 @@ export class CardioExercise extends Model {
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
-  get cardioExerciseMuscles () {
+  eagerCardioExerciseMuscles () {
     return this._cardioExerciseData.cardioExerciseMuscles ? this._cardioExerciseData.cardioExerciseMuscles.map(cardioExerciseMuscles => new CardioExerciseMuscle(cardioExerciseMuscles, this.sessionHandler)) : undefined
   }
 
@@ -82,7 +82,7 @@ export class CardioExercise extends Model {
     return new CardioExerciseMuscles(cardioExerciseMuscles, cardioExerciseMusclesMeta, this.sessionHandler)
   }
 
-  get cardioExerciseVariants () {
+  eagerCardioExerciseVariants () {
     return this._cardioExerciseData.cardioExerciseVariants ? this._cardioExerciseData.cardioExerciseVariants.map(cardioExerciseVariant => new CardioExerciseVariant(cardioExerciseVariant, this.sessionHandler)) : undefined
   }
 

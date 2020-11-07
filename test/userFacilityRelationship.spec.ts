@@ -45,9 +45,10 @@ describe('User to Facility Relationship', function () {
   })
 
   it('can access facility instance', async function () {
-    expect(typeof existingFacilityRelationship.facility).to.equal('object')
-    expect(typeof existingFacilityRelationship.facility?.id).to.equal('number')
-    expect(existingFacilityRelationship.facility instanceof PrivilegedFacility).to.equal(true)
+    const facility = existingFacilityRelationship.eagerFacility()
+    expect(typeof facility).to.equal('object')
+    expect(typeof facility?.id).to.equal('number')
+    expect(facility instanceof PrivilegedFacility).to.equal(true)
   })
 
   it('can reload facility relationship', async function () {
@@ -74,7 +75,7 @@ describe('User to Facility Relationship', function () {
     expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
     expect(facilityRelationship instanceof UserFacilityMemberRelationship).to.equal(true)
     expect(facilityRelationship instanceof UserFacilityEmployeeRelationship).to.equal(false)
-    expect(facilityRelationship.facility instanceof PrivilegedFacility).to.equal(false)
+    expect(facilityRelationship.eagerFacility() instanceof PrivilegedFacility).to.equal(false)
   })
 
   it('can get specific facility employee relationship', async function () {
@@ -84,7 +85,7 @@ describe('User to Facility Relationship', function () {
     expect(facilityRelationship.id).to.equal(existingFacilityRelationship.id)
     expect(facilityRelationship instanceof UserFacilityMemberRelationship).to.equal(false)
     expect(facilityRelationship instanceof UserFacilityEmployeeRelationship).to.equal(true)
-    expect(facilityRelationship.facility instanceof PrivilegedFacility).to.equal(true)
+    expect(facilityRelationship.eagerFacility() instanceof PrivilegedFacility).to.equal(true)
   })
 
   it('can try to delete facility relationships', async function () {

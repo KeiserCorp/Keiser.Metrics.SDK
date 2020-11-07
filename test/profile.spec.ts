@@ -26,7 +26,7 @@ describe('Profile', function () {
   })
 
   it('can reload profile', async function () {
-    const profile = await user.profile.reload()
+    const profile = await user.eagerProfile().reload()
 
     expect(profile).to.be.an('object')
     expect(profile.updatedAt instanceof Date).to.equal(true)
@@ -38,7 +38,7 @@ describe('Profile', function () {
   })
 
   it('can update profile', async function () {
-    const prevUpdatedAt = user.profile.updatedAt
+    const prevUpdatedAt = user.eagerProfile().updatedAt
     const params = {
       name: 'test',
       birthday: '1980-01-01',
@@ -46,7 +46,7 @@ describe('Profile', function () {
       language: null,
       units: null
     }
-    const profile = await user.profile.update(params)
+    const profile = await user.eagerProfile().update(params)
 
     expect(profile).to.be.an('object')
     expect(profile.updatedAt).to.not.equal(prevUpdatedAt)

@@ -1,4 +1,3 @@
-import { DeepReadonlyArray } from '../lib/readonly'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { StrengthExercise, StrengthExerciseData, StrengthExerciseResponse } from './strengthExercise'
@@ -57,14 +56,17 @@ export class StrengthMachines extends ModelList<StrengthMachine, StrengthMachine
 
 export class StrengthMachine extends Model {
   private _strengthMachineData: StrengthMachineData
+  private _models: StrengthMachineModel[]
 
   constructor (strengthMachineData: StrengthMachineData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineData = strengthMachineData
+    this._models = this._strengthMachineData.models ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
   }
 
   protected setStrengthMachineData (strengthMachineData: StrengthMachineData) {
     this._strengthMachineData = strengthMachineData
+    this._models = this._strengthMachineData.models ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
   }
 
   async reload () {
@@ -93,16 +95,28 @@ export class StrengthMachine extends Model {
     return this._strengthMachineData.dualSided
   }
 
-  get defaultStrengthExercise () {
-    return this._strengthMachineData.defaultStrengthExercise ? new StrengthExercise(this._strengthMachineData.defaultStrengthExercise, this.sessionHandler) : undefined
+  get models () {
+    return this._models
   }
 
-  get models () {
-    return this._strengthMachineData.models ? [...this._strengthMachineData.models] as DeepReadonlyArray<StrengthMachineModelData> : undefined
+  eagerDefaultStrengthExercise () {
+    return this._strengthMachineData.defaultStrengthExercise ? new StrengthExercise(this._strengthMachineData.defaultStrengthExercise, this.sessionHandler) : undefined
   }
 
   async getDefaultStrengthExercise () {
     const { strengthExercise } = await this.action('strengthExercise:show' , { id: this._strengthMachineData.defaultStrengthExerciseId }) as StrengthExerciseResponse
     return new StrengthExercise(strengthExercise, this.sessionHandler)
+  }
+}
+
+export class StrengthMachineModel {
+  private _strengthMachineModelData: StrengthMachineModelData
+
+  constructor (strengthMachineModelData: StrengthMachineModelData) {
+    this._strengthMachineModelData = strengthMachineModelData
+  }
+
+  get model () {
+    return this._strengthMachineModelData.model
   }
 }

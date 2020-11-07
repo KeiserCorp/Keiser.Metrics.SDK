@@ -25,7 +25,7 @@ describe('OAuth Service', function () {
   })
 
   it('has OAuth services on first load', async function () {
-    expect(Array.isArray(user.oauthServices)).to.equal(true)
+    expect(Array.isArray(user.eagerOAuthServices())).to.equal(true)
   })
 
   it('can get list of OAuth services', async function () {

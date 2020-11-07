@@ -147,7 +147,7 @@ export class UserFacilityRelationship extends FacilityRelationship {
 }
 
 export class UserFacilityMemberRelationship extends UserFacilityRelationship {
-  get facility () {
+  eagerFacility () {
     if (typeof this._facilityRelationshipData.facility === 'undefined') {
       return undefined
     }
@@ -156,7 +156,7 @@ export class UserFacilityMemberRelationship extends UserFacilityRelationship {
 }
 
 export class UserFacilityEmployeeRelationship extends UserFacilityRelationship {
-  get facility () {
+  eagerFacility () {
     if (typeof this._facilityRelationshipData.facility === 'undefined') {
       return undefined
     }
@@ -197,23 +197,23 @@ export class FacilityUserRelationship extends FacilityRelationship {
     await this.action('facilityRelationship:facilityDelete', { id: this.id })
   }
 
-  get user () {
+  eagerUser () {
     return new User(this._facilityRelationshipData.user, this.sessionHandler)
   }
 }
 
 export class FacilityUserMemberRelationship extends FacilityUserRelationship {
-  get user () {
+  eagerUser () {
     return new FacilityMemberUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
   }
 
-  get activeSession () {
+  eagerActiveSession () {
     return this._facilityRelationshipData.user.sessions && this._facilityRelationshipData.user.sessions.length > 0 ? new Session(this._facilityRelationshipData.user.sessions[0], this.sessionHandler) : undefined
   }
 }
 
 export class FacilityUserEmployeeRelationship extends FacilityUserRelationship {
-  get user () {
+  eagerUser () {
     return new FacilityEmployeeUser(this._facilityRelationshipData.user, this.sessionHandler, this.id)
   }
 }

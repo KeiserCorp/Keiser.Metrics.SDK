@@ -46,14 +46,17 @@ export class HeartRateDataSets extends ModelList<HeartRateDataSet, HeartRateData
 
 export class HeartRateDataSet extends Model {
   private _heartRateDataSetData: HeartRateDataSetData
+  private _graphData?: HeartRateDataPoint[]
 
   constructor (heartRateDataSetData: HeartRateDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._heartRateDataSetData = heartRateDataSetData
+    this._graphData = this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   private setHeartRateDataSet (heartRateDataSetData: HeartRateDataSetData) {
     this._heartRateDataSetData = heartRateDataSetData
+    this._graphData = this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
@@ -97,13 +100,12 @@ export class HeartRateDataSet extends Model {
   }
 
   get graphData () {
-    return this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
+    return this._graphData
   }
 
-  get Session () {
+  eagerSession () {
     return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this.sessionHandler) : undefined
   }
-
 }
 
 export interface HeartRateDataPointData {
