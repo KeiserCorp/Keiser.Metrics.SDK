@@ -77,16 +77,14 @@ The [`UserSession`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/user
 ```ts
 const userSession = await metrics.authenticateWithCredentials({email: 'demo@keiser.com', password: 'password'})
 
-console.log(userSession.user.profile.name)
+console.log(userSession.user.eagerProfile().name)
 ```
 
-All properties exposed by the [`User`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/user.html) class and it's children are instances that are generated on access, so subsequent calls to the same property are not returning the exact same instance. It is recommended to keep accessed instances in scope using local references. This prevents memory leaks and improves performance when dealing with large data sets.
-
-This means that separate instances will also be out of sync as changes to one instance will not be reflected in other instances. The `reload()` method available on most classes will bring the instance in sync with the current server state.
+All properties exposed by the [`User`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/user.html) class and it's children readonly. Most classes have eager loaded associated classes which are accessed through function calls prefixed with `eager` (ex: `user.eagerProfile`). While the data for the eager classes is already stored, the class is not instantiated until the method is called and each call will instantiate a new class, so it is recommended to store the eager class locally. Separate instances will also be out of sync as changes to one instance will not be reflected in other instances. The `reload()` method available on most classes will bring the instance in sync with the current server state.
 
 ```ts
-let userProfile1 = userSession.user.profile
-let userProfile2 = userSession.user.profile
+let userProfile1 = userSession.user.eagerProfile()
+let userProfile2 = userSession.user.eagerProfile()
 
 console.log(userProfile1 === userProfile2)           // Output: false
 console.log(userProfile1.name === userProfile2.name) // Output: true
@@ -103,9 +101,9 @@ console.log(userProfile1.name === userProfile2.name) // Output: true
 ```ts
 // Recommended usage example
 function generateUsername(user: User) {
-  const name = user.profile.name
+  const profile = user.eagerProfile()
 
-  return name ? name.replace(/\s/, '_').toLowerCase() : 'unknown_username'
+  return profile?.name ? profile.name.replace(/\s/, '_').toLowerCase() : 'unknown_username'
 }
 ```
 
@@ -145,32 +143,32 @@ This restriction on direct property mutation preserves the integrity of the data
 
 ```ts
 // This will result in an error
-user.profile.name = 'Rick Sanchez'
+profile.name = 'Rick Sanchez'
 
 // Instead, issue an update
-console.log(user.profile.name) // Outputs: 'Richard Sanchez'
+console.log(profile.name) // Outputs: 'Richard Sanchez'
 
-await user.profile.update({ ...user.profile, name: 'Rick Sanchez' })
+await profile.update({ ...profile, name: 'Rick Sanchez' })
 
-console.log(user.profile.name) // Outputs: 'Rick Sanchez'
+console.log(profile.name) // Outputs: 'Rick Sanchez'
 ```
 
 Update calls are always full replacements of the model, so properties not included in the `update` parameters will be cast to `null` in the data model. Best practice is to expand the model and then override the property changes in the new model instance to ensure there is no unintended data loss.
 
 ```ts
 // Performing an update with a partial property will result in loss of other properties.
-console.log(user.profile.language) // Outputs: 'en'
+console.log(profile.language) // Outputs: 'en'
 
-await user.profile.update({ name: 'Rick Sanchez' })
+await profile.update({ name: 'Rick Sanchez' })
 
-console.log(user.profile.language) // Outputs: null
+console.log(profile.language) // Outputs: null
 
 // Instead, expand the model to ensure that data is not lost
-console.log(user.profile.language) // Outputs: 'en'
+console.log(profile.language) // Outputs: 'en'
 
-await user.profile.update({ ...user.profile, name: 'Rick Sanchez' })
+await profile.update({ ...profile, name: 'Rick Sanchez' })
 
-console.log(user.profile.language) // Outputs: 'en'
+console.log(profile.language) // Outputs: 'en'
 ```
 
 ## Error Handling
