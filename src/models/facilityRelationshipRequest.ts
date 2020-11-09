@@ -98,7 +98,7 @@ export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelati
     return this.update({ approval: false })
   }
 
-  private async update (params: { approval: boolean}) {
+  private async update (params: { approval: boolean }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userUpdate', { ...params, id: this.id }) as FacilityRelationshipRequestResponse
     this.setFacilityRelationshipRequestData(facilityRelationshipRequest)
     return this
@@ -106,7 +106,7 @@ export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelati
 }
 
 export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationshipRequest {
-  async approve (params: {memberIdentifier: string}) {
+  async approve (params: { memberIdentifier: string }) {
     return this.update({ ...params, approval: true })
   }
 
@@ -114,7 +114,7 @@ export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationsh
     return this.update({ approval: false })
   }
 
-  private async update (params: {approval: boolean}) {
+  private async update (params: { approval: boolean }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipRequestResponse
     this.setFacilityRelationshipRequestData(facilityRelationshipRequest)
     return this

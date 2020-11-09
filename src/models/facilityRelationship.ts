@@ -187,7 +187,7 @@ export class FacilityUserRelationship extends FacilityRelationship {
     return this
   }
 
-  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null}) {
+  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this

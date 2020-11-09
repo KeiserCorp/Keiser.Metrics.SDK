@@ -15,7 +15,7 @@ export class Model {
     this.sessionHandler = sessionHandler
   }
 
-  protected action (action: string, params: Object = {}) {
+  protected action (action: string, params: Object = { }) {
     return this.sessionHandler.action(action, params)
   }
 }

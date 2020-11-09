@@ -68,7 +68,7 @@ export class StretchExercise extends Model {
     return this._stretchExerciseData.exerciseAliases ? this._stretchExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
-  async getExerciseAliases (options: {alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { exerciseAliases, exerciseAliasesMeta } = await this.action('exerciseAlias:list', { ...options, stretchExerciseId: this.id }) as ExerciseAliasListResponse
     return new ExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
@@ -77,7 +77,7 @@ export class StretchExercise extends Model {
     return this._stretchExerciseData.stretchExerciseMuscles ? this._stretchExerciseData.stretchExerciseMuscles.map(stretchExerciseMuscle => new StretchExerciseMuscle(stretchExerciseMuscle, this.sessionHandler)) : undefined
   }
 
-  async getStretchExerciseMuscles (options: {muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getStretchExerciseMuscles (options: { muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stretchExerciseMuscles, stretchExerciseMusclesMeta } = await this.action('stretchExerciseMuscle:list', { ...options, stretchExerciseId: this.id }) as StretchExerciseMuscleListResponse
     return new StretchExerciseMuscles(stretchExerciseMuscles, stretchExerciseMusclesMeta, this.sessionHandler)
   }
@@ -86,7 +86,7 @@ export class StretchExercise extends Model {
     return this._stretchExerciseData.stretchExerciseVariants ? this._stretchExerciseData.stretchExerciseVariants.map(stretchExerciseVariant => new StretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)) : undefined
   }
 
-  async getStretchExerciseVariants (options: {stretchExerciseId?: number, stretchMachineId?: number, variant?: StretchExerciseVariantType, sort?: StretchExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getStretchExerciseVariants (options: { stretchExerciseId?: number, stretchMachineId?: number, variant?: StretchExerciseVariantType, sort?: StretchExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stretchExerciseVariants, stretchExerciseVariantsMeta } = await this.action('stretchExerciseVariant:list', options) as StretchExerciseVariantListResponse
     return new StretchExerciseVariants(stretchExerciseVariants, stretchExerciseVariantsMeta, this.sessionHandler)
   }
@@ -105,32 +105,32 @@ export class PrivilegedStretchExercise extends StretchExercise {
     await this.action('stretchExercise:delete', { id : this.id })
   }
 
-  async getExerciseAliases (options: {alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { exerciseAliases, exerciseAliasesMeta } = await this.action('exerciseAlias:list', { ...options, stretchExerciseId: this.id }) as ExerciseAliasListResponse
     return new PrivilegedExerciseAliases(exerciseAliases, exerciseAliasesMeta, this.sessionHandler)
   }
 
-  async createExerciseAlias (params: {alias: string}) {
+  async createExerciseAlias (params: { alias: string }) {
     const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, stretchExerciseId: this.id }) as ExerciseAliasResponse
     return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 
-  async getStretchExerciseMuscles (options: {muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getStretchExerciseMuscles (options: { muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stretchExerciseMuscles, stretchExerciseMusclesMeta } = await this.action('stretchExerciseMuscle:list', { ...options, stretchExerciseId: this.id }) as StretchExerciseMuscleListResponse
     return new PrivilegedStretchExerciseMuscles(stretchExerciseMuscles, stretchExerciseMusclesMeta, this.sessionHandler)
   }
 
-  async createStretchExerciseMuscle (params: {muscle: MuscleIdentifier, targetLevel: MuscleTargetLevel}) {
+  async createStretchExerciseMuscle (params: { muscle: MuscleIdentifier, targetLevel: MuscleTargetLevel }) {
     const { stretchExerciseMuscle } = await this.action('stretchExerciseMuscle:create', { ...params, stretchExerciseId: this.id }) as StretchExerciseMuscleResponse
     return new PrivilegedStretchExerciseMuscle(stretchExerciseMuscle, this.sessionHandler)
   }
 
-  async getStretchExerciseVariants (options: {stretchExerciseId?: number, stretchMachineId?: number, variant?: StretchExerciseVariantType, sort?: StretchExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getStretchExerciseVariants (options: { stretchExerciseId?: number, stretchMachineId?: number, variant?: StretchExerciseVariantType, sort?: StretchExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stretchExerciseVariants, stretchExerciseVariantsMeta } = await this.action('stretchExerciseVariant:list', options) as StretchExerciseVariantListResponse
     return new PrivilegedStretchExerciseVariants(stretchExerciseVariants, stretchExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createStretchExerciseVariant (params: {stretchMachineId?: number, variant: StretchExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
+  async createStretchExerciseVariant (params: { stretchMachineId?: number, variant: StretchExerciseVariantType, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { stretchExerciseVariant } = await this.action('stretchExerciseVariant:create', { ...params, stretchExerciseId: this.id }) as StretchExerciseVariantResponse
     return new PrivilegedStretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)
   }

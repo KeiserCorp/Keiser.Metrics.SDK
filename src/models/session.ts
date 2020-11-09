@@ -195,13 +195,13 @@ export class FacilitySessions extends ModelList<FacilitySession, SessionData, Se
 }
 
 export class FacilitySession extends Session {
-  async end (params: {echipId?: string, echipData?: object} = { }) {
+  async end (params: { echipId?: string, echipData?: object } = { }) {
     const { session } = await this.action('facilitySession:end', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
     this.setSessionData(session)
     return this
   }
 
-  async update (params: {echipId: string, echipData: object}) {
+  async update (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilitySession:update', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
     this.setSessionData(session)
     return this

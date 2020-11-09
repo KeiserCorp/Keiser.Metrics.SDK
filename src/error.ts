@@ -194,7 +194,7 @@ export class UnhealthyNodeError extends ServerError {
 // Local Errors
 
 export class ClientSideActionPrevented extends RequestError {
-  constructor ({ explanation }: {explanation?: string }) {
+  constructor ({ explanation }: { explanation?: string }) {
     super({
       name: 'InvalidAdminSession',
       message: 'is not a valid super-user session',

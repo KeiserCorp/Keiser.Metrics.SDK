@@ -39,7 +39,7 @@ export class MetricsConnection {
   private _lastMessageId = 0
   private _checkCallbacksTimeoutInstance: number | null = null
   private _socketRetryAttempts: number = 0
-  private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = {}
+  private _callbacks: { [key: number]: { expiresAt: number | null, callback: (success: any, fail?: any) => void } } = { }
   private _retryStrategy = Policy.wrap(
     Policy.handleWhen(ERROR_FILTER).retry().delay([125, 1000, 5000]),
     Policy.handleWhen(ERROR_FILTER).circuitBreaker(15000, new ConsecutiveBreaker(10))
@@ -133,7 +133,7 @@ export class MetricsConnection {
     }
   }
 
-  async action (action: string, params: Object = {}) {
+  async action (action: string, params: Object = { }) {
     try {
       const result = await this._retryStrategy.execute(() => {
         return new Promise((resolve, reject) => {
@@ -185,7 +185,7 @@ export class MetricsConnection {
   }
 
   private pong (time: string) {
-    this._socket?.send(`"primus::pong::${time}"`)
+    this._socket?.send(`"primus::pong::${ time }"`)
   }
 
   private parseResponse (data: { messageId?: number, error?: any }) {
@@ -224,7 +224,7 @@ export class MetricsConnection {
     try {
       const response = await Axios({
         method: 'POST',
-        url: `${this._restEndpoint}?action=${action}`,
+        url: `${ this._restEndpoint }?action=${ action }`,
         data: params,
         timeout: this._requestTimeout
       })

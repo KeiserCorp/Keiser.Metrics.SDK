@@ -29,7 +29,7 @@ export class AcceptedTermsVersion extends Model {
     return this
   }
 
-  async update (params: {revision: string}) {
+  async update (params: { revision: string }) {
     const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { ...params, userId: this._acceptedTermsVersionData.userId }) as AcceptedTermsVersionResponse
     this.setAcceptedTermsVersionData(acceptedTermsVersion)
     return this

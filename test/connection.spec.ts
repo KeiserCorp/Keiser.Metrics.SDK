@@ -78,7 +78,7 @@ describe('Connection', function () {
         }))
 
         expect(result).to.equal(true)
-        const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
+        const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
       })
@@ -86,7 +86,7 @@ describe('Connection', function () {
       it('can make request to server before connection event', async function () {
         this.timeout(connectionTimeout)
 
-        const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
+        const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
       })
@@ -131,7 +131,7 @@ describe('Connection', function () {
       it('can make request to server', async function () {
         this.timeout(connectionTimeout)
 
-        const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
+        const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
       })
@@ -178,7 +178,7 @@ describe('Connection', function () {
     it('can make request to server', async function () {
       this.timeout(connectionTimeout)
 
-      const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
+      const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
       expect(typeof healthResponse.error).to.equal('undefined')
       expect(healthResponse.healthy).to.equal(true)
     })
@@ -201,7 +201,7 @@ describe('Connection', function () {
     it('can make request to server', async function () {
       this.timeout(connectionTimeout)
 
-      const healthResponse = await (metricsInstance.action('core:health') as Promise<{healthy: boolean, error?: any}>)
+      const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
       expect(typeof healthResponse.error).to.equal('undefined')
       expect(healthResponse.healthy).to.equal(true)
     })

@@ -59,7 +59,7 @@ export class HeartRateDataSet extends Model {
     this._graphData = this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
-  async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
+  async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
     const { heartRateDataSet } = await this.action('heartRateDataSet:show', { id: this.id, graph: options.graphResolution }) as HeartRateDataSetResponse
     this.setHeartRateDataSet(heartRateDataSet)
     return this

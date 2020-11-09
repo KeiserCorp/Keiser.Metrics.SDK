@@ -72,7 +72,7 @@ export class MSeriesDataSet extends Model {
     this._graphData = this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
   }
 
-  async reload (options: {graphResolution?: number} = { graphResolution: 200 }) {
+  async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
     const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { id: this.id, graph: options.graphResolution }) as MSeriesDataSetResponse
     this.setMSeriesDataSet(mSeriesDataSet)
     return this

@@ -43,7 +43,7 @@ export class Cache extends Model {
     return this.mutateObject(cacheObject)
   }
 
-  async updateObject (params: {value: string, expireIn?: number}) {
+  async updateObject (params: { value: string, expireIn?: number }) {
     const { cacheObject } = await this.action('resque:cache:update', { ...params, key: this.key }) as CacheObjectResponse
     return this.mutateObject(cacheObject)
   }
