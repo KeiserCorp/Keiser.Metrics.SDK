@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { HeightMeasurement, HeightMeasurementSorting } from '../src/models/heightMeasurement'
 import { User } from '../src/models/user'
@@ -97,5 +98,4 @@ describe('Height Measurement', function () {
 
     expect(heightMeasurements[0].id).to.not.equal(createdHeightMeasurement.id)
   })
-
 })

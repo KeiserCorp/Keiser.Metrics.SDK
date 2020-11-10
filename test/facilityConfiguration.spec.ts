@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { CompositionType, FacilityConfiguration } from '../src/models/facilityConfiguration'
@@ -59,5 +60,4 @@ describe('Facility Configuration', function () {
     expect(facilityConfiguration.memberIdentificationComposition).to.equal(CompositionType.Alpha)
     expect(facilityConfiguration.memberIdentificationRegex).to.equal('^[a-z0-9]{8}$')
   })
-
 })

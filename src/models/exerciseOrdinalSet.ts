@@ -72,10 +72,10 @@ export class ExerciseOrdinalSet extends Model {
   }
 
   eagerExerciseOrdinalSetAssignments () {
-    return this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments ? this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
+    return typeof this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments !== 'undefined' ? this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 
-  async getExerciseOrdinalSetAssignments (options: {ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseOrdinalSetAssignments (options: { ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { exerciseOrdinalSetAssignments, exerciseOrdinalSetAssignmentsMeta } = await this.action('exerciseOrdinalSetAssignment:list', { ...options, exerciseOrdinalSetId: this.id }) as ExerciseOrdinalSetAssignmentListResponse
     return new ExerciseOrdinalSetAssignments(exerciseOrdinalSetAssignments, exerciseOrdinalSetAssignmentsMeta, this.sessionHandler)
   }
@@ -97,15 +97,15 @@ export class PrivilegedExerciseOrdinalSet extends ExerciseOrdinalSet {
   }
 
   async delete () {
-    await this.action('exerciseOrdinalSet:delete', { id : this.id })
+    await this.action('exerciseOrdinalSet:delete', { id: this.id })
   }
 
-  async getExerciseOrdinalSetAssignments (options: {ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getExerciseOrdinalSetAssignments (options: { ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { exerciseOrdinalSetAssignments, exerciseOrdinalSetAssignmentsMeta } = await this.action('exerciseOrdinalSetAssignment:list', { ...options, exerciseOrdinalSetId: this.id }) as ExerciseOrdinalSetAssignmentListResponse
     return new PrivilegedExerciseOrdinalSetAssignments(exerciseOrdinalSetAssignments, exerciseOrdinalSetAssignmentsMeta, this.sessionHandler)
   }
 
-  async createExerciseOrdinalSetAssignment (params: {ordinalIdentifier: string, strengthExerciseVariantId?: number, cardioExerciseVariantId?: number, stretchExerciseVariantId?: number}) {
+  async createExerciseOrdinalSetAssignment (params: { ordinalIdentifier: string, strengthExerciseVariantId?: number, cardioExerciseVariantId?: number, stretchExerciseVariantId?: number }) {
     const { exerciseOrdinalSetAssignment } = await this.action('exerciseOrdinalSetAssignment:create', { ...params, exerciseOrdinalSetId: this.id }) as ExerciseOrdinalSetAssignmentResponse
     return new PrivilegedExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)
   }

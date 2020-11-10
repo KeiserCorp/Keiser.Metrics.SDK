@@ -31,25 +31,25 @@ export class FacilityAccessControl extends Model {
   }
 
   eagerFacilityAccessControlIPRanges () {
-    return this._facilityAccessControlData.facilityAccessControlIPRanges ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
+    return typeof this._facilityAccessControlData.facilityAccessControlIPRanges !== 'undefined' ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
   }
 
-  async createFacilityAccessControlIPRange (params: {cidr: string}) {
+  async createFacilityAccessControlIPRange (params: { cidr: string }) {
     const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:create', params) as FacilityAccessControlIPRangeResponse
     return new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)
   }
 
-  async getFacilityAccessControlIPRange (params: {id: number}) {
+  async getFacilityAccessControlIPRange (params: { id: number }) {
     const { facilityAccessControlIPRange } = await this.action('facilityAccessControlIPRange:show', params) as FacilityAccessControlIPRangeResponse
     return new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)
   }
 
-  async getFacilityAccessControlIPRanges (options: {cidr?: string, sort?: FacilityAccessControlIPRangeSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getFacilityAccessControlIPRanges (options: { cidr?: string, sort?: FacilityAccessControlIPRangeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityAccessControlIPRanges, facilityAccessControlIPRangesMeta } = await this.action('facilityAccessControlIPRange:list', options) as FacilityAccessControlIPRangeListResponse
     return new FacilityAccessControlIPRanges(facilityAccessControlIPRanges, facilityAccessControlIPRangesMeta, this.sessionHandler)
   }
 
   eagerFacilityAccessControlKiosk () {
-    return this._facilityAccessControlData.facilityAccessControlKiosk ? new FacilityAccessControlKiosk(this._facilityAccessControlData.facilityAccessControlKiosk, this.sessionHandler) : undefined
+    return typeof this._facilityAccessControlData.facilityAccessControlKiosk !== 'undefined' ? new FacilityAccessControlKiosk(this._facilityAccessControlData.facilityAccessControlKiosk, this.sessionHandler) : undefined
   }
 }

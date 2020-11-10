@@ -45,8 +45,8 @@ export class FacilityAccessControlKiosk extends Model {
   }
 
   async update (params: {
-    kioskModeAllowed: boolean,
-    primaryIdentification?: PrimaryIdentification,
+    kioskModeAllowed: boolean
+    primaryIdentification?: PrimaryIdentification
     secondaryIdentification?: SecondaryIdentification
   }) {
     const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', params) as FacilityAccessControlKioskResponse

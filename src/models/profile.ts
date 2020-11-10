@@ -65,7 +65,7 @@ export class Profile extends Model {
   }
 
   get gender () {
-    return this._profileData.gender ? this._profileData.gender as Gender : null
+    return this._profileData.gender as Gender ?? null
   }
 
   get language () {
@@ -73,6 +73,6 @@ export class Profile extends Model {
   }
 
   get units () {
-    return this._profileData.units ? this._profileData.units as Units : null
+    return this._profileData.units as Units ?? null
   }
 }

@@ -29,7 +29,7 @@ export interface FacilityResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityListResponse extends AuthenticatedResponse {
-  facilities: FacilityData[],
+  facilities: FacilityData[]
   facilitiesMeta: FacilityListResponseMeta
 }
 
@@ -73,20 +73,16 @@ export class Facility extends Model {
   }
 
   eagerFacilityProfile () {
-    return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
+    return typeof this._facilityData.facilityProfile !== 'undefined' ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
-  async createRelationshipRequest (params: {memberIdentifier?: string}) {
+  async createRelationshipRequest (params: { memberIdentifier?: string }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userCreate', { ...params, facilityId: this.id }) as FacilityRelationshipRequestResponse
     return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 }
 
 export class PrivilegedFacility extends Facility {
-  constructor (facilityData: FacilityData, sessionHandler: SessionHandler) {
-    super(facilityData, sessionHandler)
-  }
-
   get licensedUntil () {
     return new Date(this._facilityData.licensedUntil)
   }
@@ -96,7 +92,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   eagerFacilityProfile () {
-    return this._facilityData.facilityProfile ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
+    return typeof this._facilityData.facilityProfile !== 'undefined' ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
   async setActive () {
@@ -108,77 +104,77 @@ export class PrivilegedFacility extends Facility {
     return new KioskSession(response, this.sessionHandler.connection)
   }
 
-  async createFacilityMemberUser (params: {email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, memberIdentifier?: string, memberSecret?: string, employeeRole?: string | null}) {
+  async createFacilityMemberUser (params: { email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, memberIdentifier?: string, memberSecret?: string, employeeRole?: string | null }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityCreate', { ...params, member: true }) as FacilityRelationshipResponse
     return new FacilityUserMemberRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async createFacilityEmployeeUser (params: {email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, member?: boolean, memberIdentifier?: string, memberSecret?: string, employeeRole: string }) {
+  async createFacilityEmployeeUser (params: { email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, member?: boolean, memberIdentifier?: string, memberSecret?: string, employeeRole: string }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityCreate', params) as FacilityRelationshipResponse
     return new FacilityUserEmployeeRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async createRelationshipRequest (params: {email: string, member?: boolean, memberIdentifier?: string, employeeRole?: FacilityEmployeeRole | null}) {
+  async createRelationshipRequest (params: { email: string, member?: boolean, memberIdentifier?: string, employeeRole?: FacilityEmployeeRole | null }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:facilityCreate', params) as FacilityRelationshipRequestResponse
     return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 
-  async getRelationshipRequest (params: {id: number}) {
+  async getRelationshipRequest (params: { id: number }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:facilityShow', params) as FacilityRelationshipRequestResponse
     return new UserInitiatedFacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 
-  async getRelationshipRequests (options: {memberIdentifier?: string, name?: string, sort?: UserInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getRelationshipRequests (options: { memberIdentifier?: string, name?: string, sort?: UserInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationshipRequests, facilityRelationshipRequestsMeta } = await this.action('facilityRelationshipRequest:facilityList', options) as FacilityRelationshipRequestListResponse
     return new UserInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
   }
 
-  async getRelationship (params: {id: number}) {
+  async getRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
     return new FacilityUserRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async getMemberRelationship (params: {id: number}) {
+  async getMemberRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
     return new FacilityUserMemberRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async getMemberRelationships (options: {name?: string, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getMemberRelationships (options: { name?: string, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
     return new FacilityUserMemberRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getEmployeeRelationship (params: {id: number}) {
+  async getEmployeeRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
     return new FacilityUserEmployeeRelationship(facilityRelationship, this.sessionHandler)
   }
 
-  async getEmployeeRelationships (options: {name?: string, employeeRole?: FacilityEmployeeRole | null, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getEmployeeRelationships (options: { name?: string, employeeRole?: FacilityEmployeeRole | null, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, employee: true }) as FacilityUserRelationshipListResponse
     return new FacilityUserEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getSession (params: {id: number}) {
+  async getSession (params: { id: number }) {
     const { session } = await this.action('facilitySession:show', params) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
   }
 
-  async getSessionByEChip (params: {echipId: string}) {
+  async getSessionByEChip (params: { echipId: string }) {
     const { session } = await this.action('facilitySession:checkEchip', params) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
   }
 
-  async getSessions (options: {open?: boolean, name?: string, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getSessions (options: { open?: boolean, name?: string, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { sessions, sessionsMeta } = await this.action('facilitySession:list', options) as SessionListResponse
     return new FacilitySessions(sessions, sessionsMeta, this.sessionHandler)
   }
 
-  async createFacilityStrengthMachine (params: {strengthMachineId: number, model: string, version: string, serial: string, location?: string}) {
+  async createFacilityStrengthMachine (params: { strengthMachineId: number, model: string, version: string, serial: string, location?: string }) {
     const { facilityStrengthMachine } = await this.action('facilityStrengthMachine:create', { ...params }) as FacilityStrengthMachineResponse
     return new FacilityStrengthMachine(facilityStrengthMachine, this.sessionHandler)
   }
 
-  async createFacilityStrengthMachinesFromEChip (params: {echipData: any}) {
+  async createFacilityStrengthMachinesFromEChip (params: { echipData: any }) {
     const { facilityStrengthMachines, unknownMachines } = await this.action('facilityStrengthMachine:createEchip', { echipData: JSON.stringify(params.echipData) }) as FacilityStrengthMachineBulkCreateResponse
     return {
       strengthMachines: facilityStrengthMachines.map(f => new FacilityStrengthMachine(f, this.sessionHandler)),
@@ -186,12 +182,12 @@ export class PrivilegedFacility extends Facility {
     }
   }
 
-  async getFacilityStrengthMachine (params: {id: number}) {
+  async getFacilityStrengthMachine (params: { id: number }) {
     const { facilityStrengthMachine } = await this.action('facilityStrengthMachine:show', params) as FacilityStrengthMachineResponse
     return new FacilityStrengthMachine(facilityStrengthMachine, this.sessionHandler)
   }
 
-  async getFacilityStrengthMachines (options: {model?: string, sort?: FacilityStrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number} = { }) {
+  async getFacilityStrengthMachines (options: { model?: string, sort?: FacilityStrengthMachineSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityStrengthMachines, facilityStrengthMachinesMeta } = await this.action('facilityStrengthMachine:list', { ...options, member: true }) as FacilityStrengthMachineListResponse
     return new FacilityStrengthMachines(facilityStrengthMachines, facilityStrengthMachinesMeta, this.sessionHandler)
   }

@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { BlacklistTokenError } from '../src/error'
 import { User } from '../src/models/user'
@@ -46,7 +47,7 @@ describe('User', function () {
   })
 
   it('can change user password', async function () {
-    const newPassword = 'p@$$\/\/0r|)'
+    const newPassword = 'p@$$w0r|)'
     await user.changePassword({ password: newPassword })
   })
 
@@ -64,5 +65,4 @@ describe('User', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(BlacklistTokenError.code)
   })
-
 })

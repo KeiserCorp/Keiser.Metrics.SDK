@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementSorting } from '../src/models/mSeriesFtpMeasurement'
@@ -16,7 +17,7 @@ describe('M Series FTP Measurement', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     user = userSession.user
   })
 
@@ -73,5 +74,4 @@ describe('M Series FTP Measurement', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

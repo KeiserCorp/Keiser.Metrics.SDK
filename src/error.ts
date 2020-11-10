@@ -20,7 +20,7 @@ export class BaseMetricsError extends Error {
   }
 
   toString () {
-    return this.name + ': ' + this.message + (this.params?.length ? ' [' + this.params.join(', ') + ']' : '')
+    return this.name + ': ' + this.message + (this.params?.length > 0 ? ' [' + this.params.join(', ') + ']' : '')
   }
 
   get code () {
@@ -30,7 +30,7 @@ export class BaseMetricsError extends Error {
 
 /** @hidden */
 export function GetErrorInstance (errorProperties: ActionErrorProperties) {
-  const errorType = [
+  const ErrorType = [
     MissingParamsError,
     UnknownActionError,
     InvalidCredentialsError,
@@ -59,8 +59,8 @@ export function GetErrorInstance (errorProperties: ActionErrorProperties) {
     UnhealthyNodeError
   ].find(c => c.code === errorProperties.code)
 
-  if (errorType) {
-    return new errorType(errorProperties)
+  if (typeof ErrorType !== 'undefined') {
+    return new ErrorType(errorProperties)
   }
 
   return new ConnectionError(errorProperties)
@@ -194,7 +194,7 @@ export class UnhealthyNodeError extends ServerError {
 // Local Errors
 
 export class ClientSideActionPrevented extends RequestError {
-  constructor ({ explanation }: {explanation?: string }) {
+  constructor ({ explanation }: { explanation?: string }) {
     super({
       name: 'InvalidAdminSession',
       message: 'is not a valid super-user session',

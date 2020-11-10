@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics, { MetricsAdmin } from '../src'
 import { StrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { UserSession } from '../src/session'

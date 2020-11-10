@@ -40,11 +40,11 @@ export class FacilityConfiguration extends Model {
   }
 
   async update (params: {
-    memberIdentificationComposition: CompositionType,
-    memberIdentificationForceLength: boolean,
-    memberIdentificationLength: number,
-    memberSecretComposition: CompositionType,
-    memberSecretForceLength: boolean,
+    memberIdentificationComposition: CompositionType
+    memberIdentificationForceLength: boolean
+    memberIdentificationLength: number
+    memberSecretComposition: CompositionType
+    memberSecretForceLength: boolean
     memberSecretLength: number
   }) {
     const { facilityConfiguration } = await this.action('facilityConfiguration:update', params) as FacilityConfigurationResponse

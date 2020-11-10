@@ -77,12 +77,12 @@ export class WeightMeasurement extends Model {
   constructor (weightMeasurementData: WeightMeasurementData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._weightMeasurementData = weightMeasurementData
-    this._bodyCompositionMeasurement = this._weightMeasurementData.bodyCompositionMeasurement ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
+    this._bodyCompositionMeasurement = typeof this._weightMeasurementData.bodyCompositionMeasurement !== 'undefined' ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
   }
 
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
     this._weightMeasurementData = weightMeasurementData
-    this._bodyCompositionMeasurement = this._weightMeasurementData.bodyCompositionMeasurement ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
+    this._bodyCompositionMeasurement = typeof this._weightMeasurementData.bodyCompositionMeasurement !== 'undefined' ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
   }
 
   async reload () {
@@ -131,7 +131,7 @@ export class WeightMeasurement extends Model {
 }
 
 export class BodyCompositionMeasurement {
-  private _bodyCompositionMeasurementData: BodyCompositionMeasurementData
+  private readonly _bodyCompositionMeasurementData: BodyCompositionMeasurementData
 
   constructor (bodyCompositionMeasurementData: BodyCompositionMeasurementData) {
     this._bodyCompositionMeasurementData = bodyCompositionMeasurementData

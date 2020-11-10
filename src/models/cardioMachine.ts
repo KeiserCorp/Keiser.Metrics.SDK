@@ -84,11 +84,11 @@ export class CardioMachine extends Model {
   }
 
   eagerDefaultCardioExercise () {
-    return this._cardioMachineData.defaultCardioExercise ? new CardioExercise(this._cardioMachineData.defaultCardioExercise, this.sessionHandler) : undefined
+    return typeof this._cardioMachineData.defaultCardioExercise !== 'undefined' ? new CardioExercise(this._cardioMachineData.defaultCardioExercise, this.sessionHandler) : undefined
   }
 
   async getDefaultCardioExercise () {
-    const { cardioExercise } = await this.action('cardioExercise:show' , { id: this._cardioMachineData.defaultCardioExerciseId }) as CardioExerciseResponse
+    const { cardioExercise } = await this.action('cardioExercise:show', { id: this._cardioMachineData.defaultCardioExerciseId }) as CardioExerciseResponse
     return new CardioExercise(cardioExercise, this.sessionHandler)
   }
 }

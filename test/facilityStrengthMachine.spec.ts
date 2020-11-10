@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
@@ -45,7 +46,7 @@ describe('Facility Strength Machine', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {
@@ -138,5 +139,4 @@ describe('Facility Strength Machine', function () {
 
     await importResults.strengthMachines[0].delete()
   })
-
 })

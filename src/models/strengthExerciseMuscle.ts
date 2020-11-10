@@ -41,13 +41,13 @@ export class PrivilegedStrengthExerciseMuscles extends ModelList<PrivilegedStren
 
 /** @hidden */
 export class PrivilegedStrengthExerciseMuscle extends StrengthExerciseMuscle {
-  async update (params: { targetLevel: MuscleTargetLevel}) {
+  async update (params: { targetLevel: MuscleTargetLevel }) {
     const { strengthExerciseMuscle } = await this.action('strengthExerciseMuscle:update', { ...params, id: this.id }) as StrengthExerciseMuscleResponse
     this.setMuscleData(strengthExerciseMuscle)
     return this
   }
 
   async delete () {
-    await this.action('strengthExerciseMuscle:delete', { id : this.id })
+    await this.action('strengthExerciseMuscle:delete', { id: this.id })
   }
 }

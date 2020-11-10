@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
@@ -45,7 +46,7 @@ describe('Facility Access Control IP Range', function () {
   })
 
   it('can get facility access control IP ranges dynamically', async function () {
-    let accessControlIPRanges = await accessControl.getFacilityAccessControlIPRanges()
+    const accessControlIPRanges = await accessControl.getFacilityAccessControlIPRanges()
 
     expect(Array.isArray(accessControlIPRanges)).to.equal(true)
     expect(accessControlIPRanges.length).to.be.above(0)

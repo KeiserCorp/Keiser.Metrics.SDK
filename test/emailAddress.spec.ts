@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { EmailAddress } from '../src/models/emailAddress'
@@ -49,7 +50,7 @@ describe('Email Address', function () {
     expect(emailAddresses.length).to.equal(2)
     expect(emailAddresses.meta.totalCount).to.equal(2)
   })
-  
+
   it('can delete email address', async function () {
     let extError
 
@@ -64,5 +65,4 @@ describe('Email Address', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

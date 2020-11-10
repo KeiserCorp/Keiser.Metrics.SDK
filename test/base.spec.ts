@@ -1,9 +1,9 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
 
 describe('Base', function () {
-
   it('can create instance with properties', function () {
     const metricsInstance = new Metrics({
       restEndpoint: DevRestEndpoint,
@@ -41,5 +41,4 @@ describe('Base', function () {
     metricsInstance.dispose()
     expect(metricsInstance.persistConnection).to.equal(false)
   })
-
 })

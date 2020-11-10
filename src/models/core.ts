@@ -26,11 +26,11 @@ export class Core {
     this._connection = connection
   }
 
-  health () {
-    return this._connection.action('core:health') as Promise<HealthResponse>
+  async health () {
+    return await this._connection.action('core:health') as HealthResponse
   }
 
-  status () {
-    return this._connection.action('core:status') as Promise<StatusResponse>
+  async status () {
+    return await this._connection.action('core:status') as StatusResponse
   }
 }

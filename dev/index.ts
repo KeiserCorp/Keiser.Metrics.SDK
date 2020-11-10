@@ -1,6 +1,4 @@
 mocha.setup('bdd')
-// mocha.growl()
-
+// eslint-disable-next-line import/first
 import '../test'
-
 mocha.run()

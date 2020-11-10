@@ -102,15 +102,15 @@ export class StrengthExerciseVariant extends Model {
   }
 
   eagerStrengthExercise () {
-    return this._strengthExerciseVariantData.strengthExercise ? new StrengthExercise(this._strengthExerciseVariantData.strengthExercise, this.sessionHandler) : undefined
+    return typeof this._strengthExerciseVariantData.strengthExercise !== 'undefined' ? new StrengthExercise(this._strengthExerciseVariantData.strengthExercise, this.sessionHandler) : undefined
   }
 
   eagerStrengthMachine () {
-    return this._strengthExerciseVariantData.strengthMachine ? new StrengthMachine(this._strengthExerciseVariantData.strengthMachine, this.sessionHandler) : undefined
+    return typeof this._strengthExerciseVariantData.strengthMachine !== 'undefined' ? new StrengthMachine(this._strengthExerciseVariantData.strengthMachine, this.sessionHandler) : undefined
   }
 
   eagerExerciseOrdinalSetAssignments () {
-    return this._strengthExerciseVariantData.exerciseOrdinalSetAssignments ? this._strengthExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
+    return typeof this._strengthExerciseVariantData.exerciseOrdinalSetAssignments !== 'undefined' ? this._strengthExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 
@@ -130,6 +130,6 @@ export class PrivilegedStrengthExerciseVariant extends StrengthExerciseVariant {
   }
 
   async delete () {
-    await this.action('strengthExerciseVariant:delete', { id : this.id })
+    await this.action('strengthExerciseVariant:delete', { id: this.id })
   }
 }

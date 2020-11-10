@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -24,10 +25,9 @@ describe('Core', function () {
   })
 
   it('can get status', async function () {
-    let status = await metricsInstance.core.status()
+    const status = await metricsInstance.core.status()
 
     expect(status).to.be.an('object')
     expect(status.name).to.equal('keiser.metrics.api')
   })
-
 })

@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
@@ -16,7 +17,7 @@ describe('Strength Machine Data Set', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     user = userSession.user
   })
 
@@ -83,5 +84,4 @@ describe('Strength Machine Data Set', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

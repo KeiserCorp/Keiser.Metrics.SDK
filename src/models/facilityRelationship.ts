@@ -125,10 +125,6 @@ export class UserFacilityEmployeeRelationships extends ModelList<UserFacilityEmp
 }
 
 export class UserFacilityRelationship extends FacilityRelationship {
-  constructor (facilityRelationshipData: FacilityRelationshipData, sessionHandler: SessionHandler) {
-    super(facilityRelationshipData, sessionHandler)
-  }
-
   async reload () {
     const { facilityRelationship } = await this.action('facilityRelationship:userShow', { userId: this.userId, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
@@ -177,17 +173,13 @@ export class FacilityUserEmployeeRelationships extends ModelList<FacilityUserEmp
 }
 
 export class FacilityUserRelationship extends FacilityRelationship {
-  constructor (facilityRelationshipData: FacilityRelationshipData, sessionHandler: SessionHandler) {
-    super(facilityRelationshipData, sessionHandler)
-  }
-
   async reload () {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this
   }
 
-  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null}) {
+  async update (params: { memberIdentifier?: string | null, member?: boolean, employeeRole?: string | null }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityUpdate', { ...params, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
     return this
@@ -208,7 +200,7 @@ export class FacilityUserMemberRelationship extends FacilityUserRelationship {
   }
 
   eagerActiveSession () {
-    return this._facilityRelationshipData.user.sessions && this._facilityRelationshipData.user.sessions.length > 0 ? new Session(this._facilityRelationshipData.user.sessions[0], this.sessionHandler) : undefined
+    return typeof this._facilityRelationshipData.user.sessions !== 'undefined' && this._facilityRelationshipData.user.sessions.length > 0 ? new Session(this._facilityRelationshipData.user.sessions[0], this.sessionHandler) : undefined
   }
 }
 

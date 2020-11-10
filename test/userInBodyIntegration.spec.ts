@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { FacilityMemberUser } from '../src/models/user'
@@ -52,5 +53,4 @@ describe('User InBody Integration', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(ActionPreventedError.code)
   })
-
 })

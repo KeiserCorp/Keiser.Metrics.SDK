@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import { MetricsAdmin } from '../src'
 import { Queue, TaskSorting } from '../src/models/task'
 import { AdminSession } from '../src/session'

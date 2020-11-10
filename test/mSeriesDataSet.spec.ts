@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { MSeriesDataSet, MSeriesDataSetSorting } from '../src/models/mSeriesDataSet'
@@ -32,7 +33,7 @@ describe('M Series Data Set', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     user = userSession.user
   })
 
@@ -94,5 +95,4 @@ describe('M Series Data Set', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

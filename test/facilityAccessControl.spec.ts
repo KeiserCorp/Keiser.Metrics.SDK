@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControl } from '../src/models/facilityAccessControl'
@@ -45,5 +46,4 @@ describe('Facility Access Control', function () {
     expect(Array.isArray(accessControl.eagerFacilityAccessControlIPRanges())).to.equal(true)
     expect(typeof accessControl.eagerFacilityAccessControlKiosk()).to.equal('object')
   })
-
 })

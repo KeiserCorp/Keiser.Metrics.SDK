@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole } from '../src/models/facilityRelationship'

@@ -13,7 +13,7 @@ export interface UserInBodyIntegrationResponse extends AuthenticatedResponse {
 
 export class UserInBodyIntegration extends Model {
   private _userInBodyIntegrationData: UserInBodyIntegrationData
-  private _userId: number
+  private readonly _userId: number
 
   constructor (userInBodyIntegrationData: UserInBodyIntegrationData, sessionHandler: SessionHandler, userId: number) {
     super(sessionHandler)

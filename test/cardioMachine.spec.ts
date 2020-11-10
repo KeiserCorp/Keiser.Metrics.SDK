@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics, { MetricsAdmin } from '../src'
 import { CardioMachine, CardioMachineSorting } from '../src/models/cardioMachine'
 import { UserSession } from '../src/session'

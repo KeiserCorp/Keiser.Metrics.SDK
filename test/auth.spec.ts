@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { BlacklistTokenError, DuplicateEntityError, InvalidCredentialsError, UnauthorizedTokenError } from '../src/error'
 import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
@@ -117,14 +118,15 @@ describe('Auth', function () {
 
     const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: false })
     await new Promise((resolve, reject) => {
-      setTimeout(async () => {
+      const reload = async () => {
         try {
           await session.user.reload()
           resolve()
         } catch (error) {
-          reject()
+          reject(error)
         }
-      }, accessTokenTimeout + 100)
+      }
+      setTimeout(() => void reload(), accessTokenTimeout + 100)
     })
 
     session.close()
@@ -138,7 +140,7 @@ describe('Auth', function () {
 
     const event = await new Promise(resolve => {
       session.onRefreshTokenChangeEvent.one(e => resolve(e))
-      setTimeout(() => session.user.reload(), accessTokenTimeout + 100)
+      setTimeout(() => void session.user.reload(), accessTokenTimeout + 100)
     }) as any
 
     expect(event).to.be.an('object')

@@ -23,7 +23,10 @@ export interface SessionData {
   user?: UserData
   facility?: FacilityData
 
-  sessionPlanSequenceInstance?: any   // To-Do: Add Session Plan Sequence Instance model
+  /**
+   * @todo Add Session Plan Sequence Instance model
+   */
+  sessionPlanSequenceInstance?: any
   heartRateDataSets?: HeartRateDataSetData[]
   mSeriesDataSets?: MSeriesDataSetData[]
   strengthMachineDataSets?: StrengthMachineDataSetData[]
@@ -34,7 +37,10 @@ export interface SessionData {
 
 export interface SessionResponse extends AuthenticatedResponse {
   session: SessionData
-  echipData?: object // To-Do: Define struct for echipData
+  /**
+   * @todo Define interface for echipData
+   */
+  echipData?: object
 }
 
 export interface SessionListResponse extends AuthenticatedResponse {
@@ -56,7 +62,7 @@ export class Sessions extends ModelList<Session, SessionData, SessionListRespons
 }
 
 export class StaticSession {
-  private _sessionData: SessionData
+  private readonly _sessionData: SessionData
 
   constructor (sessionData: SessionData) {
     this._sessionData = sessionData
@@ -79,7 +85,7 @@ export class StaticSession {
   }
 
   get endedAt () {
-    return this._sessionData.endedAt ? new Date(this._sessionData.endedAt) : null
+    return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
   }
 
   get user () {
@@ -156,35 +162,35 @@ export class Session extends Model {
   }
 
   get endedAt () {
-    return this._sessionData.endedAt ? new Date(this._sessionData.endedAt) : null
+    return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
   }
 
   eagerUser () {
-    return this._sessionData.user ? new User(this._sessionData.user, this.sessionHandler) : undefined
+    return typeof this._sessionData.user !== 'undefined' ? new User(this._sessionData.user, this.sessionHandler) : undefined
   }
 
   eagerFacility () {
-    return this._sessionData.facility ? new Facility(this._sessionData.facility, this.sessionHandler) : undefined
+    return typeof this._sessionData.facility !== 'undefined' ? new Facility(this._sessionData.facility, this.sessionHandler) : undefined
   }
 
   eagerHeartRateDataSets () {
-    return this._sessionData.heartRateDataSets ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler)) : undefined
+    return typeof this._sessionData.heartRateDataSets !== 'undefined' ? this._sessionData.heartRateDataSets.map(heartRateDataSet => new HeartRateDataSet(heartRateDataSet, this.sessionHandler)) : undefined
   }
 
   eagerMSeriesDataSets () {
-    return this._sessionData.mSeriesDataSets ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)) : undefined
+    return typeof this._sessionData.mSeriesDataSets !== 'undefined' ? this._sessionData.mSeriesDataSets.map(mSeriesDataSet => new MSeriesDataSet(mSeriesDataSet, this.sessionHandler)) : undefined
   }
 
   eagerStrengthMachineDataSets () {
-    return this._sessionData.strengthMachineDataSets ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)) : undefined
+    return typeof this._sessionData.strengthMachineDataSets !== 'undefined' ? this._sessionData.strengthMachineDataSets.map(strengthMachineDataSet => new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)) : undefined
   }
 
   eagerHeightMeasurement () {
-    return this._sessionData.heightMeasurement ? new HeightMeasurement(this._sessionData.heightMeasurement, this.sessionHandler) : undefined
+    return typeof this._sessionData.heightMeasurement !== 'undefined' ? new HeightMeasurement(this._sessionData.heightMeasurement, this.sessionHandler) : undefined
   }
 
   eagerWeightMeasurement () {
-    return this._sessionData.weightMeasurement ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler) : undefined
+    return typeof this._sessionData.weightMeasurement !== 'undefined' ? new WeightMeasurement(this._sessionData.weightMeasurement, this.sessionHandler) : undefined
   }
 }
 
@@ -195,13 +201,13 @@ export class FacilitySessions extends ModelList<FacilitySession, SessionData, Se
 }
 
 export class FacilitySession extends Session {
-  async end (params: {echipId?: string, echipData?: object} = { }) {
+  async end (params: { echipId?: string, echipData?: object } = { }) {
     const { session } = await this.action('facilitySession:end', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
     this.setSessionData(session)
     return this
   }
 
-  async update (params: {echipId: string, echipData: object}) {
+  async update (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilitySession:update', { echipId: params.echipId, echipData: JSON.stringify(params.echipData), id: this.id }) as SessionResponse
     this.setSessionData(session)
     return this

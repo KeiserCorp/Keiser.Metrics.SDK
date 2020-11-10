@@ -10,15 +10,15 @@ export interface CacheObjectResponse extends AuthenticatedResponse {
 }
 
 export interface CacheObject {
-  createdAt: number,
-  expireTimestamp: number,
-  lastReadAt: number,
-  key: string,
+  createdAt: number
+  expireTimestamp: number
+  lastReadAt: number
+  key: string
   value: string
 }
 
 export class Cache extends Model {
-  private _key: string
+  private readonly _key: string
 
   constructor (key: string, sessionHandler: SessionHandler) {
     super(sessionHandler)
@@ -43,7 +43,7 @@ export class Cache extends Model {
     return this.mutateObject(cacheObject)
   }
 
-  async updateObject (params: {value: string, expireIn?: number}) {
+  async updateObject (params: { value: string, expireIn?: number }) {
     const { cacheObject } = await this.action('resque:cache:update', { ...params, key: this.key }) as CacheObjectResponse
     return this.mutateObject(cacheObject)
   }

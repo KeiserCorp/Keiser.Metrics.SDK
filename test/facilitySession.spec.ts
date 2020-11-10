@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
@@ -12,7 +13,7 @@ describe('Facility Session', function () {
   let user: FacilityMemberUser
   let createdSession: FacilitySession
   const echipId = [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
-  let echipData = {
+  const echipData = {
     1621: {
       position: {
         chest: null,
@@ -48,7 +49,7 @@ describe('Facility Session', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    let userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {
@@ -56,7 +57,7 @@ describe('Facility Session', function () {
       await facility.setActive()
     }
 
-    user = ((await facility?.getMemberRelationships()) || [])[0]?.eagerUser()
+    user = (await facility.getMemberRelationships())[0]?.eagerUser()
   })
 
   after(function () {
@@ -201,5 +202,4 @@ describe('Facility Session', function () {
     expect(createdSession.eagerStrengthMachineDataSets()?.length).to.equal(2)
     await createdSession.delete()
   })
-
 })
