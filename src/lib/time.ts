@@ -6,16 +6,16 @@ export const durationToSeconds = (duration: string): number => {
   if (match !== null) {
     const groups = match.groups
     if (typeof groups !== 'undefined') {
-      if (groups.days !== '') {
+      if (typeof groups.days !== 'undefined' && groups.days !== '') {
         accumulated += parseInt(groups.days, 10) * 86400
       }
-      if (groups.hours !== '') {
+      if (typeof groups.hours !== 'undefined' && groups.hours !== '') {
         accumulated += parseInt(groups.hours, 10) * 3600
       }
-      if (groups.minutes !== '') {
+      if (typeof groups.minutes !== 'undefined' && groups.minutes !== '') {
         accumulated += parseInt(groups.minutes, 10) * 60
       }
-      if (groups.seconds !== '') {
+      if (typeof groups.seconds !== 'undefined' && groups.seconds !== '') {
         accumulated += parseInt(groups.seconds, 10)
       }
     }
