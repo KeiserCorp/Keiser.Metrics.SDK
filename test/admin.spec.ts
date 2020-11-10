@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import { MetricsAdmin } from '../src'
 import { StatSorting } from '../src/models/stat'
 import { User, UserSorting } from '../src/models/user'
@@ -79,7 +80,6 @@ describe('Admin', function () {
     expect(emailAddresses.length).to.above(1)
     const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
     expect(addedEmailAddresses.length).to.equal(1)
-    await Promise.all(addedEmailAddresses.map(e => e.delete()))
+    await Promise.all(addedEmailAddresses.map(async e => await e.delete()))
   })
-
 })

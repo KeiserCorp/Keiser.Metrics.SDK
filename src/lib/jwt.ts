@@ -8,9 +8,9 @@ const atobImp = (str: string): string => {
 
 export const DecodeJWT = (token: string) => {
   let bodySeg = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-  bodySeg = bodySeg.padEnd(bodySeg.length + (4 - (bodySeg.length % 4)), '=').replace(/====$/,'')
-  return JSON.parse(decodeURIComponent(atobImp(bodySeg).replace(/(.)/g, (m, p) => {
-    const code = p.charCodeAt(0).toString(16).toUpperCase()
-    return '%' + (code.length < 2 ? '0' : '') + code
+  bodySeg = bodySeg.padEnd(bodySeg.length + (4 - (bodySeg.length % 4)), '=').replace(/====$/, '')
+  return JSON.parse(decodeURIComponent(atobImp(bodySeg).replace(/(.)/g, m => {
+    const code = m.charCodeAt(0).toString(16).toUpperCase()
+    return `%${(code.length < 2 ? '0' : '')}${code}`
   })))
 }

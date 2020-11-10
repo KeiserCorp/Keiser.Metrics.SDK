@@ -73,25 +73,25 @@ export class ExerciseAlias extends Model {
   }
 
   get type () {
-    if (this._exerciseAliasData.strengthExercise) {
+    if (typeof this._exerciseAliasData.strengthExercise !== 'undefined') {
       return ExerciseAliasType.Strength
     }
-    if (this._exerciseAliasData.cardioExercise) {
+    if (typeof this._exerciseAliasData.cardioExercise !== 'undefined') {
       return ExerciseAliasType.Cardio
     }
     return ExerciseAliasType.Stretch
   }
 
   eagerStrengthExercise () {
-    return this._exerciseAliasData.strengthExercise ? new StrengthExercise(this._exerciseAliasData.strengthExercise, this.sessionHandler) : undefined
+    return typeof this._exerciseAliasData.strengthExercise !== 'undefined' ? new StrengthExercise(this._exerciseAliasData.strengthExercise, this.sessionHandler) : undefined
   }
 
   eagerCardioExercise () {
-    return this._exerciseAliasData.cardioExercise ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
+    return typeof this._exerciseAliasData.cardioExercise !== 'undefined' ? new CardioExercise(this._exerciseAliasData.cardioExercise, this.sessionHandler) : undefined
   }
 
   eagerStretchExercise () {
-    return this._exerciseAliasData.stretchExercise ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
+    return typeof this._exerciseAliasData.stretchExercise !== 'undefined' ? new StretchExercise(this._exerciseAliasData.stretchExercise, this.sessionHandler) : undefined
   }
 }
 
@@ -111,6 +111,6 @@ export class PrivilegedExerciseAlias extends ExerciseAlias {
   }
 
   async delete () {
-    await this.action('exerciseAlias:delete', { id : this.id })
+    await this.action('exerciseAlias:delete', { id: this.id })
   }
 }

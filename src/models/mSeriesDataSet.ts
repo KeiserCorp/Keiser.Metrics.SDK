@@ -15,7 +15,10 @@ export interface MSeriesDataSetData {
   source: string | null
   startedAt: string
   endedAt: string
-  machineType: string // To-Do: Machine Type Model
+  /**
+   * @todo Add machine type enum
+   */
+  machineType: string
   ordinalId: number
   buildMajor: number
   buildMinor: number
@@ -64,12 +67,12 @@ export class MSeriesDataSet extends Model {
   constructor (mSeriesDataSetData: MSeriesDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._mSeriesDataSetData = mSeriesDataSetData
-    this._graphData = this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
+    this._graphData = typeof this._mSeriesDataSetData.graphData !== 'undefined' ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
   }
 
   private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
     this._mSeriesDataSetData = mSeriesDataSetData
-    this._graphData = this._mSeriesDataSetData.graphData ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
+    this._graphData = typeof this._mSeriesDataSetData.graphData !== 'undefined' ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
@@ -205,13 +208,12 @@ export class MSeriesDataSet extends Model {
   }
 
   eagerMSeriesFtpMeasurement () {
-    return this._mSeriesDataSetData.mSeriesFtpMeasurement ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler) : undefined
+    return typeof this._mSeriesDataSetData.mSeriesFtpMeasurement !== 'undefined' ? new MSeriesFtpMeasurement(this._mSeriesDataSetData.mSeriesFtpMeasurement, this.sessionHandler) : undefined
   }
 
   eagerSession () {
-    return this._mSeriesDataSetData.session ? new Session(this._mSeriesDataSetData.session, this.sessionHandler) : undefined
+    return typeof this._mSeriesDataSetData.session !== 'undefined' ? new Session(this._mSeriesDataSetData.session, this.sessionHandler) : undefined
   }
-
 }
 
 export interface MSeriesDataPointData {
@@ -243,7 +245,7 @@ export interface MSeriesCapturedDataPoint {
 }
 
 export class MSeriesDataPoint {
-  private _mSeriesDataPointData: MSeriesDataPointData
+  private readonly _mSeriesDataPointData: MSeriesDataPointData
 
   constructor (mSeriesDataPointData: MSeriesDataPointData) {
     this._mSeriesDataPointData = mSeriesDataPointData

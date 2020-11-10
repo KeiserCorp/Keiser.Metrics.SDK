@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const WriteJsonPlugin = require('write-json-webpack-plugin')
 const CreateFileWebpack = require('create-file-webpack')
 const DIST = path.resolve(__dirname, '../dist')
-const package = Object.assign(require('../package.json'), {
+const packageData = Object.assign(require('../package.json'), {
   main: 'index.js',
   browser: 'index.browser.js',
   types: 'index.d.ts',
@@ -55,10 +55,11 @@ const browserConfig = {
     new CreateFileWebpack({
       path: './dist',
       fileName: '.npmrc',
+      // eslint-disable-next-line no-template-curly-in-string
       content: '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'
     }),
     new WriteJsonPlugin({
-      object: package,
+      object: packageData,
       filename: 'package.json',
       pretty: true
     })

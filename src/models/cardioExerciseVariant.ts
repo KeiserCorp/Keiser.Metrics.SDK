@@ -80,15 +80,15 @@ export class CardioExerciseVariant extends Model {
   }
 
   eagerCardioExercise () {
-    return this._cardioExerciseVariantData.cardioExercise ? new CardioExercise(this._cardioExerciseVariantData.cardioExercise, this.sessionHandler) : undefined
+    return typeof this._cardioExerciseVariantData.cardioExercise !== 'undefined' ? new CardioExercise(this._cardioExerciseVariantData.cardioExercise, this.sessionHandler) : undefined
   }
 
   eagerCardioMachine () {
-    return this._cardioExerciseVariantData.cardioMachine ? new CardioMachine(this._cardioExerciseVariantData.cardioMachine, this.sessionHandler) : undefined
+    return typeof this._cardioExerciseVariantData.cardioMachine !== 'undefined' ? new CardioMachine(this._cardioExerciseVariantData.cardioMachine, this.sessionHandler) : undefined
   }
 
   eagerExerciseOrdinalSetAssignments () {
-    return this._cardioExerciseVariantData.exerciseOrdinalSetAssignments ? this._cardioExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
+    return typeof this._cardioExerciseVariantData.exerciseOrdinalSetAssignments !== 'undefined' ? this._cardioExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 
@@ -108,6 +108,6 @@ export class PrivilegedCardioExerciseVariant extends CardioExerciseVariant {
   }
 
   async delete () {
-    await this.action('cardioExerciseVariant:delete', { id : this.id })
+    await this.action('cardioExerciseVariant:delete', { id: this.id })
   }
 }

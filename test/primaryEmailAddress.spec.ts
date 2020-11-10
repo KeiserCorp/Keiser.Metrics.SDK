@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { EmailAddress } from '../src/models/emailAddress'
 import { PrimaryEmailAddress } from '../src/models/primaryEmailAddress'
@@ -63,7 +64,7 @@ describe('Primary Email Address', function () {
   })
 
   it('can get email addresses marked as primary', async function () {
-    let emailAddress = await existingPrimaryEmailAddress.getEmailAddress()
+    const emailAddress = await existingPrimaryEmailAddress.getEmailAddress()
 
     expect(emailAddress).to.be.an('object')
     expect(emailAddress.id).to.be.a('number')

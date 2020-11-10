@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
@@ -144,5 +145,4 @@ describe('Facility Kiosk Token', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnauthorizedTokenError.code)
   })
-
 })

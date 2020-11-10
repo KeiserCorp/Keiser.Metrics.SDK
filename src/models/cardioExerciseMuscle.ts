@@ -48,6 +48,6 @@ export class PrivilegedCardioExerciseMuscle extends CardioExerciseMuscle {
   }
 
   async delete () {
-    await this.action('cardioExerciseMuscle:delete', { id : this.id })
+    await this.action('cardioExerciseMuscle:delete', { id: this.id })
   }
 }

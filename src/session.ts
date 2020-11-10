@@ -1,4 +1,5 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
+
 import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
@@ -12,7 +13,7 @@ import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAlia
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet, PrivilegedExerciseOrdinalSets } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
-import { FacilityLicense, FacilityLicenseListResponse,FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting , LicenseType } from './models/facilityLicense'
+import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
 import { OAuthProviders } from './models/oauthService'
 import { SessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
@@ -49,8 +50,8 @@ export interface KioskTokenChangeEvent {
 
 export interface JWTToken {
   user: { id: number }
-  facility: FacilityData | null
-  facilityRole: string | null
+  facility?: FacilityData | null
+  facilityRole?: string | null
   type: 'access' | 'refresh'
   iat: number
   exp: number
@@ -76,54 +77,54 @@ export interface KioskToken {
   jti: string
 }
 
-export class Authentication {
-  static async useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
+export module Authentication {
+  export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:login', params) as UserResponse
     return new UserSession(response, connection)
   }
 
-  static async useToken (connection: MetricsConnection, params: { token: string }) {
+  export async function useToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     return new UserSession(response, connection)
   }
 
-  static async useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
+  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:resetFulfillment', params) as UserResponse
     return new UserSession(response, connection)
   }
 
-  static async useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean }) {
+  export async function useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:facilityWelcomeFulfillment', params) as UserResponse
     return new UserSession(response, connection)
   }
 
-  static async useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
+  export async function useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
     await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
     return new KioskSession(params, connection)
   }
 
-  static async useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
+  export async function useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
     const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
     return response.url
   }
 
-  static async createUser (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
+  export async function createUser (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('user:create', params) as UserResponse
     return new UserSession(response, connection)
   }
 
-  static async passwordReset (connection: MetricsConnection, params: { email: string }) {
+  export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
     await connection.action('auth:resetRequest', params)
   }
 
   /** @hidden */
-  static async useAdminCredentials (connection: MetricsConnection, params: { email: string, password: string, token: string, refreshable: boolean }) {
+  export async function useAdminCredentials (connection: MetricsConnection, params: { email: string, password: string, token: string, refreshable: boolean }) {
     const response = await connection.action('admin:login', params) as UserResponse
     return new AdminSession(response, connection)
   }
 
   /** @hidden */
-  static async useAdminToken (connection: MetricsConnection, params: { token: string }) {
+  export async function useAdminToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (accessToken?.superUser !== true) {
@@ -134,12 +135,12 @@ export class Authentication {
 }
 
 export class SessionHandler {
-  private _connection: MetricsConnection
+  private readonly _connection: MetricsConnection
   private _keepAlive: boolean = true
   private _accessToken: string = ''
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
-  private _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
+  private readonly _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
   private _userId: number | null = null
 
   constructor (connection: MetricsConnection, loginResponse: UserResponse) {
@@ -149,22 +150,20 @@ export class SessionHandler {
   }
 
   private updateTokens (response: AuthenticatedResponse) {
-    if (response.accessToken) {
-      this._accessToken = response.accessToken
+    this._accessToken = response.accessToken
 
-      if (this._accessTokenTimeout) {
-        clearTimeout(this._accessTokenTimeout)
-      }
+    if (this._accessTokenTimeout !== null) {
+      clearTimeout(this._accessTokenTimeout)
+    }
 
-      if (this._keepAlive) {
-        const tokenTTL = this.decodedAccessToken.exp * 1000 - Date.now() - JWT_TTL_LIMIT
-        this._accessTokenTimeout = setTimeout(() => this.keepAccessTokenAlive(), tokenTTL)
-      }
+    if (this._keepAlive) {
+      const tokenTTL = this.decodedAccessToken.exp * 1000 - Date.now() - JWT_TTL_LIMIT
+      this._accessTokenTimeout = setTimeout(() => { void this.keepAccessTokenAlive() }, tokenTTL)
+    }
 
-      if (response.refreshToken) {
-        this._refreshToken = response.refreshToken
-        this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
-      }
+    if (typeof response.refreshToken !== 'undefined') {
+      this._refreshToken = response.refreshToken
+      this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
     }
   }
 
@@ -173,7 +172,7 @@ export class SessionHandler {
       try {
         await this.action('auth:keepAlive')
       } catch (error) {
-        return
+
       }
     }
   }
@@ -188,7 +187,7 @@ export class SessionHandler {
 
   set keepAlive (value: boolean) {
     this._keepAlive = value
-    if (!this._keepAlive && this._accessTokenTimeout) {
+    if (!this._keepAlive && this._accessTokenTimeout !== null) {
       clearTimeout(this._accessTokenTimeout)
     }
   }
@@ -202,7 +201,7 @@ export class SessionHandler {
   }
 
   get decodedRefreshToken () {
-    return this._refreshToken ? DecodeJWT(this._refreshToken) as RefreshToken : undefined
+    return this._refreshToken !== null ? DecodeJWT(this._refreshToken) as RefreshToken : null
   }
 
   get onRefreshTokenChangeEvent () {
@@ -231,7 +230,7 @@ export class SessionHandler {
       const authParams = { authorization: this._accessToken, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse
     } catch (error) {
-      if (error instanceof SessionError && this._refreshToken && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
+      if (error instanceof SessionError && this._refreshToken !== null && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
         const authParams = { authorization: this._refreshToken, ...params }
         response = await this._connection.action(action, authParams) as AuthenticatedResponse
       } else {
@@ -244,9 +243,9 @@ export class SessionHandler {
 }
 
 export class KioskSessionHandler {
-  private _connection: MetricsConnection
+  private readonly _connection: MetricsConnection
   private _kioskToken: string = ''
-  private _onKioskTokenChangeEvent = new SimpleEventDispatcher<KioskTokenChangeEvent>()
+  private readonly _onKioskTokenChangeEvent = new SimpleEventDispatcher<KioskTokenChangeEvent>()
 
   constructor (connection: MetricsConnection, { kioskToken }: { kioskToken: string }) {
     this._connection = connection
@@ -292,7 +291,7 @@ export class KioskSessionHandler {
 }
 
 export class KioskSession {
-  private _sessionHandler: KioskSessionHandler
+  private readonly _sessionHandler: KioskSessionHandler
 
   constructor ({ kioskToken }: { kioskToken: string }, connection: MetricsConnection) {
     this._sessionHandler = new KioskSessionHandler(connection, { kioskToken })
@@ -310,8 +309,8 @@ export class KioskSession {
     await this._sessionHandler.logout()
   }
 
-  private action (action: string, params: Object = { }) {
-    return this.sessionHandler.action(action, params)
+  private async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 
   async userLogin (params: { primaryIdentification: string | number, secondaryIdentification?: string | number }) {
@@ -332,7 +331,7 @@ export class KioskSession {
 
 export class UserSession {
   private _sessionHandler: SessionHandler
-  private _user: User
+  private readonly _user: User
 
   constructor (loginResponse: UserResponse, connection: MetricsConnection) {
     this._sessionHandler = new SessionHandler(connection, loginResponse)
@@ -372,11 +371,11 @@ export class UserSession {
   }
 
   eagerActiveFacility () {
-    return this._sessionHandler.decodedAccessToken.facility ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
+    return typeof this._sessionHandler.decodedAccessToken.facility !== 'undefined' && this._sessionHandler.decodedAccessToken.facility !== null ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 
-  protected action (action: string, params: Object = { }) {
-    return this.sessionHandler.action(action, params)
+  protected async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 
   async getExerciseAlias (params: { id: number }) {
@@ -490,14 +489,13 @@ export class UserSession {
   }
 
   async getFacilities (options: { name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
-    const { facilities ,facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
+    const { facilities, facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
   }
 }
 
 /** @hidden */
 export class AdminSession extends UserSession {
-
   async getStats (options: { from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stats, statsMeta } = await this.action('stats:list', options) as StatListResponse
     return new Stats(stats, statsMeta, this.sessionHandler)

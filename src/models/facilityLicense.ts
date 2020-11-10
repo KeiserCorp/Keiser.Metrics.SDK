@@ -61,13 +61,13 @@ export class FacilityLicense extends Model {
   }
 
   async reload () {
-    const { facilityLicense } = await this.action('facilityLicense:show', { id : this.id }) as FacilityLicenseResponse
+    const { facilityLicense } = await this.action('facilityLicense:show', { id: this.id }) as FacilityLicenseResponse
     this.setFacilityLicenseData(facilityLicense)
     return this
   }
 
   async delete () {
-    await this.action('facilityLicense:delete', { id : this.id })
+    await this.action('facilityLicense:delete', { id: this.id })
   }
 
   get id () {
@@ -95,14 +95,14 @@ export class FacilityLicense extends Model {
   }
 
   get effectiveDate () {
-    return this._facilityLicenseData.effectiveDate ? new Date(this._facilityLicenseData.effectiveDate) : null
+    return this._facilityLicenseData.effectiveDate !== null ? new Date(this._facilityLicenseData.effectiveDate) : null
   }
 
   get expiresDate () {
-    return this.effectiveDate ? new Date(this.effectiveDate.getTime() + (this.term * msPerDay)) : null
+    return this.effectiveDate !== null ? new Date(this.effectiveDate.getTime() + (this.term * msPerDay)) : null
   }
 
   eagerFacility () {
-    return this._facilityLicenseData.facility ? new Facility(this._facilityLicenseData.facility, this.sessionHandler) : undefined
+    return typeof this._facilityLicenseData.facility !== 'undefined' ? new Facility(this._facilityLicenseData.facility, this.sessionHandler) : undefined
   }
 }

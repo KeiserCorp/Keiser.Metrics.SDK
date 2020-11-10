@@ -78,11 +78,11 @@ export class StretchExerciseVariant extends Model {
   }
 
   eagerStretchExercise () {
-    return this._stretchExerciseVariantData.stretchExercise ? new StretchExercise(this._stretchExerciseVariantData.stretchExercise, this.sessionHandler) : undefined
+    return typeof this._stretchExerciseVariantData.stretchExercise !== 'undefined' ? new StretchExercise(this._stretchExerciseVariantData.stretchExercise, this.sessionHandler) : undefined
   }
 
   eagerExerciseOrdinalSetAssignments () {
-    return this._stretchExerciseVariantData.exerciseOrdinalSetAssignments ? this._stretchExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
+    return typeof this._stretchExerciseVariantData.exerciseOrdinalSetAssignments !== 'undefined' ? this._stretchExerciseVariantData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 }
 
@@ -102,6 +102,6 @@ export class PrivilegedStretchExerciseVariant extends StretchExerciseVariant {
   }
 
   async delete () {
-    await this.action('stretchExerciseVariant:delete', { id : this.id })
+    await this.action('stretchExerciseVariant:delete', { id: this.id })
   }
 }

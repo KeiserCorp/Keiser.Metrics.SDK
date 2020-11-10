@@ -65,7 +65,7 @@ export class StretchExercise extends Model {
   }
 
   eagerExerciseAliases () {
-    return this._stretchExerciseData.exerciseAliases ? this._stretchExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
+    return typeof this._stretchExerciseData.exerciseAliases !== 'undefined' ? this._stretchExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
   async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -74,7 +74,7 @@ export class StretchExercise extends Model {
   }
 
   eagerStretchExerciseMuscles () {
-    return this._stretchExerciseData.stretchExerciseMuscles ? this._stretchExerciseData.stretchExerciseMuscles.map(stretchExerciseMuscle => new StretchExerciseMuscle(stretchExerciseMuscle, this.sessionHandler)) : undefined
+    return typeof this._stretchExerciseData.stretchExerciseMuscles !== 'undefined' ? this._stretchExerciseData.stretchExerciseMuscles.map(stretchExerciseMuscle => new StretchExerciseMuscle(stretchExerciseMuscle, this.sessionHandler)) : undefined
   }
 
   async getStretchExerciseMuscles (options: { muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -83,7 +83,7 @@ export class StretchExercise extends Model {
   }
 
   eagerStretchExerciseVariants () {
-    return this._stretchExerciseData.stretchExerciseVariants ? this._stretchExerciseData.stretchExerciseVariants.map(stretchExerciseVariant => new StretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)) : undefined
+    return typeof this._stretchExerciseData.stretchExerciseVariants !== 'undefined' ? this._stretchExerciseData.stretchExerciseVariants.map(stretchExerciseVariant => new StretchExerciseVariant(stretchExerciseVariant, this.sessionHandler)) : undefined
   }
 
   async getStretchExerciseVariants (options: { stretchExerciseId?: number, stretchMachineId?: number, variant?: StretchExerciseVariantType, sort?: StretchExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -102,7 +102,7 @@ export class PrivilegedStretchExercises extends ModelList<PrivilegedStretchExerc
 /** @hidden */
 export class PrivilegedStretchExercise extends StretchExercise {
   async delete () {
-    await this.action('stretchExercise:delete', { id : this.id })
+    await this.action('stretchExercise:delete', { id: this.id })
   }
 
   async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -111,7 +111,7 @@ export class PrivilegedStretchExercise extends StretchExercise {
   }
 
   async createExerciseAlias (params: { alias: string }) {
-    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, stretchExerciseId: this.id }) as ExerciseAliasResponse
+    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias: params.alias, stretchExerciseId: this.id }) as ExerciseAliasResponse
     return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 

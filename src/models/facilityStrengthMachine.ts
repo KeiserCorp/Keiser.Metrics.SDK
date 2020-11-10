@@ -31,7 +31,7 @@ export interface FacilityStrengthMachineBulkCreateResponse extends Authenticated
 }
 
 export interface FacilityStrengthMachineListResponseMeta extends ListMeta {
-  model: string,
+  model: string
   source: string
   sort: FacilityStrengthMachineSorting
 }
@@ -87,6 +87,6 @@ export class FacilityStrengthMachine extends Model {
   }
 
   eagerStrengthMachine () {
-    return this._facilityStrengthMachineData.strengthMachine ? new StrengthMachine(this._facilityStrengthMachineData.strengthMachine, this.sessionHandler) : undefined
+    return typeof this._facilityStrengthMachineData.strengthMachine !== 'undefined' ? new StrengthMachine(this._facilityStrengthMachineData.strengthMachine, this.sessionHandler) : undefined
   }
 }

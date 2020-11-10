@@ -49,7 +49,10 @@ export interface StrengthMachineDataSetData {
   test?: StrengthMachineDataSetTestData
   strengthMachine?: StrengthMachineData
   strengthExercise?: StrengthExerciseData
-  a500DataSet?: any        // To-Do: Add A500 Data Set model
+  /**
+   * @todo Add A500 Data Set class
+   */
+  a500DataSet?: any
 
   session?: SessionData
 }
@@ -95,12 +98,12 @@ export class StrengthMachineDataSet extends Model {
   constructor (strengthMachineDataSetData: StrengthMachineDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineDataSetData = strengthMachineDataSetData
-    this._test = this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
+    this._test = typeof this._strengthMachineDataSetData.test !== 'undefined' ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
   }
 
   private setStrengthMachineDataSet (strengthMachineDataSetData: StrengthMachineDataSetData) {
     this._strengthMachineDataSetData = strengthMachineDataSetData
-    this._test = this._strengthMachineDataSetData.test ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
+    this._test = typeof this._strengthMachineDataSetData.test !== 'undefined' ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
   }
 
   async reload () {
@@ -216,20 +219,20 @@ export class StrengthMachineDataSet extends Model {
   }
 
   eagerSession () {
-    return this._strengthMachineDataSetData.session ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler) : undefined
+    return typeof this._strengthMachineDataSetData.session !== 'undefined' ? new Session(this._strengthMachineDataSetData.session, this.sessionHandler) : undefined
   }
 
   eagerStrengthMachine () {
-    return this._strengthMachineDataSetData.strengthMachine ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
+    return typeof this._strengthMachineDataSetData.strengthMachine !== 'undefined' ? new StrengthMachine(this._strengthMachineDataSetData.strengthMachine, this.sessionHandler) : undefined
   }
 
   eagerStrengthExercise () {
-    return this._strengthMachineDataSetData.strengthExercise ? new StrengthExercise(this._strengthMachineDataSetData.strengthExercise, this.sessionHandler) : undefined
+    return typeof this._strengthMachineDataSetData.strengthExercise !== 'undefined' ? new StrengthExercise(this._strengthMachineDataSetData.strengthExercise, this.sessionHandler) : undefined
   }
 }
 
 export class StrengthMachineDataSetTest {
-  private _strengthMachineDataSetTestData: StrengthMachineDataSetTestData
+  private readonly _strengthMachineDataSetTestData: StrengthMachineDataSetTestData
   private readonly _low: StrengthMachineDataSetTestSubset
   private readonly _high: StrengthMachineDataSetTestSubset
 
@@ -259,7 +262,7 @@ export class StrengthMachineDataSetTest {
 }
 
 export class StrengthMachineDataSetTestSubset {
-  private _strengthMachineDataSetTestSubsetData: StrengthMachineDataSetTestSubsetData
+  private readonly _strengthMachineDataSetTestSubsetData: StrengthMachineDataSetTestSubsetData
 
   constructor (strengthMachineDataSetTestSubsetData: StrengthMachineDataSetTestSubsetData) {
     this._strengthMachineDataSetTestSubsetData = strengthMachineDataSetTestSubsetData

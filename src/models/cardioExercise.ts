@@ -65,7 +65,7 @@ export class CardioExercise extends Model {
   }
 
   eagerExerciseAliases () {
-    return this._cardioExerciseData.exerciseAliases ? this._cardioExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
+    return typeof this._cardioExerciseData.exerciseAliases !== 'undefined' ? this._cardioExerciseData.exerciseAliases.map(exerciseAlias => new ExerciseAlias(exerciseAlias, this.sessionHandler)) : undefined
   }
 
   async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -74,7 +74,7 @@ export class CardioExercise extends Model {
   }
 
   eagerCardioExerciseMuscles () {
-    return this._cardioExerciseData.cardioExerciseMuscles ? this._cardioExerciseData.cardioExerciseMuscles.map(cardioExerciseMuscles => new CardioExerciseMuscle(cardioExerciseMuscles, this.sessionHandler)) : undefined
+    return typeof this._cardioExerciseData.cardioExerciseMuscles !== 'undefined' ? this._cardioExerciseData.cardioExerciseMuscles.map(cardioExerciseMuscles => new CardioExerciseMuscle(cardioExerciseMuscles, this.sessionHandler)) : undefined
   }
 
   async getCardioExerciseMuscles (options: { muscle?: string, targetLevel?: MuscleTargetLevel, sort?: MuscleSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -83,7 +83,7 @@ export class CardioExercise extends Model {
   }
 
   eagerCardioExerciseVariants () {
-    return this._cardioExerciseData.cardioExerciseVariants ? this._cardioExerciseData.cardioExerciseVariants.map(cardioExerciseVariant => new CardioExerciseVariant(cardioExerciseVariant, this.sessionHandler)) : undefined
+    return typeof this._cardioExerciseData.cardioExerciseVariants !== 'undefined' ? this._cardioExerciseData.cardioExerciseVariants.map(cardioExerciseVariant => new CardioExerciseVariant(cardioExerciseVariant, this.sessionHandler)) : undefined
   }
 
   async getCardioExerciseVariants (options: { cardioExerciseId?: number, cardioMachineId?: number, variant?: CardioExerciseVariantType, sort?: CardioExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -102,7 +102,7 @@ export class PrivilegedCardioExercises extends ModelList<PrivilegedCardioExercis
 /** @hidden */
 export class PrivilegedCardioExercise extends CardioExercise {
   async delete () {
-    await this.action('cardioExercise:delete', { id : this.id })
+    await this.action('cardioExercise:delete', { id: this.id })
   }
 
   async getExerciseAliases (options: { alias?: string, sort?: ExerciseAliasSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -111,7 +111,7 @@ export class PrivilegedCardioExercise extends CardioExercise {
   }
 
   async createExerciseAlias (params: { alias: string }) {
-    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias : params.alias, cardioExerciseId: this.id }) as ExerciseAliasResponse
+    const { exerciseAlias } = await this.action('exerciseAlias:create', { alias: params.alias, cardioExerciseId: this.id }) as ExerciseAliasResponse
     return new PrivilegedExerciseAlias(exerciseAlias, this.sessionHandler)
   }
 

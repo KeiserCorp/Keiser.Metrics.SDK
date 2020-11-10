@@ -13,12 +13,12 @@
     "**/dist": true,
     "**/node_modules": true
   },
+  "javascript.format.enable": false,
   "typescript.format.enable": false,
   "typescript.validate.enable": true,
   "typescript.format.insertSpaceAfterConstructor": true,
   "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
-  "tslint.jsEnable": true,
-  "tslint.ignoreDefinitionFiles": false,
+  "eslint.format.enable": true,
   "cSpell.words": [
     "actionhero",
     "backtrace",
@@ -37,6 +37,7 @@
     "resque",
     "strava",
     "trainingpeaks",
-    "typedoc"
+    "typedoc",
+    "unparsable"
   ]
 }

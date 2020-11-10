@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'

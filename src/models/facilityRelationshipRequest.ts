@@ -91,11 +91,11 @@ export class FacilityRelationshipRequest extends Model {
 
 export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelationshipRequest {
   async approve () {
-    return this.update({ approval: true })
+    return await this.update({ approval: true })
   }
 
   async deny () {
-    return this.update({ approval: false })
+    return await this.update({ approval: false })
   }
 
   private async update (params: { approval: boolean }) {
@@ -107,11 +107,11 @@ export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelati
 
 export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationshipRequest {
   async approve (params: { memberIdentifier: string }) {
-    return this.update({ ...params, approval: true })
+    return await this.update({ ...params, approval: true })
   }
 
   async deny () {
-    return this.update({ approval: false })
+    return await this.update({ approval: false })
   }
 
   private async update (params: { approval: boolean }) {

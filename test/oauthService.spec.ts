@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { OAuthProviders, OAuthServiceSorting } from '../src/models/oauthService'
 import { User } from '../src/models/user'
@@ -36,33 +37,32 @@ describe('OAuth Service', function () {
   })
 
   it('can create Facebook OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Facebook , redirect: 'localhost:8080' })
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Facebook, redirect: 'localhost:8080' })
 
     expect(typeof oauthServiceUrl).to.equal('string')
   })
 
   it('can create Apple OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Apple , redirect: 'localhost:8080' })
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Apple, redirect: 'localhost:8080' })
 
     expect(typeof oauthServiceUrl).to.equal('string')
   })
 
   it('can create Google OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Google , redirect: 'localhost:8080' })
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Google, redirect: 'localhost:8080' })
 
     expect(typeof oauthServiceUrl).to.equal('string')
   })
 
   it('can create Strava OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Strava , redirect: 'localhost:8080' })
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Strava, redirect: 'localhost:8080' })
 
     expect(typeof oauthServiceUrl).to.equal('string')
   })
 
   it('can create Training Peaks OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.TrainingPeaks , redirect: 'localhost:8080' })
+    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.TrainingPeaks, redirect: 'localhost:8080' })
 
     expect(typeof oauthServiceUrl).to.equal('string')
   })
-
 })

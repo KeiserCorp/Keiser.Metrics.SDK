@@ -72,7 +72,7 @@ export class ExerciseOrdinalSet extends Model {
   }
 
   eagerExerciseOrdinalSetAssignments () {
-    return this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments ? this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
+    return typeof this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments !== 'undefined' ? this._exerciseOrdinalSetData.exerciseOrdinalSetAssignments.map(exerciseOrdinalSetAssignment => new ExerciseOrdinalSetAssignment(exerciseOrdinalSetAssignment, this.sessionHandler)) : undefined
   }
 
   async getExerciseOrdinalSetAssignments (options: { ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -97,7 +97,7 @@ export class PrivilegedExerciseOrdinalSet extends ExerciseOrdinalSet {
   }
 
   async delete () {
-    await this.action('exerciseOrdinalSet:delete', { id : this.id })
+    await this.action('exerciseOrdinalSet:delete', { id: this.id })
   }
 
   async getExerciseOrdinalSetAssignments (options: { ordinalIdentifier?: string, sort?: ExerciseOrdinalSetAssignmentSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {

@@ -29,7 +29,7 @@ export interface FacilityResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityListResponse extends AuthenticatedResponse {
-  facilities: FacilityData[],
+  facilities: FacilityData[]
   facilitiesMeta: FacilityListResponseMeta
 }
 
@@ -73,7 +73,7 @@ export class Facility extends Model {
   }
 
   eagerFacilityProfile () {
-    return this._facilityData.facilityProfile ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
+    return typeof this._facilityData.facilityProfile !== 'undefined' ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
   async createRelationshipRequest (params: { memberIdentifier?: string }) {
@@ -83,10 +83,6 @@ export class Facility extends Model {
 }
 
 export class PrivilegedFacility extends Facility {
-  constructor (facilityData: FacilityData, sessionHandler: SessionHandler) {
-    super(facilityData, sessionHandler)
-  }
-
   get licensedUntil () {
     return new Date(this._facilityData.licensedUntil)
   }
@@ -96,7 +92,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   eagerFacilityProfile () {
-    return this._facilityData.facilityProfile ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
+    return typeof this._facilityData.facilityProfile !== 'undefined' ? new PrivilegedFacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
   async setActive () {

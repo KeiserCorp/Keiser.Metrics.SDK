@@ -67,19 +67,19 @@ export class ExerciseOrdinalSetAssignment extends Model {
   }
 
   eagerExerciseOrdinalSet () {
-    return this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet ? new ExerciseOrdinalSet(this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet, this.sessionHandler) : undefined
+    return typeof this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet !== 'undefined' ? new ExerciseOrdinalSet(this._exerciseOrdinalSetAssignmentData.exerciseOrdinalSet, this.sessionHandler) : undefined
   }
 
   eagerStrengthExerciseVariant () {
-    return this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant ? new StrengthExerciseVariant(this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant, this.sessionHandler) : undefined
+    return typeof this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant !== 'undefined' ? new StrengthExerciseVariant(this._exerciseOrdinalSetAssignmentData.strengthExerciseVariant, this.sessionHandler) : undefined
   }
 
   eagerCardioExerciseVariant () {
-    return this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant ? new CardioExerciseVariant(this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant, this.sessionHandler) : undefined
+    return typeof this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant !== 'undefined' ? new CardioExerciseVariant(this._exerciseOrdinalSetAssignmentData.cardioExerciseVariant, this.sessionHandler) : undefined
   }
 
   eagerStretchExerciseVariant () {
-    return this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant ? new StretchExerciseVariant(this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant, this.sessionHandler) : undefined
+    return typeof this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant !== 'undefined' ? new StretchExerciseVariant(this._exerciseOrdinalSetAssignmentData.stretchExerciseVariant, this.sessionHandler) : undefined
   }
 }
 
@@ -93,6 +93,6 @@ export class PrivilegedExerciseOrdinalSetAssignments extends ModelList<Privilege
 /** @hidden */
 export class PrivilegedExerciseOrdinalSetAssignment extends ExerciseOrdinalSetAssignment {
   async delete () {
-    await this.action('exerciseOrdinalSetAssignment:delete', { id : this.id })
+    await this.action('exerciseOrdinalSetAssignment:delete', { id: this.id })
   }
 }

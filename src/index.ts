@@ -32,8 +32,8 @@ export default class Metrics {
     this._connection.dispose()
   }
 
-  action (action: string, params: Object = { }) {
-    return this._connection.action(action, params)
+  async action (action: string, params: Object = { }) {
+    return await this._connection.action(action, params)
   }
 
   get onConnectionChangeEvent () {
@@ -41,39 +41,39 @@ export default class Metrics {
   }
 
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean }) {
-    return Authentication.useCredentials(this._connection, { refreshable: true, ...params })
+    return await Authentication.useCredentials(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithToken (params: { token: string }) {
-    return Authentication.useToken(this._connection, params)
+    return await Authentication.useToken(this._connection, params)
   }
 
   async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean }) {
-    return Authentication.useResetToken(this._connection, { refreshable: true, ...params })
+    return await Authentication.useResetToken(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithWelcomeToken (params: { welcomeToken: string, password: string, refreshable?: boolean }) {
-    return Authentication.useWelcomeToken(this._connection, { refreshable: true, ...params })
+    return await Authentication.useWelcomeToken(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithKioskToken (params: { kioskToken: string }) {
-    return Authentication.useKioskToken(this._connection, params)
+    return await Authentication.useKioskToken(this._connection, params)
   }
 
   async authenticateWithFacebook (params: { redirect: string }) {
-    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
+    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
   }
 
   async authenticateWithGoogle (params: { redirect: string }) {
-    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
+    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
   }
 
   async authenticateWithApple (params: { redirect: string }) {
-    return Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
+    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
   }
 
   async createUser (params: { email: string, password: string, refreshable?: boolean }) {
-    return Authentication.createUser(this._connection, { refreshable: true, ...params })
+    return await Authentication.createUser(this._connection, { refreshable: true, ...params })
   }
 
   async passwordReset (params: { email: string }) {
@@ -84,10 +84,10 @@ export default class Metrics {
 /** @hidden */
 export class MetricsAdmin extends Metrics {
   async authenticateAdminWithCredentials (params: { email: string, password: string, token: string, refreshable?: boolean }) {
-    return Authentication.useAdminCredentials(this._connection, { refreshable: true, ...params })
+    return await Authentication.useAdminCredentials(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateAdminWithToken (params: { token: string }) {
-    return Authentication.useAdminToken(this._connection, params)
+    return await Authentication.useAdminToken(this._connection, params)
   }
 }

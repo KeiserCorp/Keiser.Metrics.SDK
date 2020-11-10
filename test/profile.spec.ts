@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
@@ -56,5 +57,4 @@ describe('Profile', function () {
     expect(profile.language).to.equal(params.language)
     expect(profile.units).to.equal(params.units)
   })
-
 })

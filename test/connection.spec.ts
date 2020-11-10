@@ -1,13 +1,12 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
 
 const connectionTimeout = 3000
 
 describe('Connection', function () {
-
   if (IsBrowser) {
-
     describe('Socket (Dev Server)', function () {
       let metricsInstance: Metrics
 
@@ -73,7 +72,7 @@ describe('Connection', function () {
       it('can make request to server after connection event', async function () {
         this.timeout(connectionTimeout)
 
-        const result = await(new Promise(resolve => {
+        const result = await (new Promise(resolve => {
           metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
         }))
 
@@ -90,7 +89,6 @@ describe('Connection', function () {
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
       })
-
     })
 
     describe.skip('Socket (Prod Server)', function () {
@@ -135,9 +133,7 @@ describe('Connection', function () {
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
       })
-
     })
-
   }
 
   describe('REST (Dev Server)', function () {
@@ -182,7 +178,6 @@ describe('Connection', function () {
       expect(typeof healthResponse.error).to.equal('undefined')
       expect(healthResponse.healthy).to.equal(true)
     })
-
   })
 
   describe.skip('REST (Prod Server)', function () {
@@ -205,7 +200,5 @@ describe('Connection', function () {
       expect(typeof healthResponse.error).to.equal('undefined')
       expect(healthResponse.healthy).to.equal(true)
     })
-
   })
-
 })

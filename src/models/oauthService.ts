@@ -78,7 +78,7 @@ export class OAuthService extends Model {
   }
 
   get lastTransaction () {
-    return this._oauthServiceData.lastTransaction ? new Date(this._oauthServiceData.lastTransaction) : null
+    return this._oauthServiceData.lastTransaction !== null ? new Date(this._oauthServiceData.lastTransaction) : null
   }
 
   get reauthRequired () {

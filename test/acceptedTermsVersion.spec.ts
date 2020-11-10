@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { AcceptedTermsVersion } from '../src/models/acceptedTermsVersion'
 import { User } from '../src/models/user'
@@ -57,5 +58,4 @@ describe('Accepted Terms Version', function () {
     expect(acceptedTermsVersion.updatedAt).to.not.equal(prevUpdatedAt)
     expect(acceptedTermsVersion.revision).to.not.equal(revision)
   })
-
 })

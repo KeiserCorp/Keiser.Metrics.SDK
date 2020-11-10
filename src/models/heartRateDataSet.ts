@@ -51,12 +51,12 @@ export class HeartRateDataSet extends Model {
   constructor (heartRateDataSetData: HeartRateDataSetData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._heartRateDataSetData = heartRateDataSetData
-    this._graphData = this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
+    this._graphData = typeof this._heartRateDataSetData.graphData !== 'undefined' ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   private setHeartRateDataSet (heartRateDataSetData: HeartRateDataSetData) {
     this._heartRateDataSetData = heartRateDataSetData
-    this._graphData = this._heartRateDataSetData.graphData ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
+    this._graphData = typeof this._heartRateDataSetData.graphData !== 'undefined' ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
@@ -104,7 +104,7 @@ export class HeartRateDataSet extends Model {
   }
 
   eagerSession () {
-    return this._heartRateDataSetData.session ? new Session(this._heartRateDataSetData.session, this.sessionHandler) : undefined
+    return typeof this._heartRateDataSetData.session !== 'undefined' ? new Session(this._heartRateDataSetData.session, this.sessionHandler) : undefined
   }
 }
 
@@ -119,7 +119,7 @@ export interface HeartRateCapturedDataPoint {
 }
 
 export class HeartRateDataPoint {
-  private _heartRateDataPointData: HeartRateDataPointData
+  private readonly _heartRateDataPointData: HeartRateDataPointData
 
   constructor (heartRateDataPointData: HeartRateDataPointData) {
     this._heartRateDataPointData = heartRateDataPointData

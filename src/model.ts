@@ -15,20 +15,18 @@ export class Model {
     this.sessionHandler = sessionHandler
   }
 
-  protected action (action: string, params: Object = { }) {
-    return this.sessionHandler.action(action, params)
+  protected async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 }
 
-export interface ModelClass<Model> {
-  new(x: any, sessionHandler: SessionHandler): Model
-}
+export type ModelClass<Model> = new(x: any, sessionHandler: SessionHandler) => Model
 
 export class ModelList<Model, Data, Meta> extends Array<Model> {
   protected _meta: Meta
 
-  constructor (type: ModelClass<Model>, items: Array<Data> | number, meta: Meta, sessionHandler: SessionHandler) {
-    Array.isArray(items) ? super(...items.map(x => new type(x, sessionHandler))) : super(items)
+  constructor (Type: ModelClass<Model>, items: Data[] | number, meta: Meta, sessionHandler: SessionHandler) {
+    Array.isArray(items) ? super(...items.map(x => new Type(x, sessionHandler))) : super(items)
     this._meta = meta
   }
 

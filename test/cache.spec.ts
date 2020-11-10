@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { AdminSession } from '../src/session'
@@ -100,5 +101,4 @@ describe('Cache', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

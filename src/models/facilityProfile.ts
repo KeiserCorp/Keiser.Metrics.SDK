@@ -88,13 +88,13 @@ export class PrivilegedFacilityProfile extends FacilityProfile {
   }
 
   async update (params: {
-    name: string | null,
-    phone?: string | null,
-    address?: string | null,
-    city?: string | null,
-    postcode?: string | null,
-    state?: string | null,
-    country?: string | null,
+    name: string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    postcode?: string | null
+    state?: string | null
+    country?: string | null
     website?: string | null
   }) {
     if (!this._facility.isActive) {

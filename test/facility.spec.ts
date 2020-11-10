@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { Facility, FacilitySorting, PrivilegedFacility } from '../src/models/facility'
 import { UserSession } from '../src/session'
@@ -57,7 +58,7 @@ describe('Facility', function () {
   })
 
   it('facility has facility profile', async function () {
-    if (facility) {
+    if (typeof facility !== 'undefined') {
       expect(typeof facility).to.equal('object')
       const profile = facility.eagerFacilityProfile()
       expect(typeof profile).to.equal('object')
@@ -67,7 +68,7 @@ describe('Facility', function () {
 
   it('cannot reload facility profile without active', async function () {
     const profile = facility?.eagerFacilityProfile()
-    if (profile) {
+    if (typeof profile !== 'undefined') {
       let extError
 
       try {
@@ -80,7 +81,7 @@ describe('Facility', function () {
   })
 
   it('can set active facility', async function () {
-    if (facility) {
+    if (typeof facility !== 'undefined') {
       expect(facility instanceof PrivilegedFacility).to.equal(true)
       if (facility instanceof PrivilegedFacility) {
         expect(typeof userSession.eagerActiveFacility()).to.equal('undefined')
@@ -96,7 +97,7 @@ describe('Facility', function () {
 
   it('can reload facility profile with active', async function () {
     const profile = facility?.eagerFacilityProfile()
-    if (profile) {
+    if (typeof profile !== 'undefined') {
       const facilityProfile = await profile.reload()
 
       expect(typeof facilityProfile).to.equal('object')
@@ -106,12 +107,11 @@ describe('Facility', function () {
 
   it('can update facility profile with active', async function () {
     const profile = userSession.eagerActiveFacility()?.eagerFacilityProfile()
-    if (profile) {
+    if (typeof profile !== 'undefined') {
       const facilityProfile = await profile.update({ name: '_test_' })
 
       expect(typeof facilityProfile).to.equal('object')
       expect(facilityProfile.name).to.equal('_test_')
     }
   })
-
 })

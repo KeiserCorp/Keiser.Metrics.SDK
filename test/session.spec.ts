@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
@@ -95,5 +96,4 @@ describe('Session', function () {
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(UnknownEntityError.code)
   })
-
 })

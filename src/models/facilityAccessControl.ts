@@ -31,7 +31,7 @@ export class FacilityAccessControl extends Model {
   }
 
   eagerFacilityAccessControlIPRanges () {
-    return this._facilityAccessControlData.facilityAccessControlIPRanges ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
+    return typeof this._facilityAccessControlData.facilityAccessControlIPRanges !== 'undefined' ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
   }
 
   async createFacilityAccessControlIPRange (params: { cidr: string }) {
@@ -50,6 +50,6 @@ export class FacilityAccessControl extends Model {
   }
 
   eagerFacilityAccessControlKiosk () {
-    return this._facilityAccessControlData.facilityAccessControlKiosk ? new FacilityAccessControlKiosk(this._facilityAccessControlData.facilityAccessControlKiosk, this.sessionHandler) : undefined
+    return typeof this._facilityAccessControlData.facilityAccessControlKiosk !== 'undefined' ? new FacilityAccessControlKiosk(this._facilityAccessControlData.facilityAccessControlKiosk, this.sessionHandler) : undefined
   }
 }

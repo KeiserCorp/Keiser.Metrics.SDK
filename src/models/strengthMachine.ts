@@ -61,12 +61,12 @@ export class StrengthMachine extends Model {
   constructor (strengthMachineData: StrengthMachineData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineData = strengthMachineData
-    this._models = this._strengthMachineData.models ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
+    this._models = typeof this._strengthMachineData.models !== 'undefined' ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
   }
 
   protected setStrengthMachineData (strengthMachineData: StrengthMachineData) {
     this._strengthMachineData = strengthMachineData
-    this._models = this._strengthMachineData.models ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
+    this._models = typeof this._strengthMachineData.models !== 'undefined' ? this._strengthMachineData.models.map(model => new StrengthMachineModel(model)) : []
   }
 
   async reload () {
@@ -100,17 +100,17 @@ export class StrengthMachine extends Model {
   }
 
   eagerDefaultStrengthExercise () {
-    return this._strengthMachineData.defaultStrengthExercise ? new StrengthExercise(this._strengthMachineData.defaultStrengthExercise, this.sessionHandler) : undefined
+    return typeof this._strengthMachineData.defaultStrengthExercise !== 'undefined' ? new StrengthExercise(this._strengthMachineData.defaultStrengthExercise, this.sessionHandler) : undefined
   }
 
   async getDefaultStrengthExercise () {
-    const { strengthExercise } = await this.action('strengthExercise:show' , { id: this._strengthMachineData.defaultStrengthExerciseId }) as StrengthExerciseResponse
+    const { strengthExercise } = await this.action('strengthExercise:show', { id: this._strengthMachineData.defaultStrengthExerciseId }) as StrengthExerciseResponse
     return new StrengthExercise(strengthExercise, this.sessionHandler)
   }
 }
 
 export class StrengthMachineModel {
-  private _strengthMachineModelData: StrengthMachineModelData
+  private readonly _strengthMachineModelData: StrengthMachineModelData
 
   constructor (strengthMachineModelData: StrengthMachineModelData) {
     this._strengthMachineModelData = strengthMachineModelData

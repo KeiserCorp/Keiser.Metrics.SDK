@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedCardioExercise } from '../src/models/cardioExercise'
@@ -111,5 +112,4 @@ describe('Cardio Exercise Muscle', function () {
       expect(extError.code).to.equal(UnknownEntityError.code)
     }
   })
-
 })

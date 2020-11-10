@@ -65,7 +65,7 @@ export interface TaskQueueResponse extends AuthenticatedResponse {
 }
 
 export interface TaskQueueResponseMeta extends ListMeta {
-  queue: string,
+  queue: string
   sort: TaskSorting
 }
 
@@ -81,7 +81,7 @@ export class Tasks extends ModelList<Task, TaskPayload, TaskQueueResponseMeta> {
 }
 
 export class Task extends Model {
-  private _taskPayload: TaskPayload
+  private readonly _taskPayload: TaskPayload
 
   constructor (taskPayload: TaskPayload, sessionHandler: SessionHandler) {
     super(sessionHandler)
@@ -112,7 +112,7 @@ export class FailedTasks extends ModelList<FailedTask, TaskFailure, TaskQueueRes
 }
 
 export class FailedTask extends Model {
-  private _taskFailure: TaskFailure
+  private readonly _taskFailure: TaskFailure
 
   constructor (taskFailure: TaskFailure, sessionHandler: SessionHandler) {
     super(sessionHandler)

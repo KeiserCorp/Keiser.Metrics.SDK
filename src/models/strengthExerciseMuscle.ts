@@ -48,6 +48,6 @@ export class PrivilegedStrengthExerciseMuscle extends StrengthExerciseMuscle {
   }
 
   async delete () {
-    await this.action('strengthExerciseMuscle:delete', { id : this.id })
+    await this.action('strengthExerciseMuscle:delete', { id: this.id })
   }
 }
