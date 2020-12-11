@@ -14,6 +14,7 @@ import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetR
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
+import { AnalyticPermission, ExericsePermission, GlobalAccessControlData, GlobalAccessControlResponse, MSeriesGuidedSessionPermission, Permission, PrivilegedGlobalAccessControl } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { SessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
@@ -52,12 +53,12 @@ export interface JWTToken {
   user: { id: number }
   facility?: FacilityData | null
   facilityRole?: string | null
+  globalAccessControl?: GlobalAccessControlData | null
   type: 'access' | 'refresh'
   iat: number
   exp: number
   iss: string
   jti: string
-  superUser?: boolean
 }
 
 export interface AccessToken extends JWTToken {
@@ -127,7 +128,7 @@ export module Authentication {
   export async function useAdminToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (accessToken?.superUser !== true) {
+    if (!accessToken?.globalAccessControl) {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for super-user actions.' })
     }
     return new AdminSession(response, connection)
@@ -496,6 +497,10 @@ export class UserSession {
 
 /** @hidden */
 export class AdminSession extends UserSession {
+  get globalAccessControl() {
+    return this.sessionHandler.decodedAccessToken.globalAccessControl
+  }
+
   async getStats (options: { from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { stats, statsMeta } = await this.action('stats:list', options) as StatListResponse
     return new Stats(stats, statsMeta, this.sessionHandler)
@@ -677,5 +682,15 @@ export class AdminSession extends UserSession {
   async createFacilityLicense (params: { accountId?: string, term: number, type: LicenseType, name?: string, email?: string }) {
     const { facilityLicense } = await this.action('facilityLicense:create', params) as FacilityLicenseResponse
     return new FacilityLicense(facilityLicense, this.sessionHandler)
+  }
+
+  async createUserGlobalAccessControl(params: {userId: number, userRights?: Permission, exerciseRights?: ExericsePermission, mSeriesGuidedSessionRights?: MSeriesGuidedSessionPermission, facilityRights?: Permission, licenseRights?: Permission, accessControlRights?: Permission, resqueRights?: Permission, analyticRights?: AnalyticPermission }) {
+    const {globalAccessControl, globalAccessControlSecret} = await this.action('globalAccessControl:create', params) as GlobalAccessControlResponse
+    return new PrivilegedGlobalAccessControl(globalAccessControl, this.sessionHandler, globalAccessControlSecret)
+  }
+
+  async getUserGlobalAccessControl(params: { userId: number}) {
+    const {globalAccessControl} = await this.action('globalAccessControl:show', params) as GlobalAccessControlResponse
+    return new PrivilegedGlobalAccessControl(globalAccessControl, this.sessionHandler)
   }
 }
