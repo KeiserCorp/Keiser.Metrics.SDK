@@ -14,7 +14,7 @@ import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetR
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
-import { AnalyticPermission, ExericsePermission, GlobalAccessControlData, GlobalAccessControlResponse, MSeriesGuidedSessionPermission, Permission, PrivilegedGlobalAccessControl } from './models/globalAccessControl'
+import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { SessionResponse, StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
@@ -121,17 +121,21 @@ export module Authentication {
   /** @hidden */
   export async function useAdminCredentials (connection: MetricsConnection, params: { email: string, password: string, token: string, refreshable: boolean }) {
     const response = await connection.action('admin:login', params) as UserResponse
-    return new AdminSession(response, connection)
+    const accessToken = DecodeJWT(response.accessToken) as AccessToken
+    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
+    }
+    return new AdminSession(response, connection, accessToken.globalAccessControl)
   }
 
   /** @hidden */
   export async function useAdminToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (!accessToken?.globalAccessControl) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for super-user actions.' })
+    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
     }
-    return new AdminSession(response, connection)
+    return new AdminSession(response, connection, accessToken.globalAccessControl)
   }
 }
 
@@ -497,8 +501,15 @@ export class UserSession {
 
 /** @hidden */
 export class AdminSession extends UserSession {
-  get globalAccessControl() {
-    return this.sessionHandler.decodedAccessToken.globalAccessControl
+  private readonly _globalAccessControl: GlobalAccessControl
+
+  constructor (loginResponse: UserResponse, connection: MetricsConnection, globalAccessControlData: GlobalAccessControlData) {
+    super(loginResponse, connection)
+    this._globalAccessControl = new GlobalAccessControl(globalAccessControlData, this.sessionHandler)
+  }
+
+  get globalAccessControl () {
+    return this._globalAccessControl
   }
 
   async getStats (options: { from?: Date, to?: Date, sort?: StatSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
@@ -684,13 +695,21 @@ export class AdminSession extends UserSession {
     return new FacilityLicense(facilityLicense, this.sessionHandler)
   }
 
-  async createUserGlobalAccessControl(params: {userId: number, userRights?: Permission, exerciseRights?: ExericsePermission, mSeriesGuidedSessionRights?: MSeriesGuidedSessionPermission, facilityRights?: Permission, licenseRights?: Permission, accessControlRights?: Permission, resqueRights?: Permission, analyticRights?: AnalyticPermission }) {
-    const {globalAccessControl, globalAccessControlSecret} = await this.action('globalAccessControl:create', params) as GlobalAccessControlResponse
-    return new PrivilegedGlobalAccessControl(globalAccessControl, this.sessionHandler, globalAccessControlSecret)
+  async getGlobalAccessControl (params: { userId: number}) {
+    const { globalAccessControl } = await this.action('globalAccessControl:show', params) as GlobalAccessControlResponse
+    return new GlobalAccessControl(globalAccessControl, this.sessionHandler)
   }
 
-  async getUserGlobalAccessControl(params: { userId: number}) {
-    const {globalAccessControl} = await this.action('globalAccessControl:show', params) as GlobalAccessControlResponse
-    return new PrivilegedGlobalAccessControl(globalAccessControl, this.sessionHandler)
+  async getGlobalAccessControls (options: { name?: string, sort?: GlobalAccessControlSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { globalAccessControls, globalAccessControlsMeta } = await this.action('globalAccessControl:list', options) as GlobalAccessControlListResponse
+    return new GlobalAccessControls(globalAccessControls, globalAccessControlsMeta, this.sessionHandler)
+  }
+
+  async createGlobalAccessControl (params: {userId: number, userRights?: Permission, exerciseRights?: ExercisePermission, mSeriesGuidedSessionRights?: MSeriesGuidedSessionPermission, facilityRights?: Permission, licenseRights?: Permission, accessControlRights?: Permission, resqueRights?: Permission, analyticRights?: AnalyticPermission }) {
+    const { globalAccessControl, globalAccessControlSecret } = await this.action('globalAccessControl:create', params) as GlobalAccessControlCreationResponse
+    return {
+      globalAccessControl: new GlobalAccessControl(globalAccessControl, this.sessionHandler),
+      globalAccessControlSecret
+    }
   }
 }

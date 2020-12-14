@@ -1,4 +1,4 @@
-import { Model } from '../model'
+import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export const enum Permission {
@@ -11,7 +11,7 @@ export const enum MSeriesGuidedSessionPermission {
   Publish = 'publish'
 }
 
-export const enum ExericsePermission {
+export const enum ExercisePermission {
   Edit = 'edit'
 }
 
@@ -19,107 +19,123 @@ export const enum AnalyticPermission {
   View = 'view'
 }
 
+export const enum GlobalAccessControlSorting {
+  ID = 'id',
+  Name = 'name'
+}
+
 export interface GlobalAccessControlData {
-  userId: number,
-  userRights: Permission | null,
-  exerciseRights: ExericsePermission | null,
-  mSeriesGuidedSessionRights: MSeriesGuidedSessionPermission | null,
-  facilityRights: Permission | null,
-  licenseRights: Permission | null,
-  accessControlRights: Permission | null,
-  resqueRights: Permission | null,
+  userId: number
+  userRights: Permission | null
+  exerciseRights: ExercisePermission | null
+  mSeriesGuidedSessionRights: MSeriesGuidedSessionPermission | null
+  facilityRights: Permission | null
+  licenseRights: Permission | null
+  accessControlRights: Permission | null
+  resqueRights: Permission | null
   analyticRights: AnalyticPermission | null
 }
 
 export interface GlobalAccessControlSecretData {
-  secret: string,
+  secret: string
   uri: string
 }
 
 export interface GlobalAccessControlResponse extends AuthenticatedResponse {
   globalAccessControl: GlobalAccessControlData
-  globalAccessControlSecret?: GlobalAccessControlSecretData
+}
+
+export interface GlobalAccessControlCreationResponse extends AuthenticatedResponse {
+  globalAccessControl: GlobalAccessControlData
+  globalAccessControlSecret: GlobalAccessControlSecretData
+}
+
+export interface GlobalAccessControlSecretResponse extends AuthenticatedResponse {
+  globalAccessControlSecret: GlobalAccessControlSecretData
+}
+
+export interface GlobalAccessControlListResponse extends AuthenticatedResponse {
+  globalAccessControls: GlobalAccessControlData[]
+  globalAccessControlsMeta: GlobalAccessControlListResponseMeta
+}
+
+export interface GlobalAccessControlListResponseMeta extends ListMeta {
+  name: string | undefined
+  sort: GlobalAccessControlSorting
+}
+
+export class GlobalAccessControls extends ModelList<GlobalAccessControl, GlobalAccessControlData, GlobalAccessControlListResponseMeta> {
+  constructor (globalAccessControls: GlobalAccessControlData[], globalAccessControlsMeta: GlobalAccessControlListResponseMeta, sessionHandler: SessionHandler) {
+    super(GlobalAccessControl, globalAccessControls, globalAccessControlsMeta, sessionHandler)
+  }
 }
 
 export class GlobalAccessControl extends Model {
   protected _globalAccessControlData: GlobalAccessControlData
 
-  constructor(globalAccessControlData: GlobalAccessControlData, sessionHandler: SessionHandler) {
+  constructor (globalAccessControlData: GlobalAccessControlData, sessionHandler: SessionHandler, globalAccessControlSecretData?: GlobalAccessControlSecretData) {
     super(sessionHandler)
     this._globalAccessControlData = globalAccessControlData
   }
 
-  protected setGlobalAccessControlData(globalAccessControlData: GlobalAccessControlData) {
+  protected setGlobalAccessControlData (globalAccessControlData: GlobalAccessControlData) {
     this._globalAccessControlData = globalAccessControlData
   }
 
-  async reload() {
-    const {globalAccessControl} = await this.action('globalAccessControl:show', {userId: this.userId}) as GlobalAccessControlResponse
+  async reload () {
+    const { globalAccessControl } = await this.action('globalAccessControl:show', { userId: this.userId }) as GlobalAccessControlResponse
     this.setGlobalAccessControlData(globalAccessControl)
     return this
   }
 
-  get userId() {
+  async update (params: { userRights?: Permission, exerciseRights?: ExercisePermission, mSeriesGuidedSessionRights?: MSeriesGuidedSessionPermission, facilityRights?: Permission, licenseRights?: Permission, accessControlRights?: Permission, resqueRights?: Permission, analyticRights?: AnalyticPermission }) {
+    const { globalAccessControl } = await this.action('globalAccessControl:update', { ...params, userId: this.userId }) as GlobalAccessControlResponse
+    this.setGlobalAccessControlData(globalAccessControl)
+    return this
+  }
+
+  async delete () {
+    await this.action('globalAccessControl:delete', { userId: this.userId })
+  }
+
+  async recreateSecret () {
+    const { globalAccessControlSecret } = await this.action('globalAccessControl:recreateSecret', { userId: this.userId }) as GlobalAccessControlSecretResponse
+    return { globalAccessControlSecret }
+  }
+
+  get userId () {
     return this._globalAccessControlData.userId
   }
 
-  get userRights() {
+  get userRights () {
     return this._globalAccessControlData.userRights
   }
 
-  get exerciseRights() {
+  get exerciseRights () {
     return this._globalAccessControlData.exerciseRights
   }
 
-  get mSeriesGuidedSessionRights() {
+  get mSeriesGuidedSessionRights () {
     return this._globalAccessControlData.mSeriesGuidedSessionRights
   }
 
-  get facilityRights() {
+  get facilityRights () {
     return this._globalAccessControlData.facilityRights
   }
 
-  get licenseRights() {
+  get licenseRights () {
     return this._globalAccessControlData.licenseRights
   }
 
-  get accessControlRights() {
+  get accessControlRights () {
     return this._globalAccessControlData.accessControlRights
   }
 
-  get resqueRights() {
+  get resqueRights () {
     return this._globalAccessControlData.resqueRights
   }
 
-  get analyticRights() {
+  get analyticRights () {
     return this._globalAccessControlData.analyticRights
-  }
-}
-
-/** @hidden */
-export class PrivilegedGlobalAccessControl extends GlobalAccessControl {
-  protected _globalAccessControlSecretData?: GlobalAccessControlSecretData
-
-  constructor(globalAccessControlData: GlobalAccessControlData, sessionHandler: SessionHandler, globalAccessControlSecretData?: GlobalAccessControlSecretData) {
-    super(globalAccessControlData, sessionHandler)
-    this._globalAccessControlSecretData = globalAccessControlSecretData
-  }
-
-  async update(params: { userRights?: Permission, exerciseRights?: ExericsePermission, mSeriesGuidedSessionRights?: MSeriesGuidedSessionPermission, facilityRights?: Permission, licenseRights?: Permission, accessControlRights?: Permission, resqueRights?: Permission, analyticRights?: AnalyticPermission }) {
-    const { globalAccessControl } = await this.action('globalAccessControl:update', {...params, userId: this.userId}) as GlobalAccessControlResponse
-    this.setGlobalAccessControlData(globalAccessControl)
-    return this
-  }
-  
-  async delete() {
-    await this.action('globalAccessControl:delete', { userId: this.userId})
-  }
-
-  get secret() {
-    return this._globalAccessControlSecretData?.secret
-  }
-
-  get uri() {
-    return this._globalAccessControlSecretData?.uri
   }
 }

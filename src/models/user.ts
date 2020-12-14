@@ -343,8 +343,8 @@ export class User extends Model {
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler)
   }
 
-  async getGlobalAccessControl() {
-    const {globalAccessControl} = await this.action('globalAccessControl:show', {userId: this.id}) as GlobalAccessControlResponse
+  async getGlobalAccessControl () {
+    const { globalAccessControl } = await this.action('globalAccessControl:show', { userId: this.id }) as GlobalAccessControlResponse
     return new GlobalAccessControl(globalAccessControl, this.sessionHandler)
   }
 }
