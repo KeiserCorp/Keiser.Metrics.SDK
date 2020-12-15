@@ -37,9 +37,17 @@ describe('GlobalAccessControl', function () {
     expect(globalAccessControlSecret.uri).to.be.a('string')
   })
 
+  it('can list global access control', async function () {
+    const globalAccessControls = await adminSession.getGlobalAccessControls()
+    expect(Array.isArray(globalAccessControls)).to.equal(true)
+    expect(globalAccessControls.length).to.be.above(0)
+    const globalAccessControl = globalAccessControls[0]
+    expect(globalAccessControl.eagerUserProfile()).to.be.an('object')
+  })
+
   it('can show global access control', async function () {
-    const user = await adminSession.getUser({ userId: user.id })
-    const globalAccessControl = await user.getGlobalAccessControl()
+    const fetchUser = await adminSession.getUser({ userId: user.id })
+    const globalAccessControl = await fetchUser.getGlobalAccessControl()
 
     expect(globalAccessControl).to.be.an('object')
     expect(globalAccessControl instanceof GlobalAccessControl).to.be.equal(true)

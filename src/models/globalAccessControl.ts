@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Profile, ProfileData } from './profile'
 
 export const enum Permission {
   View = 'view',
@@ -34,6 +35,12 @@ export interface GlobalAccessControlData {
   accessControlRights: Permission | null
   resqueRights: Permission | null
   analyticRights: AnalyticPermission | null
+  user?: GlobalAccessControlUser
+}
+
+interface GlobalAccessControlUser {
+  id: number
+  profile: ProfileData
 }
 
 export interface GlobalAccessControlSecretData {
@@ -137,5 +144,12 @@ export class GlobalAccessControl extends Model {
 
   get analyticRights () {
     return this._globalAccessControlData.analyticRights
+  }
+
+  eagerUserProfile () {
+    if (typeof this._globalAccessControlData.user === 'undefined') {
+      return undefined
+    }
+    return new Profile(this._globalAccessControlData.user.profile, this.sessionHandler)
   }
 }
