@@ -27,8 +27,8 @@ export const enum UserSorting {
 
 export interface UserData {
   id: number
-  emailAddresses: EmailAddressData[]
-  primaryEmailAddress: PrimaryEmailAddressData
+  emailAddresses?: EmailAddressData[]
+  primaryEmailAddress?: PrimaryEmailAddressData
   basicCredential?: boolean
   oauthServices?: OAuthServiceData[]
   profile: ProfileData
@@ -127,7 +127,7 @@ export class User extends Model {
   }
 
   eagerPrimaryEmailAddress () {
-    return new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler)
+    return typeof this._userData.primaryEmailAddress !== 'undefined' ? new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler) : undefined
   }
 
   async getPrimaryEmailAddress () {

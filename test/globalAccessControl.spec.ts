@@ -42,7 +42,7 @@ describe('GlobalAccessControl', function () {
     expect(Array.isArray(globalAccessControls)).to.equal(true)
     expect(globalAccessControls.length).to.be.above(0)
     const globalAccessControl = globalAccessControls[0]
-    expect(globalAccessControl.eagerUserProfile()).to.be.an('object')
+    expect(globalAccessControl.eagerUser() instanceof User).to.be.equal(true)
   })
 
   it('can show global access control', async function () {
