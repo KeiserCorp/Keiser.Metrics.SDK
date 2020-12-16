@@ -5,6 +5,7 @@ import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionRes
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { FacilityRelationship, FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse } from './facilityRelationshipRequest'
+import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
@@ -26,8 +27,8 @@ export const enum UserSorting {
 
 export interface UserData {
   id: number
-  emailAddresses: EmailAddressData[]
-  primaryEmailAddress: PrimaryEmailAddressData
+  emailAddresses?: EmailAddressData[]
+  primaryEmailAddress?: PrimaryEmailAddressData
   basicCredential?: boolean
   oauthServices?: OAuthServiceData[]
   profile: ProfileData
@@ -126,7 +127,7 @@ export class User extends Model {
   }
 
   eagerPrimaryEmailAddress () {
-    return new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler)
+    return typeof this._userData.primaryEmailAddress !== 'undefined' ? new PrimaryEmailAddress(this._userData.primaryEmailAddress, this.sessionHandler) : undefined
   }
 
   async getPrimaryEmailAddress () {
@@ -340,6 +341,11 @@ export class User extends Model {
   async getStrengthMachineDataSets (options: { from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId: this.id }) as StrengthMachineDataSetListResponse
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler)
+  }
+
+  async getGlobalAccessControl () {
+    const { globalAccessControl } = await this.action('globalAccessControl:show', { userId: this.id }) as GlobalAccessControlResponse
+    return new GlobalAccessControl(globalAccessControl, this.sessionHandler)
   }
 }
 

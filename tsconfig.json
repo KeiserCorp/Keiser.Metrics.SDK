@@ -41,7 +41,8 @@
       "src/models/cache.ts",
       "src/models/stat.ts",
       "src/models/task.ts",
-      "src/models/facilityLicense.ts"
+      "src/models/facilityLicense.ts",
+      "src/models/globalAccessControl.ts"
     ],
     "includeVersion": true,
     "includeDeclarations": false,
