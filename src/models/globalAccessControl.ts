@@ -142,9 +142,6 @@ export class GlobalAccessControl extends Model {
   }
 
   eagerUser () {
-    if (typeof this._globalAccessControlData.user === 'undefined') {
-      return undefined
-    }
-    return new User(this._globalAccessControlData.user, this.sessionHandler)
+    return typeof this._globalAccessControlData.user !== 'undefined' ? new User(this._globalAccessControlData.user, this.sessionHandler) : undefined
   }
 }
