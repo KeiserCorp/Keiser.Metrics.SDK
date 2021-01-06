@@ -62,7 +62,7 @@
     "write-json-webpack-plugin": "^1.1.0"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "cockatiel": "^1.1.1",
     "ste-simple-events": "^1.6.19"
   }
