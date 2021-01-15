@@ -115,6 +115,10 @@ export class StaticSession {
   get weightMeasurement () {
     return this._sessionData.weightMeasurement
   }
+
+  get sessionPlanSequenceInstance () {
+    return this._sessionData.sessionPlanSequenceInstance
+  }
 }
 
 export class Session extends Model {
@@ -163,6 +167,10 @@ export class Session extends Model {
 
   get endedAt () {
     return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
+  }
+
+  get sessionPlanSequenceInstance () {
+    return this._sessionData.sessionPlanSequenceInstance
   }
 
   eagerUser () {
