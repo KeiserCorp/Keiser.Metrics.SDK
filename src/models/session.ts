@@ -4,6 +4,7 @@ import { Facility, FacilityData } from './facility'
 import { HeartRateDataSet, HeartRateDataSetData } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData } from './heightMeasurement'
 import { MSeriesDataSet, MSeriesDataSetData } from './mSeriesDataSet'
+import { SessionPlanSequenceInstance, SessionPlanSequenceInstanceData } from './sessionPlanSequenceInstance'
 import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMachineDataSet'
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
@@ -22,11 +23,7 @@ export interface SessionData {
   endedAt: string | null
   user?: UserData
   facility?: FacilityData
-
-  /**
-   * @todo Add Session Plan Sequence Instance model
-   */
-  sessionPlanSequenceInstance?: any
+  sessionPlanSequenceInstance?: SessionPlanSequenceInstanceData
   heartRateDataSets?: HeartRateDataSetData[]
   mSeriesDataSets?: MSeriesDataSetData[]
   strengthMachineDataSets?: StrengthMachineDataSetData[]
@@ -169,8 +166,8 @@ export class Session extends Model {
     return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
   }
 
-  get sessionPlanSequenceInstance () {
-    return this._sessionData.sessionPlanSequenceInstance
+  eagerSessionPlanSequenceInstance () {
+    return typeof this._sessionData.sessionPlanSequenceInstance !== 'undefined' ? new SessionPlanSequenceInstance(this._sessionData.sessionPlanSequenceInstance, this.sessionHandler) : undefined
   }
 
   eagerUser () {
