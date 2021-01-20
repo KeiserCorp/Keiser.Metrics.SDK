@@ -116,7 +116,11 @@ export class StaticSession {
     return this._sessionData.weightMeasurement
   }
 
-  /** @hidden */
+  /**
+   * @deprecated This endpoint should does not expose a proper model and should will
+   * be removed in the next major version release.
+   * @hidden
+   */
   get sessionPlanSequenceInstance () {
     return this._sessionData.sessionPlanSequenceInstance
   }
@@ -170,7 +174,11 @@ export class Session extends Model {
     return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
   }
 
-  /** @hidden */
+  /**
+   * @deprecated This endpoint should does not expose a proper model and should will
+   * be removed in the next major version release.
+   * @hidden
+   */
   get sessionPlanSequenceInstance () {
     return this._sessionData.sessionPlanSequenceInstance
   }
