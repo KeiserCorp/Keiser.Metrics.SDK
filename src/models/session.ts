@@ -14,6 +14,13 @@ export const enum SessionSorting {
   EndedAt = 'endedAt'
 }
 
+export const enum SessionDataType {
+  MSeries = 'mSeries',
+  Strength = 'strength',
+  HeartRate = 'heartRate',
+  Session = 'session'
+}
+
 export interface SessionData {
   id: number
   echipId: string | null
@@ -22,6 +29,9 @@ export interface SessionData {
   endedAt: string | null
   user?: UserData
   facility?: FacilityData
+  hasMSeriesDataSets: boolean
+  hasStrengthMachineDataSets: boolean
+  hasHeartRateDataSets: boolean
 
   /**
    * @todo Add Session Plan Sequence Instance model
@@ -94,6 +104,18 @@ export class StaticSession {
 
   get facility () {
     return this._sessionData.facility
+  }
+
+  get hasMSeriesDataSets () {
+    return this._sessionData.hasMSeriesDataSets
+  }
+
+  get hasStrengthMachineDataSets () {
+    return this._sessionData.hasStrengthMachineDataSets
+  }
+
+  get hasHeartRateDataSets () {
+    return this._sessionData.hasHeartRateDataSets
   }
 
   get heartRateDataSets () {
@@ -172,6 +194,18 @@ export class Session extends Model {
 
   get endedAt () {
     return this._sessionData.endedAt !== null ? new Date(this._sessionData.endedAt) : null
+  }
+
+  get hasMSeriesDataSets () {
+    return this._sessionData.hasMSeriesDataSets
+  }
+
+  get hasStrengthMachineDataSets () {
+    return this._sessionData.hasStrengthMachineDataSets
+  }
+
+  get hasHeartRateDataSets () {
+    return this._sessionData.hasHeartRateDataSets
   }
 
   /**
