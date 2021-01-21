@@ -14,7 +14,7 @@ export const enum SessionSorting {
   EndedAt = 'endedAt'
 }
 
-export const enum SessionDataType {
+export const enum SessionRequireExtendedDataType {
   MSeries = 'mSeries',
   Strength = 'strength',
   HeartRate = 'heartRate',

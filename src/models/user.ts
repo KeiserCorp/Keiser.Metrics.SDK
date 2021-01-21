@@ -14,7 +14,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { FacilitySession, FacilitySessions, Session, SessionDataType, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
+import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
@@ -279,7 +279,7 @@ export class User extends Model {
     return new Session(session, this.sessionHandler)
   }
 
-  async getSessions (options: { open?: boolean, dataType?: SessionDataType, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getSessions (options: { open?: boolean, requireExtendedDataType?: SessionRequireExtendedDataType, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { sessions, sessionsMeta } = await this.action('session:list', { ...options, userId: this.id }) as SessionListResponse
     return new Sessions(sessions, sessionsMeta, this.sessionHandler)
   }
