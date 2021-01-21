@@ -14,7 +14,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionResponse, Sessions, SessionSorting } from './session'
+import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting } from './session'
 import { ForceUnit, ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
@@ -209,7 +209,7 @@ export class User extends Model {
     return typeof this._userData.heightMeasurements !== 'undefined' ? this._userData.heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.sessionHandler)) : undefined
   }
 
-  async createHeightMeasurement (params: { source: string, takenAt: Date, bodyFatPercentage?: number }  & XOR<{ metricHeight: number }, { imperialHeight: number }>) {
+  async createHeightMeasurement (params: { source: string, takenAt: Date, bodyFatPercentage?: number } & XOR<{ metricHeight: number }, { imperialHeight: number }>) {
     const { heightMeasurement } = await this.action('heightMeasurement:create', { ...params, userId: this.id }) as HeightMeasurementResponse
     return new HeightMeasurement(heightMeasurement, this.sessionHandler)
   }
@@ -279,7 +279,7 @@ export class User extends Model {
     return new Session(session, this.sessionHandler)
   }
 
-  async getSessions (options: { open?: boolean, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getSessions (options: { open?: boolean, requireExtendedDataType?: SessionRequireExtendedDataType, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { sessions, sessionsMeta } = await this.action('session:list', { ...options, userId: this.id }) as SessionListResponse
     return new Sessions(sessions, sessionsMeta, this.sessionHandler)
   }
@@ -373,7 +373,7 @@ export class FacilityMemberUser extends FacilityUser {
   }
 
   async getSession (params: { id: number }) {
-    const { session } = await this.action('facilitySession:show', { ...params, userId: this.id }) as SessionResponse
+    const { session } = await this.action('facilitySession:show', params) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
   }
 
