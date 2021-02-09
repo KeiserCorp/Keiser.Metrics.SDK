@@ -1,6 +1,7 @@
 import { ForceUnit } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { a500DataSetData } from './a500DataSet'
 import { Session, SessionData } from './session'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
@@ -46,8 +47,7 @@ export interface StrengthMachineDataSetData {
   /**
    * @todo Add A500 Data Set class
    */
-  a500DataSet?: any
-
+  a500DataSet?: a500DataSetData
   session?: SessionData
 }
 
