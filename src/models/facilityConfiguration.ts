@@ -15,6 +15,7 @@ export interface FacilityConfigurationData {
   memberSecretForceLength: boolean
   memberSecretLength: number
   memberSecretRegex: string
+  memberRequireEmail: boolean
 }
 
 export interface FacilityConfigurationResponse extends AuthenticatedResponse {
@@ -46,6 +47,7 @@ export class FacilityConfiguration extends Model {
     memberSecretComposition: CompositionType
     memberSecretForceLength: boolean
     memberSecretLength: number
+    memberRequireEmail: boolean
   }) {
     const { facilityConfiguration } = await this.action('facilityConfiguration:update', params) as FacilityConfigurationResponse
     this.setFacilityConfigurationData(facilityConfiguration)
@@ -82,5 +84,9 @@ export class FacilityConfiguration extends Model {
 
   get memberSecretRegex () {
     return this._facilityConfigurationData.memberSecretRegex
+  }
+
+  get memberRequireEmail () {
+    return this._facilityConfigurationData.memberRequireEmail
   }
 }
