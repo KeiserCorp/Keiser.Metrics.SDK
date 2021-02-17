@@ -2,7 +2,7 @@ import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { A500RepDataPointData, A500TestSides } from './A500RepDataPointData'
 export const enum A500SetType {
-  Normal = 'Normal',
+  Normal = 'normal',
   Test = 'test',
 }
 export interface A500DataSetData {
@@ -16,7 +16,6 @@ export interface A500DataSetData {
   graphData?: A500RepDataPointData[]
   leftTestResultId: number
   rightTestResultId: number
-
 }
 
 export interface A500DataSetResponse extends AuthenticatedResponse {
