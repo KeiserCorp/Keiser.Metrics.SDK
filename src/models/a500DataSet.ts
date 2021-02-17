@@ -1,6 +1,12 @@
-import { ForceUnit } from './strengthMachineDataSet'
+import { Model } from '../model'
+import { SessionHandler } from '../session'
+import { a500RepDataPointData, a500TestSides } from './a500RepDataPointData'
+export const enum a500SetType {
+  Normal = 'Normal',
+  Test = 'test',
+}
 export interface a500DataSetData {
-  Id: number
+  id: number
   createdAt: string
   updatedAt: string
   displaySoftwareVersion: string
@@ -10,70 +16,56 @@ export interface a500DataSetData {
   graphData?: a500RepDataPointData[]
   leftTestResultId: number
   rightTestResultId: number
+
 }
 
-export interface a500RepDataPointData {
-  id: number
-  side: a500TestSides.Left | a500TestSides.Right
-  count: number
-  work: number
-  completedAt: Date
-  reactionTime: number
-  peakPower: number
-  averagePower: number
-  peakVelocity: number
-  averageVelocity: number
-  peakForce: number
-  averageForce: number
-  rangeOfMotion: number
-  setPointForce: number
-  forceUnit: ForceUnit
-  startSinceEpoch: number
-  endSinceEpoch: number
-  addedMass: number
-  addedForce: number
-}
+export class a500DataSet extends Model {
+  private readonly _a500DataSetData: a500DataSetData
+  constructor (
+    a500DataSetData: a500DataSetData,
+    sessionHandler: SessionHandler
+  ) {
+    super(sessionHandler)
+    this._a500DataSetData = a500DataSetData
+  }
 
-export interface a500TestResultData{
-  id: number
-  averageVelocityLineM: number
-  averageVelocityLineB: number
-  averagePowerParabolaA: number
-  averagePowerParabolaH: number
-  averagePowerParabolaK: number
-  averageSlopeChanges: number
-  peakVelocityLineM: number
-  peakVelocityLineB: number
-  peakPowerParabolaA: number
-  peakPowerParabolaH: number
-  peakPowerParabolaK: number
-  peakSlopeChanges: number
-}
+  public get id (): number {
+    return this._a500DataSetData.id
+  }
 
-export interface a500TimeSeriesPointData {
-  id: number
-  timeSinceEpoch: number
-  leftPosition: number
-  leftPower: number
-  leftForce: number
-  leftVelocity: number
-  leftAcceleration: number
-  leftForceOfMassAcceleration: number
-  leftMechanicalWeight: number
-  rightPosition: number
-  rightPower: number
-  rightForce: number
-  rightVelocity: number
-  rightAcceleration: number
-  rightForceOfMassAcceleration: number
-  rightMechanicalWeight: number
-}
-export const enum a500SetType{
-  Normal = 'Normal',
-  Test = 'test'
-}
-export const enum a500TestSides {
-  Both = 'both',
-  Left = 'left',
-  Right = 'right'
+  public get createdAt (): string {
+    return this._a500DataSetData.createdAt
+  }
+
+  public get updatedAt (): string {
+    return this._a500DataSetData.updatedAt
+  }
+
+  public get displaySoftwareVersion (): string {
+    return this._a500DataSetData.displaySoftwareVersion
+  }
+
+  public get epochAt (): Date {
+    return this._a500DataSetData.epochAt
+  }
+
+  public get type (): a500SetType {
+    return this._a500DataSetData.type
+  }
+
+  public get testSide (): a500TestSides {
+    return this._a500DataSetData.testSide
+  }
+
+  public get graphData (): a500RepDataPointData[] | undefined {
+    return this._a500DataSetData.graphData
+  }
+
+  public get leftTestResultId (): number {
+    return this._a500DataSetData.leftTestResultId
+  }
+
+  public get rightTestResultId (): number {
+    return this._a500DataSetData.rightTestResultId
+  }
 }
