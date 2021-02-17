@@ -1,5 +1,5 @@
 import { Model } from '../model'
-import { SessionHandler } from '../session'
+import { SessionHandler, AuthenticatedResponse } from '../session';
 import { ForceUnit } from './strengthMachineDataSet'
 export const enum a500TestSides {
   Both = 'both',
@@ -27,6 +27,10 @@ export interface a500RepDataPointData {
   endSinceEpoch: number
   addedMass: number
   addedForce: number
+}
+
+export interface a500RepDataPointResponse extends AuthenticatedResponse {
+  a400RepDataPoint: a500RepDataPointData
 }
 
 export class a500RepDataPoint extends Model {

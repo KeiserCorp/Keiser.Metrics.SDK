@@ -1,5 +1,5 @@
 import { Model } from "../model";
-import { SessionHandler } from "../session";
+import { SessionHandler, AuthenticatedResponse } from '../session';
 export interface a500TestResultData {
   id: number;
   averageVelocityLineM: number;
@@ -14,6 +14,10 @@ export interface a500TestResultData {
   peakPowerParabolaH: number;
   peakPowerParabolaK: number;
   peakSlopeChanges: number;
+}
+
+export interface a500TestResultResponse extends AuthenticatedResponse {
+  a500TestResult: a500TestResultData;
 }
 
 export class a500TestResult extends Model {
