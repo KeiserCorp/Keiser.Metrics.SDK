@@ -1,5 +1,5 @@
 import { Model } from "../model";
-import { SessionHandler } from "../session";
+import { AuthenticatedResponse, SessionHandler } from "../session";
 export interface a500TimeSeriesPointData {
   id: number;
   timeSinceEpoch: number;
@@ -19,6 +19,9 @@ export interface a500TimeSeriesPointData {
   rightMechanicalWeight: number;
 }
 
+export interface a500TimeSeriesPointResponse extends AuthenticatedResponse {
+  a500TimeSeriesPoint: a500TimeSeriesPointData
+}
 export class a500TimeSeriesPoint extends Model {
   private readonly _a500TimeSeriesPointData: a500TimeSeriesPointData;
   constructor(

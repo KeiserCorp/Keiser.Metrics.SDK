@@ -1,5 +1,5 @@
 import { Model } from '../model'
-import { SessionHandler } from '../session'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { a500RepDataPointData, a500TestSides } from './a500RepDataPointData'
 export const enum a500SetType {
   Normal = 'Normal',
@@ -17,6 +17,10 @@ export interface a500DataSetData {
   leftTestResultId: number
   rightTestResultId: number
 
+}
+
+export interface a500DataSetResponse extends AuthenticatedResponse {
+  a500DataSet: a500DataSetData
 }
 
 export class a500DataSet extends Model {
