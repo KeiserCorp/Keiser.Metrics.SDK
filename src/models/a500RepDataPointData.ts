@@ -30,7 +30,7 @@ export interface A500RepDataPointData {
 }
 
 export interface A500RepDataPointResponse extends AuthenticatedResponse {
-  a400RepDataPoint: A500RepDataPointData
+  a500RepDataPoint: A500RepDataPointData
 }
 
 export class A500RepDataPoint extends Model {
