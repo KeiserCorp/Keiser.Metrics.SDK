@@ -1,6 +1,6 @@
 import { Model } from "../model";
 import { AuthenticatedResponse, SessionHandler } from "../session";
-export interface a500TimeSeriesPointData {
+export interface A500TimeSeriesPointData {
   id: number;
   timeSinceEpoch: number;
   leftPosition: number;
@@ -19,17 +19,17 @@ export interface a500TimeSeriesPointData {
   rightMechanicalWeight: number;
 }
 
-export interface a500TimeSeriesPointResponse extends AuthenticatedResponse {
-  a500TimeSeriesPoint: a500TimeSeriesPointData
+export interface A500TimeSeriesPointResponse extends AuthenticatedResponse {
+  A500TimeSeriesPoint: A500TimeSeriesPointData
 }
-export class a500TimeSeriesPoint extends Model {
-  private readonly _a500TimeSeriesPointData: a500TimeSeriesPointData;
+export class A500TimeSeriesPoint extends Model {
+  private readonly _a500TimeSeriesPointData: A500TimeSeriesPointData;
   constructor(
-    a500TimeSeriesPointData: a500TimeSeriesPointData,
+    A500TimeSeriesPointData: A500TimeSeriesPointData,
     sessionHandler: SessionHandler
   ) {
     super(sessionHandler);
-    this._a500TimeSeriesPointData = a500TimeSeriesPointData;
+    this._a500TimeSeriesPointData = A500TimeSeriesPointData;
   }
 
   public get id(): number {

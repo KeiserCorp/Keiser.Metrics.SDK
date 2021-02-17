@@ -1,15 +1,15 @@
 import { Model } from '../model'
-import { SessionHandler, AuthenticatedResponse } from '../session';
+import { AuthenticatedResponse, SessionHandler } from '../session'
 import { ForceUnit } from './strengthMachineDataSet'
-export const enum a500TestSides {
+export const enum A500TestSides {
   Both = 'both',
   Left = 'left',
   Right = 'right',
 }
 
-export interface a500RepDataPointData {
+export interface A500RepDataPointData {
   id: number
-  side: a500TestSides.Left | a500TestSides.Right
+  side: A500TestSides.Left | A500TestSides.Right
   count: number
   work: number
   completedAt: Date
@@ -29,25 +29,25 @@ export interface a500RepDataPointData {
   addedForce: number
 }
 
-export interface a500RepDataPointResponse extends AuthenticatedResponse {
-  a400RepDataPoint: a500RepDataPointData
+export interface A500RepDataPointResponse extends AuthenticatedResponse {
+  a400RepDataPoint: A500RepDataPointData
 }
 
-export class a500RepDataPoint extends Model {
-  private readonly _a500RepDataPointData: a500RepDataPointData
+export class A500RepDataPoint extends Model {
+  private readonly _a500RepDataPointData: A500RepDataPointData
   constructor (
-    a500RepDataPointData: a500RepDataPointData,
+    A500RepDataPointData: A500RepDataPointData,
     sessionHandler: SessionHandler
   ) {
     super(sessionHandler)
-    this._a500RepDataPointData = a500RepDataPointData
+    this._a500RepDataPointData = A500RepDataPointData
   }
 
   public get id (): number {
     return this._a500RepDataPointData.id
   }
 
-  public get side (): a500TestSides.Left | a500TestSides.Right {
+  public get side (): A500TestSides.Left | A500TestSides.Right {
     return this._a500RepDataPointData.side
   }
 

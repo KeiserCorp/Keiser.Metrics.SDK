@@ -1,6 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { a500DataSetData } from './a500DataSet'
+import { A500DataSetData } from './A500DataSet'
 import { Session, SessionData } from './session'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
@@ -21,7 +21,7 @@ export const enum StrengthTestType {
   Power6Rep = 'power6r',
   A4206Rep = 'a4206r',
   A42010Rep = 'a42010r',
-  A50010Rep = 'a50010r'
+  A50010Rep = 'A50010r'
 }
 
 export const enum StrengthMachineDataSetSorting {
@@ -53,7 +53,7 @@ export interface StrengthMachineDataSetData {
   /**
    * @todo Add A500 Data Set class
    */
-  a500DataSet?: a500DataSetData
+  a500DataSet?: A500DataSetData
   session?: SessionData
 }
 

@@ -1,6 +1,6 @@
 import { Model } from "../model";
-import { SessionHandler, AuthenticatedResponse } from '../session';
-export interface a500TestResultData {
+import { AuthenticatedResponse, SessionHandler } from "../session";
+export interface A500TestResultData {
   id: number;
   averageVelocityLineM: number;
   averageVelocityLineB: number;
@@ -16,18 +16,18 @@ export interface a500TestResultData {
   peakSlopeChanges: number;
 }
 
-export interface a500TestResultResponse extends AuthenticatedResponse {
-  a500TestResult: a500TestResultData;
+export interface A500TestResultResponse extends AuthenticatedResponse {
+  A500TestResult: A500TestResultData;
 }
 
-export class a500TestResult extends Model {
-  private readonly _a500TestResultData: a500TestResultData;
+export class A500TestResult extends Model {
+  private readonly _a500TestResultData: A500TestResultData;
   constructor(
-    a500TestResultData: a500TestResultData,
+    A500TestResultData: A500TestResultData,
     sessionHandler: SessionHandler
   ) {
     super(sessionHandler);
-    this._a500TestResultData = a500TestResultData;
+    this._a500TestResultData = A500TestResultData;
   }
   public get id(): number {
     return this._a500TestResultData.id;

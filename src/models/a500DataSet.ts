@@ -1,36 +1,36 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { a500RepDataPointData, a500TestSides } from './a500RepDataPointData'
-export const enum a500SetType {
+import { A500RepDataPointData, A500TestSides } from './A500RepDataPointData'
+export const enum A500SetType {
   Normal = 'Normal',
   Test = 'test',
 }
-export interface a500DataSetData {
+export interface A500DataSetData {
   id: number
   createdAt: string
   updatedAt: string
   displaySoftwareVersion: string
   epochAt: Date
-  type: a500SetType
-  testSide: a500TestSides
-  graphData?: a500RepDataPointData[]
+  type: A500SetType
+  testSide: A500TestSides
+  graphData?: A500RepDataPointData[]
   leftTestResultId: number
   rightTestResultId: number
 
 }
 
-export interface a500DataSetResponse extends AuthenticatedResponse {
-  a500DataSet: a500DataSetData
+export interface A500DataSetResponse extends AuthenticatedResponse {
+  A500DataSet: A500DataSetData
 }
 
-export class a500DataSet extends Model {
-  private readonly _a500DataSetData: a500DataSetData
+export class A500DataSet extends Model {
+  private readonly _a500DataSetData: A500DataSetData
   constructor (
-    a500DataSetData: a500DataSetData,
+    A500DataSetData: A500DataSetData,
     sessionHandler: SessionHandler
   ) {
     super(sessionHandler)
-    this._a500DataSetData = a500DataSetData
+    this._a500DataSetData = A500DataSetData
   }
 
   public get id (): number {
@@ -53,15 +53,15 @@ export class a500DataSet extends Model {
     return this._a500DataSetData.epochAt
   }
 
-  public get type (): a500SetType {
+  public get type (): A500SetType {
     return this._a500DataSetData.type
   }
 
-  public get testSide (): a500TestSides {
+  public get testSide (): A500TestSides {
     return this._a500DataSetData.testSide
   }
 
-  public get graphData (): a500RepDataPointData[] | undefined {
+  public get graphData (): A500RepDataPointData[] | undefined {
     return this._a500DataSetData.graphData
   }
 
