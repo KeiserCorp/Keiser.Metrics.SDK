@@ -50,32 +50,37 @@ export interface KioskTokenChangeEvent {
 }
 
 export interface JWTToken {
+  iss: string
+  jti: string
+  exp: number
+  type: 'access' | 'refresh' | 'kiosk' | 'machine'
+}
+
+export interface SessionToken extends JWTToken {
   user: { id: number }
   facility?: FacilityData | null
   facilityRole?: string | null
   globalAccessControl?: GlobalAccessControlData | null
-  type: 'access' | 'refresh'
-  iat: number
   exp: number
-  iss: string
-  jti: string
 }
 
-export interface AccessToken extends JWTToken {
+export interface AccessToken extends SessionToken {
   type: 'access'
 }
 
-export interface RefreshToken extends JWTToken {
+export interface RefreshToken extends SessionToken {
   type: 'refresh'
 }
 
-export interface KioskToken {
+export interface KioskToken extends JWTToken {
   facility: FacilityData
   type: 'kiosk'
-  iat: number
   exp: number
-  iss: string
-  jti: string
+}
+
+export interface MachineToken extends JWTToken{
+  facilityId: number
+  type: 'machine'
 }
 
 export module Authentication {
@@ -116,6 +121,10 @@ export module Authentication {
 
   export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
     await connection.action('auth:resetRequest', params)
+  }
+
+  export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string}) {
+    return new MachineSession(params, connection)
   }
 
   /** @hidden */
@@ -331,6 +340,67 @@ export class KioskSession {
   async sessionEnd (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as SessionResponse
     return new StaticSession(session)
+  }
+}
+
+export class MachineSessionHandler {
+  private readonly _connection: MetricsConnection
+  private _machineToken: string = ''
+
+  constructor (connection: MetricsConnection, { machineToken }: { machineToken: string }) {
+    this._connection = connection
+    this._connection.onDisposeEvent.one(() => this.close())
+    this.updateToken(machineToken)
+  }
+
+  private updateToken (machineToken: string) {
+    this._machineToken = machineToken
+  }
+
+  get connection () {
+    return this._connection
+  }
+
+  get decodedMachineToken () {
+    return DecodeJWT(this._machineToken) as MachineToken
+  }
+
+  get machineToken () {
+    return this._machineToken
+  }
+
+  close () {
+    this._machineToken = ''
+  }
+
+  async action (action: string, params: Object = { }) {
+    const authParams = { authorization: this._machineToken, ...params }
+    return await this._connection.action(action, authParams) as AuthenticatedResponse
+  }
+}
+
+export class MachineSession {
+  private readonly _sessionHandler: MachineSessionHandler
+
+  constructor ({ machineToken }: { machineToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new MachineSessionHandler(connection, { machineToken })
+  }
+
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
+  close () {
+    this._sessionHandler.close()
+  }
+
+  private async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
+  }
+
+  async userLogin (params: { primaryIdentification: string | number}) {
+    const response = await this.action('a500:userLogin', params) as UserResponse
+    return new UserSession(response, this.sessionHandler.connection)
   }
 }
 

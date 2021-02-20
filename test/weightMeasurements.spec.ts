@@ -55,7 +55,6 @@ describe('Weight Measurement', function () {
     expect(typeof weightMeasurement).to.equal('object')
     expect(weightMeasurement.source).to.equal('test')
     expect(weightMeasurement.metricWeight).to.equal(80)
-    expect(weightMeasurement.imperialWeight).to.equal(176.4)
   })
 
   it('can get new latest weight measurement', async function () {
@@ -66,7 +65,6 @@ describe('Weight Measurement', function () {
     expect(typeof weightMeasurements[0]).to.equal('object')
     expect(weightMeasurements[0].source).to.equal('test')
     expect(weightMeasurements[0].metricWeight).to.equal(80)
-    expect(weightMeasurements[0].imperialWeight).to.equal(176.4)
 
     createdWeightMeasurement = weightMeasurements[0]
   })
@@ -112,7 +110,6 @@ describe('Weight Measurement', function () {
     expect(typeof weightMeasurement).to.equal('object')
     expect(weightMeasurement.source).to.equal('inbody')
     expect(weightMeasurement.metricWeight).to.equal(87.5)
-    expect(weightMeasurement.imperialWeight).to.equal(192.9)
 
     await weightMeasurements[0].delete()
   })

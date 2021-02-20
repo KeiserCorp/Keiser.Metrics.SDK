@@ -60,6 +60,10 @@ export default class Metrics {
     return await Authentication.useKioskToken(this._connection, params)
   }
 
+  async authenticateWithMachineToken (params: { machineToken: string}) {
+    return await Authentication.useMachineToken(this._connection, params)
+  }
+
   async authenticateWithFacebook (params: { redirect: string }) {
     return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
   }
