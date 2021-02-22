@@ -14,6 +14,7 @@ import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetR
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
+import { FacilitySecretResponse, StaticA500FacilityConfiguration } from './models/facilitySecret'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { SessionResponse, StaticSession } from './models/session'
@@ -398,9 +399,14 @@ export class MachineSession {
     return await this.sessionHandler.action(action, params)
   }
 
-  async userLogin (params: { primaryIdentification: string | number}) {
+  async userLogin (params: { memberIdentifier: string | number}) {
     const response = await this.action('a500:userLogin', params) as UserResponse
     return new UserSession(response, this.sessionHandler.connection)
+  }
+
+  async getA500FacilityConfiguration () {
+    const { facilityConfiguration } = await this.action('a500FacilityConfiguration:show') as FacilitySecretResponse
+    return new StaticA500FacilityConfiguration(facilityConfiguration)
   }
 }
 

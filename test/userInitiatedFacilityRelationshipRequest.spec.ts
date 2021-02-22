@@ -2,6 +2,7 @@ import { expect } from 'chai'
 
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
+import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
@@ -11,7 +12,7 @@ describe('User Initiated Facility Relationship Request', function () {
   let newUserSession: UserSession
   let demoUserSession: UserSession
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(30)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+  const newUserMemberId = [...Array(8)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
   before(async function () {
     metricsInstance = new Metrics({

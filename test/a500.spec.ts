@@ -10,6 +10,8 @@ describe('A500', function () {
   let facility: PrivilegedFacility
   let machineSession: MachineSession
   let userSession: UserSession
+  const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+  const newUserMemberId = [...Array(8)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -31,7 +33,7 @@ describe('A500', function () {
   })
 
   it('can start machine session', async function () {
-    const facilityConfiguration = await facility.getA500FacilityConfiguration()
+    const facilityConfiguration = await facility.getA500Qr()
     machineSession = await metricsInstance.authenticateWithMachineToken({ machineToken: facilityConfiguration.a500AuthorizationKey })
 
     expect(typeof machineSession).to.not.equal('undefined')
@@ -40,10 +42,11 @@ describe('A500', function () {
   })
 
   it('can use machine session to login user', async function () {
-    userSession = await machineSession.userLogin({ primaryIdentification: '000000' })
+    const facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Archie Richards', memberIdentifier: newUserMemberId })
+    userSession = await machineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier })
 
     expect(typeof userSession).to.not.equal('undefined')
     expect(typeof userSession.user).to.not.equal('undefined')
-    expect(userSession.user.id).to.equal(1)
+    expect(userSession.user.id).to.equal(facilityRelationship.userId)
   })
 })

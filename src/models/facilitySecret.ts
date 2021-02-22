@@ -9,22 +9,11 @@ export interface FacilitySecretResponse extends AuthenticatedResponse {
   facilityConfiguration: FacilitySecretData
 }
 
-export class A500FacilityConfiguration extends Model {
-  private _facilitySecretData: FacilitySecretData
+export class StaticA500FacilityConfiguration {
+  private readonly _facilitySecretData: FacilitySecretData
 
-  constructor (facilitySecretData: FacilitySecretData, sessionHandler: SessionHandler) {
-    super(sessionHandler)
+  constructor (facilitySecretData: FacilitySecretData) {
     this._facilitySecretData = facilitySecretData
-  }
-
-  private setFacilitySecretData (facilitySecretData: FacilitySecretData) {
-    this._facilitySecretData = facilitySecretData
-  }
-
-  async reload () {
-    const { facilityConfiguration } = await this.action('a500FacilityConfiguration:show') as FacilitySecretResponse
-    this.setFacilitySecretData(facilityConfiguration)
-    return this
   }
 
   get a500AuthorizationKey () {

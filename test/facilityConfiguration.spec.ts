@@ -43,13 +43,15 @@ describe('Facility Configuration', function () {
       memberIdentificationLength: 8,
       memberSecretComposition: CompositionType.Alpha,
       memberSecretForceLength: true,
-      memberSecretLength: 6
+      memberSecretLength: 6,
+      memberRequireEmail: false
     })
 
     expect(typeof facilityConfiguration).to.not.equal('undefined')
     expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
     expect(facilityConfiguration.memberIdentificationComposition).to.equal(CompositionType.Alpha)
     expect(facilityConfiguration.memberIdentificationRegex).to.equal('^[a-z0-9]{8}$')
+    expect(facilityConfiguration.memberRequireEmail).to.equal(false)
   })
 
   it('can reload facility configuration', async function () {
@@ -59,5 +61,6 @@ describe('Facility Configuration', function () {
     expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
     expect(facilityConfiguration.memberIdentificationComposition).to.equal(CompositionType.Alpha)
     expect(facilityConfiguration.memberIdentificationRegex).to.equal('^[a-z0-9]{8}$')
+    expect(facilityConfiguration.memberRequireEmail).to.equal(false)
   })
 })

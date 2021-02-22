@@ -7,7 +7,7 @@ import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
-import { A500FacilityConfiguration, A500Qr, A500QrDataResponse, FacilitySecretResponse } from './facilitySecret'
+import { A500Qr, A500QrDataResponse } from './facilitySecret'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
@@ -201,11 +201,6 @@ export class PrivilegedFacility extends Facility {
   async getConfiguration () {
     const { facilityConfiguration } = await this.action('facilityConfiguration:show') as FacilityConfigurationResponse
     return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
-  }
-
-  async getA500FacilityConfiguration () {
-    const { facilityConfiguration } = await this.action('a500FacilityConfiguration:show') as FacilitySecretResponse
-    return new A500FacilityConfiguration(facilityConfiguration, this.sessionHandler)
   }
 
   async getA500Qr () {
