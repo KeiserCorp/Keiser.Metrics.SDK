@@ -10,6 +10,15 @@ describe('A500', function () {
   let facility: PrivilegedFacility
   let machineSession: MachineSession
   let userSession: UserSession
+  const a500Machine = {
+    machineModel: 1399,
+    firmwareVersion: '00000000',
+    softwareVersion: '00000000',
+    mainBoardSerial: '1234 5678 9012 3456 7890',
+    displayUUID: '1234567890123456',
+    leftCylinderSerial: '01234567',
+    rightCylinderSerial: '23456789'
+  }
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
   const newUserMemberId = [...Array(8)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
@@ -32,13 +41,13 @@ describe('A500', function () {
     metricsInstance?.dispose()
   })
 
-  it('can start machine session', async function () {
+  it('can register machine with facility', async function () {
     const facilityConfiguration = await facility.getA500Qr()
-    machineSession = await metricsInstance.authenticateWithMachineToken({ machineToken: facilityConfiguration.a500AuthorizationKey })
+    machineSession = await metricsInstance.authenticateWithA500MachineToken({ ...a500Machine, authorization: facilityConfiguration.accessToken })
 
     expect(typeof machineSession).to.not.equal('undefined')
     expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof machineSession.sessionHandler.machineToken).to.equal('string')
+    expect(typeof machineSession.sessionHandler.accessToken).to.equal('string')
   })
 
   it('can use machine session to login user', async function () {

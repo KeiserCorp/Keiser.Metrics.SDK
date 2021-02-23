@@ -63,4 +63,14 @@ describe('Facility Configuration', function () {
     expect(facilityConfiguration.memberIdentificationRegex).to.equal('^[a-z0-9]{8}$')
     expect(facilityConfiguration.memberRequireEmail).to.equal(false)
   })
+
+  it('can get facility qr code', async function () {
+    const qr = await facility.getA500Qr()
+
+    expect(typeof qr).to.not.equal('undefined')
+    expect(typeof qr.accessToken).to.equal('string')
+    expect(qr.version).to.equal('1')
+    expect(qr.model).to.equal('a500')
+    expect(qr.type).to.equal('jwt')
+  })
 })

@@ -2,12 +2,11 @@ import { Units } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
-import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
+import { A500Qr, A500QrDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
-import { A500Qr, A500QrDataResponse } from './facilitySecret'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
@@ -204,7 +203,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   async getA500Qr () {
-    const { facilityConfiguration } = await this.action('a500FacilityConfiguration:qr') as A500QrDataResponse
-    return new A500Qr(facilityConfiguration, this.sessionHandler)
+    const { qr } = await this.action('facilityConfiguration:qrCode') as A500QrDataResponse
+    return new A500Qr(qr, this.sessionHandler)
   }
 }

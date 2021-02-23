@@ -60,8 +60,8 @@ export default class Metrics {
     return await Authentication.useKioskToken(this._connection, params)
   }
 
-  async authenticateWithMachineToken (params: { machineToken: string}) {
-    return await Authentication.useMachineToken(this._connection, params)
+  async authenticateWithA500MachineToken (params: { authorization: string, machineModel: number, firmwareVersion: string, softwareVersion: string, mainBoardSerial: string, displayUUID: string, leftCylinderSerial: string, rightCylinderSerial?: string }) {
+    return await Authentication.checkInMachine(this._connection, params)
   }
 
   async authenticateWithFacebook (params: { redirect: string }) {

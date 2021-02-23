@@ -14,7 +14,7 @@ import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetR
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
-import { FacilitySecretResponse, StaticA500FacilityConfiguration } from './models/facilitySecret'
+import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { SessionResponse, StaticSession } from './models/session'
@@ -80,7 +80,11 @@ export interface KioskToken extends JWTToken {
 }
 
 export interface MachineToken extends JWTToken{
-  facilityId: number
+  facility: {
+    id: number
+  }
+  facilityRole: string
+  machine: FacilityStrengthMachineData
   type: 'machine'
 }
 
@@ -124,8 +128,9 @@ export module Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
-  export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string}) {
-    return new MachineSession(params, connection)
+  export async function checkInMachine (connection: MetricsConnection, params: { authorization: string, machineModel: number, firmwareVersion: string, softwareVersion: string, mainBoardSerial: string, displayUUID: string, leftCylinderSerial: string, rightCylinderSerial?: string }) {
+    const response = await connection.action('a500FacilityStrengthMachine:checkIn', params) as AuthenticatedResponse
+    return new MachineSession(response, connection)
   }
 
   /** @hidden */
@@ -346,36 +351,36 @@ export class KioskSession {
 
 export class MachineSessionHandler {
   private readonly _connection: MetricsConnection
-  private _machineToken: string = ''
+  private _accessToken: string = ''
 
-  constructor (connection: MetricsConnection, { machineToken }: { machineToken: string }) {
+  constructor (connection: MetricsConnection, machineResponse: AuthenticatedResponse) {
     this._connection = connection
     this._connection.onDisposeEvent.one(() => this.close())
-    this.updateToken(machineToken)
+    this.updateToken(machineResponse.accessToken)
   }
 
-  private updateToken (machineToken: string) {
-    this._machineToken = machineToken
+  private updateToken (accessToken: string) {
+    this._accessToken = accessToken
   }
 
   get connection () {
     return this._connection
   }
 
-  get decodedMachineToken () {
-    return DecodeJWT(this._machineToken) as MachineToken
+  get decodedAccessToken () {
+    return DecodeJWT(this._accessToken) as MachineToken
   }
 
-  get machineToken () {
-    return this._machineToken
+  get accessToken () {
+    return this._accessToken
   }
 
   close () {
-    this._machineToken = ''
+    this._accessToken = ''
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this._machineToken, ...params }
+    const authParams = { authorization: this._accessToken, ...params }
     return await this._connection.action(action, authParams) as AuthenticatedResponse
   }
 }
@@ -383,8 +388,8 @@ export class MachineSessionHandler {
 export class MachineSession {
   private readonly _sessionHandler: MachineSessionHandler
 
-  constructor ({ machineToken }: { machineToken: string }, connection: MetricsConnection) {
-    this._sessionHandler = new MachineSessionHandler(connection, { machineToken })
+  constructor (machineResponse: AuthenticatedResponse, connection: MetricsConnection) {
+    this._sessionHandler = new MachineSessionHandler(connection, machineResponse)
   }
 
   get sessionHandler () {
@@ -402,11 +407,6 @@ export class MachineSession {
   async userLogin (params: { memberIdentifier: string | number}) {
     const response = await this.action('a500:userLogin', params) as UserResponse
     return new UserSession(response, this.sessionHandler.connection)
-  }
-
-  async getA500FacilityConfiguration () {
-    const { facilityConfiguration } = await this.action('a500FacilityConfiguration:show') as FacilitySecretResponse
-    return new StaticA500FacilityConfiguration(facilityConfiguration)
   }
 }
 
