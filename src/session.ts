@@ -23,6 +23,7 @@ import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExerci
 import { PrivilegedStrengthExerciseMuscle, StrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './models/strengthExerciseMuscle'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariant, StrengthExerciseVariantResponse } from './models/strengthExerciseVariant'
 import { StrengthMachine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
+import { StrengthMachineDataSet, StrengthMachineDataSetResponse } from './models/strengthMachineDataSet'
 import { PrivilegedStretchExercise, PrivilegedStretchExercises, StretchExercise, StretchExerciseListResponse, StretchExerciseResponse, StretchExercises, StretchExerciseSorting } from './models/stretchExercise'
 import { PrivilegedStretchExerciseMuscle, StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/stretchExerciseMuscle'
 import { PrivilegedStretchExerciseVariant, StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
@@ -216,6 +217,10 @@ export class SessionHandler {
     return DecodeJWT(this._accessToken) as AccessToken
   }
 
+  get accessToken () {
+    return this._accessToken
+  }
+
   get refreshToken () {
     return this._refreshToken
   }
@@ -407,6 +412,15 @@ export class MachineSession {
   async userLogin (params: { memberIdentifier: string | number}) {
     const response = await this.action('a500:userLogin', params) as UserResponse
     return new UserSession(response, this.sessionHandler.connection)
+  }
+
+  async createA500Set (params: {userSession: UserSession, setData: string, lz4SampleData?: string}) {
+    const response = await this.action('a500:createSet', { setData: params.setData, lz4SampleData: params.lz4SampleData, userAuthorization: params.userSession.sessionHandler.accessToken, apiVersion: 1 }) as StrengthMachineDataSetResponse
+    return new StrengthMachineDataSet(response.strengthMachineDataSet, params.userSession.sessionHandler)
+  }
+
+  async createA500Utilization (params: { takenAt: Date, repetitionCount: number}) {
+    await this.action('a500:createUtilizationInstance', params)
   }
 }
 
