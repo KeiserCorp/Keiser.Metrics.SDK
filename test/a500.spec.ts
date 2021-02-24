@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { MachineSession, UserSession } from '../src/session'
-import { a500DataSet, a500TimeSeriesPoints } from './a500SetData'
+import { a500DataSet } from './a500SetData'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('A500', function () {

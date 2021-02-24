@@ -44,7 +44,7 @@ export class A500MachineState extends MachineModel {
     return this
   }
 
-  get focusUnits () {
+  get forceUnits () {
     return this._a500MachineState.forceUnits
   }
 

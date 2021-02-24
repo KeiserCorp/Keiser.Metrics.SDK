@@ -37,7 +37,7 @@ export class FacilityMachinesConfiguration extends Model {
     primaryFocus: string
     secondaryFocus: string
   }) {
-    const { facilityMachinesConfiguration } = await this.action('facilityMachinesConfiguration:update') as FacilityMachinesConfigurationResponse
+    const { facilityMachinesConfiguration } = await this.action('facilityMachinesConfiguration:update', params) as FacilityMachinesConfigurationResponse
     this.setFacilityMachineConfiguration(facilityMachinesConfiguration)
     return this
   }
