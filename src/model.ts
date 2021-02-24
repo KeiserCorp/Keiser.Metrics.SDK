@@ -1,4 +1,4 @@
-import { SessionHandler } from './session'
+import { MachineSessionHandler, SessionHandler } from './session'
 
 export interface ListMeta {
   sort: string
@@ -32,5 +32,17 @@ export class ModelList<Model, Data, Meta> extends Array<Model> {
 
   get meta () {
     return this._meta
+  }
+}
+
+export class MachineModel {
+  protected sessionHandler: MachineSessionHandler
+
+  constructor (sessionHandler: MachineSessionHandler) {
+    this.sessionHandler = sessionHandler
+  }
+
+  protected async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 }

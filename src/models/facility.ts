@@ -4,6 +4,7 @@ import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, Sessio
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
 import { A500Qr, A500QrDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
+import { FacilityMachinesConfiguration, FacilityMachinesConfigurationResponse } from './facilityMachinesConfiguration'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
@@ -205,5 +206,10 @@ export class PrivilegedFacility extends Facility {
   async getA500Qr () {
     const { qr } = await this.action('facilityConfiguration:qrCode') as A500QrDataResponse
     return new A500Qr(qr, this.sessionHandler)
+  }
+
+  async getFacilityMachinesConfiguration () {
+    const { facilityMachinesConfiguration } = await this.action('facilityMachinesConfiguration:show') as FacilityMachinesConfigurationResponse
+    return new FacilityMachinesConfiguration(facilityMachinesConfiguration, this.sessionHandler)
   }
 }

@@ -6,6 +6,7 @@ import { ClientSideActionPrevented, SessionError } from './error'
 import { compressLz4ToB64 } from './lib/compress'
 import { DecodeJWT } from './lib/jwt'
 import { A500DataSet } from './models/a500DataSet'
+import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
 import { A500TimeSeriesPoint } from './models/a500TimeSeriesPoint'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
@@ -448,6 +449,11 @@ export class MachineSession {
 
   async createA500Utilization (params: { takenAt: Date, repetitionCount: number}) {
     await this.action('a500:createUtilizationInstance', params)
+  }
+
+  async getA500MachineState () {
+    const response = await this.action('a500FacilityStrengthMachineState:show') as A500MachineStateResponse
+    return new A500MachineState(response.a500MachineState, this._sessionHandler)
   }
 }
 
