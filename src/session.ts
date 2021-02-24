@@ -4,6 +4,7 @@ import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
+import { A500DataSet } from './models/a500DataSet'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
 import { CardioExerciseMuscle, CardioExerciseMuscleResponse, PrivilegedCardioExerciseMuscle } from './models/cardioExerciseMuscle'
@@ -51,6 +52,10 @@ export interface KioskTokenChangeEvent {
   kioskToken: string
 }
 
+export interface MachineTokenChangeEvent {
+  accessToken: string
+}
+
 export interface JWTToken {
   iss: string
   jti: string
@@ -85,7 +90,7 @@ export interface MachineToken extends JWTToken{
     id: number
   }
   facilityRole: string
-  machine: FacilityStrengthMachineData
+  facilityStrengthMachineId: number
   type: 'machine'
 }
 
@@ -129,9 +134,19 @@ export module Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
-  export async function checkInMachine (connection: MetricsConnection, params: { authorization: string, machineModel: number, firmwareVersion: string, softwareVersion: string, mainBoardSerial: string, displayUUID: string, leftCylinderSerial: string, rightCylinderSerial?: string }) {
-    const response = await connection.action('a500FacilityStrengthMachine:checkIn', params) as AuthenticatedResponse
-    return new MachineSession(response, connection)
+  export async function checkInMachine (connection: MetricsConnection, params: { machineInitializerToken: string, machineModel: number, firmwareVersion: string, softwareVersion: string, mainBoardSerial: string, displayUUID: string, leftCylinderSerial: string, rightCylinderSerial?: string }) {
+    const checkInParams = {
+      authorization: params.machineInitializerToken,
+      machineModel: params.machineModel,
+      firmwareVersion: params.firmwareVersion,
+      softwareVersion: params.softwareVersion,
+      mainBoardSerial: params.mainBoardSerial,
+      displayUUID: params.displayUUID,
+      leftCylinderSerial: params.leftCylinderSerial,
+      rightCylinderSerial: params.rightCylinderSerial
+    }
+    const response = await connection.action('a500FacilityStrengthMachine:checkIn', checkInParams) as AuthenticatedResponse
+    return new MachineSession({ accessToken: response.accessToken }, connection)
   }
 
   /** @hidden */
@@ -357,15 +372,17 @@ export class KioskSession {
 export class MachineSessionHandler {
   private readonly _connection: MetricsConnection
   private _accessToken: string = ''
+  private readonly _onMachineTokenChangeEvent = new SimpleEventDispatcher<MachineTokenChangeEvent>()
 
-  constructor (connection: MetricsConnection, machineResponse: AuthenticatedResponse) {
+  constructor (connection: MetricsConnection, { accessToken }: { accessToken: string}) {
     this._connection = connection
     this._connection.onDisposeEvent.one(() => this.close())
-    this.updateToken(machineResponse.accessToken)
+    this.updateToken(accessToken)
   }
 
   private updateToken (accessToken: string) {
     this._accessToken = accessToken
+    this._onMachineTokenChangeEvent.dispatchAsync({ accessToken: this._accessToken })
   }
 
   get connection () {
@@ -378,6 +395,10 @@ export class MachineSessionHandler {
 
   get accessToken () {
     return this._accessToken
+  }
+
+  get onMachineTokenChangeEvent () {
+    return this._onMachineTokenChangeEvent.asEvent()
   }
 
   close () {
@@ -393,8 +414,8 @@ export class MachineSessionHandler {
 export class MachineSession {
   private readonly _sessionHandler: MachineSessionHandler
 
-  constructor (machineResponse: AuthenticatedResponse, connection: MetricsConnection) {
-    this._sessionHandler = new MachineSessionHandler(connection, machineResponse)
+  constructor ({ accessToken }: {accessToken: string}, connection: MetricsConnection) {
+    this._sessionHandler = new MachineSessionHandler(connection, { accessToken })
   }
 
   get sessionHandler () {
@@ -414,8 +435,8 @@ export class MachineSession {
     return new UserSession(response, this.sessionHandler.connection)
   }
 
-  async createA500Set (params: {userSession: UserSession, setData: string, lz4SampleData?: string}) {
-    const response = await this.action('a500:createSet', { setData: params.setData, lz4SampleData: params.lz4SampleData, userAuthorization: params.userSession.sessionHandler.accessToken, apiVersion: 1 }) as StrengthMachineDataSetResponse
+  async createA500Set (params: {userSession: UserSession, setData: A500DataSet, lz4SampleData?: string}) {
+    const response = await this.action('a500:createSet', { setData: JSON.stringify(params.setData), lz4SampleData: params.lz4SampleData, userAuthorization: params.userSession.sessionHandler.accessToken, apiVersion: 1 }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(response.strengthMachineDataSet, params.userSession.sessionHandler)
   }
 
