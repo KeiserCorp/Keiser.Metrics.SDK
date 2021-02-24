@@ -3,8 +3,10 @@ import { SimpleEventDispatcher } from 'ste-simple-events'
 import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
+import { compressLz4ToB64 } from './lib/compress'
 import { DecodeJWT } from './lib/jwt'
 import { A500DataSet } from './models/a500DataSet'
+import { A500TimeSeriesPoint } from './models/a500TimeSeriesPoint'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
 import { CardioExerciseMuscle, CardioExerciseMuscleResponse, PrivilegedCardioExerciseMuscle } from './models/cardioExerciseMuscle'
@@ -435,8 +437,12 @@ export class MachineSession {
     return new UserSession(response, this.sessionHandler.connection)
   }
 
-  async createA500Set (params: {userSession: UserSession, setData: A500DataSet, lz4SampleData?: string}) {
-    const response = await this.action('a500:createSet', { setData: JSON.stringify(params.setData), lz4SampleData: params.lz4SampleData, userAuthorization: params.userSession.sessionHandler.accessToken, apiVersion: 1 }) as StrengthMachineDataSetResponse
+  async createA500Set (params: {userSession: UserSession, setData: A500DataSet, lz4SampleData?: A500TimeSeriesPoint[]}) {
+    let lz4SampleData: string | null = null
+    if (params.lz4SampleData !== undefined) {
+      lz4SampleData = compressLz4ToB64(params.lz4SampleData)
+    }
+    const response = await this.action('a500:createSet', { setData: JSON.stringify(params.setData), lz4SampleData: lz4SampleData, userAuthorization: params.userSession.sessionHandler.accessToken, apiVersion: 1 }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(response.strengthMachineDataSet, params.userSession.sessionHandler)
   }
 

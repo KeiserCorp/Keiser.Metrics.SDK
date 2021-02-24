@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { MachineSession, UserSession } from '../src/session'
-import a500DataSet from './a500SetData'
+import { a500DataSet, a500TimeSeriesPoints } from './a500SetData'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('A500', function () {
@@ -65,6 +65,7 @@ describe('A500', function () {
     expect(typeof response).to.equal('undefined')
   })
 
+  // Cannot test lz4 compression because TextEncoder doesn't exist in the test environment
   it('can create A500 data set', async function () {
     const response = await machineSession.createA500Set({
       userSession: userSession,

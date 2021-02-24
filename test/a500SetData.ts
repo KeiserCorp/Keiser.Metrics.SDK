@@ -1,7 +1,7 @@
 import { A500Side } from '../src/models/a500DataSet'
 import { ForceUnit } from '../src/models/strengthMachineDataSet'
 
-export default {
+export const a500DataSet = {
   startedAt: new Date('2020-01-27T18:58:57.000Z'),
   endedAt: new Date('2020-01-27T19:03:41.358Z'),
   type: 'test',
@@ -490,3 +490,26 @@ export default {
     }
   ]
 }
+
+export const a500TimeSeriesPoints = [{
+  timeSinceEpoch: 28129,
+  id: 0,
+  left: {
+    force: 358.6,
+    position: 0,
+    power: 380.46,
+    velocity: 0.93307,
+    acceleration: 10,
+    forceOfMassAcceleration: 0,
+    mechanicalWeight: 0
+  },
+  right: {
+    force: 345.8,
+    position: 0,
+    power: 375.24,
+    velocity: 0.9221,
+    acceleration: 10,
+    forceOfMassAcceleration: 0,
+    mechanicalWeight: 0
+  }
+}]
