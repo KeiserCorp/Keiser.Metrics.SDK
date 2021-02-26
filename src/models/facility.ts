@@ -4,11 +4,11 @@ import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, Sessio
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
 import { A500InitializerTokenDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
-import { FacilityMachinesConfiguration, FacilityMachinesConfigurationResponse } from './facilityMachinesConfiguration'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
+import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
 
@@ -208,8 +208,8 @@ export class PrivilegedFacility extends Facility {
     return initializerToken
   }
 
-  async getFacilityMachinesConfiguration () {
-    const { facilityMachinesConfiguration } = await this.action('facilityMachinesConfiguration:show') as FacilityMachinesConfigurationResponse
-    return new FacilityMachinesConfiguration(facilityMachinesConfiguration, this.sessionHandler)
+  async getFacilityStrengthMachineConfiguration () {
+    const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:show') as FacilityStrengthMachineConfigurationResponse
+    return new FacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration, this.sessionHandler)
   }
 }

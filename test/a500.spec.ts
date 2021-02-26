@@ -22,7 +22,7 @@ describe('A500', function () {
     rightCylinderSerial: '23456789'
   }
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(8)].map(i => (~~(Math.random() * 10)).toString()).join('')
+  const newUserMemberId = [...Array(6)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -39,7 +39,8 @@ describe('A500', function () {
     }
   })
 
-  after(function () {
+  after(async function () {
+    await userSession.user.delete()
     metricsInstance?.dispose()
   })
 

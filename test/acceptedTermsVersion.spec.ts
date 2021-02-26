@@ -24,7 +24,8 @@ describe('Accepted Terms Version', function () {
     user = userSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await userSession.user.delete()
     metricsInstance?.dispose()
   })
 

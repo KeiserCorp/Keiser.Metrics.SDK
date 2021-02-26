@@ -1,15 +1,17 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics, { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole, FacilityUserEmployeeRelationship, FacilityUserMemberRelationship, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
+import { FacilityMemberUser } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility to User Relationship', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let existingFacilityRelationship: FacilityUserMemberRelationship
+  let createdUser: FacilityMemberUser
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
@@ -27,7 +29,17 @@ describe('Facility to User Relationship', function () {
     }
   })
 
-  after(function () {
+  after(async function () {
+    if (typeof createdUser !== 'undefined') {
+      const metricsAdminInstance = new MetricsAdmin({
+        restEndpoint: DevRestEndpoint,
+        socketEndpoint: DevSocketEndpoint,
+        persistConnection: true
+      })
+      const adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+      await (await adminSession.getUser({ userId: createdUser.id })).delete()
+      metricsAdminInstance.dispose()
+    }
     metricsInstance?.dispose()
   })
 
@@ -72,6 +84,7 @@ describe('Facility to User Relationship', function () {
 
   it('can create new facility member user', async function () {
     const facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
+    createdUser = facilityRelationship.eagerUser()
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(true)

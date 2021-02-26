@@ -24,7 +24,8 @@ describe('GlobalAccessControl', function () {
     user = (await metricsAdminInstance.createUser({ email: userEmailAddress, password: DemoPassword })).user
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsAdminInstance?.dispose()
   })
 

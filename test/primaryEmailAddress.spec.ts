@@ -28,7 +28,8 @@ describe('Primary Email Address', function () {
     addedEmailAddress = await user.createEmailAddress({ email: newEmail })
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 

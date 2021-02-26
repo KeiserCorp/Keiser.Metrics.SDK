@@ -9,6 +9,15 @@ describe('Facility Configuration', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let facilityConfiguration: FacilityConfiguration
+  let originalFacilityConfigurationParameters: {
+    memberIdentificationComposition: CompositionType
+    memberIdentificationForceLength: boolean
+    memberIdentificationLength: number
+    memberSecretComposition: CompositionType
+    memberSecretForceLength: boolean
+    memberSecretLength: number
+    memberRequireEmail: boolean
+  }
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -34,6 +43,15 @@ describe('Facility Configuration', function () {
 
     expect(typeof facilityConfiguration).to.not.equal('undefined')
     expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
+    originalFacilityConfigurationParameters = {
+      memberIdentificationComposition: facilityConfiguration.memberIdentificationComposition,
+      memberIdentificationForceLength: facilityConfiguration.memberSecretForceLength,
+      memberIdentificationLength: facilityConfiguration.memberIdentificationLength,
+      memberSecretComposition: facilityConfiguration.memberSecretComposition,
+      memberSecretForceLength: facilityConfiguration.memberSecretForceLength,
+      memberSecretLength: facilityConfiguration.memberSecretLength,
+      memberRequireEmail: facilityConfiguration.memberRequireEmail
+    }
   })
 
   it('can update facility configuration', async function () {
@@ -54,14 +72,24 @@ describe('Facility Configuration', function () {
     expect(facilityConfiguration.memberRequireEmail).to.equal(false)
   })
 
+  it('can revert facility configuration', async function () {
+    facilityConfiguration = await facilityConfiguration.update({ ...originalFacilityConfigurationParameters })
+
+    expect(typeof facilityConfiguration).to.not.equal('undefined')
+    expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
+    expect(facilityConfiguration.memberIdentificationComposition).to.equal(originalFacilityConfigurationParameters.memberIdentificationComposition)
+    expect(facilityConfiguration.memberIdentificationLength).to.equal(originalFacilityConfigurationParameters.memberIdentificationLength)
+    expect(facilityConfiguration.memberRequireEmail).to.equal(originalFacilityConfigurationParameters.memberRequireEmail)
+  })
+
   it('can reload facility configuration', async function () {
     facilityConfiguration = await facilityConfiguration.reload()
 
     expect(typeof facilityConfiguration).to.not.equal('undefined')
     expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
-    expect(facilityConfiguration.memberIdentificationComposition).to.equal(CompositionType.Alpha)
-    expect(facilityConfiguration.memberIdentificationRegex).to.equal('^[a-z0-9]{8}$')
-    expect(facilityConfiguration.memberRequireEmail).to.equal(false)
+    expect(facilityConfiguration.memberIdentificationComposition).to.equal(originalFacilityConfigurationParameters.memberIdentificationComposition)
+    expect(facilityConfiguration.memberIdentificationLength).to.equal(originalFacilityConfigurationParameters.memberIdentificationLength)
+    expect(facilityConfiguration.memberRequireEmail).to.equal(originalFacilityConfigurationParameters.memberRequireEmail)
   })
 
   it('can get facility qr code', async function () {
