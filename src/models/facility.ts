@@ -102,7 +102,7 @@ export class PrivilegedFacility extends Facility {
 
   async createKioskSession () {
     const response = await this.action('facilityKioskToken:create') as FacilityKioskTokenResponse
-    return new KioskSession(response, this.sessionHandler.connection)
+    return new KioskSession({ accessToken: response.kioskToken }, this.sessionHandler.connection)
   }
 
   async createFacilityMemberUser (params: { email: string, name: string, birthday?: Date, gender?: Gender, language?: string, units?: Units, memberIdentifier?: string, memberSecret?: string, employeeRole?: string | null }) {

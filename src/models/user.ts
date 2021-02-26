@@ -3,7 +3,7 @@ import { ClientSideActionPrevented } from '../error'
 import { compressLz4ToB64 } from '../lib/compress'
 import { XOR } from '../lib/types'
 import { ListMeta, Model, ModelList } from '../model'
-import { AuthenticatedResponse, KioskSession, SessionHandler, StrengthMachineSession } from '../session'
+import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData, A500TimeSeriesDataPoint } from './a500DataSet'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
@@ -17,7 +17,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
-import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting } from './session'
+import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
@@ -44,6 +44,11 @@ export interface UserData {
 
 export interface UserResponse extends AuthenticatedResponse {
   user: UserData
+}
+
+export interface FacilityUserResponse extends AuthenticatedResponse {
+  user: UserData
+  facilityRelationshipId: number
 }
 
 /** @hidden */
@@ -269,14 +274,6 @@ export class User extends Model {
     }
   }
 
-  async startSessionFromKiosk (params: { kioskSession: KioskSession, forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number }) {
-    const { session, echipData } = await this.action('facilityKiosk:sessionStart', { forceEndPrevious: params.forceEndPrevious, echipId: params.echipId, sessionPlanSequenceAssignmentId: params.sessionPlanSequenceAssignmentId, kioskToken: params.kioskSession.sessionHandler.accessToken }) as SessionResponse
-    return {
-      session: new Session(session, this.sessionHandler),
-      echipData
-    }
-  }
-
   async getSession (params: { id: number }) {
     const { session } = await this.action('session:show', { ...params, userId: this.id }) as SessionResponse
     return new Session(session, this.sessionHandler)
@@ -368,7 +365,7 @@ export class FacilityUser extends User {
 
 export class FacilityMemberUser extends FacilityUser {
   async startSession (params: { forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number } = { }) {
-    const { session, echipData } = await this.action('facilitySession:start', { ...params, userId: this.id }) as SessionResponse
+    const { session, echipData } = await this.action('facilitySession:start', { ...params, userId: this.id }) as SessionStartResponse
     return {
       session: new FacilitySession(session, this.sessionHandler),
       echipData
