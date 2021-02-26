@@ -1,13 +1,7 @@
-import { ForceUnit } from './strengthMachineDataSet'
-
-export enum A500Side {
-  Left = 'left',
-  Right = 'right',
-  Both = 'both'
-}
+import { ForceUnit, Side, TestSide } from '../constants'
 
 export interface A500RepData {
-  side: A500Side
+  side: Side
   count: number
   work: number
   completedAt: Date
@@ -27,11 +21,27 @@ export interface A500RepData {
   addedForce: number
 }
 
-export interface A500DataSet {
+export interface A500SetData {
   startedAt: Date
   endedAt: Date
   type: string
-  testSide: A500Side
-  sampleData: any[]
+  testSide: TestSide
   repData: A500RepData[]
+}
+
+export interface A500TimeSeriesDataPoint {
+  id: number
+  left: A500TimeSeriesDataPointSide
+  right: A500TimeSeriesDataPointSide
+  timeSinceEpoch: number
+}
+
+export interface A500TimeSeriesDataPointSide {
+  force: number
+  position: number
+  power: number
+  velocity: number
+  acceleration: number
+  forceOfMassAcceleration: number
+  mechanicalWeight: number
 }

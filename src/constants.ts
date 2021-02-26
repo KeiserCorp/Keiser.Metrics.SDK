@@ -7,3 +7,21 @@ export const enum Units {
   Metric = 'metric',
   Imperial = 'imperial'
 }
+
+export enum Side {
+  Left = 'left',
+  Right = 'right'
+}
+
+export enum TestSide {
+  Left = 'left',
+  Right = 'right',
+  Both = 'both'
+}
+
+export const enum ForceUnit {
+  Pounds = 'lb',
+  Kilograms = 'kg',
+  Newtons = 'ne',
+  Unknown = 'er'
+}

@@ -12,7 +12,8 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "typeRoots": [
-      "./node_modules/@types"
+      "./node_modules/@types",
+      "./types"
     ],
     "types": [
       "mocha",
@@ -24,7 +25,8 @@
     ]
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./types/**/*.d.ts"
   ],
   "exclude": [
     "./node_modules",

@@ -65,12 +65,8 @@ describe('Facility Configuration', function () {
   })
 
   it('can get facility qr code', async function () {
-    const qr = await facility.getA500Qr()
+    const token = await facility.getA500MachineInitializerToken()
 
-    expect(typeof qr).to.not.equal('undefined')
-    expect(typeof qr.accessToken).to.equal('string')
-    expect(qr.version).to.equal('1')
-    expect(qr.model).to.equal('a500')
-    expect(qr.type).to.equal('jwt')
+    expect(typeof token).to.equal('string')
   })
 })

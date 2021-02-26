@@ -1,3 +1,4 @@
+import { ForceUnit } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
@@ -7,13 +8,6 @@ import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 export const enum ResistancePrecision {
   Integer = 'int',
   Decimal = 'dec'
-}
-
-export const enum ForceUnit {
-  Pounds = 'lb',
-  Kilograms = 'kg',
-  Newtons = 'ne',
-  Unknown = 'er'
 }
 
 export const enum StrengthTestType {

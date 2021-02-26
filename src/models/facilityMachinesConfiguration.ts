@@ -1,6 +1,6 @@
+import { ForceUnit } from '../constants'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { ForceUnit } from './strengthMachineDataSet'
 
 export interface FacilityMachinesConfigurationData {
   timeZone: string
@@ -31,12 +31,7 @@ export class FacilityMachinesConfiguration extends Model {
     return this
   }
 
-  async update (params: {
-    timeZone: string
-    forceUnits: ForceUnit
-    primaryFocus: string
-    secondaryFocus: string
-  }) {
+  async update (params: { timeZone: string, forceUnits: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
     const { facilityMachinesConfiguration } = await this.action('facilityMachinesConfiguration:update', params) as FacilityMachinesConfigurationResponse
     this.setFacilityMachineConfiguration(facilityMachinesConfiguration)
     return this

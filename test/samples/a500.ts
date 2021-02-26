@@ -1,15 +1,14 @@
-import { A500Side } from '../src/models/a500DataSet'
-import { ForceUnit } from '../src/models/strengthMachineDataSet'
+import { ForceUnit, Side, TestSide } from '../../src/constants'
+import { A500SetData, A500TimeSeriesDataPoint } from '../../src/models/a500DataSet'
 
-export const a500DataSet = {
+export const a500SetDataSample: A500SetData = {
   startedAt: new Date('2020-01-27T18:58:57.000Z'),
   endedAt: new Date('2020-01-27T19:03:41.358Z'),
   type: 'test',
-  testSide: A500Side.Both,
-  sampleData: [],
+  testSide: TestSide.Both,
   repData: [
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 1,
       work: 433,
       completedAt: new Date('2020-01-27T19:01:16.000Z'),
@@ -29,7 +28,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 1,
       work: 436,
       completedAt: new Date('2020-01-27T19:01:16.000Z'),
@@ -49,7 +48,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 2,
       work: 579,
       completedAt: new Date('2020-01-27T19:01:23.000Z'),
@@ -69,7 +68,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 2,
       work: 568,
       completedAt: new Date('2020-01-27T19:01:24.000Z'),
@@ -89,7 +88,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 3,
       work: 786,
       completedAt: new Date('2020-01-27T19:01:32.000Z'),
@@ -109,7 +108,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 3,
       work: 758,
       completedAt: new Date('2020-01-27T19:01:32.000Z'),
@@ -129,7 +128,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 4,
       work: 966,
       completedAt: new Date('2020-01-27T19:01:40.000Z'),
@@ -149,7 +148,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 4,
       work: 936,
       completedAt: new Date('2020-01-27T19:01:40.000Z'),
@@ -169,7 +168,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 5,
       work: 1166,
       completedAt: new Date('2020-01-27T19:01:52.000Z'),
@@ -189,7 +188,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 5,
       work: 1111,
       completedAt: new Date('2020-01-27T19:01:52.000Z'),
@@ -209,7 +208,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 6,
       work: 1352,
       completedAt: new Date('2020-01-27T19:02:07.000Z'),
@@ -229,7 +228,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 6,
       work: 1301,
       completedAt: new Date('2020-01-27T19:02:07.000Z'),
@@ -249,7 +248,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 7,
       work: 1485,
       completedAt: new Date('2020-01-27T19:02:28.000Z'),
@@ -269,7 +268,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 7,
       work: 1454,
       completedAt: new Date('2020-01-27T19:02:28.000Z'),
@@ -289,7 +288,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 8,
       work: 1639,
       completedAt: new Date('2020-01-27T19:02:56.000Z'),
@@ -309,7 +308,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 8,
       work: 1603,
       completedAt: new Date('2020-01-27T19:02:56.000Z'),
@@ -329,7 +328,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 9,
       work: 1884,
       completedAt: new Date('2020-01-27T19:03:36.000Z'),
@@ -349,7 +348,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 9,
       work: 1814,
       completedAt: new Date('2020-01-27T19:03:36.000Z'),
@@ -369,7 +368,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 10,
       work: 2044,
       completedAt: new Date('2020-01-27T19:04:17.000Z'),
@@ -389,7 +388,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 10,
       work: 1965,
       completedAt: new Date('2020-01-27T19:04:17.000Z'),
@@ -409,7 +408,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 11,
       work: 2169,
       completedAt: new Date('2020-01-27T19:04:58.000Z'),
@@ -429,7 +428,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 11,
       work: 2111,
       completedAt: new Date('2020-01-27T19:04:58.000Z'),
@@ -449,7 +448,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Right,
+      side: Side.Right,
       count: 12,
       work: 2258,
       completedAt: new Date('2020-01-27T19:05:39.000Z'),
@@ -469,7 +468,7 @@ export const a500DataSet = {
       addedForce: 0
     },
     {
-      side: A500Side.Left,
+      side: Side.Left,
       count: 12,
       work: 2150,
       completedAt: new Date('2020-01-27T19:05:39.000Z'),
@@ -491,7 +490,7 @@ export const a500DataSet = {
   ]
 }
 
-export const a500TimeSeriesPoints = [{
+export const a500TimeSeriesPointsSample: A500TimeSeriesDataPoint[] = [{
   timeSinceEpoch: 28129,
   id: 0,
   left: {

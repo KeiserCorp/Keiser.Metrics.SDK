@@ -1,6 +1,7 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Core } from './models/core'
 import { OAuthProviders } from './models/oauthService'
+import { StrengthMachineIdentifier } from './models/strengthMachine'
 import { Authentication } from './session'
 
 export default class Metrics {
@@ -60,8 +61,8 @@ export default class Metrics {
     return await Authentication.useKioskToken(this._connection, params)
   }
 
-  async authenticateWithA500MachineToken (params: { machineInitializerToken: string, machineModel: number, firmwareVersion: string, softwareVersion: string, mainBoardSerial: string, displayUUID: string, leftCylinderSerial: string, rightCylinderSerial?: string }) {
-    return await Authentication.checkInMachine(this._connection, params)
+  async authenticateWithA500MachineInitializerToken (params: { a500MachineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    return await Authentication.useA500MachineInitializerToken(this._connection, params)
   }
 
   async authenticateWithFacebook (params: { redirect: string }) {

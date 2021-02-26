@@ -2,7 +2,6 @@ import { expect } from 'chai'
 
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
-import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { UserSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 

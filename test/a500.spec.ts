@@ -2,17 +2,18 @@ import { expect } from 'chai'
 
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
-import { MachineSession, UserSession } from '../src/session'
-import { a500DataSet } from './a500SetData'
+import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
+import { FacilityUserSession, StrengthMachineSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { a500SetDataSample, a500TimeSeriesPointsSample } from './samples/a500'
 
 describe('A500', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
-  let machineSession: MachineSession
-  let userSession: UserSession
-  const a500Machine = {
-    machineModel: 1399,
+  let machineSession: StrengthMachineSession
+  let userSession: FacilityUserSession
+  const strengthMachineIdentifier: StrengthMachineIdentifier = {
+    machineModel: '1399',
     firmwareVersion: '00000000',
     softwareVersion: '00000000',
     mainBoardSerial: '1234 5678 9012 3456 7890',
@@ -43,8 +44,8 @@ describe('A500', function () {
   })
 
   it('can register machine with facility', async function () {
-    const facilityConfiguration = await facility.getA500Qr()
-    machineSession = await metricsInstance.authenticateWithA500MachineToken({ ...a500Machine, machineInitializerToken: facilityConfiguration.accessToken })
+    const a500MachineInitializerToken = await facility.getA500MachineInitializerToken()
+    machineSession = await metricsInstance.authenticateWithA500MachineInitializerToken({ a500MachineInitializerToken, strengthMachineIdentifier })
 
     expect(typeof machineSession).to.not.equal('undefined')
     expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
@@ -53,7 +54,7 @@ describe('A500', function () {
 
   it('can use machine session to login user', async function () {
     const facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Archie Richards', memberIdentifier: newUserMemberId })
-    userSession = await machineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier })
+    userSession = await machineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier as string })
 
     expect(typeof userSession).to.not.equal('undefined')
     expect(typeof userSession.user).to.not.equal('undefined')
@@ -61,15 +62,16 @@ describe('A500', function () {
   })
 
   it('can create A500 utilization instance', async function () {
-    const response = await machineSession.createA500Utilization({ takenAt: new Date(), repetitionCount: 15 })
-    expect(typeof response).to.equal('undefined')
+    await machineSession.createA500UtilizationInstance({ takenAt: new Date(), repetitionCount: 15 })
   })
 
-  // Cannot test lz4 compression because TextEncoder doesn't exist in the test environment
   it('can create A500 data set', async function () {
-    const response = await machineSession.createA500Set({
-      userSession: userSession,
-      setData: a500DataSet
+    this.timeout(10000)
+
+    const response = await userSession.user.createA500Set({
+      strengthMachineSession: machineSession,
+      setData: a500SetDataSample,
+      sampleData: a500TimeSeriesPointsSample
     })
     expect(typeof response).to.not.equal('undefined')
     expect(response.id).to.not.equal(0)

@@ -22,40 +22,8 @@ export interface FacilityConfigurationResponse extends AuthenticatedResponse {
   facilityConfiguration: FacilityConfigurationData
 }
 
-export interface A500QrDataResponse extends AuthenticatedResponse {
-  qr: string
-}
-export class A500Qr extends Model {
-  private readonly _model: string
-  private readonly _type: string
-  private readonly _version: string
-  private readonly _accessToken: string
-
-  constructor (a500QrData: string, sessionHandler: SessionHandler) {
-    super(sessionHandler)
-    const data = a500QrData.split(':')
-    const [model, type, version] = data[0].split('.')
-    this._model = model
-    this._type = type
-    this._version = version
-    this._accessToken = data[1]
-  }
-
-  get accessToken () {
-    return this._accessToken
-  }
-
-  get model () {
-    return this._model
-  }
-
-  get type () {
-    return this._type
-  }
-
-  get version () {
-    return this._version
-  }
+export interface A500InitializerTokenDataResponse extends AuthenticatedResponse {
+  initializerToken: string
 }
 
 export class FacilityConfiguration extends Model {

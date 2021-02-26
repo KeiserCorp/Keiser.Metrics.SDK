@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 
 import Metrics from '../src'
+import { ForceUnit } from '../src/constants'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityMachinesConfiguration } from '../src/models/facilityMachinesConfiguration'
-import { ForceUnit } from '../src/models/strengthMachineDataSet'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility Machines Configuration', function () {

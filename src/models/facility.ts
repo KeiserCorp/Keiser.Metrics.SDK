@@ -2,7 +2,7 @@ import { Units } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
-import { A500Qr, A500QrDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
+import { A500InitializerTokenDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityMachinesConfiguration, FacilityMachinesConfigurationResponse } from './facilityMachinesConfiguration'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
@@ -203,9 +203,9 @@ export class PrivilegedFacility extends Facility {
     return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
   }
 
-  async getA500Qr () {
-    const { qr } = await this.action('facilityConfiguration:qrCode') as A500QrDataResponse
-    return new A500Qr(qr, this.sessionHandler)
+  async getA500MachineInitializerToken () {
+    const { initializerToken } = await this.action('facilityConfiguration:a500InitializerToken') as A500InitializerTokenDataResponse
+    return initializerToken
   }
 
   async getFacilityMachinesConfiguration () {
