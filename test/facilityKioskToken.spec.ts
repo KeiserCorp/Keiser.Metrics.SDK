@@ -4,14 +4,14 @@ import Metrics from '../src'
 import { UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
-import { KioskSession, UserSession } from '../src/session'
+import { FacilityUserSession, KioskSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Facility Kiosk Token', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let kioskSession: KioskSession
-  let userSession: UserSession
+  let userSession: FacilityUserSession
   const echipId = [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
   const echipData = {
     1621: {
@@ -76,16 +76,16 @@ describe('Facility Kiosk Token', function () {
 
     expect(typeof kioskSession).to.not.equal('undefined')
     expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
+    expect(typeof kioskSession.sessionHandler.accessToken).to.equal('string')
   })
 
   it('can restore kiosk session from token', async function () {
-    const token = kioskSession.sessionHandler.kioskToken
+    const token = kioskSession.sessionHandler.accessToken
     const restoredKioskSession = await metricsInstance.authenticateWithKioskToken({ kioskToken: token })
 
     expect(typeof restoredKioskSession).to.not.equal('undefined')
     expect(typeof restoredKioskSession.sessionHandler).to.not.equal('undefined')
-    expect(restoredKioskSession.sessionHandler.kioskToken).to.equal(token)
+    expect(restoredKioskSession.sessionHandler.accessToken).to.equal(token)
   })
 
   it('can use kiosk session to login user', async function () {
@@ -96,8 +96,8 @@ describe('Facility Kiosk Token', function () {
     expect(userSession.user.id).to.equal(1)
   })
 
-  it('can use kiosk session to start workout session', async function () {
-    const { session, echipData } = await userSession.user.startSessionFromKiosk({ kioskSession, echipId, forceEndPrevious: true })
+  it('can use start workout session (facility user session)', async function () {
+    const { session, echipData } = await userSession.user.startSession({ echipId, forceEndPrevious: true })
 
     expect(typeof session).to.not.equal('undefined')
     expect(typeof echipData).to.not.equal('undefined')
@@ -129,8 +129,8 @@ describe('Facility Kiosk Token', function () {
 
     expect(typeof kioskSession).to.not.equal('undefined')
     expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
-    expect(kioskSession.sessionHandler.kioskToken).to.equal('')
+    expect(typeof kioskSession.sessionHandler.accessToken).to.equal('string')
+    expect(kioskSession.sessionHandler.accessToken).to.equal('')
   })
 
   it('cannot use kiosk session after logout', async function () {

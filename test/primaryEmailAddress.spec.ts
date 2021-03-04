@@ -28,12 +28,13 @@ describe('Primary Email Address', function () {
     addedEmailAddress = await user.createEmailAddress({ email: newEmail })
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 
   it('can get static primary email address', async function () {
-    const primaryEmailAddress = user.eagerPrimaryEmailAddress()
+    const primaryEmailAddress = user.eagerPrimaryEmailAddress() as PrimaryEmailAddress
 
     expect(primaryEmailAddress).to.be.an('object')
     expect(primaryEmailAddress.emailAddressId).to.be.a('number')

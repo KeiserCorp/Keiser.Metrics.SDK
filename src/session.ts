@@ -4,6 +4,7 @@ import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
+import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting, PrivilegedCardioExercise, PrivilegedCardioExercises } from './models/cardioExercise'
 import { CardioExerciseMuscle, CardioExerciseMuscleResponse, PrivilegedCardioExerciseMuscle } from './models/cardioExerciseMuscle'
@@ -13,20 +14,21 @@ import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAlia
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet, PrivilegedExerciseOrdinalSets } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
+import { KioskSessionResponse } from './models/facilityKiosk'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
-import { SessionResponse, StaticSession } from './models/session'
+import { StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
 import { PrivilegedStrengthExerciseMuscle, StrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './models/strengthExerciseMuscle'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariant, StrengthExerciseVariantResponse } from './models/strengthExerciseVariant'
-import { StrengthMachine, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
+import { StrengthMachine, StrengthMachineIdentifier, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
 import { PrivilegedStretchExercise, PrivilegedStretchExercises, StretchExercise, StretchExerciseListResponse, StretchExerciseResponse, StretchExercises, StretchExerciseSorting } from './models/stretchExercise'
 import { PrivilegedStretchExerciseMuscle, StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/stretchExerciseMuscle'
 import { PrivilegedStretchExerciseVariant, StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
-import { User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
+import { FacilityMemberUser, FacilityUserResponse, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -41,6 +43,10 @@ export interface OAuthLoginResponse {
   url: string
 }
 
+export interface AccessTokenChangeEvent {
+  accessToken: string
+}
+
 export interface RefreshTokenChangeEvent {
   refreshToken: string
 }
@@ -49,35 +55,47 @@ export interface KioskTokenChangeEvent {
   kioskToken: string
 }
 
+export interface StrengthMachineTokenChangeEvent {
+  accessToken: string
+}
+
 export interface JWTToken {
+  iss: string
+  jti: string
+  exp: number
+  type: 'access' | 'refresh' | 'kiosk' | 'machine'
+}
+
+export interface SessionToken extends JWTToken {
   user: { id: number }
   facility?: FacilityData | null
   facilityRole?: string | null
   globalAccessControl?: GlobalAccessControlData | null
-  type: 'access' | 'refresh'
-  iat: number
   exp: number
-  iss: string
-  jti: string
 }
 
-export interface AccessToken extends JWTToken {
+export interface AccessToken extends SessionToken {
   type: 'access'
 }
 
-export interface RefreshToken extends JWTToken {
+export interface RefreshToken extends SessionToken {
   type: 'refresh'
 }
 
-export interface KioskToken {
+export interface KioskToken extends JWTToken {
   facility: FacilityData
   type: 'kiosk'
-  iat: number
   exp: number
-  iss: string
-  jti: string
 }
 
+export interface StrengthMachineToken extends JWTToken{
+  facility: {
+    id: number
+  }
+  facilityRole: string
+  facilityStrengthMachineId: number
+  type: 'machine'
+}
 export module Authentication {
   export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:login', params) as UserResponse
@@ -101,7 +119,7 @@ export module Authentication {
 
   export async function useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
     await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
-    return new KioskSession(params, connection)
+    return new KioskSession({ accessToken: params.kioskToken }, connection)
   }
 
   export async function useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
@@ -116,6 +134,15 @@ export module Authentication {
 
   export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
     await connection.action('auth:resetRequest', params)
+  }
+
+  export async function useA500MachineInitializerToken (connection: MetricsConnection, params: { a500MachineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
+    const checkInParams = {
+      ...params.strengthMachineIdentifier,
+      authorization: params.a500MachineInitializerToken
+    }
+    const response = await connection.action('a500:initialize', checkInParams) as AuthenticatedResponse
+    return new StrengthMachineSession({ accessToken: response.accessToken }, connection)
   }
 
   /** @hidden */
@@ -139,23 +166,25 @@ export module Authentication {
   }
 }
 
-export class SessionHandler {
-  private readonly _connection: MetricsConnection
+export abstract class BaseSessionHandler {
+  protected readonly _connection: MetricsConnection
   private _keepAlive: boolean = true
   private _accessToken: string = ''
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
+  private readonly _onAccessTokenChangeEvent = new SimpleEventDispatcher<AccessTokenChangeEvent>()
   private readonly _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
-  private _userId: number | null = null
 
-  constructor (connection: MetricsConnection, loginResponse: UserResponse) {
+  constructor (connection: MetricsConnection, authenticatedResponse: AuthenticatedResponse, keepAlive: boolean = true) {
     this._connection = connection
+    this._keepAlive = keepAlive
     this._connection.onDisposeEvent.one(() => this.close())
-    this.updateTokens(loginResponse)
+    this.updateTokens(authenticatedResponse)
   }
 
   private updateTokens (response: AuthenticatedResponse) {
     this._accessToken = response.accessToken
+    this._onAccessTokenChangeEvent.dispatchAsync({ accessToken: this._accessToken })
 
     if (this._accessTokenTimeout !== null) {
       clearTimeout(this._accessTokenTimeout)
@@ -201,6 +230,10 @@ export class SessionHandler {
     return DecodeJWT(this._accessToken) as AccessToken
   }
 
+  get accessToken () {
+    return this._accessToken
+  }
+
   get refreshToken () {
     return this._refreshToken
   }
@@ -213,30 +246,22 @@ export class SessionHandler {
     return this._onRefreshTokenChangeEvent.asEvent()
   }
 
-  get userId () {
-    return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
-  }
-
   close () {
     this.keepAlive = false
     this._accessToken = ''
     this._refreshToken = null
   }
 
-  async logout () {
-    const authParams = { authorization: this._refreshToken ?? this._accessToken }
-    await this._connection.action('auth:logout', authParams)
-    this.close()
-  }
+  abstract logout (): void
 
   async action (action: string, params: Object = { }) {
     let response
     try {
-      const authParams = { authorization: this._accessToken, ...params }
+      const authParams = { authorization: this._accessToken, apiVersion: 1, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse
     } catch (error) {
       if (error instanceof SessionError && this._refreshToken !== null && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
-        const authParams = { authorization: this._refreshToken, ...params }
+        const authParams = { authorization: this._refreshToken, apiVersion: 1, ...params }
         response = await this._connection.action(action, authParams) as AuthenticatedResponse
       } else {
         throw error
@@ -247,59 +272,41 @@ export class SessionHandler {
   }
 }
 
-export class KioskSessionHandler {
-  private readonly _connection: MetricsConnection
-  private _kioskToken: string = ''
-  private readonly _onKioskTokenChangeEvent = new SimpleEventDispatcher<KioskTokenChangeEvent>()
+export class SessionHandler extends BaseSessionHandler {
+  private _userId: number | null = null
 
-  constructor (connection: MetricsConnection, { kioskToken }: { kioskToken: string }) {
-    this._connection = connection
-    this._connection.onDisposeEvent.one(() => this.close())
-    this.updateToken(kioskToken)
+  constructor (connection: MetricsConnection, userResponse: UserResponse) {
+    super(connection, userResponse, true)
   }
 
-  private updateToken (kioskToken: string) {
-    this._kioskToken = kioskToken
-    this._onKioskTokenChangeEvent.dispatchAsync({ kioskToken: this._kioskToken })
-  }
-
-  get connection () {
-    return this._connection
-  }
-
-  get decodedKioskToken () {
-    return DecodeJWT(this._kioskToken) as KioskToken
-  }
-
-  get kioskToken () {
-    return this._kioskToken
-  }
-
-  get onKioskTokenChangeEvent () {
-    return this._onKioskTokenChangeEvent.asEvent()
-  }
-
-  close () {
-    this._kioskToken = ''
+  get userId () {
+    return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
   }
 
   async logout () {
-    const authParams = { authorization: this._kioskToken }
-    await this._connection.action('facilityKioskToken:delete', authParams)
+    const authParams = { authorization: this.refreshToken ?? this.accessToken }
+    await this._connection.action('auth:logout', authParams)
     this.close()
   }
+}
 
-  async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this._kioskToken, ...params }
-    return await this._connection.action(action, authParams) as AuthenticatedResponse
+export class KioskSessionHandler extends BaseSessionHandler {
+  constructor (connection: MetricsConnection, { accessToken }: { accessToken: string }) {
+    super(connection, { accessToken }, false)
+  }
+
+  async logout () {
+    const authParams = { authorization: this.accessToken }
+    await this._connection.action('facilityKioskToken:delete', authParams)
+    this.close()
   }
 }
 
 export class KioskSession {
   private readonly _sessionHandler: KioskSessionHandler
 
-  constructor ({ kioskToken }: { kioskToken: string }, connection: MetricsConnection) {
-    this._sessionHandler = new KioskSessionHandler(connection, { kioskToken })
+  constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new KioskSessionHandler(connection, { accessToken })
   }
 
   get sessionHandler () {
@@ -314,33 +321,80 @@ export class KioskSession {
     await this._sessionHandler.logout()
   }
 
-  private async action (action: string, params: Object = { }) {
-    return await this.sessionHandler.action(action, params)
+  async action (action: string, params: Object = { }) {
+    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const response = await this.sessionHandler.connection.action(action, authParams)
+    return response
   }
 
   async userLogin (params: { primaryIdentification: string | number, secondaryIdentification?: string | number }) {
-    const response = await this.action('facilityKiosk:userLogin', params) as UserResponse
-    return new UserSession(response, this.sessionHandler.connection)
+    const response = await this.action('facilityKiosk:userLogin', params) as FacilityUserResponse
+    return new FacilityUserSession(response, this.sessionHandler.connection)
   }
 
   async sessionUpdate (params: { echipId: string, echipData: object }) {
-    const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as SessionResponse
+    const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new StaticSession(session)
   }
 
   async sessionEnd (params: { echipId: string, echipData: object }) {
-    const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as SessionResponse
+    const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new StaticSession(session)
   }
 }
 
-export class UserSession {
-  private _sessionHandler: SessionHandler
-  private readonly _user: User
+export class StrengthMachineSessionHandler extends BaseSessionHandler {
+  constructor (connection: MetricsConnection, authenticatedResponse: AuthenticatedResponse) {
+    super(connection, authenticatedResponse, false)
+  }
 
-  constructor (loginResponse: UserResponse, connection: MetricsConnection) {
-    this._sessionHandler = new SessionHandler(connection, loginResponse)
-    this._user = new User(loginResponse.user, this._sessionHandler)
+  async logout () {
+    this.close()
+  }
+}
+
+export class StrengthMachineSession {
+  private readonly _sessionHandler: StrengthMachineSessionHandler
+
+  constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new StrengthMachineSessionHandler(connection, { accessToken })
+  }
+
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
+  close () {
+    this._sessionHandler.close()
+  }
+
+  async action (action: string, params: Object = { }) {
+    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const response = await this.sessionHandler.connection.action(action, authParams) as AuthenticatedResponse
+    return response
+  }
+
+  async userLogin (params: { memberIdentifier: string | number }) {
+    const response = await this.action('a500:userLogin', params) as FacilityUserResponse
+    return new FacilityUserSession(response, this.sessionHandler.connection)
+  }
+
+  async createA500UtilizationInstance (params: { takenAt: Date, repetitionCount: number }) {
+    await this.action('a500:createUtilizationInstance', params)
+  }
+
+  async getA500MachineState () {
+    const response = await this.action('a500:showMachineState') as A500MachineStateResponse
+    return new A500MachineState(response.a500MachineState, this._sessionHandler)
+  }
+}
+
+export abstract class UserSessionBase<UserType extends User = User> {
+  protected _sessionHandler: SessionHandler
+  protected abstract readonly _user: UserType
+
+  constructor (userResponse: UserResponse, connection: MetricsConnection) {
+    this._sessionHandler = new SessionHandler(connection, userResponse)
   }
 
   get sessionHandler () {
@@ -496,6 +550,24 @@ export class UserSession {
   async getFacilities (options: { name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilities, facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
+  }
+}
+
+export class UserSession extends UserSessionBase<User> {
+  protected readonly _user: User
+
+  constructor (userResponse: UserResponse, connection: MetricsConnection) {
+    super(userResponse, connection)
+    this._user = new User(userResponse.user, this._sessionHandler)
+  }
+}
+
+export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
+  protected readonly _user: FacilityMemberUser
+
+  constructor (facilityUserResponse: FacilityUserResponse, connection: MetricsConnection) {
+    super(facilityUserResponse, connection)
+    this._user = new FacilityMemberUser(facilityUserResponse.user, this._sessionHandler, facilityUserResponse.facilityRelationshipId)
   }
 }
 

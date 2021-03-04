@@ -55,7 +55,6 @@ describe('Height Measurement', function () {
     expect(typeof heightMeasurement).to.equal('object')
     expect(heightMeasurement.source).to.equal('test')
     expect(heightMeasurement.metricHeight).to.equal(182)
-    expect(heightMeasurement.imperialHeight).to.equal(71.7)
   })
 
   it('can get new latest height measurement', async function () {
@@ -66,7 +65,6 @@ describe('Height Measurement', function () {
     expect(typeof heightMeasurements[0]).to.equal('object')
     expect(heightMeasurements[0].source).to.equal('test')
     expect(heightMeasurements[0].metricHeight).to.equal(182)
-    expect(heightMeasurements[0].imperialHeight).to.equal(71.7)
 
     createdHeightMeasurement = heightMeasurements[0]
   })

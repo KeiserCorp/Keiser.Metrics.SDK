@@ -13,7 +13,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
   let newUser: User
   let userSession: UserSession
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(30)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+  const newUserMemberId = [...Array(6)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -25,14 +25,12 @@ describe('Facility Initiated Facility Relationship Request', function () {
 
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    facility = await facilities[0].eagerFacility().reload()
+    await facility.setActive()
   })
 
-  after(function () {
+  after(async function () {
+    await newUser.delete()
     metricsInstance?.dispose()
   })
 

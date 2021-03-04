@@ -17,6 +17,16 @@ export const enum StrengthMachineSorting {
   Line = 'line'
 }
 
+export interface StrengthMachineIdentifier {
+  machineModel: string
+  firmwareVersion: string
+  softwareVersion: string
+  mainBoardSerial: string
+  displayUUID: string
+  leftCylinderSerial: string
+  rightCylinderSerial?: string
+}
+
 export interface StrengthMachineModelData {
   model: string
 }

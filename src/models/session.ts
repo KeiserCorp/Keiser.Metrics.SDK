@@ -47,10 +47,13 @@ export interface SessionData {
 
 export interface SessionResponse extends AuthenticatedResponse {
   session: SessionData
+}
+
+export interface SessionStartResponse extends SessionResponse {
   /**
    * @todo Define interface for echipData
    */
-  echipData?: object
+  echipData: object
 }
 
 export interface SessionListResponse extends AuthenticatedResponse {

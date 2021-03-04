@@ -11,7 +11,7 @@ describe('User Initiated Facility Relationship Request', function () {
   let newUserSession: UserSession
   let demoUserSession: UserSession
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(30)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+  const newUserMemberId = [...Array(6)].map(i => (~~(Math.random() * 10)).toString()).join('')
 
   before(async function () {
     metricsInstance = new Metrics({
@@ -19,7 +19,7 @@ describe('User Initiated Facility Relationship Request', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    newUserSession = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword }))
+    newUserSession = await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword })
 
     demoUserSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
     const facilities = await demoUserSession.user.getFacilityEmploymentRelationships()
@@ -30,7 +30,8 @@ describe('User Initiated Facility Relationship Request', function () {
     }
   })
 
-  after(function () {
+  after(async function () {
+    await newUserSession.user.delete()
     metricsInstance?.dispose()
   })
 

@@ -25,7 +25,8 @@ describe('Email Address', function () {
     user = userSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 
