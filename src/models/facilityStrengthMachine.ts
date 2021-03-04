@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { A500MachineState, A500MachineStateData } from './a500MachineState'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
 export const enum FacilityStrengthMachineSorting {
@@ -11,9 +12,14 @@ export interface FacilityStrengthMachineData {
   id: number
   model: string
   version: string
-  serial: string
+  softwareVersion: string | null
+  mainBoardSerial: string | null
   location: string | null
+  displayUUID: string | null
+  leftCylinderSerial: string | null
+  rightCylinderSerial: string | null
   strengthMachine?: StrengthMachineData
+  a500MachineState?: A500MachineStateData
 }
 
 export interface FacilityStrengthMachineResponse extends AuthenticatedResponse {
@@ -88,5 +94,9 @@ export class FacilityStrengthMachine extends Model {
 
   eagerStrengthMachine () {
     return typeof this._facilityStrengthMachineData.strengthMachine !== 'undefined' ? new StrengthMachine(this._facilityStrengthMachineData.strengthMachine, this.sessionHandler) : undefined
+  }
+
+  eagerA500MachineState () {
+    return typeof this._facilityStrengthMachineData.a500MachineState !== 'undefined' ? new A500MachineState(this._facilityStrengthMachineData.a500MachineState, this.sessionHandler) : undefined
   }
 }

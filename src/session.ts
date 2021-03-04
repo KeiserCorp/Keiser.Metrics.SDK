@@ -16,6 +16,7 @@ import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, Pri
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { KioskSessionResponse } from './models/facilityKiosk'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
+import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { StaticSession } from './models/session'
@@ -37,6 +38,10 @@ export interface AuthenticatedResponse {
 
 export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
   kioskToken: string
+}
+
+export interface StrengthMachineInitializeResponse extends AuthenticatedResponse {
+  facilityStrengthMachine: FacilityStrengthMachineData
 }
 
 export interface OAuthLoginResponse {
@@ -141,8 +146,8 @@ export module Authentication {
       ...params.strengthMachineIdentifier,
       authorization: params.a500MachineInitializerToken
     }
-    const response = await connection.action('a500:initialize', checkInParams) as AuthenticatedResponse
-    return new StrengthMachineSession({ accessToken: response.accessToken }, connection)
+    const response = await connection.action('a500:initialize', checkInParams) as StrengthMachineInitializeResponse
+    return new StrengthMachineSession(response, connection)
   }
 
   /** @hidden */
@@ -355,9 +360,11 @@ export class StrengthMachineSessionHandler extends BaseSessionHandler {
 
 export class StrengthMachineSession {
   private readonly _sessionHandler: StrengthMachineSessionHandler
+  protected _facilityStrengthMachineData: FacilityStrengthMachineData
 
-  constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
+  constructor ({ accessToken, facilityStrengthMachine }: { accessToken: string, facilityStrengthMachine: FacilityStrengthMachineData }, connection: MetricsConnection) {
     this._sessionHandler = new StrengthMachineSessionHandler(connection, { accessToken })
+    this._facilityStrengthMachineData = facilityStrengthMachine
   }
 
   get sessionHandler () {
@@ -374,6 +381,14 @@ export class StrengthMachineSession {
     return response
   }
 
+  get facilityId () {
+    return this._facilityStrengthMachineData.id
+  }
+
+  eagerA500MachineState () {
+    return typeof this._facilityStrengthMachineData.a500MachineState !== 'undefined' ? new A500MachineState(this._facilityStrengthMachineData.a500MachineState, this.sessionHandler) : undefined
+  }
+
   async userLogin (params: { memberIdentifier: string | number }) {
     const response = await this.action('a500:userLogin', params) as FacilityUserResponse
     return new FacilityUserSession(response, this.sessionHandler.connection)
@@ -385,7 +400,7 @@ export class StrengthMachineSession {
 
   async getA500MachineState () {
     const response = await this.action('a500:showMachineState') as A500MachineStateResponse
-    return new A500MachineState(response.a500MachineState, this._sessionHandler)
+    return new A500MachineState(response.a500MachineState, this.sessionHandler)
   }
 }
 
