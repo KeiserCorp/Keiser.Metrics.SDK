@@ -1,4 +1,4 @@
 declare module "lz4js" {
-  export function compress (buffer: Array | Uint8Array): Array
-  export function decompress (buffer: Array | Uint8Array): Array
+  export function compress (buffer: Array<number> | Uint8Array): Array<number>
+  export function decompress (buffer: Array<number> | Uint8Array): Array<number>
 }
