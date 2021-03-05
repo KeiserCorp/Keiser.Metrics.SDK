@@ -209,7 +209,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   async getFacilityStrengthMachineInitializerToken () {
-    const { initializerToken } = await this.action('facilityStrengthMachine:showInitializerToken') as FacilityStrengthMachineInitializerTokenResponse
+    const { initializerToken } = await this.action('facilityStrengthMachine:initializerToken') as FacilityStrengthMachineInitializerTokenResponse
     return initializerToken
   }
 }
