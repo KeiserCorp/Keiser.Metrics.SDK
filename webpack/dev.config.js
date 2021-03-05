@@ -15,10 +15,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      vue: 'vue/dist/vue.common.js'
-    }
+    extensions: ['.tsx', '.ts', '.js']
   },
   devtool: 'inline-source-map',
   devServer: {

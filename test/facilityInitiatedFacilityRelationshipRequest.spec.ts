@@ -24,8 +24,8 @@ describe('Facility Initiated Facility Relationship Request', function () {
     newUser = (await metricsInstance.createUser({ email: newUserEmailAddress, password: DemoPassword })).user
 
     userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    facility = await facilities[0].eagerFacility().reload()
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    facility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
     await facility.setActive()
   })
 
