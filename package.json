@@ -55,7 +55,6 @@
     "ts-mocha": "^7.0.0",
     "typedoc": "^0.18.0",
     "typescript": "^3.9.7",
-    "vue": "^2.6.12",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.2",
@@ -65,6 +64,6 @@
     "axios": "^0.21.1",
     "cockatiel": "^2.0.1",
     "lz4js": "^0.2.0",
-    "ste-simple-events": "^2.0.9"
+    "ste-simple-events": "2.0.9"
   }
 }
