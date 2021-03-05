@@ -251,6 +251,10 @@ export abstract class BaseSessionHandler {
     return this._onRefreshTokenChangeEvent.asEvent()
   }
 
+  get onAccessTokenChangeEvent () {
+    return this._onAccessTokenChangeEvent.asEvent()
+  }
+
   close () {
     this.keepAlive = false
     this._accessToken = ''
@@ -318,6 +322,14 @@ export class KioskSession {
     return this._sessionHandler
   }
 
+  get accessToken () {
+    return this._sessionHandler.accessToken
+  }
+
+  get onAccessTokenChangeEvent () {
+    return this._sessionHandler.onAccessTokenChangeEvent
+  }
+
   close () {
     this._sessionHandler.close()
   }
@@ -369,6 +381,14 @@ export class StrengthMachineSession {
 
   get sessionHandler () {
     return this._sessionHandler
+  }
+
+  get accessToken () {
+    return this._sessionHandler.accessToken
+  }
+
+  get onAccessTokenChangeEvent () {
+    return this._sessionHandler.onAccessTokenChangeEvent
   }
 
   close () {
