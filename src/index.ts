@@ -61,8 +61,8 @@ export default class Metrics {
     return await Authentication.useKioskToken(this._connection, params)
   }
 
-  async authenticateWithA500MachineInitializerToken (params: { a500MachineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    return await Authentication.useA500MachineInitializerToken(this._connection, params)
+  async authenticateWithA500MachineInitializerToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    return await Authentication.useMachineInitializerToken(this._connection, params)
   }
 
   async authenticateWithFacebook (params: { redirect: string }) {

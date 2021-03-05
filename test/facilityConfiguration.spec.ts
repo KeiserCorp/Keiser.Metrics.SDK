@@ -93,7 +93,7 @@ describe('Facility Configuration', function () {
   })
 
   it('can get facility qr code', async function () {
-    const token = await facility.getA500MachineInitializerToken()
+    const token = await facility.getFacilityStrengthMachineInitializerToken()
 
     expect(typeof token).to.equal('string')
   })

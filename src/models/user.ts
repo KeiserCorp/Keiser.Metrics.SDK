@@ -396,7 +396,8 @@ export class FacilityMemberUser extends FacilityUser {
     const machineToken = params.strengthMachineSession.sessionHandler.accessToken
     const setData = JSON.stringify(params.setData)
     const lz4SampleData = typeof params.sampleData !== 'undefined' ? compressLz4ToB64(params.sampleData) : null
-    const response = await this.action('strengthMachineDataSet:createA500', { machineToken, setData, lz4SampleData }) as StrengthMachineDataSetResponse
+    console.log(lz4SampleData)
+    const response = await this.action('strengthMachineDataSet:createA500', { userId: this.id, machineToken, setData, lz4SampleData }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(response.strengthMachineDataSet, this.sessionHandler)
   }
 }

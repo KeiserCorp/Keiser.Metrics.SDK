@@ -141,10 +141,10 @@ export module Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
-  export async function useA500MachineInitializerToken (connection: MetricsConnection, params: { a500MachineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
+  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
     const checkInParams = {
       ...params.strengthMachineIdentifier,
-      authorization: params.a500MachineInitializerToken
+      authorization: params.machineInitializerToken
     }
     const response = await connection.action('a500:initialize', checkInParams) as StrengthMachineInitializeResponse
     return new StrengthMachineSession(response, connection)

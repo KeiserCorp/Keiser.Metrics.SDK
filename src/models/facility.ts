@@ -2,12 +2,12 @@ import { Units } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
-import { A500InitializerTokenDataResponse, FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
+import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
-import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
+import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
@@ -203,13 +203,13 @@ export class PrivilegedFacility extends Facility {
     return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
   }
 
-  async getA500MachineInitializerToken () {
-    const { initializerToken } = await this.action('facilityConfiguration:a500InitializerToken') as A500InitializerTokenDataResponse
-    return initializerToken
-  }
-
   async getFacilityStrengthMachineConfiguration () {
     const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:show') as FacilityStrengthMachineConfigurationResponse
     return new FacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration, this.sessionHandler)
+  }
+
+  async getFacilityStrengthMachineInitializerToken () {
+    const { initializerToken } = await this.action('facilityStrengthMachine:showInitializerToken') as FacilityStrengthMachineInitializerTokenResponse
+    return initializerToken
   }
 }

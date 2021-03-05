@@ -22,6 +22,10 @@ export interface FacilityStrengthMachineData {
   a500MachineState?: A500MachineStateData
 }
 
+export interface FacilityStrengthMachineInitializerTokenResponse extends AuthenticatedResponse {
+  initializerToken: string
+}
+
 export interface FacilityStrengthMachineResponse extends AuthenticatedResponse {
   facilityStrengthMachine: FacilityStrengthMachineData
 }

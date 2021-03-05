@@ -22,10 +22,6 @@ export interface FacilityConfigurationResponse extends AuthenticatedResponse {
   facilityConfiguration: FacilityConfigurationData
 }
 
-export interface A500InitializerTokenDataResponse extends AuthenticatedResponse {
-  initializerToken: string
-}
-
 export class FacilityConfiguration extends Model {
   private _facilityConfigurationData: FacilityConfigurationData
 
