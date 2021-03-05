@@ -30,7 +30,6 @@ export interface A500SetData {
 }
 
 export interface A500TimeSeriesDataPoint {
-  id: number
   left: A500TimeSeriesDataPointSide
   right: A500TimeSeriesDataPointSide
   timeSinceEpoch: number
@@ -44,4 +43,5 @@ export interface A500TimeSeriesDataPointSide {
   acceleration: number
   forceOfMassAcceleration: number
   mechanicalWeight: number
+  rawPower: number
 }

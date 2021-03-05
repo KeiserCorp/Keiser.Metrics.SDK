@@ -63,7 +63,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "cockatiel": "^2.0.1",
-    "lz4js": "^0.2.0",
+    "pack": "^1.2.0",
+    "pako": "^1.0.11",
     "ste-simple-events": "2.0.9"
   }
 }

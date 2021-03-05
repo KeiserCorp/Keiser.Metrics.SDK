@@ -8,6 +8,7 @@
     "sourceMap": true,
     "strict": true,
     "newLine": "lf",
+    "esModuleInterop": true,
     "removeComments": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
