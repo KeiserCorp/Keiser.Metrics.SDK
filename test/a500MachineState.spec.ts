@@ -37,7 +37,7 @@ describe('A500 Machine State', function () {
       facility = tmpFacility
       await facility.setActive()
       const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerToken()
-      strengthMachineSession = await metricsInstance.authenticateWithA500MachineInitializerToken({ machineInitializerToken, strengthMachineIdentifier })
+      strengthMachineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken, strengthMachineIdentifier })
     }
   })
 

@@ -46,7 +46,7 @@ describe('A500', function () {
 
   it('can register machine with facility', async function () {
     const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerToken()
-    machineSession = await metricsInstance.authenticateWithA500MachineInitializerToken({ machineInitializerToken, strengthMachineIdentifier })
+    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken, strengthMachineIdentifier })
 
     expect(typeof machineSession).to.not.equal('undefined')
     expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
