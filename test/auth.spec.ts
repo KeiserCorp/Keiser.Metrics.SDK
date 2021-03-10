@@ -117,7 +117,7 @@ describe('Auth', function () {
     this.timeout(accessTokenTimeout + 1000)
 
     const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: false })
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const reload = async () => {
         try {
           await session.user.reload()
