@@ -92,9 +92,21 @@ describe('Facility Configuration', function () {
     expect(facilityConfiguration.memberRequireEmail).to.equal(originalFacilityConfigurationParameters.memberRequireEmail)
   })
 
-  it('can get facility qr code', async function () {
-    const token = await facility.getFacilityStrengthMachineInitializerToken()
+  it('can get facility jwt qr code', async function () {
+    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
 
-    expect(typeof token).to.equal('string')
+    expect(typeof machineInitializerToken).to.not.equal('undefined')
+    expect(typeof machineInitializerToken.initializerToken).to.equal('string')
+    expect(typeof machineInitializerToken.jwtToken).to.equal('string')
+    expect(typeof machineInitializerToken.metricsApiUrl).to.equal('string')
+  })
+
+  it('can get facility otp qr code', async function () {
+    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerOTPToken()
+
+    expect(typeof machineInitializerToken).to.not.equal('undefined')
+    expect(typeof machineInitializerToken.initializerToken).to.equal('string')
+    expect(typeof machineInitializerToken.otp).to.equal('string')
+    expect(typeof machineInitializerToken.metricsApiUrl).to.equal('string')
   })
 })

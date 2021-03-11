@@ -9,6 +9,7 @@ import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmploye
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
+import { MachineInitializerJWTToken, MachineInitializerOTPToken } from './machineInitializerToken'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
 
@@ -208,8 +209,13 @@ export class PrivilegedFacility extends Facility {
     return new FacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration, this.sessionHandler)
   }
 
-  async getFacilityStrengthMachineInitializerToken () {
+  async getFacilityStrengthMachineInitializerJWTToken () {
     const { initializerToken } = await this.action('facilityStrengthMachine:initializerToken') as FacilityStrengthMachineInitializerTokenResponse
-    return initializerToken
+    return new MachineInitializerJWTToken(initializerToken)
+  }
+
+  async getFacilityStrengthMachineInitializerOTPToken () {
+    const { initializerToken } = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerTokenResponse
+    return new MachineInitializerOTPToken(initializerToken)
   }
 }
