@@ -141,29 +141,10 @@ export module Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
-  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken?: string, facilityId?: string, token?: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
-    const checkInParams: {
-      machineModel: string
-      firmwareVersion: string
-      softwareVersion: string
-      mainBoardSerial: string
-      displayUUID: string
-      leftCylinderSerial: string
-      rightCylinderSerial?: string
-      authorization?: string
-      facilityId?: string
-      token?: string
-    } = {
-      ...params.strengthMachineIdentifier
-    }
-    if (params.machineInitializerToken !== undefined) {
-      checkInParams.authorization = params.machineInitializerToken
-    }
-    if (params.facilityId !== undefined) {
-      checkInParams.facilityId = params.facilityId
-    }
-    if (params.token !== undefined) {
-      checkInParams.token = params.token
+  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
+    const checkInParams = {
+      ...params.strengthMachineIdentifier,
+      authorization: params.machineInitializerToken
     }
     const response = await connection.action('a500:initialize', checkInParams) as StrengthMachineInitializeResponse
     return new StrengthMachineSession(response, connection)

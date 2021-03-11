@@ -25,27 +25,21 @@ export class MachineInitializerJWTToken extends MachineInitializerToken {
     this._jwtToken = jwt
   }
 
-  get jwtToken () {
+  get token () {
     return this._jwtToken
   }
 }
 
 export class MachineInitializerOTPToken extends MachineInitializerToken {
   private readonly _otp: string
-  private readonly _facilityId: string
 
   constructor (initializerToken: string) {
-    const [url, otp, facilityId] = initializerToken.substr(initializerToken.indexOf(':') + 1).split(',')
+    const [url, otp] = initializerToken.substr(initializerToken.indexOf(':') + 1).split(',')
     super(initializerToken, url)
     this._otp = otp
-    this._facilityId = facilityId
   }
 
-  get facilityId () {
-    return this._facilityId
-  }
-
-  get otp () {
-    return this._otp
+  get token () {
+    return `otp:${this._otp}`
   }
 }

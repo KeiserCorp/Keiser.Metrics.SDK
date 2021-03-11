@@ -97,7 +97,7 @@ describe('Facility Configuration', function () {
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
     expect(typeof machineInitializerToken.initializerToken).to.equal('string')
-    expect(typeof machineInitializerToken.jwtToken).to.equal('string')
+    expect(typeof machineInitializerToken.token).to.equal('string')
     expect(typeof machineInitializerToken.metricsApiUrl).to.equal('string')
   })
 
@@ -106,7 +106,7 @@ describe('Facility Configuration', function () {
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
     expect(typeof machineInitializerToken.initializerToken).to.equal('string')
-    expect(typeof machineInitializerToken.otp).to.equal('string')
+    expect(typeof machineInitializerToken.token).to.equal('string')
     expect(typeof machineInitializerToken.metricsApiUrl).to.equal('string')
   })
 })

@@ -65,7 +65,10 @@ export default class Metrics {
     return await Authentication.useMachineInitializerToken(this._connection, params)
   }
 
-  async authenticateWithMachineInitializerOPTToken (params: { facilityId: string, token: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+  async authenticateWithMachineInitializerOPTToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    if (!params.machineInitializerToken.startsWith('otp:')) {
+      params.machineInitializerToken = `otp:${params.machineInitializerToken}`
+    }
     return await Authentication.useMachineInitializerToken(this._connection, params)
   }
 
