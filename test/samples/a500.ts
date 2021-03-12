@@ -1384,4 +1384,3 @@ export const a500TimeSeriesPointsSample: A500TimeSeriesDataPoint[] = [
   { timeSinceEpoch: 2169, left: { position: 0.1251, power: 0, force: 62.854, velocity: 0, acceleration: 0.00008, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 }, right: { position: 0.127078, power: 0, force: 57.929, velocity: -0.00004, acceleration: -0.00007, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 } },
   { timeSinceEpoch: 2170, left: { position: 0.1251, power: 0, force: 62.867, velocity: 0.00001, acceleration: 0.00003, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 }, right: { position: 0.127078, power: 0, force: 57.976, velocity: -0.00005, acceleration: 0.00001, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 } }
 ]
-
