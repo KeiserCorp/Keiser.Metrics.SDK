@@ -142,11 +142,11 @@ export module Authentication {
   }
 
   export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
-    const checkInParams = {
+    const initializationParams = {
       ...params.strengthMachineIdentifier,
       authorization: params.machineInitializerToken
     }
-    const response = await connection.action('a500:initialize', checkInParams) as StrengthMachineInitializeResponse
+    const response = await connection.action('a500:initialize', initializationParams) as StrengthMachineInitializeResponse
     return new StrengthMachineSession(response, connection)
   }
 
@@ -412,6 +412,11 @@ export class StrengthMachineSession {
   async userLogin (params: { memberIdentifier: string | number }) {
     const response = await this.action('a500:userLogin', params) as FacilityUserResponse
     return new FacilityUserSession(response, this.sessionHandler.connection)
+  }
+
+  async updateMachineIdentifier (params: { strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    const response = await this.action('a500:initialize', params) as StrengthMachineInitializeResponse
+    this._facilityStrengthMachineData = response.facilityStrengthMachine
   }
 
   async createA500UtilizationInstance (params: { takenAt: Date, repetitionCount: number }) {
