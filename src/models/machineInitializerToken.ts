@@ -1,11 +1,15 @@
-
 export interface MachineInitializerTokenData {
   initializerToken: string
   url: string
-  expiresAt?: string
+  isEncrypted: boolean
 }
+
+export interface MachineInitializerOTPTokenData extends MachineInitializerTokenData {
+  expiresAt: string
+}
+
 export class MachineInitializerToken {
-  protected readonly _machineInitializerTokenData: MachineInitializerTokenData
+  private readonly _machineInitializerTokenData: MachineInitializerTokenData
 
   constructor (machineInitializerTokenData: MachineInitializerTokenData) {
     this._machineInitializerTokenData = machineInitializerTokenData
@@ -18,11 +22,21 @@ export class MachineInitializerToken {
   get url () {
     return this._machineInitializerTokenData.url
   }
+
+  get isEncrypted () {
+    return this._machineInitializerTokenData.isEncrypted
+  }
 }
 
 export class MachineInitializerOTPToken extends MachineInitializerToken {
+  private readonly _expiresAt: string
 
-  get expiresAt() {
-    return new Date(this._machineInitializerTokenData.expiresAt as string)
+  constructor (machineInitializerTokenData: MachineInitializerOTPTokenData) {
+    super(machineInitializerTokenData)
+    this._expiresAt = machineInitializerTokenData.expiresAt
+  }
+
+  get expiresAt () {
+    return new Date(this._expiresAt)
   }
 }

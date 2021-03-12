@@ -7,7 +7,7 @@ import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
 import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
-import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
+import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerOTPTokenResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
 import { MachineInitializerOTPToken, MachineInitializerToken } from './machineInitializerToken'
 import { Gender } from './profile'
@@ -215,7 +215,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   async getFacilityStrengthMachineInitializerOTPToken () {
-    const response = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerTokenResponse
+    const response = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerOTPTokenResponse
     return new MachineInitializerOTPToken(response)
   }
 }

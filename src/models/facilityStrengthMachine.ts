@@ -25,7 +25,11 @@ export interface FacilityStrengthMachineData {
 export interface FacilityStrengthMachineInitializerTokenResponse extends AuthenticatedResponse {
   initializerToken: string
   url: string
-  expiresAt?: string
+  isEncrypted: boolean
+}
+
+export interface FacilityStrengthMachineInitializerOTPTokenResponse extends FacilityStrengthMachineInitializerTokenResponse {
+  expiresAt: string
 }
 
 export interface FacilityStrengthMachineResponse extends AuthenticatedResponse {
