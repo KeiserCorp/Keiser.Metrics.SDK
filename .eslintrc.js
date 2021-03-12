@@ -11,7 +11,7 @@ module.exports = {
   ],
   rules: {
     'no-void': 'off',
-    'simple-import-sort/sort': 'error',
+    'simple-import-sort/imports': 'error',
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

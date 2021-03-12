@@ -44,9 +44,18 @@ describe('A500', function () {
     metricsInstance?.dispose()
   })
 
-  it('can register machine with facility', async function () {
-    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerToken()
-    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken, strengthMachineIdentifier })
+  it('can register machine with facility using JWT', async function () {
+    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
+    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: machineInitializerToken.initializerToken, strengthMachineIdentifier })
+
+    expect(typeof machineSession).to.not.equal('undefined')
+    expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
+    expect(typeof machineSession.sessionHandler.accessToken).to.equal('string')
+  })
+
+  it('can register machine with facility using OTP', async function () {
+    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerOTPToken()
+    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: `otp:${machineInitializerToken.initializerToken}`, strengthMachineIdentifier })
 
     expect(typeof machineSession).to.not.equal('undefined')
     expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
