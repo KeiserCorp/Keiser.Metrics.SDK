@@ -9,7 +9,7 @@ import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmploye
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, UserInitiatedFacilityRelationshipRequest, UserInitiatedFacilityRelationshipRequests, UserInitiatedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
-import { MachineInitializerJWTToken, MachineInitializerOTPToken } from './machineInitializerToken'
+import { MachineInitializerOTPToken, MachineInitializerToken } from './machineInitializerToken'
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
 
@@ -210,12 +210,12 @@ export class PrivilegedFacility extends Facility {
   }
 
   async getFacilityStrengthMachineInitializerJWTToken () {
-    const { initializerToken } = await this.action('facilityStrengthMachine:initializerToken') as FacilityStrengthMachineInitializerTokenResponse
-    return new MachineInitializerJWTToken(initializerToken)
+    const response = await this.action('facilityStrengthMachine:initializerToken') as FacilityStrengthMachineInitializerTokenResponse
+    return new MachineInitializerToken(response)
   }
 
   async getFacilityStrengthMachineInitializerOTPToken () {
-    const { initializerToken } = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerTokenResponse
-    return new MachineInitializerOTPToken(initializerToken)
+    const response = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerTokenResponse
+    return new MachineInitializerOTPToken(response)
   }
 }

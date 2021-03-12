@@ -24,6 +24,8 @@ export interface FacilityStrengthMachineData {
 
 export interface FacilityStrengthMachineInitializerTokenResponse extends AuthenticatedResponse {
   initializerToken: string
+  url: string
+  expiresAt?: string
 }
 
 export interface FacilityStrengthMachineResponse extends AuthenticatedResponse {

@@ -60,15 +60,8 @@ export default class Metrics {
   async authenticateWithKioskToken (params: { kioskToken: string }) {
     return await Authentication.useKioskToken(this._connection, params)
   }
-
-  async authenticateWithMachineInitializerJWTToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    return await Authentication.useMachineInitializerToken(this._connection, params)
-  }
-
-  async authenticateWithMachineInitializerOPTToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    if (!params.machineInitializerToken.startsWith('otp:')) {
-      params.machineInitializerToken = `otp:${params.machineInitializerToken}`
-    }
+  
+  async authenticateWithMachineInitializerToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
     return await Authentication.useMachineInitializerToken(this._connection, params)
   }
 

@@ -1,45 +1,28 @@
-export class MachineInitializerToken {
-  protected _initializerToken: string
-  private readonly _metricsApiUrl: string
 
-  constructor (initializerToken: string, metricsApiUrl: string) {
-    this._initializerToken = initializerToken
-    this._metricsApiUrl = metricsApiUrl
+export interface MachineInitializerTokenData {
+  initializerToken: string
+  url: string
+  expiresAt?: string
+}
+export class MachineInitializerToken {
+  protected readonly _machineInitializerTokenData: MachineInitializerTokenData
+
+  constructor (machineInitializerTokenData: MachineInitializerTokenData) {
+    this._machineInitializerTokenData = machineInitializerTokenData
   }
 
   get initializerToken () {
-    return this._initializerToken
+    return this._machineInitializerTokenData.initializerToken
   }
 
-  get metricsApiUrl () {
-    return this._metricsApiUrl
-  }
-}
-
-export class MachineInitializerJWTToken extends MachineInitializerToken {
-  private readonly _jwtToken: string
-
-  constructor (initializerToken: string) {
-    const [url, jwt] = initializerToken.substr(initializerToken.indexOf(':') + 1).split(',')
-    super(initializerToken, url)
-    this._jwtToken = jwt
-  }
-
-  get token () {
-    return this._jwtToken
+  get url () {
+    return this._machineInitializerTokenData.url
   }
 }
 
 export class MachineInitializerOTPToken extends MachineInitializerToken {
-  private readonly _otp: string
 
-  constructor (initializerToken: string) {
-    const [url, otp] = initializerToken.substr(initializerToken.indexOf(':') + 1).split(',')
-    super(initializerToken, url)
-    this._otp = otp
-  }
-
-  get token () {
-    return `otp:${this._otp}`
+  get expiresAt() {
+    return new Date(this._machineInitializerTokenData.expiresAt as string)
   }
 }
