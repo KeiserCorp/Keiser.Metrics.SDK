@@ -92,7 +92,7 @@ describe('Facility Configuration', function () {
     expect(facilityConfiguration.memberRequireEmail).to.equal(originalFacilityConfigurationParameters.memberRequireEmail)
   })
 
-  it('can get facility jwt qr code', async function () {
+  it('can get facility initialization jwt', async function () {
     const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
@@ -100,7 +100,7 @@ describe('Facility Configuration', function () {
     expect(typeof machineInitializerToken.url).to.equal('string')
   })
 
-  it('can get facility otp qr code', async function () {
+  it('can get facility initialization otp', async function () {
     const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerOTPToken()
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
