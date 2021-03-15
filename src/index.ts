@@ -61,6 +61,10 @@ export default class Metrics {
     return await Authentication.useKioskToken(this._connection, params)
   }
 
+  async authenticateWithMachineToken (params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    return await Authentication.useMachineToken(this._connection, params)
+  }
+
   async authenticateWithMachineInitializerToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
     return await Authentication.useMachineInitializerToken(this._connection, params)
   }

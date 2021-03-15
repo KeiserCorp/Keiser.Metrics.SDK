@@ -141,7 +141,16 @@ export module Authentication {
     await connection.action('auth:resetRequest', params)
   }
 
-  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier}) {
+  export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
+    const initializationParams = {
+      ...params.strengthMachineIdentifier,
+      authorization: params.machineToken
+    }
+    const response = await connection.action('a500:initialize', initializationParams) as StrengthMachineInitializeResponse
+    return new StrengthMachineSession(response, connection)
+  }
+
+  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
     const initializationParams = {
       ...params.strengthMachineIdentifier,
       authorization: params.machineInitializerToken
