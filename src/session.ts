@@ -424,7 +424,7 @@ export class StrengthMachineSession {
   }
 
   async updateMachineIdentifier (params: { strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    const response = await this.action('a500:initialize', params) as StrengthMachineInitializeResponse
+    const response = await this.action('a500:initialize', { ...params.strengthMachineIdentifier }) as StrengthMachineInitializeResponse
     this._facilityStrengthMachineData = response.facilityStrengthMachine
   }
 
