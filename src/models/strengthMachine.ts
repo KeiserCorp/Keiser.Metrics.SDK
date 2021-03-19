@@ -24,7 +24,7 @@ export interface StrengthMachineIdentifier {
   mainBoardSerial: string
   displayUUID: string
   leftCylinderSerial: string
-  rightCylinderSerial?: string
+  rightCylinderSerial: string | null
 }
 
 export interface StrengthMachineModelData {
