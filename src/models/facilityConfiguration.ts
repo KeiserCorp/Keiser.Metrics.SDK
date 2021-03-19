@@ -90,3 +90,47 @@ export class FacilityConfiguration extends Model {
     return this._facilityConfigurationData.memberRequireEmail
   }
 }
+
+export class StaticFacilityConfiguration {
+  private readonly _facilityConfigurationData: FacilityConfigurationData
+
+  constructor (facilityConfigurationData: FacilityConfigurationData) {
+    this._facilityConfigurationData = facilityConfigurationData
+  }
+
+  get memberIdentificationComposition () {
+    return this._facilityConfigurationData.memberIdentificationComposition
+  }
+
+  get memberIdentificationForceLength () {
+    return this._facilityConfigurationData.memberIdentificationForceLength
+  }
+
+  get memberIdentificationLength () {
+    return this._facilityConfigurationData.memberIdentificationLength
+  }
+
+  get memberIdentificationRegex () {
+    return this._facilityConfigurationData.memberIdentificationRegex
+  }
+
+  get memberSecretComposition () {
+    return this._facilityConfigurationData.memberSecretComposition
+  }
+
+  get memberSecretForceLength () {
+    return this._facilityConfigurationData.memberSecretForceLength
+  }
+
+  get memberSecretLength () {
+    return this._facilityConfigurationData.memberSecretLength
+  }
+
+  get memberSecretRegex () {
+    return this._facilityConfigurationData.memberSecretRegex
+  }
+
+  get memberRequireEmail () {
+    return this._facilityConfigurationData.memberRequireEmail
+  }
+}

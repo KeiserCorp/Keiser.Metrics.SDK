@@ -14,6 +14,7 @@ import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAlia
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet, PrivilegedExerciseOrdinalSets } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssignment } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
+import { FacilityConfigurationResponse, StaticFacilityConfiguration } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
 import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
@@ -435,6 +436,11 @@ export class StrengthMachineSession {
   async getA500MachineState () {
     const response = await this.action('a500:showMachineState') as A500MachineStateResponse
     return new A500MachineState(response.a500MachineState, this.sessionHandler)
+  }
+
+  async getFacilityConfiguration () {
+    const { facilityConfiguration } = await this.action('facilityConfiguration:show') as FacilityConfigurationResponse
+    return new StaticFacilityConfiguration(facilityConfiguration)
   }
 }
 
