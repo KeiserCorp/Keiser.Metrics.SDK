@@ -98,6 +98,26 @@ export class FacilityStrengthMachine extends Model {
     return this._facilityStrengthMachineData.version
   }
 
+  get softwareVersion() {
+    return this._facilityStrengthMachineData.softwareVersion
+  }
+
+  get serial() {
+    return this.mainBoardSerial
+  }
+
+  get mainBoardSerial() {
+    return this._facilityStrengthMachineData.mainBoardSerial
+  }
+
+  get leftCylinderSerial() {
+    return this._facilityStrengthMachineData.leftCylinderSerial
+  }
+
+  get rightCylinderSerial() {
+    return this._facilityStrengthMachineData.rightCylinderSerial
+  }
+
   get location () {
     return this._facilityStrengthMachineData.location
   }
