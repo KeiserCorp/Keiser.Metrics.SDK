@@ -75,4 +75,36 @@ export class Profile extends Model {
   get units () {
     return this._profileData.units as Units ?? null
   }
+
+  toJSON () {
+    return this._profileData
+  }
+}
+
+export class StaticProfile {
+  private readonly _profileData: ProfileData
+
+  constructor (profileData: ProfileData) {
+    this._profileData = profileData
+  }
+
+  get name () {
+    return this._profileData.name
+  }
+
+  get birthday () {
+    return this._profileData.birthday
+  }
+
+  get gender () {
+    return this._profileData.gender as Gender ?? null
+  }
+
+  get language () {
+    return this._profileData.language
+  }
+
+  get units () {
+    return this._profileData.units as Units ?? null
+  }
 }

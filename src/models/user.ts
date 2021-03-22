@@ -16,7 +16,7 @@ import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, M
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
-import { Profile, ProfileData } from './profile'
+import { Profile, ProfileData, StaticProfile } from './profile'
 import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
@@ -119,6 +119,10 @@ export class User extends Model {
     }
 
     await this.action('user:delete', { userId: this.id })
+  }
+
+  public toJSON () {
+    return this._userData
   }
 
   get id () {
@@ -403,4 +407,16 @@ export class FacilityMemberUser extends FacilityUser {
 
 export class FacilityEmployeeUser extends FacilityUser {
 
+}
+
+export class StaticUser {
+  private readonly _userData: UserData
+
+  constructor (userData: UserData) {
+    this._userData = userData
+  }
+
+  get profile () {
+    return new StaticProfile(this._userData.profile)
+  }
 }
