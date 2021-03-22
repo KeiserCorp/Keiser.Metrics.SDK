@@ -133,4 +133,8 @@ export class StaticFacilityConfiguration {
   get memberRequireEmail () {
     return this._facilityConfigurationData.memberRequireEmail
   }
+
+  public toJSON () {
+    return this._facilityConfigurationData
+  }
 }
