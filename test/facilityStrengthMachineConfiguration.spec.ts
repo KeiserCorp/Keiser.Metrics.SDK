@@ -45,7 +45,8 @@ describe('Facility Machines Configuration', function () {
       timeZone: 'America/Denver',
       forceUnit: ForceUnit.Kilograms,
       primaryFocus: 'velocity',
-      secondaryFocus: 'force'
+      secondaryFocus: 'force',
+      locale: 'en-us'
     })
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
@@ -53,6 +54,7 @@ describe('Facility Machines Configuration', function () {
     expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
     expect(facilityStrengthMachineConfiguration.secondaryFocus).to.equal('force')
+    expect(facilityStrengthMachineConfiguration.locale).to.equal('en-us')
   })
 
   it('can reload facility machines configuration', async function () {
@@ -63,5 +65,6 @@ describe('Facility Machines Configuration', function () {
     expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
     expect(facilityStrengthMachineConfiguration.secondaryFocus).to.equal('force')
+    expect(facilityStrengthMachineConfiguration.locale).to.equal('en-us')
   })
 })

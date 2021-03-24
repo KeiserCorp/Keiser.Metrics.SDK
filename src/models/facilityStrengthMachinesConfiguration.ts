@@ -7,6 +7,7 @@ export interface FacilityStrengthMachineConfigurationData {
   forceUnit: ForceUnit
   primaryFocus: string
   secondaryFocus: string
+  locale: string
 }
 
 export interface FacilityStrengthMachineConfigurationResponse extends AuthenticatedResponse {
@@ -31,7 +32,7 @@ export class FacilityStrengthMachineConfiguration extends Model {
     return this
   }
 
-  async update (params: { timeZone: string, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
+  async update (params: { timeZone: string, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string, locale: string }) {
     const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:update', params) as FacilityStrengthMachineConfigurationResponse
     this.setFacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration)
     return this
@@ -51,5 +52,9 @@ export class FacilityStrengthMachineConfiguration extends Model {
 
   get secondaryFocus () {
     return this._facilityStrengthMachineConfigurationData.secondaryFocus
+  }
+
+  get locale () {
+    return this._facilityStrengthMachineConfigurationData.locale
   }
 }
