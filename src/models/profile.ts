@@ -75,10 +75,6 @@ export class Profile extends Model {
   get units () {
     return this._profileData.units as Units ?? null
   }
-
-  toJSON () {
-    return this._profileData
-  }
 }
 
 export class StaticProfile {

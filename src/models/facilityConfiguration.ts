@@ -54,6 +54,10 @@ export class FacilityConfiguration extends Model {
     return this
   }
 
+  public ejectData () {
+    return { ...this._facilityConfigurationData }
+  }
+
   get memberIdentificationComposition () {
     return this._facilityConfigurationData.memberIdentificationComposition
   }
@@ -98,6 +102,10 @@ export class StaticFacilityConfiguration {
     this._facilityConfigurationData = facilityConfigurationData
   }
 
+  public ejectData () {
+    return { ...this._facilityConfigurationData }
+  }
+
   get memberIdentificationComposition () {
     return this._facilityConfigurationData.memberIdentificationComposition
   }
@@ -132,9 +140,5 @@ export class StaticFacilityConfiguration {
 
   get memberRequireEmail () {
     return this._facilityConfigurationData.memberRequireEmail
-  }
-
-  public toJSON () {
-    return this._facilityConfigurationData
   }
 }

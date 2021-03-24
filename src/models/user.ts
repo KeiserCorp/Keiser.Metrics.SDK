@@ -121,8 +121,8 @@ export class User extends Model {
     await this.action('user:delete', { userId: this.id })
   }
 
-  public toJSON () {
-    return this._userData
+  ejectData () {
+    return { ...this._userData }
   }
 
   get id () {

@@ -36,24 +36,8 @@ export class A500MachineState extends Model<StrengthMachineSessionHandler> {
     return this
   }
 
-  get forceUnit () {
-    return this._a500MachineState.forceUnit
-  }
-
-  get primaryFocus () {
-    return this._a500MachineState.primaryFocus
-  }
-
-  get secondaryFocus () {
-    return this._a500MachineState.secondaryFocus
-  }
-}
-
-export class StaticA500MachineState {
-  private readonly _a500MachineState: A500MachineStateData
-
-  constructor (a500MachineStateData: A500MachineStateData) {
-    this._a500MachineState = a500MachineStateData
+  ejectData () {
+    return { ...this._a500MachineState }
   }
 
   get forceUnit () {
@@ -66,9 +50,5 @@ export class StaticA500MachineState {
 
   get secondaryFocus () {
     return this._a500MachineState.secondaryFocus
-  }
-
-  public toJSON () {
-    return this._a500MachineState
   }
 }
