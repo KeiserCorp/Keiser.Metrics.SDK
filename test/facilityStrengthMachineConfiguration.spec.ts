@@ -35,7 +35,7 @@ describe('Facility Machines Configuration', function () {
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
     expect(typeof facilityStrengthMachineConfiguration.timeZone).to.equal('string')
-    expect(typeof facilityStrengthMachineConfiguration.forceUnits).to.equal('string')
+    expect(typeof facilityStrengthMachineConfiguration.forceUnit).to.equal('string')
     expect(typeof facilityStrengthMachineConfiguration.primaryFocus).to.equal('string')
     expect(typeof facilityStrengthMachineConfiguration.secondaryFocus).to.equal('string')
   })
@@ -43,14 +43,14 @@ describe('Facility Machines Configuration', function () {
   it('can update facility machines configuration', async function () {
     facilityStrengthMachineConfiguration = await facilityStrengthMachineConfiguration.update({
       timeZone: 'America/Denver',
-      forceUnits: ForceUnit.Kilograms,
+      forceUnit: ForceUnit.Kilograms,
       primaryFocus: 'velocity',
       secondaryFocus: 'force'
     })
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
     expect(facilityStrengthMachineConfiguration.timeZone).to.equal('America/Denver')
-    expect(facilityStrengthMachineConfiguration.forceUnits).to.equal(ForceUnit.Kilograms)
+    expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
     expect(facilityStrengthMachineConfiguration.secondaryFocus).to.equal('force')
   })
@@ -60,7 +60,7 @@ describe('Facility Machines Configuration', function () {
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
     expect(facilityStrengthMachineConfiguration.timeZone).to.equal('America/Denver')
-    expect(facilityStrengthMachineConfiguration.forceUnits).to.equal(ForceUnit.Kilograms)
+    expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
     expect(facilityStrengthMachineConfiguration.secondaryFocus).to.equal('force')
   })

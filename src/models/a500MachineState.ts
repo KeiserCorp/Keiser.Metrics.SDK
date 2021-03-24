@@ -3,7 +3,7 @@ import { Model } from '../model'
 import { AuthenticatedResponse, StrengthMachineSessionHandler } from '../session'
 
 export interface A500MachineStateData {
-  forceUnits: ForceUnit
+  forceUnit: ForceUnit
   primaryFocus: string
   secondaryFocus: string
 }
@@ -30,14 +30,14 @@ export class A500MachineState extends Model<StrengthMachineSessionHandler> {
     return this
   }
 
-  async update (params: { forceUnits: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
+  async update (params: { forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
     const { a500MachineState } = await this.action('a500:updateMachineState', params) as A500MachineStateResponse
     this.setA500MachineState(a500MachineState)
     return this
   }
 
-  get forceUnits () {
-    return this._a500MachineState.forceUnits
+  get forceUnit () {
+    return this._a500MachineState.forceUnit
   }
 
   get primaryFocus () {
@@ -56,8 +56,8 @@ export class StaticA500MachineState {
     this._a500MachineState = a500MachineStateData
   }
 
-  get forceUnits () {
-    return this._a500MachineState.forceUnits
+  get forceUnit () {
+    return this._a500MachineState.forceUnit
   }
 
   get primaryFocus () {

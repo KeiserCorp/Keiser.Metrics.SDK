@@ -4,7 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface FacilityStrengthMachineConfigurationData {
   timeZone: string
-  forceUnits: ForceUnit
+  forceUnit: ForceUnit
   primaryFocus: string
   secondaryFocus: string
 }
@@ -31,7 +31,7 @@ export class FacilityStrengthMachineConfiguration extends Model {
     return this
   }
 
-  async update (params: { timeZone: string, forceUnits: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
+  async update (params: { timeZone: string, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
     const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:update', params) as FacilityStrengthMachineConfigurationResponse
     this.setFacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration)
     return this
@@ -41,8 +41,8 @@ export class FacilityStrengthMachineConfiguration extends Model {
     return this._facilityStrengthMachineConfigurationData.timeZone
   }
 
-  get forceUnits () {
-    return this._facilityStrengthMachineConfigurationData.forceUnits
+  get forceUnit () {
+    return this._facilityStrengthMachineConfigurationData.forceUnit
   }
 
   get primaryFocus () {
