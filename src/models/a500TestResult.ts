@@ -21,11 +21,12 @@ export interface A500TestResultResponse extends AuthenticatedResponse {
 
 export class A500TestResult {
   private readonly _a500TestResultData: A500TestResultData
+
   constructor (a500TestResultData: A500TestResultData) {
     this._a500TestResultData = a500TestResultData
   }
 
-  get id() {
+  get id () {
     return this._a500TestResultData.id
   }
 

@@ -1,15 +1,9 @@
-import { ForceUnit } from '../constants'
+import { ForceUnit, TestSide } from '../constants'
 import { AuthenticatedResponse } from '../session'
-
-export const enum A500TestSides {
-  Both = 'both',
-  Left = 'left',
-  Right = 'right',
-}
 
 export interface A500RepDataPointData {
   id: number
-  side: A500TestSides.Left | A500TestSides.Right
+  side: TestSide.Left | TestSide.Right
   count: number
   work: number
   completedAt: string
@@ -33,29 +27,18 @@ export interface A500RepDataPointResponse extends AuthenticatedResponse {
   a500RepDataPoint: A500RepDataPointData
 }
 
-export class A500RepDataPoints {
-  private readonly _repDataPoints: A500RepDataPoint[]
-
-  constructor (a500RepDataPointData: A500RepDataPointData[]) {
-    this._repDataPoints = a500RepDataPointData.map(repDataPoint => new A500RepDataPoint(repDataPoint))
-  }
-
-  get repDataPoints () {
-    return this._repDataPoints
-  }
-}
-
 export class A500RepDataPoint {
   private readonly _a500RepDataPointData: A500RepDataPointData
+
   constructor (A500RepDataPointData: A500RepDataPointData) {
     this._a500RepDataPointData = A500RepDataPointData
   }
 
-  get id() {
+  get id () {
     return this._a500RepDataPointData.id
   }
 
-  get side (): A500TestSides.Left | A500TestSides.Right {
+  get side (): TestSide.Left | TestSide.Right {
     return this._a500RepDataPointData.side
   }
 

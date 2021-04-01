@@ -1,7 +1,12 @@
-import { A500Type, ForceUnit, Side, TestSide } from '../constants'
-import { A500RepDataPointData, A500RepDataPoints } from './a500RepDataPoint'
+import { ForceUnit, Side, TestSide } from '../constants'
+import { A500RepDataPoint, A500RepDataPointData } from './a500RepDataPoint'
 import { A500TestResult, A500TestResultData } from './a500TestResult'
-import { A500TimeSeriesPointData, A500TimeSeriesPoints } from './a500TimeSeriesPoint'
+import { A500TimeSeriesPoint, A500TimeSeriesPointData } from './a500TimeSeriesPoint'
+
+export enum A500DDataSetType {
+  Normal = 'normal',
+  Test = 'test'
+}
 
 export interface A500RepData {
   side: Side
@@ -36,8 +41,8 @@ export interface A500DataSetData {
   id: number
   displaySoftwareVersion: string
   epochAt: string
-  type: A500Type
-  testSide?: TestSide
+  type: A500DDataSetType
+  testSide: TestSide | null
   leftTestResult?: A500TestResultData
   rightTestResult?: A500TestResultData
   a500RepDataPoints?: A500RepDataPointData[]
@@ -80,10 +85,10 @@ export class A500DataSet {
   }
 
   eagerRepDataPoints () {
-    return typeof this._a500DataSetData.a500RepDataPoints !== 'undefined' ? new A500RepDataPoints(this._a500DataSetData.a500RepDataPoints) : undefined
+    return typeof this._a500DataSetData.a500RepDataPoints !== 'undefined' ? this._a500DataSetData.a500RepDataPoints.map(a500RepDataPoint => new A500RepDataPoint(a500RepDataPoint)) : undefined
   }
 
   eagerTimeSeriesPoints () {
-    return typeof this._a500DataSetData.a500TimeSeriesPoints !== 'undefined' ? new A500TimeSeriesPoints(this._a500DataSetData.a500TimeSeriesPoints) : undefined
+    return typeof this._a500DataSetData.a500TimeSeriesPoints !== 'undefined' ? this._a500DataSetData.a500TimeSeriesPoints.map(a500TimeSeriesPoint => new A500TimeSeriesPoint(a500TimeSeriesPoint)) : undefined
   }
 }
