@@ -1,7 +1,7 @@
 import { A500Type, ForceUnit, Side, TestSide } from '../constants'
-import { A500RepDataPointData, A500RepDataPoints } from './a500RepDataPointData'
-import { A500TestResult, A500TestResultData } from './a500TestResultData'
-import { A500TimeSeriesPointData, A500TimeSeriesPoints } from './a500TimeSeriesPointData'
+import { A500RepDataPointData, A500RepDataPoints } from './a500RepDataPoint'
+import { A500TestResult, A500TestResultData } from './a500TestResult'
+import { A500TimeSeriesPointData, A500TimeSeriesPoints } from './a500TimeSeriesPoint'
 
 export interface A500RepData {
   side: Side
