@@ -5,7 +5,7 @@ import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { a500SetDataSample, a500TimeSeriesPointsSample } from './samples/a500'
+import { a500SetDataSample, a500TimeSeriesDataPointSamples } from './samples/a500'
 
 describe('A500', function () {
   let metricsInstance: Metrics
@@ -90,8 +90,9 @@ describe('A500', function () {
     const response = await userSession.user.createA500Set({
       strengthMachineSession: machineSession,
       setData: a500SetDataSample,
-      sampleData: a500TimeSeriesPointsSample
+      sampleData: a500TimeSeriesDataPointSamples
     })
+
     expect(typeof response).to.not.equal('undefined')
     expect(response.id).to.not.equal(0)
   })

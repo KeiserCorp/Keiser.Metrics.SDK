@@ -1,6 +1,6 @@
 import { ForceUnit, Side, TestSide } from '../../src/constants'
 import { A500SetData } from '../../src/models/a500DataSet'
-import { A500TimeSeriesSampleDataPoint } from '../../src/models/a500TimeSeriesPointData'
+import { A500TimeSeriesPointSample } from '../../src/models/a500TimeSeriesPoint'
 
 export const a500SetDataSample: A500SetData = {
   startedAt: new Date('2020-01-27T18:58:57.000Z'),
@@ -491,7 +491,7 @@ export const a500SetDataSample: A500SetData = {
   ]
 }
 
-export const a500TimeSeriesPointsSample: A500TimeSeriesSampleDataPoint[] = [
+export const a500TimeSeriesDataPointSamples: A500TimeSeriesPointSample[] = [
   { timeSinceEpoch: 1181, left: { position: 0.124536, power: 0, force: 69.601, velocity: 0.00007, acceleration: 0.00033, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 }, right: { position: 0.1266, power: 0, force: 70.983, velocity: -0.00004, acceleration: -0.00015, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 } },
   { timeSinceEpoch: 1182, left: { position: 0.124537, power: 0, force: 69.598, velocity: 0.00011, acceleration: 0.00031, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 }, right: { position: 0.1266, power: 0, force: 70.983, velocity: -0.00005, acceleration: -0.00013, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 } },
   { timeSinceEpoch: 1183, left: { position: 0.124538, power: 0, force: 69.597, velocity: 0.00013, acceleration: 0.00022, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 }, right: { position: 0.126599, power: 0, force: 70.984, velocity: -0.00006, acceleration: -0.00007, forceOfMassAcceleration: 0, mechanicalWeight: 0, rawPower: 0 } },

@@ -28,6 +28,12 @@ export interface A500TimeSeriesDataPointSideData {
   rawPower: number
 }
 
+export interface A500TimeSeriesPointSample {
+  timeSinceEpoch: number
+  left: A500TimeSeriesDataPointSideData
+  right: A500TimeSeriesDataPointSideData
+}
+
 export class A500TimeSeriesPoint {
   private readonly _a500TimeSeriesPointData: A500TimeSeriesPointData
 

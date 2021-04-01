@@ -5,7 +5,7 @@ import { XOR } from '../lib/types'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
-import { A500TimeSeriesSampleDataPoint } from './a500TimeSeriesPoint'
+import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { FacilityRelationship, FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
@@ -397,7 +397,7 @@ export class FacilityMemberUser extends FacilityUser {
     return new UserInBodyIntegration(userInBodyIntegration, this.sessionHandler, this.facilityRelationshipId)
   }
 
-  async createA500Set (params: { strengthMachineSession: StrengthMachineSession, setData: A500SetData, sampleData?: A500TimeSeriesSampleDataPoint[] }) {
+  async createA500Set (params: { strengthMachineSession: StrengthMachineSession, setData: A500SetData, sampleData?: A500TimeSeriesPointSample[] }) {
     const machineToken = params.strengthMachineSession.sessionHandler.accessToken
     const setData = JSON.stringify(params.setData)
     const deflatedSampleData = typeof params.sampleData !== 'undefined' ? compressDeflateToB64(params.sampleData) : null
