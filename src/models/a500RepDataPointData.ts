@@ -1,6 +1,6 @@
-import { Model } from '../model'
-import { AuthenticatedResponse, SessionHandler } from '../session'
-import { ForceUnit } from './strengthMachineDataSet'
+import { ForceUnit } from '../constants'
+import { AuthenticatedResponse } from '../session'
+
 export const enum A500TestSides {
   Both = 'both',
   Left = 'left',
@@ -12,7 +12,7 @@ export interface A500RepDataPointData {
   side: A500TestSides.Left | A500TestSides.Right
   count: number
   work: number
-  completedAt: Date
+  completedAt: string
   reactionTime: number
   peakPower: number
   averagePower: number
@@ -33,89 +33,97 @@ export interface A500RepDataPointResponse extends AuthenticatedResponse {
   a500RepDataPoint: A500RepDataPointData
 }
 
-export class A500RepDataPoint extends Model {
+export class A500RepDataPoints {
+  private readonly _repDataPoints: A500RepDataPoint[]
+
+  constructor (a500RepDataPointData: A500RepDataPointData[]) {
+    this._repDataPoints = a500RepDataPointData.map(repDataPoint => new A500RepDataPoint(repDataPoint))
+  }
+
+  get repDataPoints () {
+    return this._repDataPoints
+  }
+}
+
+export class A500RepDataPoint {
   private readonly _a500RepDataPointData: A500RepDataPointData
-  constructor (
-    A500RepDataPointData: A500RepDataPointData,
-    sessionHandler: SessionHandler
-  ) {
-    super(sessionHandler)
+  constructor (A500RepDataPointData: A500RepDataPointData) {
     this._a500RepDataPointData = A500RepDataPointData
   }
 
-  public get id (): number {
+  get id() {
     return this._a500RepDataPointData.id
   }
 
-  public get side (): A500TestSides.Left | A500TestSides.Right {
+  get side (): A500TestSides.Left | A500TestSides.Right {
     return this._a500RepDataPointData.side
   }
 
-  public get count (): number {
+  get count () {
     return this._a500RepDataPointData.count
   }
 
-  public get work (): number {
+  get work () {
     return this._a500RepDataPointData.work
   }
 
-  public get completedAt (): Date {
+  get completedAt () {
     return new Date(this._a500RepDataPointData.completedAt)
   }
 
-  public get reactionTime (): number {
+  get reactionTime () {
     return this._a500RepDataPointData.reactionTime
   }
 
-  public get peakPower (): number {
+  get peakPower () {
     return this._a500RepDataPointData.peakPower
   }
 
-  public get averagePower (): number {
+  get averagePower () {
     return this._a500RepDataPointData.averagePower
   }
 
-  public get peakVelocity (): number {
+  get peakVelocity () {
     return this._a500RepDataPointData.peakVelocity
   }
 
-  public get averageVelocity (): number {
+  get averageVelocity () {
     return this._a500RepDataPointData.averageVelocity
   }
 
-  public get peakForce (): number {
+  get peakForce () {
     return this._a500RepDataPointData.peakForce
   }
 
-  public get averageForce (): number {
+  get averageForce () {
     return this._a500RepDataPointData.averageForce
   }
 
-  public get rangeOfMotion (): number {
+  get rangeOfMotion () {
     return this._a500RepDataPointData.rangeOfMotion
   }
 
-  public get setPointForce (): number {
+  get setPointForce () {
     return this._a500RepDataPointData.setPointForce
   }
 
-  public get forceUnit (): ForceUnit {
+  get forceUnit () {
     return this._a500RepDataPointData.forceUnit
   }
 
-  public get startSinceEpoch (): number {
+  get startSinceEpoch () {
     return this._a500RepDataPointData.startSinceEpoch
   }
 
-  public get endSinceEpoch (): number {
+  get endSinceEpoch () {
     return this._a500RepDataPointData.endSinceEpoch
   }
 
-  public get addedMass (): number {
+  get addedMass () {
     return this._a500RepDataPointData.addedMass
   }
 
-  public get addedForce (): number {
+  get addedForce () {
     return this._a500RepDataPointData.addedForce
   }
 }

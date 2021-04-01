@@ -1,83 +1,79 @@
-import { Model } from "../model";
-import { AuthenticatedResponse, SessionHandler } from "../session";
+import { AuthenticatedResponse } from '../session'
 export interface A500TestResultData {
-  id: number;
-  averageVelocityLineM: number;
-  averageVelocityLineB: number;
-  averagePowerParabolaA: number;
-  averagePowerParabolaH: number;
-  averagePowerParabolaK: number;
-  averageSlopeChanges: number;
-  peakVelocityLineM: number;
-  peakVelocityLineB: number;
-  peakPowerParabolaA: number;
-  peakPowerParabolaH: number;
-  peakPowerParabolaK: number;
-  peakSlopeChanges: number;
+  id: number
+  averageVelocityLineM: number
+  averageVelocityLineB: number
+  averagePowerParabolaA: number
+  averagePowerParabolaH: number
+  averagePowerParabolaK: number
+  averageSlopeChanges: number
+  peakVelocityLineM: number
+  peakVelocityLineB: number
+  peakPowerParabolaA: number
+  peakPowerParabolaH: number
+  peakPowerParabolaK: number
+  peakSlopeChanges: number
 }
 
 export interface A500TestResultResponse extends AuthenticatedResponse {
-  A500TestResult: A500TestResultData;
+  A500TestResult: A500TestResultData
 }
 
-export class A500TestResult extends Model {
-  private readonly _a500TestResultData: A500TestResultData;
-  constructor(
-    A500TestResultData: A500TestResultData,
-    sessionHandler: SessionHandler
-  ) {
-    super(sessionHandler);
-    this._a500TestResultData = A500TestResultData;
-  }
-  public get id(): number {
-    return this._a500TestResultData.id;
+export class A500TestResult {
+  private readonly _a500TestResultData: A500TestResultData
+  constructor (a500TestResultData: A500TestResultData) {
+    this._a500TestResultData = a500TestResultData
   }
 
-  public get averageVelocityLineM(): number {
-    return this._a500TestResultData.averageVelocityLineM;
+  get id() {
+    return this._a500TestResultData.id
   }
 
-  public get averageVelocityLineB(): number {
-    return this._a500TestResultData.averageVelocityLineB;
+  get averageVelocityLineM () {
+    return this._a500TestResultData.averageVelocityLineM
   }
 
-  public get averagePowerParabolaA(): number {
-    return this._a500TestResultData.averagePowerParabolaA;
+  get averageVelocityLineB () {
+    return this._a500TestResultData.averageVelocityLineB
   }
 
-  public get averagePowerParabolaH(): number {
-    return this._a500TestResultData.averagePowerParabolaH;
+  get averagePowerParabolaA () {
+    return this._a500TestResultData.averagePowerParabolaA
   }
 
-  public get averagePowerParabolaK(): number {
-    return this._a500TestResultData.averagePowerParabolaK;
+  get averagePowerParabolaH () {
+    return this._a500TestResultData.averagePowerParabolaH
   }
 
-  public get averageSlopeChanges(): number {
-    return this._a500TestResultData.averageSlopeChanges;
+  get averagePowerParabolaK () {
+    return this._a500TestResultData.averagePowerParabolaK
   }
 
-  public get peakVelocityLineM(): number {
-    return this._a500TestResultData.peakVelocityLineM;
+  get averageSlopeChanges () {
+    return this._a500TestResultData.averageSlopeChanges
   }
 
-  public get peakVelocityLineB(): number {
-    return this._a500TestResultData.peakVelocityLineB;
+  get peakVelocityLineM () {
+    return this._a500TestResultData.peakVelocityLineM
   }
 
-  public get peakPowerParabolaA(): number {
-    return this._a500TestResultData.peakPowerParabolaA;
+  get peakVelocityLineB () {
+    return this._a500TestResultData.peakVelocityLineB
   }
 
-  public get peakPowerParabolaH(): number {
-    return this._a500TestResultData.peakPowerParabolaH;
+  get peakPowerParabolaA () {
+    return this._a500TestResultData.peakPowerParabolaA
   }
 
-  public get peakPowerParabolaK(): number {
-    return this._a500TestResultData.peakPowerParabolaK;
+  get peakPowerParabolaH () {
+    return this._a500TestResultData.peakPowerParabolaH
   }
 
-  public get peakSlopeChanges(): number {
-    return this._a500TestResultData.peakSlopeChanges;
+  get peakPowerParabolaK () {
+    return this._a500TestResultData.peakPowerParabolaK
+  }
+
+  get peakSlopeChanges () {
+    return this._a500TestResultData.peakSlopeChanges
   }
 }

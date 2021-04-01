@@ -1,98 +1,135 @@
-import { Model } from "../model";
-import { AuthenticatedResponse, SessionHandler } from "../session";
+import { AuthenticatedResponse } from '../session'
+
 export interface A500TimeSeriesPointData {
-  id: number;
-  timeSinceEpoch: number;
-  leftPosition: number;
-  leftPower: number;
-  leftForce: number;
-  leftVelocity: number;
-  leftAcceleration: number;
-  leftForceOfMassAcceleration: number;
-  leftMechanicalWeight: number;
-  rightPosition: number;
-  rightPower: number;
-  rightForce: number;
-  rightVelocity: number;
-  rightAcceleration: number;
-  rightForceOfMassAcceleration: number;
-  rightMechanicalWeight: number;
+  id: number
+  timeSinceEpoch: number
+  leftPosition: number
+  leftPower: number
+  leftForce: number
+  leftVelocity: number
+  leftAcceleration: number
+  leftForceOfMassAcceleration: number
+  leftMechanicalWeight: number
+  rightPosition: number
+  rightPower: number
+  rightForce: number
+  rightVelocity: number
+  rightAcceleration: number
+  rightForceOfMassAcceleration: number
+  rightMechanicalWeight: number
+}
+
+export interface A500TimeSeriesDataPointSideData {
+  force: number
+  position: number
+  power: number
+  velocity: number
+  acceleration: number
+  forceOfMassAcceleration: number
+  mechanicalWeight: number
+  rawPower: number
+}
+
+export interface A500TimeSeriesSampleDataPoint {
+  left: A500TimeSeriesDataPointSideData
+  right: A500TimeSeriesDataPointSideData
+  timeSinceEpoch: number
 }
 
 export interface A500TimeSeriesPointResponse extends AuthenticatedResponse {
   A500TimeSeriesPoint: A500TimeSeriesPointData
 }
-export class A500TimeSeriesPoint extends Model {
-  private readonly _a500TimeSeriesPointData: A500TimeSeriesPointData;
-  constructor(
-    A500TimeSeriesPointData: A500TimeSeriesPointData,
-    sessionHandler: SessionHandler
-  ) {
-    super(sessionHandler);
-    this._a500TimeSeriesPointData = A500TimeSeriesPointData;
+
+export class A500TimeSeriesPoints {
+  private readonly _timeSeriesPoints: A500TimeSeriesPoint[]
+
+  constructor (timeSeriesPoints: A500TimeSeriesPointData[]) {
+    this._timeSeriesPoints = timeSeriesPoints.map(timeSeriesPoint => new A500TimeSeriesPoint(timeSeriesPoint))
   }
 
-  public get id(): number {
-    return this._a500TimeSeriesPointData.id;
+  get timeSeriesPoints () {
+    return this._timeSeriesPoints
+  }
+}
+
+export class A500TimeSeriesPoint {
+  private readonly _a500TimeSeriesPointData: A500TimeSeriesPointData
+  private readonly _left: A500TimeSeriesDataPointSideData
+  private readonly _right: A500TimeSeriesDataPointSideData
+
+  constructor (a500TimeSeriesPointData: A500TimeSeriesPointData) {
+    this._a500TimeSeriesPointData = a500TimeSeriesPointData
+    this._left = {
+      position: a500TimeSeriesPointData.leftPosition,
+      power: a500TimeSeriesPointData.leftPower,
+      force: a500TimeSeriesPointData.leftForce,
+      velocity: a500TimeSeriesPointData.leftVelocity,
+      acceleration: a500TimeSeriesPointData.leftAcceleration,
+      forceOfMassAcceleration: a500TimeSeriesPointData.leftForceOfMassAcceleration,
+      mechanicalWeight: a500TimeSeriesPointData.leftMechanicalWeight,
+      rawPower: a500TimeSeriesPointData.leftPosition
+    }
+    this._right = {
+      position: a500TimeSeriesPointData.rightPosition,
+      power: a500TimeSeriesPointData.rightPower,
+      force: a500TimeSeriesPointData.rightForce,
+      velocity: a500TimeSeriesPointData.rightVelocity,
+      acceleration: a500TimeSeriesPointData.rightAcceleration,
+      forceOfMassAcceleration: a500TimeSeriesPointData.rightForceOfMassAcceleration,
+      mechanicalWeight: a500TimeSeriesPointData.rightMechanicalWeight,
+      rawPower: a500TimeSeriesPointData.rightPosition
+    }
   }
 
-  public get timeSinceEpoch(): number {
-    return this._a500TimeSeriesPointData.timeSinceEpoch;
+  get id() {
+    return this._a500TimeSeriesPointData.id
   }
 
-  public get leftPosition(): number {
-    return this._a500TimeSeriesPointData.leftPosition;
+  get timeSinceEpoch () {
+    return this._a500TimeSeriesPointData.timeSinceEpoch
   }
 
-  public get leftPower(): number {
-    return this._a500TimeSeriesPointData.leftPower;
+  get left () {
+    return new A500TimeSeriesDataPointSide(this._left)
   }
 
-  public get leftForce(): number {
-    return this._a500TimeSeriesPointData.leftForce;
+  get right () {
+    return new A500TimeSeriesDataPointSide(this._right)
+  }
+}
+
+export class A500TimeSeriesDataPointSide {
+  private readonly _timeSeriesDataPointSideData: A500TimeSeriesDataPointSideData
+
+  constructor (timeSeriesDataPointSideData: A500TimeSeriesDataPointSideData) {
+    this._timeSeriesDataPointSideData = timeSeriesDataPointSideData
   }
 
-  public get leftVelocity(): number {
-    return this._a500TimeSeriesPointData.leftVelocity;
+  get position () {
+    return this._timeSeriesDataPointSideData.position
   }
 
-  public get leftAcceleration(): number {
-    return this._a500TimeSeriesPointData.leftAcceleration;
+  get power () {
+    return this._timeSeriesDataPointSideData.power
   }
 
-  public get leftForceOfMassAcceleration(): number {
-    return this._a500TimeSeriesPointData.leftForceOfMassAcceleration;
+  get force () {
+    return this._timeSeriesDataPointSideData.force
   }
 
-  public get leftMechanicalWeight(): number {
-    return this._a500TimeSeriesPointData.leftMechanicalWeight;
+  get velocity () {
+    return this._timeSeriesDataPointSideData.velocity
   }
 
-  public get rightPosition(): number {
-    return this._a500TimeSeriesPointData.rightPosition;
+  get acceleration () {
+    return this._timeSeriesDataPointSideData.acceleration
   }
 
-  public get rightPower(): number {
-    return this._a500TimeSeriesPointData.rightPower;
+  get forceOfMassAcceleration () {
+    return this._timeSeriesDataPointSideData.forceOfMassAcceleration
   }
 
-  public get rightForce(): number {
-    return this._a500TimeSeriesPointData.rightForce;
-  }
-
-  public get rightVelocity(): number {
-    return this._a500TimeSeriesPointData.rightVelocity;
-  }
-
-  public get rightAcceleration(): number {
-    return this._a500TimeSeriesPointData.rightAcceleration;
-  }
-
-  public get rightForceOfMassAcceleration(): number {
-    return this._a500TimeSeriesPointData.rightForceOfMassAcceleration;
-  }
-
-  public get rightMechanicalWeight(): number {
-    return this._a500TimeSeriesPointData.rightMechanicalWeight;
+  get mechanicalWeight () {
+    return this._timeSeriesDataPointSideData.mechanicalWeight
   }
 }

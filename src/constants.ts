@@ -19,6 +19,11 @@ export enum TestSide {
   Both = 'both'
 }
 
+export enum A500Type {
+  Normal = 'normal',
+  Test = 'test'
+}
+
 export const enum ForceUnit {
   Pounds = 'lb',
   Kilograms = 'kg',
