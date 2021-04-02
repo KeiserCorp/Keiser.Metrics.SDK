@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -41,7 +42,16 @@ const baseConfig = {
 const browserConfig = {
   ...baseConfig,
   target: 'web',
+  resolve: {
+    ...baseConfig.resolve,
+    alias: {
+      buffer: 'buffer'
+    }
+  },
   plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    }),
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [DIST],
       cleanAfterEveryBuildPatterns: []

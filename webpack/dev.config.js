@@ -15,6 +15,9 @@ module.exports = {
     ]
   },
   resolve: {
+    alias: {
+      buffer: 'buffer'
+    },
     extensions: ['.tsx', '.ts', '.js']
   },
   devtool: 'inline-source-map',
@@ -25,6 +28,9 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './dev/index.html'
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
     }),
     new webpack.HotModuleReplacementPlugin()
   ],
