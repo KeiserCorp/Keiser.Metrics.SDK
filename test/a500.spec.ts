@@ -5,13 +5,14 @@ import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { a500SetDataSample, a500TimeSeriesPointsSample } from './samples/a500'
+import { a500SetDataSample, a500TimeSeriesDataPointSamples } from './samples/a500'
 
 describe('A500', function () {
   let metricsInstance: Metrics
   let facility: PrivilegedFacility
   let machineSession: StrengthMachineSession
   let userSession: FacilityUserSession
+  let a500ResultId: number
   const strengthMachineIdentifier: StrengthMachineIdentifier = {
     machineModel: '1399',
     firmwareVersion: '00000000',
@@ -90,9 +91,34 @@ describe('A500', function () {
     const response = await userSession.user.createA500Set({
       strengthMachineSession: machineSession,
       setData: a500SetDataSample,
-      sampleData: a500TimeSeriesPointsSample
+      sampleData: a500TimeSeriesDataPointSamples
     })
+
     expect(typeof response).to.not.equal('undefined')
     expect(response.id).to.not.equal(0)
+
+    a500ResultId = response.id
+  })
+
+  it('can create retrieve a500 data set', async function () {
+    this.timeout(10000)
+    if (typeof a500ResultId === 'undefined') {
+      this.skip()
+    }
+
+    const response = await userSession.user.getStrengthMachineDataSet({ id: a500ResultId })
+
+    expect(typeof response).to.not.equal('undefined')
+    expect(response.id).to.equal(a500ResultId)
+
+    const a500DataSet = response.eagerA500DataSet()
+    expect(a500DataSet).to.not.equal('undefined')
+
+    if (typeof a500DataSet !== 'undefined') {
+      expect(a500DataSet.eagerRepDataPoints()).to.not.equal('undefined')
+      expect(a500DataSet.eagerTimeSeriesPoints()).to.not.equal('undefined')
+      expect(a500DataSet.eagerLeftTestResult()).to.not.equal('undefined')
+      expect(a500DataSet.eagerRightTestResult()).to.not.equal('undefined')
+    }
   })
 })

@@ -1,4 +1,12 @@
 import { ForceUnit, Side, TestSide } from '../constants'
+import { A500RepDataPoint, A500RepDataPointData } from './a500RepDataPoint'
+import { A500TestResult, A500TestResultData } from './a500TestResult'
+import { A500TimeSeriesPoint, A500TimeSeriesPointData } from './a500TimeSeriesPoint'
+
+export enum A500DDataSetType {
+  Normal = 'normal',
+  Test = 'test'
+}
 
 export interface A500RepData {
   side: Side
@@ -29,19 +37,58 @@ export interface A500SetData {
   repData: A500RepData[]
 }
 
-export interface A500TimeSeriesDataPoint {
-  left: A500TimeSeriesDataPointSide
-  right: A500TimeSeriesDataPointSide
-  timeSinceEpoch: number
+export interface A500DataSetData {
+  id: number
+  displaySoftwareVersion: string
+  epochAt: string
+  type: A500DDataSetType
+  testSide: TestSide | null
+  leftTestResult?: A500TestResultData
+  rightTestResult?: A500TestResultData
+  a500RepDataPoints?: A500RepDataPointData[]
+  a500TimeSeriesPoints?: A500TimeSeriesPointData[]
 }
 
-export interface A500TimeSeriesDataPointSide {
-  force: number
-  position: number
-  power: number
-  velocity: number
-  acceleration: number
-  forceOfMassAcceleration: number
-  mechanicalWeight: number
-  rawPower: number
+export class A500DataSet {
+  private readonly _a500DataSetData: A500DataSetData
+
+  constructor (a500DataSetData: A500DataSetData) {
+    this._a500DataSetData = a500DataSetData
+  }
+
+  get id () {
+    return this._a500DataSetData.id
+  }
+
+  get displaySoftwareVersion () {
+    return this._a500DataSetData.displaySoftwareVersion
+  }
+
+  get epochAt () {
+    return new Date(this._a500DataSetData.epochAt)
+  }
+
+  get type () {
+    return this._a500DataSetData.type
+  }
+
+  get testSide () {
+    return this._a500DataSetData.testSide
+  }
+
+  eagerLeftTestResult () {
+    return typeof this._a500DataSetData.leftTestResult !== 'undefined' ? new A500TestResult(this._a500DataSetData.leftTestResult) : undefined
+  }
+
+  eagerRightTestResult () {
+    return typeof this._a500DataSetData.rightTestResult !== 'undefined' ? new A500TestResult(this._a500DataSetData.rightTestResult) : undefined
+  }
+
+  eagerRepDataPoints () {
+    return typeof this._a500DataSetData.a500RepDataPoints !== 'undefined' ? this._a500DataSetData.a500RepDataPoints.map(a500RepDataPoint => new A500RepDataPoint(a500RepDataPoint)) : undefined
+  }
+
+  eagerTimeSeriesPoints () {
+    return typeof this._a500DataSetData.a500TimeSeriesPoints !== 'undefined' ? this._a500DataSetData.a500TimeSeriesPoints.map(a500TimeSeriesPoint => new A500TimeSeriesPoint(a500TimeSeriesPoint)) : undefined
+  }
 }

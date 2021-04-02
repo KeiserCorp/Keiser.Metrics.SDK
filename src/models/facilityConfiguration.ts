@@ -54,7 +54,7 @@ export class FacilityConfiguration extends Model {
     return this
   }
 
-  public ejectData () {
+  ejectData () {
     return { ...this._facilityConfigurationData }
   }
 
@@ -102,7 +102,7 @@ export class StaticFacilityConfiguration {
     this._facilityConfigurationData = facilityConfigurationData
   }
 
-  public ejectData () {
+  ejectData () {
     return { ...this._facilityConfigurationData }
   }
 

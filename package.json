@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "buffer": "^6.0.3",
     "cockatiel": "^2.0.1",
     "pack": "^2.2.0",
     "pako": "^2.0.3",
