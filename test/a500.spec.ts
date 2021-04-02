@@ -12,6 +12,7 @@ describe('A500', function () {
   let facility: PrivilegedFacility
   let machineSession: StrengthMachineSession
   let userSession: FacilityUserSession
+  let a500ResultId: number
   const strengthMachineIdentifier: StrengthMachineIdentifier = {
     machineModel: '1399',
     firmwareVersion: '00000000',
@@ -95,5 +96,29 @@ describe('A500', function () {
 
     expect(typeof response).to.not.equal('undefined')
     expect(response.id).to.not.equal(0)
+
+    a500ResultId = response.id
+  })
+
+  it('can create retrieve a500 data set', async function () {
+    this.timeout(10000)
+    if (typeof a500ResultId === 'undefined') {
+      this.skip()
+    }
+
+    const response = await userSession.user.getStrengthMachineDataSet({ id: a500ResultId })
+
+    expect(typeof response).to.not.equal('undefined')
+    expect(response.id).to.equal(a500ResultId)
+
+    const a500DataSet = response.eagerA500DataSet()
+    expect(a500DataSet).to.not.equal('undefined')
+
+    if (typeof a500DataSet !== 'undefined') {
+      expect(a500DataSet.eagerRepDataPoints()).to.not.equal('undefined')
+      expect(a500DataSet.eagerTimeSeriesPoints()).to.not.equal('undefined')
+      expect(a500DataSet.eagerLeftTestResult()).to.not.equal('undefined')
+      expect(a500DataSet.eagerRightTestResult()).to.not.equal('undefined')
+    }
   })
 })
