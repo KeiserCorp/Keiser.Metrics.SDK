@@ -103,12 +103,10 @@ export class FacilityStrengthMachine extends Model {
   }
 
   /**
-   *@deprecated This property has been replaced by displayUUID to reflect
-   * hardware changes
-   * @hidden
+   * @deprecated
    */
   get serial () {
-    return this._facilityStrengthMachineData.displayUUID
+    return this._facilityStrengthMachineData.mainBoardSerial
   }
 
   get displayUUID () {
