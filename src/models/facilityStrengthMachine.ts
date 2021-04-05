@@ -98,23 +98,32 @@ export class FacilityStrengthMachine extends Model {
     return this._facilityStrengthMachineData.version
   }
 
-  get softwareVersion() {
+  get softwareVersion () {
     return this._facilityStrengthMachineData.softwareVersion
   }
 
-  get serial() {
-    return this.mainBoardSerial
+  /**
+   *@deprecated This property has been replaced by displayUUID to reflect
+   * hardware changes
+   * @hidden
+   */
+  get serial () {
+    return this._facilityStrengthMachineData.displayUUID
   }
 
-  get mainBoardSerial() {
+  get displayUUID () {
+    return this._facilityStrengthMachineData.displayUUID
+  }
+
+  get mainBoardSerial () {
     return this._facilityStrengthMachineData.mainBoardSerial
   }
 
-  get leftCylinderSerial() {
+  get leftCylinderSerial () {
     return this._facilityStrengthMachineData.leftCylinderSerial
   }
 
-  get rightCylinderSerial() {
+  get rightCylinderSerial () {
     return this._facilityStrengthMachineData.rightCylinderSerial
   }
 
