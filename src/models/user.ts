@@ -272,7 +272,7 @@ export class User extends Model {
     return new UserFacilityEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number } = { }) {
+  async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {
     const { session } = await this.action('session:start', { ...params, userId: this.id }) as SessionResponse
     return {
       session: new Session(session, this.sessionHandler)
@@ -369,7 +369,7 @@ export class FacilityUser extends User {
 }
 
 export class FacilityMemberUser extends FacilityUser {
-  async startSession (params: { forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number } = { }) {
+  async startSession (params: { forceEndPrevious?: boolean, echipId?: string, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {
     const { session, echipData } = await this.action('facilitySession:start', { ...params, userId: this.id }) as SessionStartResponse
     return {
       session: new FacilitySession(session, this.sessionHandler),
