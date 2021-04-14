@@ -18,7 +18,8 @@ export const enum SessionRequireExtendedDataType {
   MSeries = 'mSeries',
   Strength = 'strength',
   HeartRate = 'heartRate',
-  Session = 'session'
+  Session = 'session',
+  Workout = 'workout'
 }
 
 export interface SessionData {
