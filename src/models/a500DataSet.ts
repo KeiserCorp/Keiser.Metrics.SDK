@@ -3,7 +3,7 @@ import { A500RepDataPoint, A500RepDataPointData } from './a500RepDataPoint'
 import { A500TestResult, A500TestResultData } from './a500TestResult'
 import { A500TimeSeriesPoint, A500TimeSeriesPointData } from './a500TimeSeriesPoint'
 
-export enum A500DDataSetType {
+export enum A500DataSetType {
   Normal = 'normal',
   Test = 'test'
 }
@@ -41,7 +41,7 @@ export interface A500DataSetData {
   id: number
   displaySoftwareVersion: string
   epochAt: string
-  type: A500DDataSetType
+  type: A500DataSetType
   testSide: TestSide | null
   leftTestResult?: A500TestResultData
   rightTestResult?: A500TestResultData
