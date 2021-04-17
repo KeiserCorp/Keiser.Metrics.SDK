@@ -33,7 +33,7 @@ export interface A500SetData {
   startedAt: Date
   endedAt: Date
   type: string
-  testSide: TestSide
+  testSide: TestSide | null
   repData: A500RepData[]
 }
 

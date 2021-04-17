@@ -3,7 +3,7 @@ export const DEFAULT_SOCKET_ENDPOINT = 'wss://metrics-api.keiser.com/ws'
 export const DEFAULT_REQUEST_TIMEOUT = 5000
 export const JWT_TTL_LIMIT = 5000
 
-export const enum Units {
+export enum Units {
   Metric = 'metric',
   Imperial = 'imperial'
 }
@@ -19,7 +19,7 @@ export enum TestSide {
   Both = 'both'
 }
 
-export const enum ForceUnit {
+export enum ForceUnit {
   Pounds = 'lb',
   Kilograms = 'kg',
   Newtons = 'ne',
