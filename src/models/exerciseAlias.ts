@@ -18,6 +18,7 @@ export const enum ExerciseAliasSorting {
 export interface ExerciseAliasData {
   id: number
   alias: string
+  type: ExerciseAliasType
   strengthExercise?: StrengthExerciseData
   cardioExercise?: CardioExerciseData
   stretchExercise?: StretchExerciseData
@@ -73,13 +74,7 @@ export class ExerciseAlias extends Model {
   }
 
   get type () {
-    if (typeof this._exerciseAliasData.strengthExercise !== 'undefined') {
-      return ExerciseAliasType.Strength
-    }
-    if (typeof this._exerciseAliasData.cardioExercise !== 'undefined') {
-      return ExerciseAliasType.Cardio
-    }
-    return ExerciseAliasType.Stretch
+    return this._exerciseAliasData.type
   }
 
   eagerStrengthExercise () {
