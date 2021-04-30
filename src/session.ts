@@ -1,7 +1,7 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 
 import { MetricsConnection } from './connection'
-import { JWT_TTL_LIMIT } from './constants'
+import { JWT_TTL_LIMIT, Units } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
@@ -20,6 +20,7 @@ import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, 
 import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
+import { Gender } from './models/profile'
 import { StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
@@ -45,8 +46,15 @@ export interface StrengthMachineInitializeResponse extends AuthenticatedResponse
   facilityStrengthMachine: FacilityStrengthMachineData
 }
 
-export interface OAuthLoginResponse {
+export interface SSOInitResponse {
   url: string
+}
+
+export interface OAuthLoginResponse extends SSOInitResponse {
+}
+
+export interface SSOLoginResponse extends AuthenticatedResponse {
+  redirectUrl: string
 }
 
 export interface AccessTokenChangeEvent {
@@ -102,8 +110,24 @@ export interface StrengthMachineToken extends JWTToken{
   facilityStrengthMachineId: number
   type: 'machine'
 }
+
 export module Authentication {
+  export async function init (connection: MetricsConnection, params: {redirectUrl: string}) {
+    const response = await connection.action('auth:init', params) as SSOInitResponse
+    return response.url
+  }
+
+  /**
+   * @deprecated This endpoint is being replaced with SSO
+   * This will be removed in the next minor version release
+  */
   export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
+    const response = await connection.action('auth:login', params) as UserResponse
+    return new UserSession(response, connection)
+  }
+
+  /** @hidden */
+  export async function useFacilityCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:login', params) as UserResponse
     return new UserSession(response, connection)
   }
@@ -113,6 +137,10 @@ export module Authentication {
     return new UserSession(response, connection)
   }
 
+  /**
+   * @deprecated This endpoint is being replaced with SSO
+   * This will be removed in the next minor version release
+  */
   export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:resetFulfillment', params) as UserResponse
     return new UserSession(response, connection)
@@ -138,6 +166,10 @@ export module Authentication {
     return new UserSession(response, connection)
   }
 
+  /**
+   * @deprecated This endpoint is being replaced with SSO
+   * This will be removed in the next minor version release
+  */
   export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
     await connection.action('auth:resetRequest', params)
   }
@@ -178,6 +210,32 @@ export module Authentication {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
     }
     return new AdminSession(response, connection, accessToken.globalAccessControl)
+  }
+}
+
+/** @hidden */
+export module SSO {
+  export async function useCredentials (connection: MetricsConnection, params: {email: string, password: string, refreshable: boolean, code: string}) {
+    const response = await connection.action('auth:login', { apiVersion: 2, ...params }) as SSOLoginResponse
+    return response
+  }
+
+  export async function useNewUser (connection: MetricsConnection, params: { email: string, code: string}) {
+    await connection.action('auth:userInit', params)
+  }
+
+  export async function useUserFulfillment (connection: MetricsConnection, params: { code: string, password: string, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricHeight: number, metricWeight: number}) {
+    const response = await connection.action('auth:userInitFulfillment', params) as SSOLoginResponse
+    return response
+  }
+
+  export async function passwordReset (connection: MetricsConnection, params: { email: string}) {
+    await connection.action('auth:resetRequest', params)
+  }
+
+  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean, code: string }) {
+    const response = await connection.action('auth:resetFulfillment', { apiVersion: 2, ...params }) as SSOLoginResponse
+    return response
   }
 }
 
@@ -490,6 +548,11 @@ export abstract class UserSessionBase<UserType extends User = User> {
 
   protected async action (action: string, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
+  }
+
+  async exchangeAuthorizationCode(params: {code: string}) {
+    const response = await this.sessionHandler.action('auth:exchangeCode', params) as SSOLoginResponse
+    return response
   }
 
   async getExerciseAlias (params: { id: number }) {

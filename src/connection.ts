@@ -142,9 +142,9 @@ export class MetricsConnection {
         return await new Promise((resolve, reject) => {
           const callback = (success: any, fail?: any) => typeof fail !== 'undefined' ? reject(fail) : resolve(success)
           if (this.socketConnected) {
-            this.actionSocket(action, params, callback)
+            this.actionSocket(action, { apiVersion: 1, ...params }, callback)
           } else {
-            void this.actionRest(action, params, callback)
+            void this.actionRest(action, { apiVersion: 1, ...params }, callback)
           }
         })
       })

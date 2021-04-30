@@ -13,6 +13,8 @@ describe('Auth', function () {
   // --------------------------------------------------------------------
 
   let metricsInstance: Metrics
+  let code: string
+  const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(function () {
     metricsInstance = new Metrics({
@@ -33,6 +35,23 @@ describe('Auth', function () {
     expect(session.user).to.be.an('object')
     expect(session.user.id).to.equal(DemoUserId)
     session.close()
+  })
+
+  it('can request authorization code', async function () {
+    const redirectUrl = await metricsInstance.sso({ redirectUrl: 'localhost:8080' })
+    const queryParams: any = redirectUrl.split('?').map(value => value.split('=')).reduce((acc, current) => {
+      acc[current[0]] = current[1]
+      return acc
+    }, {})
+    expect(queryParams.code).to.be.a('string')
+    code = queryParams.code
+  })
+
+  it('can authenticate using basic credientials (SSO)', async function () {
+    const session = await metricsInstance.ssoWithCredentials({ email: DemoEmail, password: DemoPassword, code })
+
+    expect(session).to.be.an('object')
+    expect(session.redirectUrl).to.be.a('string')
   })
 
   it('can authenticate without refresh token', async function () {
@@ -210,5 +229,22 @@ describe('Auth', function () {
 
   it('can request password reset', async function () {
     await metricsInstance.passwordReset({ email: DemoEmail })
+  })
+
+  it('can request user init email', async function () {
+    const redirectUrl = await metricsInstance.sso({ redirectUrl: 'localhost:8080' })
+    const queryParams: any = redirectUrl.split('?').map(value => value.split('=')).reduce((acc, current) => {
+      acc[current[0]] = current[1]
+      return acc
+    }, {})
+    expect(queryParams.code).to.be.a('string')
+    code = queryParams.code
+    await metricsInstance.ssoWithNewUser({ email: userEmailAddress, code })
+  })
+
+  it('can create new user', async function () {
+    const response = await metricsInstance.ssoWithUserFulfillment({ code, password: DemoPassword, acceptedTermsRevision: '2020-01-01', name: 'Fake User', birthday: '1990-01-01', gender: 'm', language: 'en', units: 'imperial', metricHeight: 54, metricWeight: 74 })
+
+    expect(response.redirectUrl).to.be.a('string')
   })
 })

@@ -1,8 +1,10 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
+import { Units } from './constants'
 import { Core } from './models/core'
 import { OAuthProviders } from './models/oauthService'
+import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
-import { Authentication } from './session'
+import { Authentication, SSO } from './session'
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection
@@ -41,6 +43,10 @@ export default class Metrics {
     return this._connection.onConnectionChangeEvent
   }
 
+  /**
+   * @deprecated This endpoint is being replaced with sso()
+   * This will be removed in the next minor version release
+  */
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean }) {
     return await Authentication.useCredentials(this._connection, { refreshable: true, ...params })
   }
@@ -49,6 +55,10 @@ export default class Metrics {
     return await Authentication.useToken(this._connection, params)
   }
 
+  /**
+   * @deprecated This endpoint is being replaced with sso()
+   * This will be removed in the next minor version release
+  */
   async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean }) {
     return await Authentication.useResetToken(this._connection, { refreshable: true, ...params })
   }
@@ -85,8 +95,46 @@ export default class Metrics {
     return await Authentication.createUser(this._connection, { refreshable: true, ...params })
   }
 
+  /**
+   * @deprecated This endpoint is being replaced with sso()
+   * This will be removed in the next minor version release
+  */
   async passwordReset (params: { email: string }) {
     await Authentication.passwordReset(this._connection, params)
+  }
+
+  async sso (params: {redirectUrl: string}) {
+    return await Authentication.init(this._connection, params)
+  }
+
+  /** @hidden */
+  async authenticateWithFacilityCredentials (params: {email: string, password: string, refreshable: boolean}) {
+    return await Authentication.useFacilityCredentials(this._connection, params)
+  }
+
+  /** @hidden */
+  async ssoWithCredentials (params: {email: string, password: string, refreshable?: boolean, code: string}) {
+    return await SSO.useCredentials(this._connection, { refreshable: true, ...params })
+  }
+
+  /** @hidden */
+  async ssoWithNewUser (params: { email: string, code: string}) {
+    return await SSO.useNewUser(this._connection, params)
+  }
+
+  /** @hidden */
+  async ssoWithUserFulfillment (params: { code: string, password: string, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricHeight: number, metricWeight: number}) {
+    return await SSO.useUserFulfillment(this._connection, params)
+  }
+
+  /** @hidden */
+  async ssoPasswordReset (params: {email: string}) {
+    return await SSO.passwordReset(this._connection, params)
+  }
+
+  /** @hidden */
+  async ssoWithResetToken (params: {resetToken: string, password: string, refreshable?: boolean, code: string}) {
+    return await SSO.useResetToken(this._connection, { refreshable: true, ...params })
   }
 }
 
