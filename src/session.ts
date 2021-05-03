@@ -361,8 +361,15 @@ export class SessionHandler extends BaseSessionHandler {
   }
 
   async logout () {
-    const authParams = { authorization: this.refreshToken ?? this.accessToken }
+    const authParams = { apiVersion: 2, authorization: this.refreshToken ?? this.accessToken }
     await this._connection.action('auth:logout', authParams)
+    this.close()
+  }
+
+  /** @hidden */
+  async globalLogout () {
+    const authParams = { global: true, authorization: this.refreshToken ?? this.accessToken }
+    await this._connection.action('auth:globalLogout', authParams)
     this.close()
   }
 }
@@ -538,6 +545,11 @@ export abstract class UserSessionBase<UserType extends User = User> {
     await this._sessionHandler.logout()
   }
 
+  /** @hidden */
+  async globalLogout () {
+    await this._sessionHandler.globalLogout()
+  }
+
   get user () {
     return this._user
   }
@@ -550,7 +562,7 @@ export abstract class UserSessionBase<UserType extends User = User> {
     return await this.sessionHandler.action(action, params)
   }
 
-  async exchangeAuthorizationCode(params: {code: string}) {
+  async exchangeAuthorizationCode (params: {code: string}) {
     const response = await this.sessionHandler.action('auth:exchangeCode', params) as SSOLoginResponse
     return response
   }
