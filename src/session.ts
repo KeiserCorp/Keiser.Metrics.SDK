@@ -1,7 +1,7 @@
 import { SimpleEventDispatcher } from 'ste-simple-events'
 
 import { MetricsConnection } from './connection'
-import { JWT_TTL_LIMIT } from './constants'
+import { JWT_TTL_LIMIT, Units } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
@@ -20,6 +20,7 @@ import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, 
 import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
+import { Gender } from './models/profile'
 import { StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
@@ -45,8 +46,37 @@ export interface StrengthMachineInitializeResponse extends AuthenticatedResponse
   facilityStrengthMachine: FacilityStrengthMachineData
 }
 
-export interface OAuthLoginResponse {
+export interface URLResponse {
   url: string
+}
+
+export interface SSOInitResponse extends URLResponse {}
+export interface OAuthLoginResponse extends URLResponse {}
+
+export interface CheckReturnRouteResponse {
+  valid: boolean
+}
+
+export interface AuthPrefillParams {
+  email: string
+  returnUrl: string
+  requiresElevated?: boolean
+  name?: string
+  birthday?: string
+  gender?: string
+  language?: string
+  units?: string
+  metricWeight?: number
+  bodyFatPercentage?: number
+  metricHeight?: number
+}
+
+export interface AuthShowResponse {
+  authPrefillParams: AuthPrefillParams
+}
+
+export interface AuthExchangeResponse {
+  exchangeToken: string
 }
 
 export interface AccessTokenChangeEvent {
@@ -103,6 +133,17 @@ export interface StrengthMachineToken extends JWTToken{
   type: 'machine'
 }
 export module Authentication {
+  export async function url (connection: MetricsConnection) {
+    const response = await connection.action('sso:init') as SSOInitResponse
+    return response.url
+  }
+
+  export async function useExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
+    const response = await connection.action('auth:exchange', params) as UserResponse
+    return new UserSession(response, connection)
+  }
+
+  /** @deprecated */
   export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:login', params) as UserResponse
     return new UserSession(response, connection)
@@ -110,11 +151,6 @@ export module Authentication {
 
   export async function useToken (connection: MetricsConnection, params: { token: string }) {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:resetFulfillment', params) as UserResponse
     return new UserSession(response, connection)
   }
 
@@ -126,20 +162,6 @@ export module Authentication {
   export async function useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
     await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
     return new KioskSession({ accessToken: params.kioskToken }, connection)
-  }
-
-  export async function useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
-    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
-    return response.url
-  }
-
-  export async function createUser (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('user:create', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
-    await connection.action('auth:resetRequest', params)
   }
 
   export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
@@ -178,6 +200,47 @@ export module Authentication {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
     }
     return new AdminSession(response, connection, accessToken.globalAccessControl)
+  }
+}
+
+/** @hidden */
+export module SSO {
+  export async function checkReturnRoute (connection: MetricsConnection, params: { returnUrl: string }) {
+    const response = await connection.action('sso:checkReturnRoute', params) as CheckReturnRouteResponse
+    return response.valid
+  }
+
+  export async function authenticate (connection: MetricsConnection, params: { email: string, password: string, refreshable?: boolean}) {
+    const response = await connection.action('auth:login', { apiVersion: 1, ...params }) as AuthExchangeResponse
+    return response
+  }
+
+  export async function createUser (connection: MetricsConnection, params: { email: string, returnUrl: string, refreshable?: boolean, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
+    await connection.action('auth:userInit', params)
+  }
+
+  export async function createUserFulfillment (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+    const response = await connection.action('auth:userInitFulfillment', params) as AuthExchangeResponse
+    return response
+  }
+
+  export async function showUserParams (connection: MetricsConnection, params: { authorizationCode: string}) {
+    const response = await connection.action('auth:show', params) as AuthShowResponse
+    return response
+  }
+
+  export async function useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
+    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
+    return response.url
+  }
+
+  export async function passwordReset (connection: MetricsConnection, params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
+    await connection.action('auth:resetRequest', { apiVersion: 1, ...params })
+  }
+
+  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
+    const response = await connection.action('auth:resetFulfillment', { apiVersion: 1, ...params }) as AuthExchangeResponse
+    return response
   }
 }
 
@@ -276,11 +339,11 @@ export abstract class BaseSessionHandler {
   async action (action: string, params: Object = { }) {
     let response
     try {
-      const authParams = { authorization: this._accessToken, apiVersion: 1, ...params }
+      const authParams = { authorization: this._accessToken, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse
     } catch (error) {
       if (error instanceof SessionError && this._refreshToken !== null && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
-        const authParams = { authorization: this._refreshToken, apiVersion: 1, ...params }
+        const authParams = { authorization: this._refreshToken, ...params }
         response = await this._connection.action(action, authParams) as AuthenticatedResponse
       } else {
         throw error
@@ -349,7 +412,7 @@ export class KioskSession {
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
     const response = await this.sessionHandler.connection.action(action, authParams)
     return response
   }
@@ -406,7 +469,7 @@ export class StrengthMachineSession {
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
     const response = await this.sessionHandler.connection.action(action, authParams) as AuthenticatedResponse
     return response
   }

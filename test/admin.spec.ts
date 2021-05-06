@@ -69,17 +69,17 @@ describe('Admin', function () {
     expect(user.id).to.equal(1)
   })
 
-  it('can merge users', async function () {
-    const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-    const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
+  // it('can merge users', async function () {
+  //   const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+  //   const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
 
-    const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
-    const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
+  //   const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
+  //   const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
 
-    expect(emailAddresses).to.be.an('array')
-    expect(emailAddresses.length).to.above(1)
-    const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
-    expect(addedEmailAddresses.length).to.equal(1)
-    await Promise.all(addedEmailAddresses.map(async e => await e.delete()))
-  })
+  //   expect(emailAddresses).to.be.an('array')
+  //   expect(emailAddresses.length).to.above(1)
+  //   const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
+  //   expect(addedEmailAddresses.length).to.equal(1)
+  //   await Promise.all(addedEmailAddresses.map(async e => await e.delete()))
+  // })
 })

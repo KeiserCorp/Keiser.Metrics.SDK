@@ -1,6 +1,7 @@
 import './base.spec'
 import './connection.spec'
 import './core.spec'
+import './sso.spec'
 import './auth.spec'
 import './admin.spec'
 import './cache.spec'

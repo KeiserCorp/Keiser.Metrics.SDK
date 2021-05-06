@@ -1,8 +1,10 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
+import { Units } from './constants'
 import { Core } from './models/core'
 import { OAuthProviders } from './models/oauthService'
+import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
-import { Authentication } from './session'
+import { Authentication, SSO } from './session'
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection
@@ -41,16 +43,17 @@ export default class Metrics {
     return this._connection.onConnectionChangeEvent
   }
 
+  async authenticateWithExchangeToken (params: { exchangeToken: string}) {
+    return await Authentication.useExchangeToken(this._connection, params)
+  }
+
+  /** @deprecated */
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean }) {
     return await Authentication.useCredentials(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithToken (params: { token: string }) {
     return await Authentication.useToken(this._connection, params)
-  }
-
-  async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean }) {
-    return await Authentication.useResetToken(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithWelcomeToken (params: { welcomeToken: string, password: string, refreshable?: boolean }) {
@@ -68,25 +71,36 @@ export default class Metrics {
   async authenticateWithMachineInitializerToken (params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
     return await Authentication.useMachineInitializerToken(this._connection, params)
   }
+}
+
+/** @hidden */
+export class MetricsSSO extends Metrics {
+  async authenticate (params: { email: string, password: string, refreshable?: boolean}) {
+    return await SSO.authenticate(this._connection, params)
+  }
 
   async authenticateWithFacebook (params: { redirect: string }) {
-    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
+    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
   }
 
   async authenticateWithGoogle (params: { redirect: string }) {
-    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
+    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
   }
 
   async authenticateWithApple (params: { redirect: string }) {
-    return await Authentication.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
+    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
   }
 
-  async createUser (params: { email: string, password: string, refreshable?: boolean }) {
-    return await Authentication.createUser(this._connection, { refreshable: true, ...params })
+  async createUser (params: { email: string, returnUrl: string, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
+    return await SSO.createUser(this._connection, { refreshable: true, ...params })
   }
 
-  async passwordReset (params: { email: string }) {
-    await Authentication.passwordReset(this._connection, params)
+  async passwordReset (params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
+    await SSO.passwordReset(this._connection, params)
+  }
+
+  async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean }) {
+    return await SSO.useResetToken(this._connection, { refreshable: true, ...params })
   }
 }
 
