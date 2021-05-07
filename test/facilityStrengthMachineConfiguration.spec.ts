@@ -1,23 +1,24 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
 import { ForceUnit } from '../src/constants'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachinesConfiguration'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('Facility Machines Configuration', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let facility: PrivilegedFacility
   let facilityStrengthMachineConfiguration: FacilityStrengthMachineConfiguration
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await AuthenticatedUser(metricsInstance)
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {

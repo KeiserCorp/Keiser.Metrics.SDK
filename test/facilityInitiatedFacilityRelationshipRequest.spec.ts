@@ -1,13 +1,12 @@
 import { expect } from 'chai'
 
 import { MetricsSSO } from '../src'
-import { Units } from '../src/constants'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole } from '../src/models/facilityRelationship'
-import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser, CreateUser } from './persistent/user'
 
 describe('Facility Initiated Facility Relationship Request', function () {
   let metricsInstance: MetricsSSO
@@ -23,12 +22,9 @@ describe('Facility Initiated Facility Relationship Request', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const createUserResponse = await metricsInstance.createUser({ email: newUserEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    newUser = (await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })).user
+    newUser = (await CreateUser(metricsInstance, newUserEmailAddress)).user
+    userSession = await AuthenticatedUser(metricsInstance)
 
-    const exchangeResponse = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword })
-    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: exchangeResponse.exchangeToken })
     const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
     facility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
     await facility.setActive()

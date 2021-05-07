@@ -1,33 +1,27 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import { MetricsSSO } from '../src'
 import { CardioMachine, CardioMachineSorting } from '../src/models/cardioMachine'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('Cardio Machine', function () {
-  let metricsInstance: Metrics
-  let metricsAdminInstance: MetricsAdmin
+  let metricsInstance: MetricsSSO
   let userSession: UserSession
   let existingMachine: CardioMachine
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    userSession = await AuthenticatedUser(metricsInstance)
   })
 
   after(function () {
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
   })
 
   it('can list cardio machines', async function () {

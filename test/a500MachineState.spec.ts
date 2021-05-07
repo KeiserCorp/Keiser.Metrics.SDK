@@ -1,15 +1,16 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
 import { ForceUnit } from '../src/constants'
 import { A500MachineState } from '../src/models/a500MachineState'
 import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { StrengthMachineSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('A500 Machine State', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let facility: PrivilegedFacility
   let strengthMachineSession: StrengthMachineSession
   let a500MachineState: A500MachineState
@@ -24,13 +25,13 @@ describe('A500 Machine State', function () {
   }
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
 
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await AuthenticatedUser(metricsInstance)
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {

@@ -1,26 +1,27 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
 import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityUserRelationshipSorting, UserFacilityEmployeeRelationship, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('User to Facility Relationship', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let userSession: UserSession
   let user: User
   let existingFacilityRelationship: UserFacilityMemberRelationship
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    userSession = await AuthenticatedUser(metricsInstance)
     user = userSession.user
   })
 

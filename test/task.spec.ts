@@ -3,7 +3,8 @@ import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
 import { Queue, TaskSorting } from '../src/models/task'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser } from './persistent/user'
 
 describe('Task', function () {
   let metricsInstance: MetricsAdmin
@@ -15,7 +16,7 @@ describe('Task', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    session = await AdminUser(metricsInstance)
   })
 
   after(function () {

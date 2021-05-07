@@ -1,11 +1,10 @@
 import { expect } from 'chai'
 
 import { MetricsSSO } from '../src'
-import { Units } from '../src/constants'
 import { PrivilegedFacility } from '../src/models/facility'
-import { Gender } from '../src/models/profile'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser, CreateUser } from './persistent/user'
 
 describe('User Initiated Facility Relationship Request', function () {
   let metricsInstance: MetricsSSO
@@ -21,12 +20,10 @@ describe('User Initiated Facility Relationship Request', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const createUserResponse = await metricsInstance.createUser({ email: newUserEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    newUserSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
 
-    const demoAuthenticationResponse = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword })
-    demoUserSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: demoAuthenticationResponse.exchangeToken })
+    newUserSession = await CreateUser(metricsInstance, newUserEmailAddress)
+
+    demoUserSession = await AuthenticatedUser(metricsInstance)
     const facilities = await demoUserSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {

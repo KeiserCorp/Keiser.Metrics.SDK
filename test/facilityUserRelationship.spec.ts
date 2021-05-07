@@ -1,26 +1,27 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import { MetricsAdmin, MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole, FacilityUserEmployeeRelationship, FacilityUserMemberRelationship, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
 import { FacilityMemberUser } from '../src/models/user'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser, AuthenticatedUser } from './persistent/user'
 
 describe('Facility to User Relationship', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let facility: PrivilegedFacility
   let existingFacilityRelationship: FacilityUserMemberRelationship
   let createdUser: FacilityMemberUser
   const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await AuthenticatedUser(metricsInstance)
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {
@@ -36,7 +37,7 @@ describe('Facility to User Relationship', function () {
         socketEndpoint: DevSocketEndpoint,
         persistConnection: true
       })
-      const adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+      const adminSession = await AdminUser(metricsAdminInstance)
       await (await adminSession.getUser({ userId: createdUser.id })).delete()
       metricsAdminInstance.dispose()
     }

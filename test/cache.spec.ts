@@ -3,7 +3,8 @@ import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser } from './persistent/user'
 
 describe('Cache', function () {
   let metricsInstance: MetricsAdmin
@@ -18,7 +19,7 @@ describe('Cache', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    session = await AdminUser(metricsInstance)
   })
 
   after(function () {

@@ -1,12 +1,13 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { CompositionType, FacilityConfiguration } from '../src/models/facilityConfiguration'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('Facility Configuration', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let facility: PrivilegedFacility
   let facilityConfiguration: FacilityConfiguration
   let originalFacilityConfigurationParameters: {
@@ -20,12 +21,12 @@ describe('Facility Configuration', function () {
   }
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await AuthenticatedUser(metricsInstance)
     const facilities = await userSession.user.getFacilityEmploymentRelationships()
     const tmpFacility = facilities[0]?.eagerFacility()
     if (typeof tmpFacility !== 'undefined') {

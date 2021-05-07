@@ -1,16 +1,17 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import { MetricsAdmin, MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { ExerciseAliasSorting, PrivilegedExerciseAlias } from '../src/models/exerciseAlias'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { AdminSession, UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser, AuthenticatedUser } from './persistent/user'
 
 const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
 
 describe('Exercise Alias', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let metricsAdminInstance: MetricsAdmin
   let userSession: UserSession
   let adminSession: AdminSession
@@ -19,7 +20,7 @@ describe('Exercise Alias', function () {
   const newAlias = newNameGen()
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
@@ -29,8 +30,8 @@ describe('Exercise Alias', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    userSession = await AuthenticatedUser(metricsInstance)
+    adminSession = await AdminUser(metricsAdminInstance)
     newStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: newNameGen(),
       category: StrengthExerciseCategory.Complex,

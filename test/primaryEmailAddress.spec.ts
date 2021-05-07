@@ -1,13 +1,12 @@
 import { expect } from 'chai'
 
 import { MetricsSSO } from '../src'
-import { Units } from '../src/constants'
 import { EmailAddress } from '../src/models/emailAddress'
 import { PrimaryEmailAddress } from '../src/models/primaryEmailAddress'
-import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { CreateUser } from './persistent/user'
 
 describe('Primary Email Address', function () {
   let metricsInstance: MetricsSSO
@@ -25,9 +24,7 @@ describe('Primary Email Address', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const createUserResponse = await metricsInstance.createUser({ email: newUserEmail, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
+    userSession = await CreateUser(metricsInstance, newUserEmail)
     user = userSession.user
     addedEmailAddress = await user.createEmailAddress({ email: newEmail })
   })

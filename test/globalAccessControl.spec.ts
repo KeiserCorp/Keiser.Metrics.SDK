@@ -1,13 +1,12 @@
 import { expect } from 'chai'
 
 import { MetricsAdmin, MetricsSSO } from '../src'
-import { Units } from '../src/constants'
 import { UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
-import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser, CreateUser } from './persistent/user'
 
 describe('GlobalAccessControl', function () {
   let metricsAdminInstance: MetricsAdmin
@@ -28,10 +27,8 @@ describe('GlobalAccessControl', function () {
       persistConnection: true
     })
 
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    const createUserResponse = await ssoInstance.createUser({ email: userEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await ssoInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    user = (await ssoInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })).user
+    adminSession = await AdminUser(metricsAdminInstance)
+    user = (await CreateUser(ssoInstance, userEmailAddress)).user
   })
 
   after(async function () {

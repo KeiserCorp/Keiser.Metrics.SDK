@@ -1,8 +1,9 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
-import { BlacklistTokenError, UnauthorizedTokenError } from '../src/error'
-import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { MetricsSSO } from '../src'
+import { BlacklistTokenError, DuplicateEntityError, UnauthorizedTokenError } from '../src/error'
+import { DemoEmail, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser, CreateUser } from './persistent/user'
 
 describe('Auth', function () {
   const accessTokenTimeout = 6000
@@ -12,16 +13,10 @@ describe('Auth', function () {
   // SESSION_REFRESH_TIMEOUT="1m"
   // --------------------------------------------------------------------
 
-  let ssoInstance: MetricsSSO
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
 
   before(function () {
-    ssoInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
@@ -33,12 +28,7 @@ describe('Auth', function () {
   })
 
   it('can authenticate using token', async function () {
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: true })
-
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await AuthenticatedUser(metricsInstance, true)
     const tokenSession = await metricsInstance.authenticateWithToken({ token: session.refreshToken })
     session.close()
 
@@ -51,12 +41,7 @@ describe('Auth', function () {
   it('does keep access token alive', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: true })
-
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await AuthenticatedUser(metricsInstance, true)
     await new Promise<void>((resolve, reject) => {
       const reload = async () => {
         try {
@@ -75,12 +60,7 @@ describe('Auth', function () {
   it('can subscribe to refresh token change', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: true })
-
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await AuthenticatedUser(metricsInstance, true)
     session.keepAlive = false
 
     const event = await new Promise(resolve => {
@@ -95,12 +75,8 @@ describe('Auth', function () {
   })
 
   it('can make model request', async function () {
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword })
+    const session = await AuthenticatedUser(metricsInstance)
 
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
     expect(session).to.be.an('object')
 
     await session.user.reload()
@@ -110,12 +86,7 @@ describe('Auth', function () {
   it('cannot make model request after close', async function () {
     let extError
 
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword })
-
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await AuthenticatedUser(metricsInstance)
     expect(session).to.be.an('object')
     session.close()
 
@@ -132,12 +103,8 @@ describe('Auth', function () {
   it('cannot make model request after logout', async function () {
     let extError
 
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword })
+    const session = await AuthenticatedUser(metricsInstance)
 
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
     expect(session).to.be.an('object')
     await session.logout()
 
@@ -154,12 +121,8 @@ describe('Auth', function () {
   it('cannot start session after logout', async function () {
     let extError
 
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: true })
+    const session = await AuthenticatedUser(metricsInstance, true)
 
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
     const refreshToken = session.refreshToken ?? ''
     await session.logout()
 
@@ -171,5 +134,31 @@ describe('Auth', function () {
 
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(BlacklistTokenError.code)
+  })
+
+  it('can create a new user with basic authentication', async function () {
+    const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+    const session = await CreateUser(metricsInstance, emailAddress)
+
+    expect(session).to.be.an('object')
+    expect(session.user).to.be.an('object')
+    expect(session.user.id).to.not.equal(DemoUserId)
+    await session.user.delete()
+    session.close()
+  })
+
+  it('can catch error when creating new user (duplicate user)', async function () {
+    let session
+    let extError
+
+    try {
+      session = await CreateUser(metricsInstance, DemoEmail)
+    } catch (error) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(DuplicateEntityError.code)
+    expect(session).to.not.be.an('object')
   })
 })

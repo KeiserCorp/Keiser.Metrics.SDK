@@ -1,12 +1,11 @@
 import { expect } from 'chai'
 
 import { MetricsSSO } from '../src'
-import { Units } from '../src/constants'
 import { AcceptedTermsVersion } from '../src/models/acceptedTermsVersion'
-import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
 import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { CreateUser } from './persistent/user'
 
 describe('Accepted Terms Version', function () {
   let metricsInstance: MetricsSSO
@@ -22,9 +21,7 @@ describe('Accepted Terms Version', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const createUserResponse = await metricsInstance.createUser({ email: newUserEmail, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: 'password', acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
+    userSession = await CreateUser(metricsInstance, newUserEmail)
     user = userSession.user
   })
 

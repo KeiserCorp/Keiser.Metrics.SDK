@@ -1,23 +1,24 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementSorting } from '../src/models/mSeriesFtpMeasurement'
 import { User } from '../src/models/user'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('M Series FTP Measurement', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let user: User
   let createdMSeriesFtpMeasurement: MSeriesFtpMeasurement
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const userSession = await AuthenticatedUser(metricsInstance)
     user = userSession.user
   })
 

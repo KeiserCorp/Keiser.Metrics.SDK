@@ -5,7 +5,8 @@ import { Units } from '../src/constants'
 import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { CreateUser } from './persistent/user'
 
 describe('Profile', function () {
   let metricsInstance: MetricsSSO
@@ -14,7 +15,7 @@ describe('Profile', function () {
   const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   const userProfile = {
-    name: 'Scotty Baker',
+    name: 'Test',
     birthday: '1990-01-01',
     gender: Gender.Male,
     language: 'en',
@@ -27,9 +28,7 @@ describe('Profile', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    const createUserResponse = await metricsInstance.createUser({ email: newUserEmail, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2020-01-01', name: userProfile.name, birthday: userProfile.birthday, gender: userProfile.gender, language: userProfile.language, units: userProfile.units })
-    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
+    userSession = await CreateUser(metricsInstance, newUserEmail)
     user = userSession.user
   })
 

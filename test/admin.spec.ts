@@ -1,12 +1,11 @@
 import { expect } from 'chai'
 
 import { MetricsAdmin, MetricsSSO } from '../src'
-import { Units } from '../src/constants'
-import { Gender } from '../src/models/profile'
 import { StatSorting } from '../src/models/stat'
 import { User, UserSorting } from '../src/models/user'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser, CreateUser } from './persistent/user'
 
 describe('Admin', function () {
   let metricsInstance: MetricsAdmin
@@ -32,7 +31,7 @@ describe('Admin', function () {
   })
 
   it('can authenticate admin using basic credentials', async function () {
-    const session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    const session = await AdminUser(metricsInstance)
 
     expect(session).to.be.an('object')
     expect(session instanceof AdminSession).to.equal(true)
@@ -42,7 +41,7 @@ describe('Admin', function () {
   })
 
   it('can authenticate using token', async function () {
-    const credentialSession = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    const credentialSession = await AdminUser(metricsInstance)
     const refreshToken = credentialSession.refreshToken ?? ''
     credentialSession.close()
 
@@ -80,9 +79,7 @@ describe('Admin', function () {
 
   it('can merge users', async function () {
     const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-    const createUserResponse = await ssoInstance.createUser({ email: userEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
-    const authenticationResponse = await ssoInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: 'password', acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
-    const newInstance = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
+    const newInstance = await CreateUser(ssoInstance, userEmailAddress)
 
     const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
     const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })

@@ -4,7 +4,8 @@ import { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser } from './persistent/user'
 
 describe('Facility License', function () {
   let metricsInstance: MetricsAdmin
@@ -17,7 +18,7 @@ describe('Facility License', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    session = await AdminUser(metricsInstance)
   })
 
   after(function () {

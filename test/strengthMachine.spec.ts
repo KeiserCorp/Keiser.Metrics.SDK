@@ -1,33 +1,27 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import { MetricsSSO } from '../src'
 import { StrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AuthenticatedUser } from './persistent/user'
 
 describe('Strength Machine', function () {
-  let metricsInstance: Metrics
-  let metricsAdminInstance: MetricsAdmin
+  let metricsInstance: MetricsSSO
   let userSession: UserSession
   let existingMachine: StrengthMachine
 
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    userSession = await AuthenticatedUser(metricsInstance)
   })
 
   after(function () {
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
   })
 
   it('can list strength machines', async function () {
