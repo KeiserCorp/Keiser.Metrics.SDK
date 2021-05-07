@@ -1,15 +1,19 @@
 import { expect } from 'chai'
 
 import Metrics, { MetricsSSO } from '../src'
+import { Units } from '../src/constants'
+import { BlacklistTokenError } from '../src/error'
+import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('User', function () {
   let ssoInstance: MetricsSSO
   let metricsInstance: Metrics
   let userSession: UserSession
   let user: User
+  const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
     ssoInstance = new MetricsSSO({
@@ -28,16 +32,13 @@ describe('User', function () {
     metricsInstance?.dispose()
   })
 
-  it('can authenticate user', async function () {
-    const authExchangeToken = await ssoInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: false })
-
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
-
-    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+  it('can create new user', async function () {
+    const createUserResponse = await ssoInstance.createUser({ email: userEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
+    const authenticationResponse = await ssoInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: 'password', acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
+    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
     expect(userSession).to.be.an('object')
     expect(userSession.user).to.be.an('object')
-    expect(userSession.user.id).to.equal(DemoUserId)
+    expect(userSession.user.id).to.not.equal(DemoUserId)
 
     user = userSession.user
   })
@@ -60,18 +61,18 @@ describe('User', function () {
     await user.changePassword({ password: newPassword })
   })
 
-  // it('can delete user', async function () {
-  //   let extError
+  it('can delete user', async function () {
+    let extError
 
-  //   await user.delete()
+    await user.delete()
 
-  //   try {
-  //     await user.reload()
-  //   } catch (error) {
-  //     extError = error
-  //   }
+    try {
+      await user.reload()
+    } catch (error) {
+      extError = error
+    }
 
-  //   expect(extError).to.be.an('error')
-  //   expect(extError.code).to.equal(BlacklistTokenError.code)
-  // })
+    expect(extError).to.be.an('error')
+    expect(extError.code).to.equal(BlacklistTokenError.code)
+  })
 })

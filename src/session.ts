@@ -216,10 +216,10 @@ export module SSO {
   }
 
   export async function createUser (connection: MetricsConnection, params: { email: string, returnUrl: string, refreshable?: boolean, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
-    await connection.action('auth:userInit', params)
+    return await connection.action('auth:userInit', params)
   }
 
-  export async function createUserFulfillment (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+  export async function userFulfillment (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
     const response = await connection.action('auth:userInitFulfillment', params) as AuthExchangeResponse
     return response
   }

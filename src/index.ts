@@ -75,8 +75,24 @@ export default class Metrics {
 
 /** @hidden */
 export class MetricsSSO extends Metrics {
+  async checkReturnRoute (params: {returnUrl: string}) {
+    return await SSO.checkReturnRoute(this._connection, params)
+  }
+
   async authenticate (params: { email: string, password: string, refreshable?: boolean}) {
     return await SSO.authenticate(this._connection, params)
+  }
+
+  async createUser (params: { email: string, returnUrl: string, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
+    return await SSO.createUser(this._connection, { refreshable: true, ...params })
+  }
+
+  async userFulfillment (params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+    return await SSO.userFulfillment(this._connection, params)
+  }
+
+  async showUserParams (params: { authorizationCode: string }) {
+    return await SSO.showUserParams(this._connection, params)
   }
 
   async authenticateWithFacebook (params: { redirect: string }) {
@@ -89,10 +105,6 @@ export class MetricsSSO extends Metrics {
 
   async authenticateWithApple (params: { redirect: string }) {
     return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
-  }
-
-  async createUser (params: { email: string, returnUrl: string, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
-    return await SSO.createUser(this._connection, { refreshable: true, ...params })
   }
 
   async passwordReset (params: { email: string, returnUrl: string, requiresElevated?: boolean }) {

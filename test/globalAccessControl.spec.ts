@@ -1,14 +1,17 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import { MetricsAdmin, MetricsSSO } from '../src'
+import { Units } from '../src/constants'
 import { UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
+import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { AdminSession } from '../src/session'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('GlobalAccessControl', function () {
   let metricsAdminInstance: MetricsAdmin
+  let ssoInstance: MetricsSSO
   let adminSession: AdminSession
   let user: User
   const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
@@ -19,9 +22,16 @@ describe('GlobalAccessControl', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
+    ssoInstance = new MetricsSSO({
+      restEndpoint: DevRestEndpoint,
+      socketEndpoint: DevSocketEndpoint,
+      persistConnection: true
+    })
 
     adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    user = (await metricsAdminInstance.createUser({ email: userEmailAddress, password: DemoPassword })).user
+    const createUserResponse = await ssoInstance.createUser({ email: userEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
+    const authenticationResponse = await ssoInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
+    user = (await ssoInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })).user
   })
 
   after(async function () {

@@ -1,6 +1,8 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import { MetricsAdmin, MetricsSSO } from '../src'
+import { Units } from '../src/constants'
+import { Gender } from '../src/models/profile'
 import { StatSorting } from '../src/models/stat'
 import { User, UserSorting } from '../src/models/user'
 import { AdminSession } from '../src/session'
@@ -8,6 +10,7 @@ import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint
 
 describe('Admin', function () {
   let metricsInstance: MetricsAdmin
+  let ssoInstance: MetricsSSO
   let session: AdminSession
 
   before(async function () {
@@ -16,10 +19,16 @@ describe('Admin', function () {
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
+    ssoInstance = new MetricsSSO({
+      restEndpoint: DevRestEndpoint,
+      socketEndpoint: DevSocketEndpoint,
+      persistConnection: true
+    })
   })
 
   after(function () {
     metricsInstance?.dispose()
+    ssoInstance?.dispose()
   })
 
   it('can authenticate admin using basic credentials', async function () {
@@ -69,17 +78,19 @@ describe('Admin', function () {
     expect(user.id).to.equal(1)
   })
 
-  // it('can merge users', async function () {
-  //   const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  //   const newInstance = await metricsInstance.createUser({ email: userEmailAddress, password: DemoPassword })
+  it('can merge users', async function () {
+    const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+    const createUserResponse = await ssoInstance.createUser({ email: userEmailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
+    const authenticationResponse = await ssoInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: 'password', acceptedTermsRevision: '2019-01-01', name: 'Test', birthday: '1990-01-01', gender: Gender.Male, language: 'en', units: Units.Imperial })
+    const newInstance = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
 
-  //   const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
-  //   const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
+    const mergedUser = await session.mergeUsers({ fromUserId: newInstance.user.id, toUserId: DemoUserId })
+    const emailAddresses = await mergedUser.getEmailAddresses({ limit: 1000 })
 
-  //   expect(emailAddresses).to.be.an('array')
-  //   expect(emailAddresses.length).to.above(1)
-  //   const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
-  //   expect(addedEmailAddresses.length).to.equal(1)
-  //   await Promise.all(addedEmailAddresses.map(async e => await e.delete()))
-  // })
+    expect(emailAddresses).to.be.an('array')
+    expect(emailAddresses.length).to.above(1)
+    const addedEmailAddresses = emailAddresses.filter(e => e.email === userEmailAddress)
+    expect(addedEmailAddresses.length).to.equal(1)
+    await Promise.all(addedEmailAddresses.map(async e => await e.delete()))
+  })
 })

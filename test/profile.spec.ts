@@ -1,24 +1,35 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import { MetricsSSO } from '../src'
+import { Units } from '../src/constants'
 import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
 describe('Profile', function () {
-  let metricsInstance: Metrics
+  let metricsInstance: MetricsSSO
   let userSession: UserSession
   let user: User
   const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
+  const userProfile = {
+    name: 'Scotty Baker',
+    birthday: '1990-01-01',
+    gender: Gender.Male,
+    language: 'en',
+    units: Units.Imperial
+  }
+
   before(async function () {
-    metricsInstance = new Metrics({
+    metricsInstance = new MetricsSSO({
       restEndpoint: DevRestEndpoint,
       socketEndpoint: DevSocketEndpoint,
       persistConnection: true
     })
-    userSession = await metricsInstance.createUser({ email: newUserEmail, password: 'password' })
+    const createUserResponse = await metricsInstance.createUser({ email: newUserEmail, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
+    const authenticationResponse = await metricsInstance.userFulfillment({ authorizationCode: createUserResponse.authorizationCode, password: DemoPassword, acceptedTermsRevision: '2020-01-01', name: userProfile.name, birthday: userProfile.birthday, gender: userProfile.gender, language: userProfile.language, units: userProfile.units })
+    userSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authenticationResponse.exchangeToken })
     user = userSession.user
   })
 
@@ -32,11 +43,11 @@ describe('Profile', function () {
 
     expect(profile).to.be.an('object')
     expect(profile.updatedAt instanceof Date).to.equal(true)
-    expect(profile.name).to.equal(null)
-    expect(profile.birthday).to.equal(null)
-    expect(profile.gender).to.equal(null)
-    expect(profile.language).to.equal(null)
-    expect(profile.units).to.equal(null)
+    expect(profile.name).to.equal(userProfile.name)
+    expect(profile.birthday).to.equal(userProfile.birthday)
+    expect(profile.gender).to.equal(userProfile.gender)
+    expect(profile.language).to.equal(userProfile.language)
+    expect(profile.units).to.equal(userProfile.units)
   })
 
   it('can update profile', async function () {

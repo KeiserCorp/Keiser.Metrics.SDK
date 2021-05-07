@@ -81,7 +81,8 @@ describe('SSO', function () {
 
   it('can request a new user account', async function () {
     const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-    await metricsInstance.createUser({ email: emailAddress, returnUrl: 'localhost:8080' })
+    const createUserResponse = await metricsInstance.createUser({ email: emailAddress, returnUrl: 'localhost:8080' }) as { authorizationCode: string }
+    expect(createUserResponse.authorizationCode).to.be.a('string')
   })
 
   it('can catch error when creating new user (duplicate user)', async function () {
