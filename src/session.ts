@@ -480,6 +480,15 @@ export abstract class UserSessionBase<UserType extends User = User> {
     await this._sessionHandler.logout()
   }
 
+  async elevateToAdminSession (params: { token: string }) {
+    const response = await this.action('auth:elevate', params) as UserResponse
+    const accessToken = DecodeJWT(response.accessToken) as AccessToken
+    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
+    }
+    return new AdminSession(response, this._sessionHandler.connection, accessToken.globalAccessControl)
+  }
+
   get user () {
     return this._user
   }
