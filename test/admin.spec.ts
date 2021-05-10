@@ -46,6 +46,24 @@ describe('Admin', function () {
     session = tokenSession
   })
 
+  it('can elevate to admin using token', async function () {
+    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+
+    expect(session).to.be.an('object')
+    expect(session instanceof AdminSession).to.equal(false)
+    expect(session.user).to.be.an('object')
+    expect(session.user.id).to.equal(DemoUserId)
+
+    const adminSession = await session.elevateToAdminSession({ token: '123456' })
+    expect(adminSession).to.be.an('object')
+    expect(adminSession instanceof AdminSession).to.equal(true)
+    expect(adminSession.user).to.be.an('object')
+    expect(adminSession.user.id).to.equal(DemoUserId)
+
+    session.close()
+    adminSession.close()
+  })
+
   it('can get stats', async function () {
     const stats = await session.getStats()
 
