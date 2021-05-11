@@ -4,8 +4,8 @@ import { MetricsAdmin, MetricsSSO } from '../src'
 import { StatSorting } from '../src/models/stat'
 import { User, UserSorting } from '../src/models/user'
 import { AdminSession } from '../src/session'
-import { DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AdminUser, CreateUser } from './persistent/user'
+import { DemoEmail, DemoPassword, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { AdminUser, AuthenticatedUser, CreateUser } from './persistent/user'
 
 describe('Admin', function () {
   let metricsInstance: MetricsAdmin
@@ -55,7 +55,7 @@ describe('Admin', function () {
   })
 
   it('can elevate to admin using token', async function () {
-    const session = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    const session = await AuthenticatedUser(ssoInstance)
 
     expect(session).to.be.an('object')
     expect(session instanceof AdminSession).to.equal(false)

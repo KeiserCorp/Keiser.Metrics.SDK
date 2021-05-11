@@ -79,7 +79,7 @@ export class MetricsSSO extends Metrics {
     return await SSO.checkReturnRoute(this._connection, params)
   }
 
-  async authenticate (params: { email: string, password: string, refreshable?: boolean}) {
+  async authenticate (params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
     return await SSO.authenticate(this._connection, params)
   }
 
@@ -87,7 +87,7 @@ export class MetricsSSO extends Metrics {
     return await SSO.createUser(this._connection, { refreshable: true, ...params })
   }
 
-  async userFulfillment (params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+  async userFulfillment (params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
     return await SSO.userFulfillment(this._connection, params)
   }
 
@@ -111,7 +111,7 @@ export class MetricsSSO extends Metrics {
     await SSO.passwordReset(this._connection, params)
   }
 
-  async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean }) {
+  async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
     return await SSO.useResetToken(this._connection, { refreshable: true, ...params })
   }
 }

@@ -75,10 +75,6 @@ export interface AuthShowResponse {
   authPrefillParams: AuthPrefillParams
 }
 
-export interface AuthExchangeResponse {
-  exchangeToken: string
-}
-
 export interface AccessTokenChangeEvent {
   accessToken: string
 }
@@ -210,18 +206,18 @@ export module SSO {
     return response.valid
   }
 
-  export async function authenticate (connection: MetricsConnection, params: { email: string, password: string, refreshable?: boolean}) {
-    const response = await connection.action('auth:login', { apiVersion: 1, ...params }) as AuthExchangeResponse
-    return response
+  export async function authenticate (connection: MetricsConnection, params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
+    const response = await connection.action('auth:login', { apiVersion: 1, ...params }) as UserResponse
+    return new UserSession(response, connection)
   }
 
   export async function createUser (connection: MetricsConnection, params: { email: string, returnUrl: string, refreshable?: boolean, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
     return await connection.action('auth:userInit', params)
   }
 
-  export async function userFulfillment (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
-    const response = await connection.action('auth:userInitFulfillment', params) as AuthExchangeResponse
-    return response
+  export async function userFulfillment (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+    const response = await connection.action('auth:userInitFulfillment', params) as UserResponse
+    return new UserSession(response, connection)
   }
 
   export async function showUserParams (connection: MetricsConnection, params: { authorizationCode: string}) {
@@ -238,9 +234,9 @@ export module SSO {
     await connection.action('auth:resetRequest', { apiVersion: 1, ...params })
   }
 
-  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:resetFulfillment', { apiVersion: 1, ...params }) as AuthExchangeResponse
-    return response
+  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean, requiresElevated?: boolean }) {
+    const response = await connection.action('auth:resetFulfillment', { apiVersion: 1, ...params }) as UserResponse
+    return new UserSession(response, connection)
   }
 }
 
@@ -510,9 +506,11 @@ export class StrengthMachineSession {
 export abstract class UserSessionBase<UserType extends User = User> {
   protected _sessionHandler: SessionHandler
   protected abstract readonly _user: UserType
+  protected readonly _exchangeToken: string | undefined
 
   constructor (userResponse: UserResponse, connection: MetricsConnection) {
     this._sessionHandler = new SessionHandler(connection, userResponse)
+    this._exchangeToken = userResponse.exchangeToken
   }
 
   get sessionHandler () {
@@ -529,6 +527,10 @@ export abstract class UserSessionBase<UserType extends User = User> {
 
   get refreshToken () {
     return this._sessionHandler.refreshToken
+  }
+
+  get exchangeToken () {
+    return this._exchangeToken
   }
 
   get onRefreshTokenChangeEvent () {

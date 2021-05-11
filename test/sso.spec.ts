@@ -26,24 +26,24 @@ describe('SSO', function () {
   })
 
   it('can authenticate using basic credentials', async function () {
-    const authExchangeToken = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword })
+    const userSession = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword })
 
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
+    expect(userSession).to.be.an('object')
+    expect(userSession.exchangeToken).to.be.a('string')
 
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: userSession.exchangeToken })
     expect(session.user).to.be.an('object')
     expect(session.user.id).to.equal(DemoUserId)
     session.close()
   })
 
   it('can authenticate without refresh token', async function () {
-    const authExchangeToken = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: false })
+    const userSession = await metricsInstance.authenticate({ email: DemoEmail, password: DemoPassword, refreshable: false })
 
-    expect(authExchangeToken).to.be.an('object')
-    expect(authExchangeToken.exchangeToken).to.be.a('string')
+    expect(userSession).to.be.an('object')
+    expect(userSession.exchangeToken).to.be.a('string')
 
-    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: authExchangeToken.exchangeToken })
+    const session = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: userSession.exchangeToken })
     expect(session.user).to.be.an('object')
     expect(session.user.id).to.equal(DemoUserId)
     session.close()

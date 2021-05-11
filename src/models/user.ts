@@ -45,6 +45,7 @@ export interface UserData {
 
 export interface UserResponse extends AuthenticatedResponse {
   user: UserData
+  exchangeToken?: string
 }
 
 export interface FacilityUserResponse extends AuthenticatedResponse {
