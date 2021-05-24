@@ -1,22 +1,139 @@
 const webpack = require('webpack')
 const path = require('path')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const WriteJsonPlugin = require('write-json-webpack-plugin')
-const CreateFileWebpack = require('create-file-webpack')
+const TerserPlugin = require('terser-webpack-plugin')
 const DIST = path.resolve(__dirname, '../dist')
+
+const importPath = './src/index.ts'
+const exportName = 'metrics'
+
 const packageData = Object.assign(require('../package.json'), {
-  main: 'index.js',
-  browser: 'index.browser.js',
-  types: 'index.d.ts',
+  main: `./${exportName}.cjs`,
+  module: `./${exportName}.mjs`,
+  browser: `./${exportName}.browser.js`,
+  types: './types/index.d.ts',
   private: false,
   devDependencies: {},
-  scripts: {}
+  scripts: {},
+  exports: {
+    import: `./${exportName}.mjs`,
+    require: `./${exportName}.cjs`,
+    node: `./${exportName}.node.js`
+  }
 })
 
-const baseConfig = {
+const esmConfig = {
   mode: 'production',
-  entry: './src/index.ts',
+  target: 'web',
+  devtool: 'source-map',
+  entry: {
+    esm: {
+      import: importPath,
+      filename: `${exportName}.mjs`,
+      library: {
+        type: 'module'
+      }
+    }
+  },
+  output: {
+    path: DIST
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      buffer: 'buffer'
+    }
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          ecma: 'esnext',
+          mangle: true,
+          module: true
+        }
+      })
+    ]
+  },
+  experiments: {
+    outputModule: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              declaration: true,
+              sourceMap: true
+            }
+          }
+        },
+        exclude: /node_modules/
+      }
+    ]
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'README.md', to: 'README.md' },
+        { from: 'LICENSE.md', to: 'LICENSE.md' }
+      ]
+    }),
+    new WriteJsonPlugin({
+      object: packageData,
+      filename: 'package.json',
+      pretty: true
+    })
+  ]
+}
+
+const cjsConfig = {
+  mode: 'production',
+  target: 'web',
+  devtool: 'source-map',
+  entry: {
+    cjs: {
+      import: importPath,
+      filename: `${exportName}.cjs`,
+      library: {
+        name: 'Metrics',
+        type: 'commonjs2'
+      }
+    }
+  },
+  externals: {
+    axios: 'axios',
+    buffer: 'buffer',
+    cockatiel: 'cockatiel',
+    pako: 'pako'
+  },
+  output: {
+    path: DIST
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      buffer: 'buffer'
+    }
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          ecma: 'es2017',
+          mangle: true,
+          module: true
+        }
+      })
+    ]
+  },
   module: {
     rules: [
       {
@@ -26,7 +143,7 @@ const baseConfig = {
           options: {
             compilerOptions: {
               declaration: false,
-              sourceMap: false
+              sourceMap: true
             }
           }
         },
@@ -34,52 +151,125 @@ const baseConfig = {
       }
     ]
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js']
-  }
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    })
+  ]
 }
 
 const browserConfig = {
-  ...baseConfig,
+  mode: 'production',
   target: 'web',
+  devtool: 'source-map',
+  entry: {
+    window: {
+      import: importPath,
+      filename: `${exportName}.browser.js`,
+      library: {
+        name: 'Metrics',
+        type: 'window'
+      }
+    }
+  },
+  output: {
+    path: DIST
+  },
   resolve: {
-    ...baseConfig.resolve,
+    extensions: ['.tsx', '.ts', '.js'],
     alias: {
       buffer: 'buffer'
     }
   },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          ecma: 'es5',
+          mangle: true,
+          module: true
+        }
+      })
+    ]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              declaration: false,
+              sourceMap: true
+            }
+          }
+        },
+        exclude: /node_modules/
+      }
+    ]
+  },
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    }),
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: [DIST],
-      cleanAfterEveryBuildPatterns: []
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: 'README.md', to: 'README.md' },
-        { from: 'LICENSE.md', to: 'LICENSE.md' }
-      ]
-    }),
-    new CreateFileWebpack({
-      path: './dist',
-      fileName: '.npmrc',
-      // eslint-disable-next-line no-template-curly-in-string
-      content: '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'
-    }),
-    new WriteJsonPlugin({
-      object: packageData,
-      filename: 'package.json',
-      pretty: true
     })
-  ],
+  ]
+}
+
+const nodeConfig = {
+  mode: 'production',
+  target: 'node',
+  devtool: 'source-map',
+  entry: {
+    window: {
+      import: importPath,
+      filename: `${exportName}.node.js`,
+      library: {
+        name: 'Metrics',
+        type: 'commonjs2'
+      }
+    }
+  },
+  externals: {
+    axios: 'axios',
+    buffer: 'buffer',
+    cockatiel: 'cockatiel',
+    pako: 'pako'
+  },
   output: {
-    filename: 'index.browser.js',
-    path: DIST,
-    libraryTarget: 'umd',
-    library: 'Metrics'
+    path: DIST
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js']
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          ecma: 'es2017',
+          mangle: true,
+          module: true
+        }
+      })
+    ]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              declaration: false,
+              sourceMap: true
+            }
+          }
+        },
+        exclude: /node_modules/
+      }
+    ]
   }
 }
 
-module.exports = [browserConfig]
+module.exports = [esmConfig, cjsConfig, browserConfig, nodeConfig]

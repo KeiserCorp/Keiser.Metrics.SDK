@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "node",
-    "outDir": "./dist",
+    "outDir": "./dist/types",
     "declaration": true,
     "sourceMap": true,
     "strict": true,
@@ -22,7 +22,7 @@
     ],
     "lib": [
       "dom",
-      "es2017"
+      "esnext"
     ]
   },
   "include": [

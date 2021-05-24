@@ -1,8 +1,13 @@
 const { join } = require('path')
+const fs = require('fs')
 const spawn = require('cross-spawn')
 const semverValid = require('semver/functions/valid')
 const semverPrerelease = require('semver/functions/prerelease')
-const version = require('../package.json').version
+
+const targetPath = process.argv[2]
+const args = 'dist'
+
+const version = require(join(process.cwd(), targetPath, 'package.json')).version
 
 if (!semverValid(version)) {
   console.error(`Error: invalid version "${version}"`)
@@ -11,14 +16,14 @@ if (!semverValid(version)) {
 
 const prerelease = semverPrerelease(version)
 const tag = (prerelease && prerelease.length) ? prerelease.filter(part => typeof part === 'string').join('.') || 'prerelease' : false
-
-const args = process.argv.slice(2)
 const tagArgs = tag ? ['--tag', tag] : []
 const npm = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 
+fs.writeFileSync(join(process.cwd(), targetPath, '.npmrc'), `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`)
+
 spawn(npm, ['publish', ...args, ...tagArgs], {
   stdio: 'inherit',
-  cwd: join(process.cwd(), 'dist')
+  cwd: join(process.cwd(), targetPath)
 }).on('exit', code => {
   process.exitCode = code
 }).on('error', e => console.error(e))
