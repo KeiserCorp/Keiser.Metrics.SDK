@@ -4,8 +4,8 @@ const spawn = require('cross-spawn')
 const semverValid = require('semver/functions/valid')
 const semverPrerelease = require('semver/functions/prerelease')
 
-const targetPath = process.argv[2]
-const args = 'dist'
+const targetPath = 'dist'
+const args = process.argv.slice(2)
 
 const version = require(join(process.cwd(), targetPath, 'package.json')).version
 
