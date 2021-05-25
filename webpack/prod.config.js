@@ -15,13 +15,16 @@ const packageData = Object.assign(require('../package.json'), {
   scripts: undefined,
   type: 'module',
   main: `./${exportName}.cjs`,
-  module: `./esm/${exportName}.js`,
+  module: `./${exportName}.mjs`,
   browser: `./${exportName}.browser.js`,
   types: './types/index.d.ts',
   exports: {
-    import: `./esm/${exportName}.js`,
+    import: `./${exportName}.mjs`,
     require: `./${exportName}.cjs`,
-    node: `./esm/${exportName}.js`,
+    node: {
+      import: `./${exportName}.mjs`,
+      require: `./${exportName}.cjs`
+    },
     default: `./${exportName}.umd.js`
   }
 })
@@ -56,7 +59,7 @@ const cjsConfig = {
       new TerserPlugin({
         terserOptions: {
           ecma: 'es2017',
-          mangle: false,
+          mangle: true,
           module: true
         }
       })
@@ -70,8 +73,8 @@ const cjsConfig = {
           loader: 'ts-loader',
           options: {
             compilerOptions: {
-              declarationDir: null,
-              declaration: false,
+              declarationDir: path.resolve(DIST, 'types'),
+              declaration: true,
               sourceMap: true
             }
           }
@@ -91,6 +94,66 @@ const cjsConfig = {
       object: packageData,
       filename: 'package.json',
       pretty: true
+    })
+  ]
+}
+
+const esmConfig = {
+  mode: 'production',
+  target: 'web',
+  devtool: 'source-map',
+  entry: {
+    esm: {
+      import: importPath,
+      filename: `${exportName}.mjs`,
+      library: {
+        type: 'module'
+      }
+    }
+  },
+  output: {
+    path: DIST
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      buffer: 'buffer'
+    }
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+        terserOptions: {
+          ecma: 'esnext',
+          mangle: true,
+          module: true
+        }
+      })
+    ]
+  },
+  experiments: {
+    outputModule: true
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              sourceMap: true
+            }
+          }
+        },
+        exclude: /node_modules/
+      }
+    ]
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
     })
   ]
 }
@@ -146,8 +209,6 @@ const browserConfig = {
           loader: 'ts-loader',
           options: {
             compilerOptions: {
-              declarationDir: null,
-              declaration: false,
               sourceMap: false
             }
           }
@@ -163,4 +224,4 @@ const browserConfig = {
   ]
 }
 
-module.exports = [cjsConfig, browserConfig]
+module.exports = [cjsConfig, esmConfig, browserConfig]
