@@ -6,58 +6,61 @@ const TerserPlugin = require('terser-webpack-plugin')
 const DIST = path.resolve(__dirname, '../dist')
 
 const importPath = './src/index.ts'
-const exportName = 'metrics'
+const exportName = 'index'
 
 const packageData = Object.assign(require('../package.json'), {
+  private: false,
+  sideEffects: false,
+  devDependencies: undefined,
+  scripts: undefined,
+  type: 'module',
   main: `./${exportName}.cjs`,
-  module: `./${exportName}.mjs`,
+  module: `./esm/${exportName}.js`,
   browser: `./${exportName}.browser.js`,
   types: './types/index.d.ts',
-  private: false,
-  devDependencies: {},
-  scripts: {},
   exports: {
-    import: `./${exportName}.mjs`,
+    import: `./esm/${exportName}.js`,
     require: `./${exportName}.cjs`,
-    node: `./${exportName}.node.js`
+    node: `./esm/${exportName}.js`,
+    default: `./${exportName}.umd.js`
   }
 })
 
-const esmConfig = {
+const cjsConfig = {
   mode: 'production',
   target: 'web',
   devtool: 'source-map',
   entry: {
-    esm: {
+    cjs: {
       import: importPath,
-      filename: `${exportName}.mjs`,
+      filename: `${exportName}.cjs`,
       library: {
-        type: 'module'
+        type: 'commonjs-module'
       }
     }
+  },
+  externals: {
+    axios: 'commonjs2 axios',
+    buffer: 'commonjs2 buffer',
+    cockatiel: 'commonjs2 cockatiel',
+    pako: 'commonjs2 pako'
   },
   output: {
     path: DIST
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      buffer: 'buffer'
-    }
+    extensions: ['.tsx', '.ts', '.js']
   },
   optimization: {
     minimizer: [
       new TerserPlugin({
         terserOptions: {
-          ecma: 'esnext',
-          mangle: true,
+          ecma: 'es2017',
+          mangle: false,
           module: true
         }
       })
     ]
-  },
-  experiments: {
-    outputModule: true
   },
   module: {
     rules: [
@@ -67,7 +70,8 @@ const esmConfig = {
           loader: 'ts-loader',
           options: {
             compilerOptions: {
-              declaration: true,
+              declarationDir: null,
+              declaration: false,
               sourceMap: true
             }
           }
@@ -77,9 +81,6 @@ const esmConfig = {
     ]
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
-    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'README.md', to: 'README.md' },
@@ -94,74 +95,10 @@ const esmConfig = {
   ]
 }
 
-const cjsConfig = {
-  mode: 'production',
-  target: 'web',
-  devtool: 'source-map',
-  entry: {
-    cjs: {
-      import: importPath,
-      filename: `${exportName}.cjs`,
-      library: {
-        name: 'Metrics',
-        type: 'commonjs2'
-      }
-    }
-  },
-  externals: {
-    axios: 'axios',
-    buffer: 'buffer',
-    cockatiel: 'cockatiel',
-    pako: 'pako'
-  },
-  output: {
-    path: DIST
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      buffer: 'buffer'
-    }
-  },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          ecma: 'es2017',
-          mangle: true,
-          module: true
-        }
-      })
-    ]
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            compilerOptions: {
-              declaration: false,
-              sourceMap: true
-            }
-          }
-        },
-        exclude: /node_modules/
-      }
-    ]
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
-    })
-  ]
-}
-
 const browserConfig = {
   mode: 'production',
   target: 'web',
-  devtool: 'source-map',
+  devtool: false,
   entry: {
     window: {
       import: importPath,
@@ -170,6 +107,14 @@ const browserConfig = {
         name: 'Metrics',
         type: 'window'
       }
+    },
+    umd: {
+      import: importPath,
+      filename: `${exportName}.umd.js`,
+      library: {
+        name: 'Metrics',
+        type: 'umd'
+      }
     }
   },
   output: {
@@ -184,6 +129,7 @@ const browserConfig = {
   optimization: {
     minimizer: [
       new TerserPlugin({
+        extractComments: false,
         terserOptions: {
           ecma: 'es5',
           mangle: true,
@@ -200,8 +146,9 @@ const browserConfig = {
           loader: 'ts-loader',
           options: {
             compilerOptions: {
+              declarationDir: null,
               declaration: false,
-              sourceMap: true
+              sourceMap: false
             }
           }
         },
@@ -216,60 +163,4 @@ const browserConfig = {
   ]
 }
 
-const nodeConfig = {
-  mode: 'production',
-  target: 'node',
-  devtool: 'source-map',
-  entry: {
-    window: {
-      import: importPath,
-      filename: `${exportName}.node.js`,
-      library: {
-        name: 'Metrics',
-        type: 'commonjs2'
-      }
-    }
-  },
-  externals: {
-    axios: 'axios',
-    buffer: 'buffer',
-    cockatiel: 'cockatiel',
-    pako: 'pako'
-  },
-  output: {
-    path: DIST
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js']
-  },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          ecma: 'es2017',
-          mangle: true,
-          module: true
-        }
-      })
-    ]
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            compilerOptions: {
-              declaration: false,
-              sourceMap: true
-            }
-          }
-        },
-        exclude: /node_modules/
-      }
-    ]
-  }
-}
-
-module.exports = [esmConfig, cjsConfig, browserConfig, nodeConfig]
+module.exports = [cjsConfig, browserConfig]

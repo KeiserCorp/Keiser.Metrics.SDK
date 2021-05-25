@@ -24,7 +24,7 @@
     "test": "ts-mocha test/index.ts",
     "lint": "npx eslint .",
     "dev": "webpack serve --config webpack/dev.config.js",
-    "build": "rimraf dist/* && webpack --config webpack/prod.config.js",
+    "build": "rimraf dist/* && tsc && webpack --config webpack/prod.config.js",
     "release": "node .bin/publish-npm.js",
     "docs": "typedoc"
   },
