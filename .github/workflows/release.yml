@@ -115,7 +115,7 @@ jobs:
           FOLDER: docs
           SINGLE_COMMIT: true
           CLEAN: true
-          COMMIT_MESSAGE: v${{ steps.check.outputs.version }}
+          COMMIT_MESSAGE: v${{ needs.version-check.outputs.version }}
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
@@ -124,4 +124,4 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel: '#deployment'
           status: ${{ job.status }}
-          version: ${{ steps.check.outputs.version }}
+          version: ${{ needs.version-check.outputs.version }}
