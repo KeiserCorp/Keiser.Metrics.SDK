@@ -1,3 +1,4 @@
+import renameExtensions from '@betit/rollup-plugin-rename-extensions'
 import commonjs from '@rollup/plugin-commonjs'
 import inject from '@rollup/plugin-inject'
 import json from '@rollup/plugin-json'
@@ -10,12 +11,6 @@ import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
 
 const DIST = path.resolve(__dirname, './dist')
-const exportName = 'index'
-const libraryName = 'Merics'
-
-const dtsFilename = `${exportName}.d.ts`
-const cjsFilename = `${exportName}.cjs`
-const esmFilename = `${exportName}.mjs`
 
 const pkg = Object.assign(require('./package.json'), {
   private: false,
@@ -23,29 +18,49 @@ const pkg = Object.assign(require('./package.json'), {
   devDependencies: {},
   scripts: {},
   type: 'module',
-  main: `./${cjsFilename}`,
-  module: `./${esmFilename}`,
-  types: `./${dtsFilename}`,
+  main: './index.cjs',
+  module: './index.mjs',
+  types: './index.d.ts',
   exports: {
-    import: `./${esmFilename}`,
-    require: `./${cjsFilename}`
+    '.': {
+      import: './index.mjs',
+      require: './index.cjs'
+    },
+    './*': {
+      import: './*.mjs',
+      require: './*.cjs'
+    }
   }
 })
 
 export default [
   {
+    preserveModules: true,
     input: 'src/index.ts',
     output: [
       {
-        file: path.resolve(DIST, cjsFilename),
-        name: libraryName,
+        dir: DIST,
         format: 'cjs',
-        sourcemap: true
+        sourcemap: true,
+        plugins: [
+          renameExtensions({
+            mappings: {
+              '.js': '.cjs'
+            }
+          })
+        ]
       },
       {
-        file: path.resolve(DIST, esmFilename),
+        dir: DIST,
         format: 'es',
-        sourcemap: true
+        sourcemap: true,
+        plugins: [
+          renameExtensions({
+            mappings: {
+              '.js': '.mjs'
+            }
+          })
+        ]
       }
     ],
     external: [
@@ -55,8 +70,11 @@ export default [
       'buffer'
     ],
     plugins: [
+      del({ targets: path.resolve(DIST, '*') }),
       json(),
-      typescript({ target: 'esnext' }),
+      typescript({
+        target: 'esnext'
+      }),
       terser({
         ecma: 'esnext',
         compress: true,
@@ -67,8 +85,8 @@ export default [
       inject({
         Buffer: 'buffer'
       }),
-      del({ targets: DIST }),
       generatePackageJson({
+        outputFolder: DIST,
         baseContents: pkg
       }),
       copy({
