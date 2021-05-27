@@ -6,7 +6,7 @@ import path from 'path'
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
 import generatePackageJson from 'rollup-plugin-generate-package-json'
-import { terser } from 'rollup-plugin-terser'
+// import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
 
 const DIST = path.resolve(__dirname, './dist')
@@ -72,11 +72,12 @@ export default [
       typescript({
         target: 'esnext'
       }),
-      terser({
-        ecma: 'esnext',
-        compress: true,
-        mangle: false
-      }),
+      // terser({
+      //   ecma: 'es2017',
+      //   module: true,
+      //   compress: false,
+      //   mangle: false
+      // }),
       commonjs(),
       nodeResolve(),
       inject({
