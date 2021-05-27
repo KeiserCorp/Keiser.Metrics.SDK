@@ -1,4 +1,3 @@
-import renameExtensions from '@betit/rollup-plugin-rename-extensions'
 import commonjs from '@rollup/plugin-commonjs'
 import inject from '@rollup/plugin-inject'
 import json from '@rollup/plugin-json'
@@ -35,32 +34,22 @@ const pkg = Object.assign(require('./package.json'), {
 
 export default [
   {
-    preserveModules: true,
     input: 'src/index.ts',
+    preserveModules: true,
     output: [
       {
         dir: DIST,
         format: 'cjs',
         sourcemap: true,
-        plugins: [
-          renameExtensions({
-            mappings: {
-              '.js': '.cjs'
-            }
-          })
-        ]
+        exports: 'named',
+        entryFileNames: '[name].cjs'
       },
       {
         dir: DIST,
         format: 'es',
         sourcemap: true,
-        plugins: [
-          renameExtensions({
-            mappings: {
-              '.js': '.mjs'
-            }
-          })
-        ]
+        exports: 'named',
+        entryFileNames: '[name].mjs'
       }
     ],
     external: [

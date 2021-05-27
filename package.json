@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -29,7 +29,6 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@betit/rollup-plugin-rename-extensions": "^0.1.0",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-inject": "^4.0.2",
     "@rollup/plugin-json": "^4.1.0",
