@@ -28,6 +28,14 @@ const pkg = Object.assign(require('./package.json'), {
     './*': {
       import: './*.mjs',
       require: './*.cjs'
+    },
+    './models/*': {
+      import: './models/*.mjs',
+      require: './models/*.cjs'
+    },
+    './lib/*': {
+      import: './lib/*.mjs',
+      require: './lib/*.cjs'
     }
   }
 })
@@ -72,7 +80,8 @@ export default [
       commonjs(),
       nodeResolve(),
       inject({
-        Buffer: 'buffer'
+        Buffer: ['buffer', 'Buffer'],
+        include: ['src/lib/*']
       }),
       generatePackageJson({
         outputFolder: DIST,
