@@ -6,10 +6,10 @@ import path from 'path'
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
 import generatePackageJson from 'rollup-plugin-generate-package-json'
-// import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
 
 const DIST = path.resolve(__dirname, './dist')
+const SRC = path.resolve(__dirname, 'src/index.ts')
 
 const pkg = Object.assign(require('./package.json'), {
   private: false,
@@ -42,7 +42,7 @@ const pkg = Object.assign(require('./package.json'), {
 
 export default [
   {
-    input: 'src/index.ts',
+    input: SRC,
     preserveModules: true,
     output: [
       {
@@ -70,14 +70,14 @@ export default [
       del({ targets: path.resolve(DIST, '*') }),
       json(),
       typescript({
-        target: 'esnext'
+        tsconfigOverride: {
+          include: [SRC],
+          compilerOptions: {
+            target: 'esnext',
+            declaration: true
+          }
+        }
       }),
-      // terser({
-      //   ecma: 'es2017',
-      //   module: true,
-      //   compress: false,
-      //   mangle: false
-      // }),
       commonjs(),
       nodeResolve(),
       inject({
