@@ -5,6 +5,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import path from 'path'
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
+import execute from 'rollup-plugin-execute'
 import generatePackageJson from 'rollup-plugin-generate-package-json'
 import typescript from 'rollup-plugin-typescript2'
 
@@ -110,7 +111,10 @@ export default [
           { src: 'README.md', dest: DIST },
           { src: 'LICENSE.md', dest: DIST }
         ]
-      })
+      }),
+      execute([
+        `npx auto-changelog -o ${path.resolve(DIST, 'CHANGELOG.md')} -t keepachangelog --commit-limit false`
+      ])
     ]
   },
   {

@@ -48,6 +48,22 @@ jobs:
           diff-search: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Use Node.js v14
+        uses: actions/setup-node@v2
+        if: steps.check.outputs.changed == 'true'
+        with:
+          node-version: 14
+
+      - name: Build changelog file
+        if: steps.check.outputs.changed == 'true'
+        run: npm run changelog
+
+      - name: Push changelog file
+        uses: EndBug/add-and-commit@v7
+        if: steps.check.outputs.changed == 'true'
+        with:
+          message: 'Updates Changelog'
+
       - name: Create Release
         id: release
         uses: actions/create-release@v1
