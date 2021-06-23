@@ -2,21 +2,44 @@ on:
   push:
     branches:
       - master
+      - 'pre/**'
 
-name: Release
+name: Master
 
 jobs:
-  release:
-    name: Build and Release
+
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js v12
+      - name: Use Node.js v14
         uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 14
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Test Build Process
+        run: npm run build
+
+      - name: Test Docs Build Process
+        run: npm run docs
+
+  version-check:
+    name: Version Check
+    needs: test 
+    runs-on: ubuntu-latest   
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Check Version
         id: check
@@ -25,45 +48,80 @@ jobs:
           diff-search: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Dependencies
-        if: steps.check.outputs.changed == 'true'
-        run: npm ci
-
-      - name: Build and Release
-        if: steps.check.outputs.changed == 'true'
-        run: npm run release
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
       - name: Create Release
-        if: steps.check.outputs.changed == 'true'
+        id: release
         uses: actions/create-release@v1
+        if: steps.check.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.check.outputs.version }}
           release_name: Release v${{ steps.check.outputs.version }}
 
+  release:
+    name: Release
+    needs: version-check
+    if: needs.version-check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v14
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Bundle Files
+        uses: papeloto/action-zip@v1
+        with:
+          files: dist
+          dest: v${{ needs.version-check.outputs.version }}.dist.zip
+      
+      - name: Archive Libraries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.version-check.outputs.upload_url }}
+          asset_path: ./v${{ needs.version-check.outputs.version }}.dist.zip
+          asset_name: v${{ needs.version-check.outputs.version }}.dist.zip
+          asset_content_type: application/zip
+
+      - name: Release to NPM
+        run: npm run release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract Branch Name
+        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+
       - name: Build Docs
-        if: steps.check.outputs.changed == 'true'
+        if: github.ref == 'refs/heads/master'
         run: npm run docs
 
       - name: Push Docs
-        if: steps.check.outputs.changed == 'true'
         uses: JamesIves/github-pages-deploy-action@releases/v3
+        if: github.ref == 'refs/heads/master'
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: docs
           SINGLE_COMMIT: true
           CLEAN: true
-          COMMIT_MESSAGE: v${{ steps.check.outputs.version }}
+          COMMIT_MESSAGE: v${{ needs.version-check.outputs.version }}
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
-        if: steps.check.outputs.changed == 'true' && always()
+        if: always()
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel: '#deployment'
           status: ${{ job.status }}
-          version: ${{ steps.check.outputs.version }}
+          version: ${{ needs.version-check.outputs.version }}

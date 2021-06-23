@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/KeiserCorp/Keiser.Metrics.SDK/issues"
   },
-  "homepage": "https://github.com/KeiserCorp/Keiser.Metrics.SDK#readme",
+  "homepage": "https://dev.keiser.com/metrics/sdk/",
   "publishConfig": {
     "access": "public"
   },
@@ -23,48 +23,51 @@
     "start": "npm run dev",
     "test": "ts-mocha test/index.ts",
     "lint": "npx eslint .",
-    "dev": "webpack serve --config webpack/dev.config.js",
-    "build": "npm run compile:browser && npm run compile:node",
-    "compile:browser": "webpack --config webpack/prod.config.js",
-    "compile:node": "tsc --sourceMap false --module commonjs",
-    "release": "npm run build && node ./scripts/release.js",
+    "dev": "webpack serve --config webpack.config.js",
+    "build": "rollup --config",
+    "release": "node .bin/publish-npm.js",
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.15",
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-inject": "^4.0.2",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@types/chai": "^4.2.18",
     "@types/mocha": "^8.2.2",
-    "@types/node": "^14.14.37",
-    "@typescript-eslint/eslint-plugin": "^4.20.0",
-    "@typescript-eslint/parser": "^4.20.0",
+    "@types/node": "^15.6.1",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
     "chai": "^4.3.4",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^8.1.0",
-    "create-file-webpack": "^1.0.2",
     "cross-spawn": "^7.0.3",
-    "eslint": "^7.23.0",
+    "eslint": "^7.27.0",
     "eslint-config-standard-with-typescript": "^20.0.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-standard": "^5.0.0",
     "html-webpack-plugin": "^5.3.1",
-    "mocha": "^8.3.2",
+    "mocha": "^8.4.0",
+    "rollup": "^2.50.2",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-generate-package-json": "^3.2.0",
+    "rollup-plugin-typescript2": "^0.30.0",
     "semver": "^7.3.5",
-    "ts-loader": "^8.1.0",
+    "ts-loader": "^9.2.2",
     "ts-mocha": "^8.0.0",
+    "tslib": "^2.2.0",
     "typedoc": "0.18.0",
-    "typescript": "^4.2.3",
-    "webpack": "^5.30.0",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2",
-    "write-json-webpack-plugin": "^1.1.0"
+    "typescript": "^4.3.2",
+    "webpack": "^5.38.0",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
     "axios": "^0.21.1",
     "buffer": "^6.0.3",
     "cockatiel": "^2.0.1",
-    "pako": "^2.0.3",
-    "ste-simple-events": "2.1.5"
+    "pako": "^2.0.3"
   }
 }
