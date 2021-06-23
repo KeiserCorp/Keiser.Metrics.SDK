@@ -39,6 +39,8 @@
     "strava",
     "trainingpeaks",
     "typedoc",
-    "unparsable"
+    "unparsable",
+    "Leaderboard",
+    "leaderboard"
   ]
 }
