@@ -218,4 +218,10 @@ export class PrivilegedFacility extends Facility {
     const response = await this.action('facilityStrengthMachine:initializerOTP') as FacilityStrengthMachineInitializerOTPTokenResponse
     return new MachineInitializerOTPToken(response)
   }
+
+  async applyLicense (params: { key: string}) {
+    const response = await this.action('facility:applyLicense', params) as FacilityResponse
+    this.setFacilityData(response.facility)
+    return this
+  }
 }
