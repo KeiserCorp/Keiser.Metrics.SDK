@@ -1,9 +1,9 @@
 import Axios from 'axios'
 import { BrokenCircuitError, ConsecutiveBreaker, Policy } from 'cockatiel'
-import { SimpleEventDispatcher } from 'ste-simple-events'
 
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
 import { ActionErrorProperties, ConnectionFaultError, GetErrorInstance, RequestError, SessionError } from './error'
+import { EventDispatcher } from './lib/event'
 
 /** @ignore */
 const PING_REGEX = /^primus::ping::(\d{13})$/
@@ -46,8 +46,8 @@ export class MetricsConnection {
     Policy.handleWhen(ERROR_FILTER).circuitBreaker(15000, new ConsecutiveBreaker(10))
   )
 
-  private readonly _onDisposeEvent = new SimpleEventDispatcher<void>()
-  private readonly _onConnectionChangeEvent = new SimpleEventDispatcher<ConnectionEvent>()
+  private readonly _onDisposeEvent = new EventDispatcher<void>()
+  private readonly _onConnectionChangeEvent = new EventDispatcher<ConnectionEvent>()
 
   constructor (options: ConnectionOptions) {
     this._restEndpoint = options.restEndpoint ?? DEFAULT_REST_ENDPOINT

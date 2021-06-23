@@ -1,8 +1,7 @@
-import { SimpleEventDispatcher } from 'ste-simple-events'
-
 import { MetricsConnection } from './connection'
 import { JWT_TTL_LIMIT, Units } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
+import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
 import { Cache, CacheKeysResponse, CacheObjectResponse } from './models/cache'
@@ -246,8 +245,8 @@ export abstract class BaseSessionHandler {
   private _accessToken: string = ''
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
-  private readonly _onAccessTokenChangeEvent = new SimpleEventDispatcher<AccessTokenChangeEvent>()
-  private readonly _onRefreshTokenChangeEvent = new SimpleEventDispatcher<RefreshTokenChangeEvent>()
+  private readonly _onAccessTokenChangeEvent = new EventDispatcher<AccessTokenChangeEvent>()
+  private readonly _onRefreshTokenChangeEvent = new EventDispatcher<RefreshTokenChangeEvent>()
 
   constructor (connection: MetricsConnection, authenticatedResponse: AuthenticatedResponse, keepAlive: boolean = true) {
     this._connection = connection

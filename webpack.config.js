@@ -8,9 +8,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          compilerOptions: {
+            target: 'es2017',
+            module: 'commonjs'
+          }
+        }
       }
     ]
   },
