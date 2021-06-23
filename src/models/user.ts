@@ -1,7 +1,6 @@
-import { ForceUnit } from '../constants'
+import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
 import { compressDeflateToB64 } from '../lib/compress'
-import { XOR } from '../lib/types'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
