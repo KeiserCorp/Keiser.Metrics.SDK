@@ -19,6 +19,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type": "module",
   "scripts": {
     "start": "npm run dev",
     "test": "ts-mocha test/index.ts",

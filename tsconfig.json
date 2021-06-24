@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
     "declaration": false,
     "sourceMap": true,
     "strict": true,
     "newLine": "lf",
-    "esModuleInterop": true,
     "removeComments": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
