@@ -92,6 +92,7 @@ export default [
           include: [SRC],
           compilerOptions: {
             target: 'es2017',
+            module: 'esnext',
             declaration: true
           }
         }
@@ -149,6 +150,7 @@ export default [
           include: [SRC],
           compilerOptions: {
             target: 'esnext',
+            module: 'esnext',
             declaration: true
           }
         }

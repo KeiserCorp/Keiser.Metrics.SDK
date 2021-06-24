@@ -1,7 +1,7 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpack = require('webpack')
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import webpack from 'webpack'
 
-module.exports = {
+export default {
   mode: 'development',
   target: 'web',
   entry: './dev/index.ts',
@@ -12,7 +12,7 @@ module.exports = {
         loader: 'ts-loader',
         options: {
           compilerOptions: {
-            target: 'es2017',
+            target: 'esnext',
             module: 'commonjs'
           }
         }
