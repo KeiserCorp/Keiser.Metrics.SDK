@@ -13,7 +13,7 @@ import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacility
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
-import { MSeriesChallenge, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeParticipantResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallenges, MSeriesChallengeSorting, MSeriesChallengeType } from './mSeriesChallenge'
+import { MSeriesChallenge, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallenges, MSeriesChallengeSorting, MSeriesChallengeType } from './mSeriesChallenge'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
@@ -327,16 +327,16 @@ export class User extends Model {
 
   async joinMSeriesChallenge (params: {joinCode: string}) {
     const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { ...params, userId: this.id }) as MSeriesChallengeParticipantResponse
-    return mSeriesChallengeParticipant
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 
-  async getMSeriesChallenge (params: {id?: number, joinCode?: string}) {
-    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { ...params }) as MSeriesChallengeResponse
+  async getMSeriesChallenge (params: XOR<{id: number}, {joinCode: string}>) {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { ...params, userId: this.id }) as MSeriesChallengeResponse
     return new MSeriesChallenge(mSeriesChallenge, this.sessionHandler)
   }
 
   async getMSeriesChallenges (params: {from?: Date, to?: Date, isCompleted?: boolean, relationship?: MSeriesChallengeRelationship, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
-    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params }) as MSeriesChallengeListResponse
+    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, userId: this.id }) as MSeriesChallengeListResponse
     return new MSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
   }
 

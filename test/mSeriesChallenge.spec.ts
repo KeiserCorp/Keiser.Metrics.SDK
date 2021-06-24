@@ -75,18 +75,18 @@ describe('M Series Challenge', function () {
   })
 
   it('can search M Series Challenge Participants by name', async function () {
-    const mSeriesChallengeParticipants = await createdMSeriesChallenge.searchParticipantsByName({ nameSearchQuery: 'Mo' })
+    const mSeriesChallengeParticipants = await createdMSeriesChallenge.getParticipants({ nameSearchQuery: 'Mo' })
 
-    expect(Array.isArray(mSeriesChallengeParticipants.mSeriesChallengeParticipants)).to.equal(true)
-    expect(mSeriesChallengeParticipants.mSeriesChallengeParticipants[0].name).to.equal('Moe Power')
-    expect(mSeriesChallengeParticipants.mSeriesChallengeParticipantsMeta.sort).to.equal(MSeriesChallengeParticipantSorting.Name)
+    expect(Array.isArray(mSeriesChallengeParticipants)).to.equal(true)
+    expect(mSeriesChallengeParticipants[0].name).to.equal('Moe Power')
+    expect(mSeriesChallengeParticipants.meta.sort).to.equal(MSeriesChallengeParticipantSorting.Name)
   })
 
   it('can get M Series Challenge Leaderboard', async function () {
-    const mSeriesChallengeLeaderboard = await createdMSeriesChallenge.getLeaderboard()
+    const mSeriesChallengeLeaderboardParticipants = await createdMSeriesChallenge.getLeaderboard()
 
-    expect(Array.isArray(mSeriesChallengeLeaderboard.mSeriesChallengeParticipants)).to.equal(true)
-    expect(mSeriesChallengeLeaderboard.mSeriesChallengeParticipantsMeta.totalCount).to.equal(1)
+    expect(Array.isArray(mSeriesChallengeLeaderboardParticipants)).to.equal(true)
+    expect(mSeriesChallengeLeaderboardParticipants.meta.totalCount).to.equal(1)
   })
 
   it('can update M Series Challenge', async function () {

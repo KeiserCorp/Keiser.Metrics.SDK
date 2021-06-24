@@ -109,9 +109,29 @@ MSeriesChallengeListResponseMeta
   }
 }
 
+export class MSeriesChallengeParticipants extends ModelList<
+MSeriesChallengeParticipant,
+MSeriesChallengeParticipantData,
+MSeriesChallengeParticipantListResponseMeta
+> {
+  constructor (mSeriesChallengeParticipants: MSeriesChallengeParticipantData[], mSeriesChallengeParticipantsMeta: MSeriesChallengeParticipantListResponseMeta, sessionHandler: SessionHandler) {
+    super(MSeriesChallengeParticipant, mSeriesChallengeParticipants, mSeriesChallengeParticipantsMeta, sessionHandler)
+  }
+}
+
+export class MSeriesChallengeLeaderboardParticipants extends ModelList<
+MSeriesChallengeParticipant,
+MSeriesChallengeParticipantData,
+MSeriesChallengeLeaderboardResponseMeta
+> {
+  constructor (mSeriesChallengeParticipants: MSeriesChallengeParticipantData[], mSeriesChallengeLeaderboardMeta: MSeriesChallengeLeaderboardResponseMeta, sessionHandler: SessionHandler) {
+    super(MSeriesChallengeParticipant, mSeriesChallengeParticipants, mSeriesChallengeLeaderboardMeta, sessionHandler)
+  }
+}
+
 export class MSeriesChallenge extends Model {
   private _mSeriesChallengeData: MSeriesChallengeData
-  private _mSeriesChallengeParticipantData?: MSeriesChallengeParticipantData
+  private _mSeriesChallengeParticipant?: MSeriesChallengeParticipant
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
     super(sessionHandler)
@@ -122,16 +142,16 @@ export class MSeriesChallenge extends Model {
     this._mSeriesChallengeData = mSeriesChallengeData
   }
 
-  private setMSeriesChallengeParticipant (mSeriesChallengeParticipantData: MSeriesChallengeParticipantData) {
-    this._mSeriesChallengeParticipantData = mSeriesChallengeParticipantData
+  private setMSeriesChallengeParticipant (mSeriesChallengeParticipant: MSeriesChallengeParticipant) {
+    this._mSeriesChallengeParticipant = mSeriesChallengeParticipant
   }
 
   async reload (options: { includeOwnedParticipantData: boolean } = { includeOwnedParticipantData: false }) {
-    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { id: this._mSeriesChallengeData.id }) as MSeriesChallengeResponse
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { id: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeResponse
 
     if (options.includeOwnedParticipantData) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id }) as MSeriesChallengeParticipantResponse
-      this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
+      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+      this.setMSeriesChallengeParticipant(new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler))
     }
 
     this.setMSeriesChallenge(mSeriesChallenge)
@@ -150,7 +170,7 @@ export class MSeriesChallenge extends Model {
    * Method to leave a challenge. Only challenge participants can leave a challenge.
    */
   async leave () {
-    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id })
+    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId })
   }
 
   /**
@@ -158,9 +178,10 @@ export class MSeriesChallenge extends Model {
    */
   async join () {
     if (this._mSeriesChallengeData.joinCode !== undefined) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode }) as MSeriesChallengeParticipantResponse
-      this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
-      return mSeriesChallengeParticipant
+      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+      const p = new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+      this.setMSeriesChallengeParticipant(p)
+      return p
     }
     return undefined
   }
@@ -173,12 +194,13 @@ export class MSeriesChallenge extends Model {
    */
   async getParticipant (mSeriesChallengeParticipantId?: number) {
     if (mSeriesChallengeParticipantId !== undefined) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId }) as MSeriesChallengeParticipantResponse
-      return mSeriesChallengeParticipant
+      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+      return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
     } else {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id }) as MSeriesChallengeParticipantResponse
-      this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
-      return mSeriesChallengeParticipant
+      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+      const p = new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+      this.setMSeriesChallengeParticipant(p)
+      return p
     }
   }
 
@@ -193,7 +215,7 @@ export class MSeriesChallenge extends Model {
    * @param options.offset default: 0
    * @returns An array of MSeries Challenge Participants
    */
-  async searchParticipantsByName (options: {
+  async getParticipants (options: {
     nameSearchQuery: string
     sort?: MSeriesChallengeParticipantSorting
     ascending?: boolean
@@ -202,9 +224,10 @@ export class MSeriesChallenge extends Model {
   }) {
     const participants = await this.action('mSeriesChallengeParticipant:list', {
       mSeriesChallengeId: this._mSeriesChallengeData.id,
+      userId: this.sessionHandler.userId,
       ...options
     }) as MSeriesChallengeParticipantListResponse
-    return participants
+    return new MSeriesChallengeParticipants(participants.mSeriesChallengeParticipants, participants.mSeriesChallengeParticipantsMeta, this.sessionHandler)
   }
 
   /**
@@ -225,10 +248,11 @@ export class MSeriesChallenge extends Model {
   } = {}) {
     const leaderboard = await this.action('mSeriesChallenge:leaderboard', {
       id: this._mSeriesChallengeData.id,
+      userId: this.sessionHandler.userId,
       ...options
     }) as MSeriesChallengeLeaderboardResponse
 
-    return leaderboard
+    return new MSeriesChallengeLeaderboardParticipants(leaderboard.mSeriesChallengeParticipants, leaderboard.mSeriesChallengeParticipantsMeta, this.sessionHandler)
   }
 
   /**
@@ -280,11 +304,11 @@ export class MSeriesChallenge extends Model {
   }
 
   get startAt () {
-    return this._mSeriesChallengeData.startAt
+    return new Date(this._mSeriesChallengeData.startAt)
   }
 
   get endAt () {
-    return this._mSeriesChallengeData.endAt
+    return this._mSeriesChallengeData.endAt !== null ? new Date(this._mSeriesChallengeData.endAt) : null
   }
 
   get focus () {
@@ -300,6 +324,52 @@ export class MSeriesChallenge extends Model {
   }
 
   get sessionUserParticipantData () {
-    return this._mSeriesChallengeParticipantData
+    return this._mSeriesChallengeParticipant
+  }
+}
+
+export class MSeriesChallengeParticipant extends Model {
+  private _mSeriesChallengeParticipantData: MSeriesChallengeParticipantData
+
+  constructor (mSeriesChallengeParticipantData: MSeriesChallengeParticipantData, sessionHandler: SessionHandler) {
+    super(sessionHandler)
+    this._mSeriesChallengeParticipantData = mSeriesChallengeParticipantData
+  }
+
+  private setMSeriesChallengeParticipant (mSeriesChallengeParticipantData: MSeriesChallengeParticipantData) {
+    this._mSeriesChallengeParticipantData = mSeriesChallengeParticipantData
+  }
+
+  get id () {
+    return this._mSeriesChallengeParticipantData.id
+  }
+
+  get userId () {
+    return this._mSeriesChallengeParticipantData.userId
+  }
+
+  get mSeriesChallengeId () {
+    return this._mSeriesChallengeParticipantData.mSeriesChallengeId
+  }
+
+  get joinedAt () {
+    return this._mSeriesChallengeParticipantData.joinedAt
+  }
+
+  get currentValue () {
+    return this._mSeriesChallengeParticipantData.currentValue
+  }
+
+  get rank () {
+    return this._mSeriesChallengeParticipantData.rank
+  }
+
+  get name () {
+    return this._mSeriesChallengeParticipantData.name
+  }
+
+  async reload () {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: this._mSeriesChallengeParticipantData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
   }
 }
