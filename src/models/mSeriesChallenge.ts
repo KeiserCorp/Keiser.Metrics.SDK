@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { MSeriesChallengeLeaderboardParticipants, MSeriesChallengeLeaderboardResponse, MSeriesChallengeParticipant, MSeriesChallengeParticipantListResponse, MSeriesChallengeParticipantResponse, MSeriesChallengeParticipants, MSeriesChallengeParticipantSorting } from './mSeriesChallengeParticipant'
 
 export const enum MSeriesChallengeType {
   TimeBased = 'timeBased',
@@ -25,12 +26,6 @@ export const enum MSeriesChallengeSorting {
   CreatedAt = 'createdAt'
 }
 
-export const enum MSeriesChallengeParticipantSorting {
-  ID = 'id',
-  Name = 'name',
-  JoinedAt = 'joinedAt'
-}
-
 export interface MSeriesChallengeData {
   joinCode: string | undefined
   id: number
@@ -46,37 +41,13 @@ export interface MSeriesChallengeData {
   isCompleted: boolean
 }
 
-export interface MSeriesChallengeParticipantData {
-  id: number
-  userId: number
-  mSeriesChallengeId: number
-  joinedAt: string
-  currentValue: number
-  rank: number | undefined
-  name: string
-}
-
 export interface MSeriesChallengeResponse extends AuthenticatedResponse {
   mSeriesChallenge: MSeriesChallengeData
-}
-
-export interface MSeriesChallengeParticipantResponse extends AuthenticatedResponse {
-  mSeriesChallengeParticipant: MSeriesChallengeParticipantData
 }
 
 export interface MSeriesChallengeListResponse extends AuthenticatedResponse {
   mSeriesChallenges: MSeriesChallengeData[]
   mSeriesChallengesMeta: MSeriesChallengeListResponseMeta
-}
-
-export interface MSeriesChallengeParticipantListResponse extends AuthenticatedResponse {
-  mSeriesChallengeParticipants: MSeriesChallengeParticipantData[]
-  mSeriesChallengeParticipantsMeta: MSeriesChallengeParticipantListResponseMeta
-}
-
-export interface MSeriesChallengeLeaderboardResponse extends AuthenticatedResponse {
-  mSeriesChallengeParticipants: MSeriesChallengeParticipantData[]
-  mSeriesChallengeParticipantsMeta: MSeriesChallengeLeaderboardResponseMeta
 }
 
 export interface MSeriesChallengeListResponseMeta extends ListMeta {
@@ -87,18 +58,6 @@ export interface MSeriesChallengeListResponseMeta extends ListMeta {
   sort: MSeriesChallengeSorting
 }
 
-export interface MSeriesChallengeParticipantListResponseMeta extends ListMeta {
-  nameSearchQuery: string
-  sort: MSeriesChallengeParticipantSorting
-}
-
-export interface MSeriesChallengeLeaderboardResponseMeta {
-  ascending: boolean
-  limit: number
-  offset: number
-  totalCount: number
-}
-
 export class MSeriesChallenges extends ModelList<
 MSeriesChallenge,
 MSeriesChallengeData,
@@ -106,26 +65,6 @@ MSeriesChallengeListResponseMeta
 > {
   constructor (mSeriesChallenges: MSeriesChallengeData[], mSeriesChallengesMeta: MSeriesChallengeListResponseMeta, sessionHandler: SessionHandler) {
     super(MSeriesChallenge, mSeriesChallenges, mSeriesChallengesMeta, sessionHandler)
-  }
-}
-
-export class MSeriesChallengeParticipants extends ModelList<
-MSeriesChallengeParticipant,
-MSeriesChallengeParticipantData,
-MSeriesChallengeParticipantListResponseMeta
-> {
-  constructor (mSeriesChallengeParticipants: MSeriesChallengeParticipantData[], mSeriesChallengeParticipantsMeta: MSeriesChallengeParticipantListResponseMeta, sessionHandler: SessionHandler) {
-    super(MSeriesChallengeParticipant, mSeriesChallengeParticipants, mSeriesChallengeParticipantsMeta, sessionHandler)
-  }
-}
-
-export class MSeriesChallengeLeaderboardParticipants extends ModelList<
-MSeriesChallengeParticipant,
-MSeriesChallengeParticipantData,
-MSeriesChallengeLeaderboardResponseMeta
-> {
-  constructor (mSeriesChallengeParticipants: MSeriesChallengeParticipantData[], mSeriesChallengeLeaderboardMeta: MSeriesChallengeLeaderboardResponseMeta, sessionHandler: SessionHandler) {
-    super(MSeriesChallengeParticipant, mSeriesChallengeParticipants, mSeriesChallengeLeaderboardMeta, sessionHandler)
   }
 }
 
@@ -325,51 +264,5 @@ export class MSeriesChallenge extends Model {
 
   get sessionUserParticipantData () {
     return this._mSeriesChallengeParticipant
-  }
-}
-
-export class MSeriesChallengeParticipant extends Model {
-  private _mSeriesChallengeParticipantData: MSeriesChallengeParticipantData
-
-  constructor (mSeriesChallengeParticipantData: MSeriesChallengeParticipantData, sessionHandler: SessionHandler) {
-    super(sessionHandler)
-    this._mSeriesChallengeParticipantData = mSeriesChallengeParticipantData
-  }
-
-  private setMSeriesChallengeParticipant (mSeriesChallengeParticipantData: MSeriesChallengeParticipantData) {
-    this._mSeriesChallengeParticipantData = mSeriesChallengeParticipantData
-  }
-
-  get id () {
-    return this._mSeriesChallengeParticipantData.id
-  }
-
-  get userId () {
-    return this._mSeriesChallengeParticipantData.userId
-  }
-
-  get mSeriesChallengeId () {
-    return this._mSeriesChallengeParticipantData.mSeriesChallengeId
-  }
-
-  get joinedAt () {
-    return this._mSeriesChallengeParticipantData.joinedAt
-  }
-
-  get currentValue () {
-    return this._mSeriesChallengeParticipantData.currentValue
-  }
-
-  get rank () {
-    return this._mSeriesChallengeParticipantData.rank
-  }
-
-  get name () {
-    return this._mSeriesChallengeParticipantData.name
-  }
-
-  async reload () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: this._mSeriesChallengeParticipantData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-    this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
   }
 }

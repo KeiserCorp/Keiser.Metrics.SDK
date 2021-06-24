@@ -2,11 +2,12 @@ import { expect } from 'chai'
 
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
-import { MSeriesChallenge, MSeriesChallengeFocus, MSeriesChallengeParticipantSorting, MSeriesChallengeSorting, MSeriesChallengeType } from '../src/models/mSeriesChallenge'
+import { MSeriesChallenge, MSeriesChallengeFocus, MSeriesChallengeSorting, MSeriesChallengeType } from '../src/models/mSeriesChallenge'
+import { MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallengeParticipant'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
-describe('M Series Challenge', function () {
+describe.only('M Series Challenge', function () {
   let metricsInstance: Metrics
   let user: User
   let createdMSeriesChallenge: MSeriesChallenge
