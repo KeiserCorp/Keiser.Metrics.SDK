@@ -7,7 +7,7 @@ import { MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallen
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
-describe.only('M Series Challenge', function () {
+describe('M Series Challenge', function () {
   let metricsInstance: Metrics
   let user: User
   let createdMSeriesChallenge: MSeriesChallenge
