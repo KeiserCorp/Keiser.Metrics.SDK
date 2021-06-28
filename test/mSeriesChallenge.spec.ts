@@ -68,7 +68,7 @@ describe('M Series Challenge', function () {
   })
 
   it('can get owned M Series Challenge Participant data', async function () {
-    const mSeriesChallengeParticipant = await createdMSeriesChallenge.getParticipant()
+    const mSeriesChallengeParticipant = await createdMSeriesChallenge.getCurrentParticipant()
 
     expect(typeof mSeriesChallengeParticipant).to.equal('object')
     expect(mSeriesChallengeParticipant.userId).to.equal(user.id)
@@ -102,7 +102,7 @@ describe('M Series Challenge', function () {
     let extError
 
     try {
-      await createdMSeriesChallenge.getParticipant()
+      await createdMSeriesChallenge.getCurrentParticipant()
     } catch (error) {
       extError = error
     }

@@ -1,3 +1,4 @@
+import { MissingParamsError } from '../error'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesChallengeLeaderboardParticipants, MSeriesChallengeLeaderboardResponse, MSeriesChallengeParticipant, MSeriesChallengeParticipantListResponse, MSeriesChallengeParticipantResponse, MSeriesChallengeParticipants, MSeriesChallengeParticipantSorting } from './mSeriesChallengeParticipant'
@@ -70,7 +71,6 @@ MSeriesChallengeListResponseMeta
 
 export class MSeriesChallenge extends Model {
   private _mSeriesChallengeData: MSeriesChallengeData
-  private _mSeriesChallengeParticipant?: MSeriesChallengeParticipant
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
     super(sessionHandler)
@@ -81,20 +81,9 @@ export class MSeriesChallenge extends Model {
     this._mSeriesChallengeData = mSeriesChallengeData
   }
 
-  private setMSeriesChallengeParticipant (mSeriesChallengeParticipant: MSeriesChallengeParticipant) {
-    this._mSeriesChallengeParticipant = mSeriesChallengeParticipant
-  }
-
-  async reload (options: { includeOwnedParticipantData: boolean } = { includeOwnedParticipantData: false }) {
+  async reload () {
     const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { id: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeResponse
-
-    if (options.includeOwnedParticipantData) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-      this.setMSeriesChallengeParticipant(new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler))
-    }
-
     this.setMSeriesChallenge(mSeriesChallenge)
-
     return this
   }
 
@@ -118,29 +107,34 @@ export class MSeriesChallenge extends Model {
   async join () {
     if (this._mSeriesChallengeData.joinCode !== undefined) {
       const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-      const p = new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-      this.setMSeriesChallengeParticipant(p)
-      return p
+      return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
     }
-    return undefined
+
+    throw new MissingParamsError({
+      name: 'MissingParams',
+      message: 'missing parameter(s) for action'
+    })
   }
 
   /**
-   * This method can return the current session user's participant data or a different user's participant data.
+   * This method returns the current session user's challenge participant data.
    *
-   * @param mSeriesChallengeParticipantId Id of participant to be shown. Leave undefined for current session user's participant data.
    * @returns An MSeries Challenge Participant
    */
-  async getParticipant (mSeriesChallengeParticipantId?: number) {
-    if (mSeriesChallengeParticipantId !== undefined) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-      return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-    } else {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-      const p = new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-      this.setMSeriesChallengeParticipant(p)
-      return p
-    }
+  async getCurrentParticipant () {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+  }
+
+  /**
+  * This method returns a user's challenge participant data.
+   *
+   * @param mSeriesChallengeParticipantId Id of participant to be shown.
+   * @returns An MSeries Challenge Participant
+   */
+  async getParticipant (mSeriesChallengeParticipantId: number) {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 
   /**
@@ -206,12 +200,12 @@ export class MSeriesChallenge extends Model {
     // isPublic?: boolean
     userLimit?: number
   }) {
-    await this.action('mSeriesChallenge:update', {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:update', {
       id: this._mSeriesChallengeData.id,
       ...options
     }) as MSeriesChallengeResponse
 
-    await this.reload()
+    this.setMSeriesChallenge(mSeriesChallenge)
   }
 
   get id () {
@@ -260,9 +254,5 @@ export class MSeriesChallenge extends Model {
 
   get isCompleted () {
     return this._mSeriesChallengeData.isCompleted
-  }
-
-  get sessionUserParticipantData () {
-    return this._mSeriesChallengeParticipant
   }
 }
