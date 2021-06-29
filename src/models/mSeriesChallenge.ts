@@ -1,4 +1,3 @@
-import { MissingParamsError } from '../error'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesChallengeLeaderboardParticipants, MSeriesChallengeLeaderboardResponse, MSeriesChallengeParticipant, MSeriesChallengeParticipantListResponse, MSeriesChallengeParticipantResponse, MSeriesChallengeParticipants, MSeriesChallengeParticipantSorting } from './mSeriesChallengeParticipant'
@@ -28,7 +27,7 @@ export const enum MSeriesChallengeSorting {
 }
 
 export interface MSeriesChallengeData {
-  joinCode: string | undefined
+  // joinCode: string | undefined
   id: number
   name: string
   userId: number
@@ -70,14 +69,14 @@ MSeriesChallengeListResponseMeta
 }
 
 export class MSeriesChallenge extends Model {
-  private _mSeriesChallengeData: MSeriesChallengeData
+  protected _mSeriesChallengeData: MSeriesChallengeData
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._mSeriesChallengeData = mSeriesChallengeData
   }
 
-  private setMSeriesChallenge (mSeriesChallengeData: MSeriesChallengeData) {
+  protected setMSeriesChallenge (mSeriesChallengeData: MSeriesChallengeData) {
     this._mSeriesChallengeData = mSeriesChallengeData
   }
 
@@ -101,20 +100,20 @@ export class MSeriesChallenge extends Model {
     await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId })
   }
 
-  /**
-   * Method to join a challenge. Challenge instance must contain joinCode to successfully join.
-   */
-  async join () {
-    if (this._mSeriesChallengeData.joinCode !== undefined) {
-      const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-      return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-    }
+  // /**
+  //  * Method to join a challenge. Challenge instance must contain joinCode to successfully join.
+  //  */
+  // async join () {
+  //   if (this._mSeriesChallengeData.joinCode !== undefined) {
+  //     const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+  //     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+  //   }
 
-    throw new MissingParamsError({
-      name: 'MissingParams',
-      message: 'missing parameter(s) for action'
-    })
-  }
+  //   throw new MissingParamsError({
+  //     name: 'MissingParams',
+  //     message: 'missing parameter(s) for action'
+  //   })
+  // }
 
   /**
    * This method returns the current session user's challenge participant data.
@@ -212,9 +211,9 @@ export class MSeriesChallenge extends Model {
     return this._mSeriesChallengeData.id
   }
 
-  get joinCode () {
-    return this._mSeriesChallengeData.joinCode
-  }
+  // get joinCode () {
+  //   return this._mSeriesChallengeData.joinCode
+  // }
 
   get userId () {
     return this._mSeriesChallengeData.userId
@@ -256,3 +255,27 @@ export class MSeriesChallenge extends Model {
     return this._mSeriesChallengeData.isCompleted
   }
 }
+
+export interface JoinableMSeriesChallengeData extends MSeriesChallengeData {
+  joinCode: string
+}
+
+export class JoinableMSeriesChallenge extends MSeriesChallenge {
+  private _joinCode: string
+
+  constructor (joinableMSeriesChallengeData: JoinableMSeriesChallengeData, sessionHandler: SessionHandler) {
+    const { joinCode, ...mSeriesChallengeData } = joinableMSeriesChallengeData
+    super(mSeriesChallengeData, sessionHandler)
+    this._joinCode = joinableMSeriesChallengeData.joinCode
+  }
+
+  private setJoinableMSeriesChallenge (joinableMSeriesChallengeData: JoinableMSeriesChallengeData) {
+    const { joinCode, ...mSeriesChallengeData } = joinableMSeriesChallengeData
+    this.setMSeriesChallenge(mSeriesChallengeData)
+    this._joinCode = joinableMSeriesChallengeData.joinCode
+  }
+}
+
+export class OwnedMSeriesChallenge extends JoinableMSeriesChallenge {}
+export class JoinedMSeriesChallenge extends JoinableMSeriesChallenge {}
+export class StaticMSeriesChallenge extends MSeriesChallenge {}
