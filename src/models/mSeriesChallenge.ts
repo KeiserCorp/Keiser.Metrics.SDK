@@ -59,7 +59,7 @@ export interface MSeriesChallengeListResponseMeta extends ListMeta {
   sort: MSeriesChallengeSorting
 }
 
-export class BaseMSeriesChallenge extends Model {
+export abstract class MSeriesChallenge extends Model {
   protected _mSeriesChallengeData: MSeriesChallengeData
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
@@ -135,7 +135,7 @@ export class BaseMSeriesChallenge extends Model {
 }
 
 // non-exportable class that contains methods shared between JoinedMSeriesChallenge and PrivilegedMSeriesChallenge
-class AccessibleMSeriesChallenge extends BaseMSeriesChallenge {
+export abstract class AccessibleMSeriesChallenge extends MSeriesChallenge {
   /**
    * Method to get the current session user's challenge participant data.
    *
@@ -237,7 +237,7 @@ MSeriesChallengeListResponseMeta
   }
 }
 
-export class JoinableMSeriesChallenge extends BaseMSeriesChallenge {
+export class JoinableMSeriesChallenge extends MSeriesChallenge {
 /**
    * Method to join a challenge
    */
