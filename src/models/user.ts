@@ -342,13 +342,14 @@ export class User extends Model {
     }
   }
 
-  async getMSeriesChallenges (params: {from?: Date, to?: Date, isCompleted?: boolean, relationship?: MSeriesChallengeRelationship, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
-    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, userId: this.id }) as MSeriesChallengeListResponse
-    if (mSeriesChallengesMeta.relationship === MSeriesChallengeRelationship.Joined) {
-      return new JoinedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
-    } else {
-      return new PrivilegedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
-    }
+  async getPrivilegedMSeriesChallenges (params: {from?: Date, to?: Date, isCompleted?: boolean, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, relationship: MSeriesChallengeRelationship.Owned, userId: this.id }) as MSeriesChallengeListResponse
+    return new PrivilegedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+  }
+
+  async getJoinedMSeriesChallenges (params: {from?: Date, to?: Date, isCompleted?: boolean, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, relationship: MSeriesChallengeRelationship.Joined, userId: this.id }) as MSeriesChallengeListResponse
+    return new JoinedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
   }
 
   async createHeartRateDataSet (params: { sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[] }) {

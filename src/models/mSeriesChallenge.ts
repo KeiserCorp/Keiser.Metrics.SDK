@@ -59,8 +59,7 @@ export interface MSeriesChallengeListResponseMeta extends ListMeta {
   sort: MSeriesChallengeSorting
 }
 
-// non-exportable base MSeriesChallenge class
-class BaseMSeriesChallenge extends Model {
+export class BaseMSeriesChallenge extends Model {
   protected _mSeriesChallengeData: MSeriesChallengeData
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
@@ -129,6 +128,10 @@ class BaseMSeriesChallenge extends Model {
   get isJoined () {
     return this._mSeriesChallengeData.isJoined
   }
+
+  get mSeriesChallengeData (): MSeriesChallengeData {
+    return { ...this._mSeriesChallengeData }
+  }
 }
 
 // non-exportable class that contains methods shared between JoinedMSeriesChallenge and PrivilegedMSeriesChallenge
@@ -149,8 +152,8 @@ class AccessibleMSeriesChallenge extends BaseMSeriesChallenge {
      * @param mSeriesChallengeParticipantId Id of participant to be shown.
      * @returns An MSeries Challenge Participant
      */
-  async getParticipant (mSeriesChallengeParticipantId: number) {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+  async getParticipant (params: { mSeriesChallengeParticipantId: number }) {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: params.mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 

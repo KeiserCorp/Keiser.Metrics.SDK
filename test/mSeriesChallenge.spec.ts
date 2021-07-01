@@ -2,12 +2,12 @@ import { expect } from 'chai'
 
 import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
-import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeRelationship, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from '../src/models/mSeriesChallenge'
+import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from '../src/models/mSeriesChallenge'
 import { MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallengeParticipant'
 import { User } from '../src/models/user'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 
-describe.only('M Series Challenge', function () {
+describe('M Series Challenge', function () {
   let metricsInstance: Metrics
   let user: User, user2: User
   const user2EmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
@@ -98,7 +98,7 @@ describe.only('M Series Challenge', function () {
   })
 
   it('can list owned M Series Challenges', async function () {
-    const mSeriesChallenges = await user.getMSeriesChallenges({ relationship: MSeriesChallengeRelationship.Owned })
+    const mSeriesChallenges = await user.getPrivilegedMSeriesChallenges()
 
     expect(Array.isArray(mSeriesChallenges)).to.equal(true)
     expect(mSeriesChallenges instanceof PrivilegedMSeriesChallenges).to.equal(true)
@@ -106,7 +106,7 @@ describe.only('M Series Challenge', function () {
   })
 
   it('can list joined M Series Challenges', async function () {
-    const mSeriesChallenges = await user2.getMSeriesChallenges()
+    const mSeriesChallenges = await user2.getJoinedMSeriesChallenges()
 
     expect(Array.isArray(mSeriesChallenges)).to.equal(true)
     expect(mSeriesChallenges instanceof JoinedMSeriesChallenges).to.equal(true)
