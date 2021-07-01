@@ -12,7 +12,7 @@ import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacility
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
-import { MSeriesChallenge, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallenges, MSeriesChallengeSorting, MSeriesChallengeType } from './mSeriesChallenge'
+import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from './mSeriesChallenge'
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse } from './mSeriesChallengeParticipant'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
@@ -320,9 +320,9 @@ export class User extends Model {
     return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler)
   }
 
-  async createMSeriesChallenge (params: {userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number, shouldAutoJoinCreator?: boolean}) {
+  async createMSeriesChallenge (params: {userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number}) {
     const { mSeriesChallenge } = await this.action('mSeriesChallenge:create', { ...params, isPublic: false }) as MSeriesChallengeResponse
-    return new MSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
   }
 
   async joinMSeriesChallenge (params: {joinCode: string}) {
@@ -332,12 +332,23 @@ export class User extends Model {
 
   async getMSeriesChallenge (params: XOR<{id: number}, {joinCode: string}>) {
     const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { ...params, userId: this.id }) as MSeriesChallengeResponse
-    return new MSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+
+    if (mSeriesChallenge.userId === this.id) {
+      return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    } else if (mSeriesChallenge.isJoined) {
+      return new JoinedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    } else {
+      return new JoinableMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    }
   }
 
   async getMSeriesChallenges (params: {from?: Date, to?: Date, isCompleted?: boolean, relationship?: MSeriesChallengeRelationship, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, userId: this.id }) as MSeriesChallengeListResponse
-    return new MSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+    if (mSeriesChallengesMeta.relationship === MSeriesChallengeRelationship.Joined) {
+      return new JoinedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+    } else {
+      return new PrivilegedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+    }
   }
 
   async createHeartRateDataSet (params: { sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[] }) {

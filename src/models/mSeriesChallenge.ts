@@ -27,8 +27,8 @@ export const enum MSeriesChallengeSorting {
 }
 
 export interface MSeriesChallengeData {
-  // joinCode: string | undefined
   id: number
+  joinCode: string
   name: string
   userId: number
   isPublic: boolean
@@ -39,6 +39,7 @@ export interface MSeriesChallengeData {
   focus: MSeriesChallengeFocus
   goal: number
   isCompleted: boolean
+  isJoined: boolean
 }
 
 export interface MSeriesChallengeResponse extends AuthenticatedResponse {
@@ -58,17 +59,8 @@ export interface MSeriesChallengeListResponseMeta extends ListMeta {
   sort: MSeriesChallengeSorting
 }
 
-export class MSeriesChallenges extends ModelList<
-MSeriesChallenge,
-MSeriesChallengeData,
-MSeriesChallengeListResponseMeta
-> {
-  constructor (mSeriesChallenges: MSeriesChallengeData[], mSeriesChallengesMeta: MSeriesChallengeListResponseMeta, sessionHandler: SessionHandler) {
-    super(MSeriesChallenge, mSeriesChallenges, mSeriesChallengesMeta, sessionHandler)
-  }
-}
-
-export class MSeriesChallenge extends Model {
+// non-exportable base MSeriesChallenge class
+class BaseMSeriesChallenge extends Model {
   protected _mSeriesChallengeData: MSeriesChallengeData
 
   constructor (mSeriesChallengeData: MSeriesChallengeData, sessionHandler: SessionHandler) {
@@ -86,134 +78,13 @@ export class MSeriesChallenge extends Model {
     return this
   }
 
-  /**
-   * Method to end a challenge. Only challenge owners can end a challenge.
-   */
-  async end () {
-    await this.action('mSeriesChallenge:delete', { id: this._mSeriesChallengeData.id })
-  }
-
-  /**
-   * Method to leave a challenge. Only challenge participants can leave a challenge.
-   */
-  async leave () {
-    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId })
-  }
-
-  // /**
-  //  * Method to join a challenge. Challenge instance must contain joinCode to successfully join.
-  //  */
-  // async join () {
-  //   if (this._mSeriesChallengeData.joinCode !== undefined) {
-  //     const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-  //     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-  //   }
-
-  //   throw new MissingParamsError({
-  //     name: 'MissingParams',
-  //     message: 'missing parameter(s) for action'
-  //   })
-  // }
-
-  /**
-   * This method returns the current session user's challenge participant data.
-   *
-   * @returns An MSeries Challenge Participant
-   */
-  async getCurrentParticipant () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-  }
-
-  /**
-  * This method returns a user's challenge participant data.
-   *
-   * @param mSeriesChallengeParticipantId Id of participant to be shown.
-   * @returns An MSeries Challenge Participant
-   */
-  async getParticipant (mSeriesChallengeParticipantId: number) {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
-    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
-  }
-
-  /**
-   * Method to search for participants in challenge.
-   * Session User must either own or have joined challenge to search for other participants.
-   *
-   * @param options.nameSearchQuery Name to search for
-   * @param options.sort default: 'name'
-   * @param options.ascending default: true
-   * @param options.limit default: 20
-   * @param options.offset default: 0
-   * @returns An array of MSeries Challenge Participants
-   */
-  async getParticipants (options: {
-    nameSearchQuery: string
-    sort?: MSeriesChallengeParticipantSorting
-    ascending?: boolean
-    limit?: number
-    offset?: number
-  }) {
-    const participants = await this.action('mSeriesChallengeParticipant:list', {
-      mSeriesChallengeId: this._mSeriesChallengeData.id,
-      userId: this.sessionHandler.userId,
-      ...options
-    }) as MSeriesChallengeParticipantListResponse
-    return new MSeriesChallengeParticipants(participants.mSeriesChallengeParticipants, participants.mSeriesChallengeParticipantsMeta, this.sessionHandler)
-  }
-
-  /**
-   * Method to get leaderboard of challenge.
-   * Session User must either own or have joined challenge to get leaderboard.
-   *
-   * @param options.targetUserId userId to "center" leaderboard on
-   * @param options.ascending default: true
-   * @param options.limit default: 20
-   * @param options.offset default: 0
-   * @returns An array of MSeries Challenge Participants sorted by rank
-   */
-  async getLeaderboard (options: {
-    targetUserId?: number
-    ascending?: boolean
-    limit?: number
-    offset?: number
-  } = {}) {
-    const leaderboard = await this.action('mSeriesChallenge:leaderboard', {
-      id: this._mSeriesChallengeData.id,
-      userId: this.sessionHandler.userId,
-      ...options
-    }) as MSeriesChallengeLeaderboardResponse
-
-    return new MSeriesChallengeLeaderboardParticipants(leaderboard.mSeriesChallengeParticipants, leaderboard.mSeriesChallengeParticipantsMeta, this.sessionHandler)
-  }
-
-  /**
-   * Method to update challenge meta data.
-   * Session User must own challenge to update it.
-   *
-   * @param options.name
-   * @param options.userLimit
-   */
-  async update (options: {
-    name?: string
-    // isPublic?: boolean
-    userLimit?: number
-  }) {
-    const { mSeriesChallenge } = await this.action('mSeriesChallenge:update', {
-      id: this._mSeriesChallengeData.id,
-      ...options
-    }) as MSeriesChallengeResponse
-
-    this.setMSeriesChallenge(mSeriesChallenge)
-  }
-
   get id () {
     return this._mSeriesChallengeData.id
   }
 
-  // get joinCode () {
-  //   return this._mSeriesChallengeData.joinCode
-  // }
+  get joinCode () {
+    return this._mSeriesChallengeData.joinCode
+  }
 
   get userId () {
     return this._mSeriesChallengeData.userId
@@ -254,28 +125,160 @@ export class MSeriesChallenge extends Model {
   get isCompleted () {
     return this._mSeriesChallengeData.isCompleted
   }
-}
 
-export interface JoinableMSeriesChallengeData extends MSeriesChallengeData {
-  joinCode: string
-}
-
-export class JoinableMSeriesChallenge extends MSeriesChallenge {
-  private _joinCode: string
-
-  constructor (joinableMSeriesChallengeData: JoinableMSeriesChallengeData, sessionHandler: SessionHandler) {
-    const { joinCode, ...mSeriesChallengeData } = joinableMSeriesChallengeData
-    super(mSeriesChallengeData, sessionHandler)
-    this._joinCode = joinableMSeriesChallengeData.joinCode
-  }
-
-  private setJoinableMSeriesChallenge (joinableMSeriesChallengeData: JoinableMSeriesChallengeData) {
-    const { joinCode, ...mSeriesChallengeData } = joinableMSeriesChallengeData
-    this.setMSeriesChallenge(mSeriesChallengeData)
-    this._joinCode = joinableMSeriesChallengeData.joinCode
+  get isJoined () {
+    return this._mSeriesChallengeData.isJoined
   }
 }
 
-export class OwnedMSeriesChallenge extends JoinableMSeriesChallenge {}
-export class JoinedMSeriesChallenge extends JoinableMSeriesChallenge {}
-export class StaticMSeriesChallenge extends MSeriesChallenge {}
+// non-exportable class that contains methods shared between JoinedMSeriesChallenge and PrivilegedMSeriesChallenge
+class AccessibleMSeriesChallenge extends BaseMSeriesChallenge {
+  /**
+   * Method to get the current session user's challenge participant data.
+   *
+   * @returns An MSeries Challenge Participant
+   */
+  async getCurrentParticipant () {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+  }
+
+  /**
+    * Method to get user's challenge participant data.
+     *
+     * @param mSeriesChallengeParticipantId Id of participant to be shown.
+     * @returns An MSeries Challenge Participant
+     */
+  async getParticipant (mSeriesChallengeParticipantId: number) {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: mSeriesChallengeParticipantId, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+  }
+
+  /**
+     * Method to search for participants in challenge.
+     *
+     * @param options.nameSearchQuery Name to search for
+     * @param options.sort default: 'name'
+     * @param options.ascending default: true
+     * @param options.limit default: 20
+     * @param options.offset default: 0
+     * @returns An array of MSeries Challenge Participants
+     */
+  async getParticipants (options: {
+    nameSearchQuery: string
+    sort?: MSeriesChallengeParticipantSorting
+    ascending?: boolean
+    limit?: number
+    offset?: number
+  }) {
+    const participants = await this.action('mSeriesChallengeParticipant:list', {
+      mSeriesChallengeId: this._mSeriesChallengeData.id,
+      userId: this.sessionHandler.userId,
+      ...options
+    }) as MSeriesChallengeParticipantListResponse
+    return new MSeriesChallengeParticipants(participants.mSeriesChallengeParticipants, participants.mSeriesChallengeParticipantsMeta, this.sessionHandler)
+  }
+
+  /**
+     * Method to get leaderboard of challenge.
+     *
+     * @param options.targetUserId userId to "center" leaderboard on
+     * @param options.ascending default: true
+     * @param options.limit default: 20
+     * @param options.offset default: 0
+     * @returns An array of MSeries Challenge Participants sorted by rank
+     */
+  async getLeaderboard (options: {
+    targetUserId?: number
+    ascending?: boolean
+    limit?: number
+    offset?: number
+  } = {}) {
+    const leaderboard = await this.action('mSeriesChallenge:leaderboard', {
+      id: this._mSeriesChallengeData.id,
+      userId: this.sessionHandler.userId,
+      ...options
+    }) as MSeriesChallengeLeaderboardResponse
+
+    return new MSeriesChallengeLeaderboardParticipants(leaderboard.mSeriesChallengeParticipants, leaderboard.mSeriesChallengeParticipantsMeta, this.sessionHandler)
+  }
+}
+
+export class JoinableMSeriesChallenges extends ModelList<
+JoinableMSeriesChallenge,
+MSeriesChallengeData,
+MSeriesChallengeListResponseMeta
+> {
+  constructor (mSeriesChallenges: MSeriesChallengeData[], mSeriesChallengesMeta: MSeriesChallengeListResponseMeta, sessionHandler: SessionHandler) {
+    super(JoinableMSeriesChallenge, mSeriesChallenges, mSeriesChallengesMeta, sessionHandler)
+  }
+}
+
+export class JoinedMSeriesChallenges extends ModelList<
+JoinedMSeriesChallenge,
+MSeriesChallengeData,
+MSeriesChallengeListResponseMeta
+> {
+  constructor (mSeriesChallenges: MSeriesChallengeData[], mSeriesChallengesMeta: MSeriesChallengeListResponseMeta, sessionHandler: SessionHandler) {
+    super(JoinedMSeriesChallenge, mSeriesChallenges, mSeriesChallengesMeta, sessionHandler)
+  }
+}
+
+export class PrivilegedMSeriesChallenges extends ModelList<
+PrivilegedMSeriesChallenge,
+MSeriesChallengeData,
+MSeriesChallengeListResponseMeta
+> {
+  constructor (mSeriesChallenges: MSeriesChallengeData[], mSeriesChallengesMeta: MSeriesChallengeListResponseMeta, sessionHandler: SessionHandler) {
+    super(PrivilegedMSeriesChallenge, mSeriesChallenges, mSeriesChallengesMeta, sessionHandler)
+  }
+}
+
+export class JoinableMSeriesChallenge extends BaseMSeriesChallenge {
+/**
+   * Method to join a challenge
+   */
+  async join () {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    return {
+      mSeriesChallengeParticipant: new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler),
+      joinedMSeriesChallenge: new JoinedMSeriesChallenge(this._mSeriesChallengeData, this.sessionHandler)
+    }
+  }
+}
+export class JoinedMSeriesChallenge extends AccessibleMSeriesChallenge {
+  /**
+   * Method to leave a challenge
+   */
+  async leave () {
+    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId })
+    return new JoinableMSeriesChallenge(this._mSeriesChallengeData, this.sessionHandler)
+  }
+}
+export class PrivilegedMSeriesChallenge extends AccessibleMSeriesChallenge {
+  /**
+   * Method to end a challenge
+   */
+  async end () {
+    await this.action('mSeriesChallenge:delete', { id: this._mSeriesChallengeData.id })
+  }
+
+  /**
+   * Method to update challenge meta data.
+   *
+   * @param options.name
+   * @param options.userLimit
+   */
+  async update (options: {
+    name?: string
+    // isPublic?: boolean
+    userLimit?: number
+  }) {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:update', {
+      id: this._mSeriesChallengeData.id,
+      ...options
+    }) as MSeriesChallengeResponse
+
+    this.setMSeriesChallenge(mSeriesChallenge)
+  }
+}
