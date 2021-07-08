@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -19,6 +19,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type": "module",
   "scripts": {
     "start": "npm run dev",
     "test": "ts-mocha test/index.ts",
@@ -26,7 +27,8 @@
     "dev": "webpack serve --config webpack.config.js",
     "build": "rollup --config",
     "release": "node .bin/publish-npm.js",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "changelog": "npx auto-changelog -t keepachangelog -p --commit-limit false"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^19.0.0",
@@ -38,6 +40,7 @@
     "@types/node": "^15.6.1",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
+    "auto-changelog": "^2.3.0",
     "chai": "^4.3.4",
     "cross-spawn": "^7.0.3",
     "eslint": "^7.27.0",
@@ -52,6 +55,7 @@
     "rollup": "^2.50.2",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-execute": "^1.1.1",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-typescript2": "^0.30.0",
     "semver": "^7.3.5",

@@ -1,7 +1,6 @@
-import { ForceUnit } from '../constants'
+import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
 import { compressDeflateToB64 } from '../lib/compress'
-import { XOR } from '../lib/types'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
@@ -13,6 +12,8 @@ import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacility
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
+import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from './mSeriesChallenge'
+import { MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse } from './mSeriesChallengeParticipant'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
@@ -318,6 +319,37 @@ export class User extends Model {
   async getMSeriesFtpMeasurements (options: { source?: string, machineType?: string, from?: Date, to?: Date, sort?: MSeriesFtpMeasurementSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta } = await this.action('mSeriesFtpMeasurement:list', { ...options, userId: this.id }) as MSeriesFtpMeasurementListResponse
     return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler)
+  }
+
+  async createMSeriesChallenge (params: { userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number }) {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:create', { ...params, isPublic: false }) as MSeriesChallengeResponse
+    return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+  }
+
+  async joinMSeriesChallenge (params: { joinCode: string }) {
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { ...params, userId: this.id }) as MSeriesChallengeParticipantResponse
+    return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
+  }
+
+  async getMSeriesChallenge (params: XOR<{ id: number }, { joinCode: string }>) {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { ...params, userId: this.id }) as MSeriesChallengeResponse
+
+    if (mSeriesChallenge.userId === this.id) {
+      return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    } else if (mSeriesChallenge.isJoined) {
+      return new JoinedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    } else {
+      return new JoinableMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
+    }
+  }
+
+  async getMSeriesChallenges (params: { from?: Date, to?: Date, relationship?: MSeriesChallengeRelationship, isCompleted?: boolean, sort?: MSeriesChallengeSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { mSeriesChallenges, mSeriesChallengesMeta } = await this.action('mSeriesChallenge:list', { ...params, userId: this.id }) as MSeriesChallengeListResponse
+    if (mSeriesChallengesMeta.relationship === MSeriesChallengeRelationship.Owned) {
+      return new PrivilegedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+    } else {
+      return new JoinedMSeriesChallenges(mSeriesChallenges, mSeriesChallengesMeta, this.sessionHandler)
+    }
   }
 
   async createHeartRateDataSet (params: { sessionId?: number, autoAttachSession?: boolean, source: string, heartRateDataPoints: HeartRateCapturedDataPoint[] }) {
