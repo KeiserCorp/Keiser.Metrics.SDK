@@ -1,4 +1,4 @@
-import { Units } from '../constants'
+import { Units, XOR } from '../constants'
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
@@ -156,13 +156,8 @@ export class PrivilegedFacility extends Facility {
     return new FacilityUserEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async getSession (params: { id: number }) {
+  async getSession (params: XOR<{ id: number }, { echipId: string }>) {
     const { session } = await this.action('facilitySession:show', params) as SessionResponse
-    return new FacilitySession(session, this.sessionHandler)
-  }
-
-  async getSessionByEChip (params: { echipId: string }) {
-    const { session } = await this.action('facilitySession:checkEchip', params) as SessionResponse
     return new FacilitySession(session, this.sessionHandler)
   }
 
