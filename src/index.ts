@@ -4,7 +4,7 @@ import { Core } from './models/core'
 import { OAuthProviders } from './models/oauthService'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
-import { Authentication, SSO } from './session'
+import { Authentication, UserSession } from './session'
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection
@@ -49,7 +49,7 @@ export default class Metrics {
 
   /** @deprecated */
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean }) {
-    return await Authentication.useCredentials(this._connection, { refreshable: true, ...params })
+    return await Authentication.useCredentialsDeprecated(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateWithToken (params: { token: string }) {
@@ -75,54 +75,59 @@ export default class Metrics {
 
 /** @hidden */
 export class MetricsSSO extends Metrics {
-  async checkReturnRoute (params: {returnUrl: string}) {
-    return await SSO.checkReturnRoute(this._connection, params)
+  async isReturnRouteValid (params: {returnUrl: string}) {
+    return await Authentication.isReturnRouteValid(this._connection, params)
   }
 
-  async authenticate (params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
-    return await SSO.authenticate(this._connection, params)
+  async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
+    return await Authentication.useCredentials(this._connection, params)
   }
 
-  async createUser (params: { email: string, returnUrl: string, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
-    return await SSO.createUser(this._connection, { refreshable: true, ...params })
+  async initializeUserCreation (params: { email: string, returnUrl: string, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
+    return await Authentication.initializeUserCreation(this._connection, { refreshable: true, ...params })
   }
 
-  async userFulfillment (params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
-    return await SSO.userFulfillment(this._connection, params)
+  async initiatePasswordReset (params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
+    await Authentication.initiatePasswordReset(this._connection, params)
   }
 
-  async showUserParams (params: { authorizationCode: string }) {
-    return await SSO.showUserParams(this._connection, params)
+  async fulfillUserCreation (params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+    return await Authentication.useUserCreationToken(this._connection, params)
   }
 
-  async authenticateWithFacebook (params: { redirect: string }) {
-    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
+  async initiateOAuthWithFacebook (params: { redirect: string }) {
+    return await Authentication.initiateOAuth(this._connection, { ...params, service: OAuthProviders.Facebook })
   }
 
-  async authenticateWithGoogle (params: { redirect: string }) {
-    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Google })
+  async initiateOAuthWithGoogle (params: { redirect: string }) {
+    return await Authentication.initiateOAuth(this._connection, { ...params, service: OAuthProviders.Google })
   }
 
-  async authenticateWithApple (params: { redirect: string }) {
-    return await SSO.useOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
-  }
-
-  async passwordReset (params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
-    await SSO.passwordReset(this._connection, params)
+  async initiateOAuthWithApple (params: { redirect: string }) {
+    return await Authentication.initiateOAuth(this._connection, { ...params, service: OAuthProviders.Apple })
   }
 
   async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
-    return await SSO.useResetToken(this._connection, { refreshable: true, ...params })
+    return await Authentication.useResetToken(this._connection, { refreshable: true, ...params })
+  }
+
+  async elevateUserSession (params: { userSession: UserSession, otpToken: string, refreshable?: boolean }) {
+    return await Authentication.elevateUserSession(params)
   }
 }
 
 /** @hidden */
 export class MetricsAdmin extends Metrics {
+  /** @deprecated */
   async authenticateAdminWithCredentials (params: { email: string, password: string, token: string, refreshable?: boolean }) {
     return await Authentication.useAdminCredentials(this._connection, { refreshable: true, ...params })
   }
 
   async authenticateAdminWithToken (params: { token: string }) {
     return await Authentication.useAdminToken(this._connection, params)
+  }
+
+  async authenticateAdminWithExchangeToken (params: { exchangeToken: string }) {
+    return await Authentication.useAdminExchangeToken(this._connection, params)
   }
 }
