@@ -32,7 +32,15 @@ import Metrics from '@keiser/metrics-sdk'
 const metrics = new Metrics({restEndpoint: 'http://localhost:8000/api', socketEndpoint: 'ws://localhost:8000/ws'})
 ```
 
-## Authentication
+## Authentication (<= v2)
+
+<hr/>
+
+### Authentication has changed drastically in v3.
+#### Updated documentation for v3+ authentication will be coming soon.
+
+<hr/>
+
 The base [`Metrics`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html) instance is a connection handler with access to only limited information. To access user specific information a [`UserSession`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/usersession.html) must be created by authenticating through one of the available mechanisms:
 
 - [`authenticateWithCredentials`](https://keisercorp.github.io/Keiser.Metrics.SDK/classes/metrics.html#authenticatewithcredentials) - Use email and password
