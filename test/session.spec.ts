@@ -4,22 +4,16 @@ import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Session', function () {
   let metricsInstance: Metrics
-  let userSession: UserSession
   let user: User
   let createdSession: Session
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 

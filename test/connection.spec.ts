@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 
 import Metrics from '../src'
-import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './utils/constants'
 
 const connectionTimeout = 3000
 
-describe('Connection', function () {
+describe.skip('Connection', function () {
   if (IsBrowser) {
     describe('Socket (Dev Server)', function () {
       let metricsInstance: Metrics

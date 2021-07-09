@@ -5,35 +5,32 @@ import { UnknownEntityError } from '../src/error'
 import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeRelationship, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from '../src/models/mSeriesChallenge'
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallengeParticipant'
 import { User } from '../src/models/user'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { createNewUserSession, getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('M Series Challenge', function () {
   let metricsInstance: Metrics
-  let user: User, user2: User
-  const user2EmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
+  let demoUser: User
+  let createdUser: User
   let createdMSeriesChallenge: PrivilegedMSeriesChallenge
   let joinedMSeriesChallenge: JoinedMSeriesChallenge
   let joinableMSeriesChallenge: JoinableMSeriesChallenge
   let createdMSeriesChallengeParticipant: MSeriesChallengeParticipant
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const userSession2 = await metricsInstance.createUser({ email: user2EmailAddress, password: DemoPassword })
-    user = userSession.user
-    user2 = userSession2.user
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    demoUser = demoUserSession.user
+    const createdUserSession = await createNewUserSession(metricsInstance)
+    createdUser = createdUserSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await createdUser?.delete()
     metricsInstance?.dispose()
   })
 
   it('can create new M Series Challenge', async function () {
-    const mSeriesChallenge = await user.createMSeriesChallenge({
+    const mSeriesChallenge = await demoUser.createMSeriesChallenge({
       userLimit: 25,
       name: 'SDK Test Challenge',
       challengeType: MSeriesChallengeType.GoalBased,
@@ -41,31 +38,31 @@ describe('M Series Challenge', function () {
       goal: 1000
     })
 
-    expect(typeof mSeriesChallenge).to.equal('object')
+    expect(mSeriesChallenge).to.be.an('object')
     expect(mSeriesChallenge.userLimit).to.equal(25)
-    expect(mSeriesChallenge.userId).to.equal(user.id)
-    expect(typeof mSeriesChallenge.joinCode).to.equal('string')
+    expect(mSeriesChallenge.userId).to.equal(demoUser.id)
+    expect(mSeriesChallenge.joinCode).to.be.a('string')
     createdMSeriesChallenge = mSeriesChallenge
   })
 
   it('can get owned M Series Challenge', async function () {
-    const mSeriesChallenge = await user.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
+    const mSeriesChallenge = await demoUser.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
 
-    expect(typeof mSeriesChallenge).to.equal('object')
+    expect(mSeriesChallenge).to.be.an('object')
     expect(mSeriesChallenge instanceof PrivilegedMSeriesChallenge).to.equal(true)
     expect(mSeriesChallenge.userLimit).to.equal(25)
-    expect(mSeriesChallenge.userId).to.equal(user.id)
-    expect(typeof mSeriesChallenge.joinCode).to.equal('string')
+    expect(mSeriesChallenge.userId).to.equal(demoUser.id)
+    expect(mSeriesChallenge.joinCode).to.be.a('string')
   })
 
   it('can get M Series Challenge using joinCode that is neither owned nor joined', async function () {
-    const mSeriesChallenge = await user2.getMSeriesChallenge({ joinCode: createdMSeriesChallenge.joinCode })
+    const mSeriesChallenge = await createdUser.getMSeriesChallenge({ joinCode: createdMSeriesChallenge.joinCode })
 
     expect(typeof mSeriesChallenge).to.equal('object')
     expect(mSeriesChallenge instanceof JoinableMSeriesChallenge).to.equal(true)
     expect(mSeriesChallenge.userLimit).to.equal(25)
-    expect(mSeriesChallenge.userId).to.equal(user.id)
-    expect(typeof mSeriesChallenge.joinCode).to.equal('string')
+    expect(mSeriesChallenge.userId).to.equal(demoUser.id)
+    expect(mSeriesChallenge.joinCode).to.be.a('string')
     joinableMSeriesChallenge = mSeriesChallenge as JoinableMSeriesChallenge
   })
 
@@ -73,7 +70,7 @@ describe('M Series Challenge', function () {
     let extError
 
     try {
-      await user2.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
+      await createdUser.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
     } catch (error) {
       extError = error
     }
@@ -85,7 +82,7 @@ describe('M Series Challenge', function () {
     const mSeriesChallengeParticipant = await createdMSeriesChallenge.getCurrentParticipant()
 
     expect(typeof mSeriesChallengeParticipant).to.equal('object')
-    expect(mSeriesChallengeParticipant.userId).to.equal(user.id)
+    expect(mSeriesChallengeParticipant.userId).to.equal(demoUser.id)
     expect(mSeriesChallengeParticipant.mSeriesChallengeId).to.equal(createdMSeriesChallenge.id)
     createdMSeriesChallengeParticipant = mSeriesChallengeParticipant
   })
@@ -121,10 +118,10 @@ describe('M Series Challenge', function () {
   })
 
   it('can join M Series Challenge', async function () {
-    const mSeriesChallengeParticipant = await user2.joinMSeriesChallenge({ joinCode: createdMSeriesChallenge.joinCode })
+    const mSeriesChallengeParticipant = await createdUser.joinMSeriesChallenge({ joinCode: createdMSeriesChallenge.joinCode })
 
     expect(typeof mSeriesChallengeParticipant).to.equal('object')
-    expect(mSeriesChallengeParticipant.userId).to.equal(user2.id)
+    expect(mSeriesChallengeParticipant.userId).to.equal(createdUser.id)
     expect(mSeriesChallengeParticipant.mSeriesChallengeId).to.equal(createdMSeriesChallenge.id)
   })
 
@@ -136,18 +133,18 @@ describe('M Series Challenge', function () {
   })
 
   it('can get joined M Series Challenge', async function () {
-    const mSeriesChallenge = await user2.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
+    const mSeriesChallenge = await createdUser.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
 
     expect(typeof mSeriesChallenge).to.equal('object')
     expect(mSeriesChallenge instanceof JoinedMSeriesChallenge).to.equal(true)
     expect(mSeriesChallenge.userLimit).to.equal(25)
-    expect(mSeriesChallenge.userId).to.equal(user.id)
+    expect(mSeriesChallenge.userId).to.equal(demoUser.id)
     expect(typeof mSeriesChallenge.joinCode).to.equal('string')
     joinedMSeriesChallenge = mSeriesChallenge as JoinedMSeriesChallenge
   })
 
   it('can list owned M Series Challenges', async function () {
-    const mSeriesChallenges = await user.getMSeriesChallenges({ relationship: MSeriesChallengeRelationship.Owned })
+    const mSeriesChallenges = await demoUser.getMSeriesChallenges({ relationship: MSeriesChallengeRelationship.Owned })
 
     expect(Array.isArray(mSeriesChallenges)).to.equal(true)
     expect(mSeriesChallenges instanceof PrivilegedMSeriesChallenges).to.equal(true)
@@ -155,7 +152,7 @@ describe('M Series Challenge', function () {
   })
 
   it('can list joined M Series Challenges', async function () {
-    const mSeriesChallenges = await user2.getMSeriesChallenges()
+    const mSeriesChallenges = await createdUser.getMSeriesChallenges()
 
     expect(Array.isArray(mSeriesChallenges)).to.equal(true)
     expect(mSeriesChallenges instanceof JoinedMSeriesChallenges).to.equal(true)

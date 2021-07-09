@@ -5,22 +5,16 @@ import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityUserRelationshipSorting, UserFacilityEmployeeRelationship, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('User to Facility Relationship', function () {
   let metricsInstance: Metrics
-  let userSession: UserSession
   let user: User
   let existingFacilityRelationship: UserFacilityMemberRelationship
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
     user = userSession.user
   })
 

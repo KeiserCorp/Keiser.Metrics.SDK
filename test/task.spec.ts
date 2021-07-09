@@ -3,27 +3,24 @@ import { expect } from 'chai'
 import { MetricsAdmin } from '../src'
 import { Queue, TaskSorting } from '../src/models/task'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('Task', function () {
-  let metricsInstance: MetricsAdmin
-  let session: AdminSession
+  let metricsAdminInstance: MetricsAdmin
+  let adminSession: AdminSession
 
   before(async function () {
-    metricsInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const demoUserSession = await getDemoUserSession(metricsAdminInstance)
+    adminSession = await elevateUserSession(metricsAdminInstance, demoUserSession)
   })
 
   after(function () {
-    metricsInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can get details', async function () {
-    const details = await session.getResqueDetails()
+    const details = await adminSession.getResqueDetails()
 
     expect(typeof details).to.equal('object')
     expect(typeof details.queues).to.equal('object')
@@ -36,25 +33,25 @@ describe('Task', function () {
   })
 
   it('can get workers', async function () {
-    const workers = await session.getWorkers()
+    const workers = await adminSession.getWorkers()
 
     expect(Array.isArray(workers)).to.equal(true)
   })
 
   it('can get queue', async function () {
-    const tasks = await session.getTasks({ queue: Queue.High })
+    const tasks = await adminSession.getTasks({ queue: Queue.High })
 
     expect(Array.isArray(tasks)).to.equal(true)
     expect(tasks.meta.sort).to.equal(TaskSorting.ID)
   })
 
   it('can delete queued task', async function () {
-    const tasks = await session.getTasks({ queue: Queue.High })
+    const tasks = await adminSession.getTasks({ queue: Queue.High })
 
     if (tasks.length > 0) {
       const task = tasks[0]
       await task.delete()
-      const newTasks = await session.getTasks({ queue: Queue.High })
+      const newTasks = await adminSession.getTasks({ queue: Queue.High })
       expect(newTasks.filter(t => t.taskName === task.taskName && t.args[0] === task.args[0]).length).to.equal(0)
     } else {
       this.skip()
@@ -62,19 +59,19 @@ describe('Task', function () {
   })
 
   it('can get failed', async function () {
-    const failed = await session.getFailedTasks()
+    const failed = await adminSession.getFailedTasks()
 
     expect(Array.isArray(failed)).to.equal(true)
     expect(failed.meta.sort).to.equal(TaskSorting.ID)
   })
 
   it('can delete failed task', async function () {
-    const failures = await session.getFailedTasks()
+    const failures = await adminSession.getFailedTasks()
 
     if (failures.length > 0) {
       const task = failures[0]
       await task.delete()
-      const newFailures = await session.getFailedTasks()
+      const newFailures = await adminSession.getFailedTasks()
       expect(newFailures.filter(t => t.taskName === task.taskName && t.args[0] === task.args[0]).length).to.equal(0)
     } else {
       this.skip()
@@ -82,12 +79,12 @@ describe('Task', function () {
   })
 
   it('can retry failed task', async function () {
-    const failures = await session.getFailedTasks()
+    const failures = await adminSession.getFailedTasks()
 
     if (failures.length > 0) {
       const task = failures[0]
       await task.retry()
-      const newFailures = await session.getFailedTasks()
+      const newFailures = await adminSession.getFailedTasks()
       expect(newFailures.filter(t => t.taskName === task.taskName && t.args[0] === task.args[0]).length).to.equal(0)
     } else {
       this.skip()
@@ -95,16 +92,16 @@ describe('Task', function () {
   })
 
   it('can retry all failed task', async function () {
-    await session.retryAllFailedTasks()
+    await adminSession.retryAllFailedTasks()
 
-    const failures = await session.getFailedTasks()
+    const failures = await adminSession.getFailedTasks()
     expect(failures.length).to.equal(0)
   })
 
   it('can delete all failed task', async function () {
-    await session.deleteAllFailedTasks()
+    await adminSession.deleteAllFailedTasks()
 
-    const failures = await session.getFailedTasks()
+    const failures = await adminSession.getFailedTasks()
     expect(failures.length).to.equal(0)
   })
 })

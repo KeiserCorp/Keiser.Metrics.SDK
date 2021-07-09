@@ -1,5 +1,5 @@
 import { MetricsConnection } from './connection'
-import { JWT_TTL_LIMIT } from './constants'
+import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT, Units } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
@@ -19,6 +19,7 @@ import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, 
 import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
+import { Gender } from './models/profile'
 import { StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
@@ -29,7 +30,7 @@ import { PrivilegedStretchExercise, PrivilegedStretchExercises, StretchExercise,
 import { PrivilegedStretchExerciseMuscle, StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/stretchExerciseMuscle'
 import { PrivilegedStretchExerciseVariant, StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
 import { FailedTasks, Queue, ResqueDetailsResponse, TaskFailedResponse, TaskQueueResponse, Tasks, WorkersResponse } from './models/task'
-import { FacilityMemberUser, FacilityUserResponse, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
+import { ExchangeableUserResponse, FacilityMemberUser, FacilityUserResponse, User, UserListResponse, UserResponse, Users, UserSorting } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -44,8 +45,26 @@ export interface StrengthMachineInitializeResponse extends AuthenticatedResponse
   facilityStrengthMachine: FacilityStrengthMachineData
 }
 
-export interface OAuthLoginResponse {
+export interface RedirectResponse {
   url: string
+}
+
+export interface CheckReturnRouteResponse {
+  valid: boolean
+}
+
+export interface AuthPrefillParams {
+  email: string
+  returnUrl: string
+  requiresElevated?: boolean
+  name?: string
+  birthday?: string
+  gender?: string
+  language?: string
+  units?: string
+  metricWeight?: number
+  bodyFatPercentage?: number
+  metricHeight?: number
 }
 
 export interface AccessTokenChangeEvent {
@@ -102,7 +121,13 @@ export interface StrengthMachineToken extends JWTToken{
   type: 'machine'
 }
 export module Authentication {
-  export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
+  export async function useExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
+    const response = await connection.action('auth:exchange', params) as UserResponse
+    return new UserSession(response, connection)
+  }
+
+  /** @deprecated */
+  export async function useCredentialsDeprecated (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
     const response = await connection.action('auth:login', params) as UserResponse
     return new UserSession(response, connection)
   }
@@ -112,33 +137,9 @@ export module Authentication {
     return new UserSession(response, connection)
   }
 
-  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:resetFulfillment', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:facilityWelcomeFulfillment', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
   export async function useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
     await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
     return new KioskSession({ accessToken: params.kioskToken }, connection)
-  }
-
-  export async function useOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
-    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as OAuthLoginResponse
-    return response.url
-  }
-
-  export async function createUser (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('user:create', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function passwordReset (connection: MetricsConnection, params: { email: string }) {
-    await connection.action('auth:resetRequest', params)
   }
 
   export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
@@ -160,11 +161,70 @@ export module Authentication {
   }
 
   /** @hidden */
+  export async function elevateUserSession (userSession: UserSession, params: { otpToken: string, refreshable?: boolean }) {
+    const response = await userSession.sessionHandler.action('auth:elevate', params) as ExchangeableUserResponse
+    const accessToken = DecodeJWT(response.accessToken) as AccessToken
+    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
+    }
+    return new ExchangeableAdminSession(response, userSession.sessionHandler.connection, accessToken.globalAccessControl)
+  }
+
+  /** @hidden */
+  export async function isReturnRouteValid (connection: MetricsConnection, params: { returnUrl: string }) {
+    const response = await connection.action('auth:validateReturnRoute', params) as CheckReturnRouteResponse
+    return response.valid
+  }
+
+  /** @hidden */
+  export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
+    const response = await connection.action('auth:login', { apiVersion: 1, ...params }) as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, connection)
+  }
+
+  /** @hidden */
+  export async function initializeUserCreation (connection: MetricsConnection, params: { email: string, returnUrl: string, refreshable?: boolean, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
+    await connection.action('auth:userInit', params)
+  }
+
+  /** @hidden */
+  export async function useUserCreationToken (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
+    const response = await connection.action('auth:userInitFulfillment', params) as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, connection)
+  }
+
+  /** @hidden */
+  export async function useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean }) {
+    const response = await connection.action('auth:facilityWelcomeFulfillment', params) as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, connection)
+  }
+
+  /** @hidden */
+  export async function initiateOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
+    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as RedirectResponse
+    return { redirectUrl: response.url }
+  }
+
+  /** @hidden */
+  export async function initiatePasswordReset (connection: MetricsConnection, params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
+    await connection.action('auth:resetRequest', { apiVersion: 1, ...params })
+  }
+
+  /** @hidden */
+  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean, requiresElevated?: boolean }) {
+    const response = await connection.action('auth:resetFulfillment', { apiVersion: 1, ...params }) as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, connection)
+  }
+
+  /**
+   * @deprecated
+   * @hidden
+   */
   export async function useAdminCredentials (connection: MetricsConnection, params: { email: string, password: string, token: string, refreshable: boolean }) {
     const response = await connection.action('admin:login', params) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
     }
     return new AdminSession(response, connection, accessToken.globalAccessControl)
   }
@@ -174,7 +234,16 @@ export module Authentication {
     const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
+    }
+    return new AdminSession(response, connection, accessToken.globalAccessControl)
+  }
+
+  export async function useAdminExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
+    const response = await connection.action('auth:exchange', params) as UserResponse
+    const accessToken = DecodeJWT(response.accessToken) as AccessToken
+    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
+      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
     }
     return new AdminSession(response, connection, accessToken.globalAccessControl)
   }
@@ -265,6 +334,9 @@ export abstract class BaseSessionHandler {
   }
 
   close () {
+    if (this._accessTokenTimeout !== null) {
+      clearTimeout(this._accessTokenTimeout)
+    }
     this.keepAlive = false
     this._accessToken = ''
     this._refreshToken = null
@@ -274,12 +346,15 @@ export abstract class BaseSessionHandler {
 
   async action (action: string, params: Object = { }) {
     let response
+    if (this._keepAlive && this._accessTokenTimeout !== null && this.decodedAccessToken.exp * 1000 - Date.now() <= JWT_TTL_LIMIT + DEFAULT_REQUEST_TIMEOUT) {
+      clearTimeout(this._accessTokenTimeout)
+    }
     try {
-      const authParams = { authorization: this._accessToken, apiVersion: 1, ...params }
+      const authParams = { authorization: this._accessToken, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse
     } catch (error) {
       if (error instanceof SessionError && this._refreshToken !== null && (DecodeJWT(this._refreshToken) as RefreshToken).exp * 1000 - Date.now() > 0) {
-        const authParams = { authorization: this._refreshToken, apiVersion: 1, ...params }
+        const authParams = { authorization: this._refreshToken, ...params }
         response = await this._connection.action(action, authParams) as AuthenticatedResponse
       } else {
         throw error
@@ -348,7 +423,7 @@ export class KioskSession {
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
     const response = await this.sessionHandler.connection.action(action, authParams)
     return response
   }
@@ -405,7 +480,7 @@ export class StrengthMachineSession {
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, apiVersion: 1, ...params }
+    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
     const response = await this.sessionHandler.connection.action(action, authParams) as AuthenticatedResponse
     return response
   }
@@ -477,15 +552,6 @@ export abstract class UserSessionBase<UserType extends User = User> {
 
   async logout () {
     await this._sessionHandler.logout()
-  }
-
-  async elevateToAdminSession (params: { token: string }) {
-    const response = await this.action('auth:elevate', params) as UserResponse
-    const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for GAC actions.' })
-    }
-    return new AdminSession(response, this._sessionHandler.connection, accessToken.globalAccessControl)
   }
 
   get user () {
@@ -622,6 +688,19 @@ export class UserSession extends UserSessionBase<User> {
   constructor (userResponse: UserResponse, connection: MetricsConnection) {
     super(userResponse, connection)
     this._user = new User(userResponse.user, this._sessionHandler)
+  }
+}
+
+export class ExchangeableUserSession extends UserSession {
+  protected readonly _exchangeToken: string
+
+  constructor (exchangeableUserResponse: ExchangeableUserResponse, connection: MetricsConnection) {
+    super(exchangeableUserResponse, connection)
+    this._exchangeToken = exchangeableUserResponse.exchangeToken
+  }
+
+  get exchangeToken () {
+    return this._exchangeToken
   }
 }
 
@@ -846,5 +925,19 @@ export class AdminSession extends UserSession {
       globalAccessControl: new GlobalAccessControl(globalAccessControl, this.sessionHandler),
       globalAccessControlSecret
     }
+  }
+}
+
+/** @hidden */
+export class ExchangeableAdminSession extends AdminSession {
+  protected readonly _exchangeToken: string
+
+  constructor (exchangeableUserResponse: ExchangeableUserResponse, connection: MetricsConnection, globalAccessControlData: GlobalAccessControlData) {
+    super(exchangeableUserResponse, connection, globalAccessControlData)
+    this._exchangeToken = exchangeableUserResponse.exchangeToken
+  }
+
+  get exchangeToken () {
+    return this._exchangeToken
   }
 }

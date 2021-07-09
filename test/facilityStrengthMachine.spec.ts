@@ -4,12 +4,9 @@ import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachine, FacilityStrengthMachineSorting } from '../src/models/facilityStrengthMachine'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Strength Machine', function () {
-  let metricsInstance: Metrics
-  let facility: PrivilegedFacility
-  let addedMachine: FacilityStrengthMachine
   const echipData = {
     1621: {
       position: {
@@ -40,19 +37,17 @@ describe('Facility Strength Machine', function () {
     }
   }
 
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
+  let addedMachine: FacilityStrengthMachine
+
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(function () {
@@ -60,7 +55,7 @@ describe('Facility Strength Machine', function () {
   })
 
   it('can add facility strength machine', async function () {
-    addedMachine = await facility.createFacilityStrengthMachine({
+    addedMachine = await privilegedFacility.createFacilityStrengthMachine({
       strengthMachineId: 1000,
       model: '1121',
       version: '4D2C55A5',
@@ -76,14 +71,14 @@ describe('Facility Strength Machine', function () {
   })
 
   it('can list facility strength machines', async function () {
-    const strengthMachines = await facility.getFacilityStrengthMachines()
+    const strengthMachines = await privilegedFacility.getFacilityStrengthMachines()
 
     expect(Array.isArray(strengthMachines)).to.equal(true)
     expect(strengthMachines.meta.sort).to.equal(FacilityStrengthMachineSorting.Model)
   })
 
   it('can filter facility strength machines', async function () {
-    const strengthMachines = await facility.getFacilityStrengthMachines({ model: '1121' })
+    const strengthMachines = await privilegedFacility.getFacilityStrengthMachines({ model: '1121' })
 
     expect(Array.isArray(strengthMachines)).to.equal(true)
     expect(strengthMachines.meta.sort).to.equal(FacilityStrengthMachineSorting.Model)
@@ -98,7 +93,7 @@ describe('Facility Strength Machine', function () {
   })
 
   it('can get specific facility strength machine', async function () {
-    const machine = await facility.getFacilityStrengthMachine({ id: addedMachine.id })
+    const machine = await privilegedFacility.getFacilityStrengthMachine({ id: addedMachine.id })
 
     expect(machine).to.be.an('object')
     expect(machine.id).to.equal(addedMachine.id)
@@ -129,7 +124,7 @@ describe('Facility Strength Machine', function () {
   })
 
   it('can add facility strength machines by eChip', async function () {
-    const importResults = await facility.createFacilityStrengthMachinesFromEChip({ echipData })
+    const importResults = await privilegedFacility.createFacilityStrengthMachinesFromEChip({ echipData })
 
     expect(importResults).to.be.an('object')
     expect(Array.isArray(importResults.strengthMachines)).to.equal(true)

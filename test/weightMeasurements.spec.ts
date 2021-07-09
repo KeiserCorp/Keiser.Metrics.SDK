@@ -3,26 +3,21 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { User } from '../src/models/user'
 import { WeightMeasurement, WeightMeasurementSorting } from '../src/models/weightMeasurement'
-import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Weight Measurement', function () {
   let metricsInstance: Metrics
-  let userSession: UserSession
   let user: User
   let createdWeightMeasurement: WeightMeasurement
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 
@@ -50,7 +45,7 @@ describe('Weight Measurement', function () {
   })
 
   it('can create weight measurement', async function () {
-    const weightMeasurement = await user.createWeightMeasurement({ source: 'test', takenAt: new Date(), metricWeight: 80 })
+    const weightMeasurement = await user.createWeightMeasurement({ source: 'test', takenAt: new Date(Date.now() + 5000), metricWeight: 80 })
 
     expect(typeof weightMeasurement).to.equal('object')
     expect(weightMeasurement.source).to.equal('test')

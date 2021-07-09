@@ -5,7 +5,7 @@ import { ForceUnit } from '../src/constants'
 import { UnknownEntityError } from '../src/error'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Strength Machine Data Set', function () {
   let metricsInstance: Metrics
@@ -13,13 +13,9 @@ describe('Strength Machine Data Set', function () {
   let createdStrengthMachineDataSet: StrengthMachineDataSet
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    user = userSession.user
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    user = demoUserSession.user
   })
 
   after(function () {

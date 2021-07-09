@@ -1,45 +1,36 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import Metrics, { MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedExerciseOrdinalSet } from '../src/models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignmentSorting, PrivilegedExerciseOrdinalSetAssignment } from '../src/models/exerciseOrdinalSetAssignment'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
 import { AdminSession, UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
-const newCodeGen = () => [...Array(6)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
-const newIdentifier = () => [...Array(6)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Exercise Ordinal Set Assignment', function () {
+  const identifier = randomCharacterSequence(6)
+
   let metricsInstance: Metrics
-  let metricsAdminInstance: MetricsAdmin
+  let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
   let createdExerciseOrdinalSet: PrivilegedExerciseOrdinalSet
   let createdStrengthExercise: PrivilegedStrengthExercise
   let createdStrengthExerciseVariant: PrivilegedStrengthExerciseVariant
   let createdExerciseOrdinalSetAssignment: PrivilegedExerciseOrdinalSetAssignment
-  const identifier = newIdentifier()
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    createdExerciseOrdinalSet = await adminSession.createExerciseOrdinalSet({ code: newCodeGen(), name: newNameGen(), description: 'test' })
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+    metricsSSOInstance = getMetricsSSOInstance()
+    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+
+    createdExerciseOrdinalSet = await adminSession.createExerciseOrdinalSet({ code: randomLetterSequence(6), name: randomCharacterSequence(16), description: 'test' })
     createdStrengthExercise = await adminSession.createStrengthExercise({
-      defaultExerciseAlias: newNameGen(),
+      defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
       plane: StrengthExercisePlane.Sagittal
@@ -55,7 +46,7 @@ describe('Exercise Ordinal Set Assignment', function () {
     await createdStrengthExercise.delete()
     await createdExerciseOrdinalSet.delete()
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
+    metricsSSOInstance?.dispose()
   })
 
   it('can create exercise ordinal set assignment', async function () {

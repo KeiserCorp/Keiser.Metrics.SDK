@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src'
-import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './constants'
+import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './utils/constants'
 
 describe('Base', function () {
   it('can create instance with properties', function () {

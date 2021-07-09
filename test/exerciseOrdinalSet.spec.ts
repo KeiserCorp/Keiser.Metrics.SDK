@@ -1,41 +1,32 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import Metrics, { MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet } from '../src/models/exerciseOrdinalSet'
 import { AdminSession, UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
-const newCodeGen = () => [...Array(6)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Exercise Ordinal Set', function () {
+  const newName = randomCharacterSequence(16)
+  const newCode = randomLetterSequence(6)
+
   let metricsInstance: Metrics
-  let metricsAdminInstance: MetricsAdmin
+  let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
   let createdExerciseOrdinalSet: PrivilegedExerciseOrdinalSet
-  const newName = newNameGen()
-  const newCode = newCodeGen()
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+    metricsSSOInstance = getMetricsSSOInstance()
+    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
   })
 
   after(async function () {
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
+    metricsSSOInstance?.dispose()
   })
 
   it('can create exercise ordinal set', async function () {
@@ -76,7 +67,7 @@ describe('Exercise Ordinal Set', function () {
   })
 
   it('can update exercise ordinal set', async function () {
-    const newerName = newNameGen()
+    const newerName = randomCharacterSequence(16)
     await createdExerciseOrdinalSet.update({
       name: newerName,
       description: 'test part 2'

@@ -4,27 +4,21 @@ import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControl } from '../src/models/facilityAccessControl'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Access Control', function () {
   let metricsInstance: Metrics
   let userSession: UserSession
-  let facility: PrivilegedFacility
+  let privilegedFacility: PrivilegedFacility
   let accessControl: FacilityAccessControl
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(function () {
@@ -32,7 +26,7 @@ describe('Facility Access Control', function () {
   })
 
   it('can get facility access control', async function () {
-    accessControl = await facility.getAccessControl()
+    accessControl = await privilegedFacility.getAccessControl()
 
     expect(typeof accessControl).to.not.equal('undefined')
     expect(Array.isArray(accessControl.eagerFacilityAccessControlIPRanges())).to.equal(true)

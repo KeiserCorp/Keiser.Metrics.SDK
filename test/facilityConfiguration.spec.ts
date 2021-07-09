@@ -3,11 +3,11 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { CompositionType, FacilityConfiguration } from '../src/models/facilityConfiguration'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Configuration', function () {
   let metricsInstance: Metrics
-  let facility: PrivilegedFacility
+  let privilegedFacility: PrivilegedFacility
   let facilityConfiguration: FacilityConfiguration
   let originalFacilityConfigurationParameters: {
     memberIdentificationComposition: CompositionType
@@ -20,18 +20,12 @@ describe('Facility Configuration', function () {
   }
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(function () {
@@ -39,7 +33,7 @@ describe('Facility Configuration', function () {
   })
 
   it('can get facility configuration', async function () {
-    facilityConfiguration = await facility.getConfiguration()
+    facilityConfiguration = await privilegedFacility.getConfiguration()
 
     expect(typeof facilityConfiguration).to.not.equal('undefined')
     expect(typeof facilityConfiguration.memberIdentificationRegex).to.equal('string')
@@ -93,7 +87,7 @@ describe('Facility Configuration', function () {
   })
 
   it('can get facility initialization jwt', async function () {
-    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
+    const machineInitializerToken = await privilegedFacility.getFacilityStrengthMachineInitializerJWTToken()
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
     expect(typeof machineInitializerToken.initializerToken).to.equal('string')
@@ -101,7 +95,7 @@ describe('Facility Configuration', function () {
   })
 
   it('can get facility initialization otp', async function () {
-    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerOTPToken()
+    const machineInitializerToken = await privilegedFacility.getFacilityStrengthMachineInitializerOTPToken()
 
     expect(typeof machineInitializerToken).to.not.equal('undefined')
     expect(typeof machineInitializerToken.initializerToken).to.equal('string')

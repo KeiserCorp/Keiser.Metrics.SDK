@@ -4,24 +4,19 @@ import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { EmailAddress } from '../src/models/emailAddress'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { randomEmailAddress } from './utils/dummy'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Email Address', function () {
+  const newEmail = randomEmailAddress()
+
   let metricsInstance: Metrics
-  let userSession: UserSession
   let user: User
   let emailAddress: EmailAddress
-  const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.createUser({ email: newUserEmail, password: 'password' })
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 

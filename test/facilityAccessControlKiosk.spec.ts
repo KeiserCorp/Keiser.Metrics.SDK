@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 
 import Metrics from '../src'
+import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControlKiosk, PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Access Control Kiosk', function () {
   let metricsInstance: Metrics
@@ -11,21 +12,17 @@ describe('Facility Access Control Kiosk', function () {
   let facilityAccessControlKiosk: FacilityAccessControlKiosk
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const facility = facilities[0]?.eagerFacility()
-    if (typeof facility !== 'undefined') {
-      await facility.setActive()
-      const accessControl = await facility.getAccessControl()
-      const tmpFacilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
-      if (typeof tmpFacilityAccessControlKiosk !== 'undefined') {
-        facilityAccessControlKiosk = tmpFacilityAccessControlKiosk
-      }
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    const privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
+
+    const accessControl = await privilegedFacility.getAccessControl()
+    const tmpFacilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
+    if (typeof tmpFacilityAccessControlKiosk !== 'undefined') {
+      facilityAccessControlKiosk = tmpFacilityAccessControlKiosk
     }
   })
 

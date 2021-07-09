@@ -5,23 +5,19 @@ import { UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
 import { User } from '../src/models/user'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { createNewUserSession, elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('GlobalAccessControl', function () {
   let metricsAdminInstance: MetricsAdmin
   let adminSession: AdminSession
   let user: User
-  const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
-    user = (await metricsAdminInstance.createUser({ email: userEmailAddress, password: DemoPassword })).user
+    metricsAdminInstance = getMetricsAdminInstance()
+    const demoUserSession = await getDemoUserSession(metricsAdminInstance)
+    adminSession = await elevateUserSession(metricsAdminInstance, demoUserSession)
+    const userSession = await createNewUserSession(metricsAdminInstance)
+    user = userSession.user
   })
 
   after(async function () {

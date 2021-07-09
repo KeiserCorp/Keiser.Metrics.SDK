@@ -3,25 +3,20 @@ import { expect } from 'chai'
 import Metrics from '../src'
 import { OAuthProviders, OAuthServiceSorting } from '../src/models/oauthService'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('OAuth Service', function () {
   let metricsInstance: Metrics
-  let userSession: UserSession
   let user: User
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 
@@ -37,32 +32,37 @@ describe('OAuth Service', function () {
   })
 
   it('can create Facebook OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Facebook, redirect: 'localhost:8080' })
+    const response = await user.initiateOAuthService({ service: OAuthProviders.Facebook, redirect: 'localhost:8080' })
 
-    expect(typeof oauthServiceUrl).to.equal('string')
+    expect(response).to.be.an('object')
+    expect(response.redirectUrl).to.be.a('string')
   })
 
   it('can create Apple OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Apple, redirect: 'localhost:8080' })
+    const response = await user.initiateOAuthService({ service: OAuthProviders.Apple, redirect: 'localhost:8080' })
 
-    expect(typeof oauthServiceUrl).to.equal('string')
+    expect(response).to.be.an('object')
+    expect(response.redirectUrl).to.be.a('string')
   })
 
   it('can create Google OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Google, redirect: 'localhost:8080' })
+    const response = await user.initiateOAuthService({ service: OAuthProviders.Google, redirect: 'localhost:8080' })
 
-    expect(typeof oauthServiceUrl).to.equal('string')
+    expect(response).to.be.an('object')
+    expect(response.redirectUrl).to.be.a('string')
   })
 
   it('can create Strava OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.Strava, redirect: 'localhost:8080' })
+    const response = await user.initiateOAuthService({ service: OAuthProviders.Strava, redirect: 'localhost:8080' })
 
-    expect(typeof oauthServiceUrl).to.equal('string')
+    expect(response).to.be.an('object')
+    expect(response.redirectUrl).to.be.a('string')
   })
 
   it('can create Training Peaks OAuth service', async function () {
-    const oauthServiceUrl = await user.createOAuthService({ service: OAuthProviders.TrainingPeaks, redirect: 'localhost:8080' })
+    const response = await user.initiateOAuthService({ service: OAuthProviders.TrainingPeaks, redirect: 'localhost:8080' })
 
-    expect(typeof oauthServiceUrl).to.equal('string')
+    expect(response).to.be.an('object')
+    expect(response.redirectUrl).to.be.a('string')
   })
 })

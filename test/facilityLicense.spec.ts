@@ -1,23 +1,22 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
 import { AdminSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Facility License', function () {
-  let metricsInstance: MetricsAdmin
-  let session: AdminSession
+  let metricsInstance: Metrics
+  let adminSession: AdminSession
   let createdFacilityLicense: FacilityLicense
 
   before(async function () {
-    metricsInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    session = await metricsInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+    const metricsSSOInstance = getMetricsSSOInstance()
+    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsSSOInstance.dispose()
   })
 
   after(function () {
@@ -25,7 +24,7 @@ describe('Facility License', function () {
   })
 
   it('can get facility licenses', async function () {
-    const facilityLicenses = await session.getFacilityLicenses()
+    const facilityLicenses = await adminSession.getFacilityLicenses()
 
     expect(Array.isArray(facilityLicenses)).to.equal(true)
     expect(facilityLicenses[0].accountId).to.equal('2568000')
@@ -33,7 +32,7 @@ describe('Facility License', function () {
   })
 
   it('can reload facility licenses', async function () {
-    let facilityLicense = (await session.getFacilityLicenses())[0]
+    let facilityLicense = (await adminSession.getFacilityLicenses())[0]
 
     expect(facilityLicense.accountId).to.equal('2568000')
     facilityLicense = await facilityLicense.reload()
@@ -41,14 +40,14 @@ describe('Facility License', function () {
   })
 
   it('can create facility license', async function () {
-    createdFacilityLicense = await session.createFacilityLicense({ term: 5, type: LicenseType.Test })
+    createdFacilityLicense = await adminSession.createFacilityLicense({ term: 5, type: LicenseType.Test })
 
     expect(createdFacilityLicense.term).to.equal(5)
     expect(createdFacilityLicense.type).to.equal(LicenseType.Test)
   })
 
   it('can get specific facility license', async function () {
-    const facilityLicense = await session.getFacilityLicense({ id: createdFacilityLicense.id })
+    const facilityLicense = await adminSession.getFacilityLicense({ id: createdFacilityLicense.id })
 
     expect(facilityLicense.id).to.equal(createdFacilityLicense.id)
     expect(facilityLicense.term).to.equal(createdFacilityLicense.term)

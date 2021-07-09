@@ -1,37 +1,29 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsAdmin } from '../src'
+import Metrics, { MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantSorting, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
 import { AdminSession, UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+import { randomCharacterSequence } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Strength Exercise Variant', function () {
   let metricsInstance: Metrics
-  let metricsAdminInstance: MetricsAdmin
+  let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
   let createdStrengthExercise: PrivilegedStrengthExercise
   let createdStrengthExerciseVariant: PrivilegedStrengthExerciseVariant
 
   before(async function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await metricsInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword })
-    adminSession = await metricsAdminInstance.authenticateAdminWithCredentials({ email: DemoEmail, password: DemoPassword, token: '123456' })
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+    metricsSSOInstance = getMetricsSSOInstance()
+    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+
     createdStrengthExercise = await adminSession.createStrengthExercise({
-      defaultExerciseAlias: newNameGen(),
+      defaultExerciseAlias: randomCharacterSequence(26),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
       plane: StrengthExercisePlane.Sagittal
@@ -41,7 +33,7 @@ describe('Strength Exercise Variant', function () {
   after(async function () {
     await createdStrengthExercise.delete()
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
+    metricsSSOInstance?.dispose()
   })
 
   it('can create strength exercise variants', async function () {
