@@ -1,34 +1,23 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin, MetricsSSO } from '../src'
+import { MetricsAdmin } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
 import { User } from '../src/models/user'
 import { AdminSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AdminUser, CreateUser } from './persistent/user'
+import { createNewUserSession, elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('GlobalAccessControl', function () {
   let metricsAdminInstance: MetricsAdmin
-  let ssoInstance: MetricsSSO
   let adminSession: AdminSession
   let user: User
-  const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    ssoInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-
-    adminSession = await AdminUser(metricsAdminInstance)
-    user = (await CreateUser(ssoInstance, userEmailAddress)).user
+    metricsAdminInstance = getMetricsAdminInstance()
+    const demoUserSession = await getDemoUserSession(metricsAdminInstance)
+    adminSession = await elevateUserSession(metricsAdminInstance, demoUserSession)
+    const userSession = await createNewUserSession(metricsAdminInstance)
+    user = userSession.user
   })
 
   after(async function () {

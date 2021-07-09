@@ -1,23 +1,18 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { StrengthMachine, StrengthMachineSorting } from '../src/models/strengthMachine'
 import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Strength Machine', function () {
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
   let userSession: UserSession
   let existingMachine: StrengthMachine
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await AuthenticatedUser(metricsInstance)
+    metricsInstance = getMetricsInstance()
+    userSession = await createNewUserSession(metricsInstance)
   })
 
   after(function () {

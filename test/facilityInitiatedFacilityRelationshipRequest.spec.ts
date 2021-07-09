@@ -1,33 +1,33 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
+import { EmailAddress } from '../src/models/emailAddress'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
 import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser, CreateUser } from './persistent/user'
+import { randomNumberSequence } from './utils/dummy'
+import { createNewUserSession, getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Initiated Facility Relationship Request', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
+  const newUserMemberIdentifier = randomNumberSequence(6)
+
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
   let newUser: User
   let userSession: UserSession
-  const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(6)].map(i => (~~(Math.random() * 10)).toString()).join('')
+  let newUserEmailAddress: EmailAddress
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    newUser = (await CreateUser(metricsInstance, newUserEmailAddress)).user
-    userSession = await AuthenticatedUser(metricsInstance)
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+    const newUserSession = await createNewUserSession(metricsInstance)
+    newUser = newUserSession.user
+    newUserEmailAddress = (await newUser.getEmailAddresses({ limit: 1 }))[0]
 
     const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
-    facility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
-    await facility.setActive()
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(async function () {
@@ -36,13 +36,13 @@ describe('Facility Initiated Facility Relationship Request', function () {
   })
 
   it('can request member relationship', async function () {
-    const facilityRelationshipRequest = await facility.createRelationshipRequest({ email: newUserEmailAddress, member: true, memberIdentifier: newUserMemberId, employeeRole: FacilityEmployeeRole.FrontDesk })
+    const facilityRelationshipRequest = await privilegedFacility.createRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(false)
     expect(facilityRelationshipRequest.facilityApproval).to.equal(true)
     expect(facilityRelationshipRequest.member).to.equal(true)
-    expect(facilityRelationshipRequest.memberIdentifier).to.equal(newUserMemberId)
+    expect(facilityRelationshipRequest.memberIdentifier).to.equal(newUserMemberIdentifier)
     expect(facilityRelationshipRequest.employeeRole).to.equal(FacilityEmployeeRole.FrontDesk)
   })
 
@@ -54,7 +54,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
     expect(facilityRelationshipRequests[0].userApproval).to.equal(false)
     expect(facilityRelationshipRequests[0].facilityApproval).to.equal(true)
     expect(facilityRelationshipRequests[0].member).to.equal(true)
-    expect(facilityRelationshipRequests[0].memberIdentifier).to.equal(newUserMemberId)
+    expect(facilityRelationshipRequests[0].memberIdentifier).to.equal(newUserMemberIdentifier)
     expect(facilityRelationshipRequests[0].employeeRole).to.equal(FacilityEmployeeRole.FrontDesk)
 
     await facilityRelationshipRequests[0].deny()
@@ -64,13 +64,13 @@ describe('Facility Initiated Facility Relationship Request', function () {
   })
 
   it('can re-request relationship', async function () {
-    const facilityRelationshipRequest = await facility.createRelationshipRequest({ email: newUserEmailAddress, member: true, memberIdentifier: newUserMemberId, employeeRole: FacilityEmployeeRole.FrontDesk })
+    const facilityRelationshipRequest = await privilegedFacility.createRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(false)
     expect(facilityRelationshipRequest.facilityApproval).to.equal(true)
     expect(facilityRelationshipRequest.member).to.equal(true)
-    expect(facilityRelationshipRequest.memberIdentifier).to.equal(newUserMemberId)
+    expect(facilityRelationshipRequest.memberIdentifier).to.equal(newUserMemberIdentifier)
     expect(facilityRelationshipRequest.employeeRole).to.equal(FacilityEmployeeRole.FrontDesk)
   })
 
@@ -82,7 +82,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
     expect(facilityRelationshipRequests[0].userApproval).to.equal(false)
     expect(facilityRelationshipRequests[0].facilityApproval).to.equal(true)
     expect(facilityRelationshipRequests[0].member).to.equal(true)
-    expect(facilityRelationshipRequests[0].memberIdentifier).to.equal(newUserMemberId)
+    expect(facilityRelationshipRequests[0].memberIdentifier).to.equal(newUserMemberIdentifier)
     expect(facilityRelationshipRequests[0].employeeRole).to.equal(FacilityEmployeeRole.FrontDesk)
 
     await facilityRelationshipRequests[0].approve()
@@ -93,6 +93,6 @@ describe('Facility Initiated Facility Relationship Request', function () {
     const facilities = await userSession.getFacilities()
     expect(Array.isArray(facilities)).to.equal(true)
     expect(typeof facilities[0]).to.equal('object')
-    expect(facilities[0].id).to.equal(facility.id)
+    expect(facilities[0].id).to.equal(privilegedFacility.id)
   })
 })

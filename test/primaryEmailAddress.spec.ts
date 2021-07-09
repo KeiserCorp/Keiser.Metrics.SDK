@@ -1,32 +1,24 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { EmailAddress } from '../src/models/emailAddress'
 import { PrimaryEmailAddress } from '../src/models/primaryEmailAddress'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { CreateUser } from './persistent/user'
+import { randomEmailAddress } from './utils/dummy'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Primary Email Address', function () {
-  let metricsInstance: MetricsSSO
-  let userSession: UserSession
+  let metricsInstance: Metrics
   let user: User
   let addedEmailAddress: EmailAddress
   let existingEmailAddressId: number
   let existingPrimaryEmailAddress: PrimaryEmailAddress
-  const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await CreateUser(metricsInstance, newUserEmail)
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
-    addedEmailAddress = await user.createEmailAddress({ email: newEmail })
+    addedEmailAddress = await user.createEmailAddress({ email: randomEmailAddress() })
   })
 
   after(async function () {

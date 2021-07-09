@@ -1,30 +1,23 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { ForceUnit } from '../src/constants'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachinesConfiguration'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Machines Configuration', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
   let facilityStrengthMachineConfiguration: FacilityStrengthMachineConfiguration
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(function () {
@@ -32,7 +25,7 @@ describe('Facility Machines Configuration', function () {
   })
 
   it('can get facility machine configuration', async function () {
-    facilityStrengthMachineConfiguration = await facility.getFacilityStrengthMachineConfiguration()
+    facilityStrengthMachineConfiguration = await privilegedFacility.getFacilityStrengthMachineConfiguration()
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
     expect(typeof facilityStrengthMachineConfiguration.timeZone).to.equal('string')

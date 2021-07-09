@@ -1,11 +1,10 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { MSeriesDataSet, MSeriesDataSetSorting } from '../src/models/mSeriesDataSet'
 import { User } from '../src/models/user'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 const generateMSeriesDataSet = () => {
   const startTime = (new Date()).getTime()
@@ -24,18 +23,14 @@ const generateMSeriesDataSet = () => {
 }
 
 describe('M Series Data Set', function () {
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
   let user: User
   let createdMSeriesDataSet: MSeriesDataSet
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    user = userSession.user
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    user = demoUserSession.user
   })
 
   after(function () {

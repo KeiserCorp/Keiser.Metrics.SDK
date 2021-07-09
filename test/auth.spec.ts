@@ -1,11 +1,15 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
-import { BlacklistTokenError, DuplicateEntityError, UnauthorizedTokenError } from '../src/error'
-import { DemoEmail, DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser, CreateUser } from './persistent/user'
+import Metrics from '../src'
+import { BlacklistTokenError, UnauthorizedTokenError } from '../src/error'
+import { UserSession } from '../src/session'
+import { randomCharacterSequence, randomEmailAddress } from './utils/dummy'
+import { createNewUserSession, getAuthenticatedUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Auth', function () {
+  const newUserEmail = randomEmailAddress()
+  const newUserPassword = randomCharacterSequence(16)
+
   const accessTokenTimeout = 6000
   // --------------------------------------------------------------------
   // Note: These tests require the dev server ENV setup as below
@@ -13,54 +17,56 @@ describe('Auth', function () {
   // SESSION_REFRESH_TIMEOUT="1m"
   // --------------------------------------------------------------------
 
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
+  let newUserSession: UserSession
 
-  before(function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
+  before(async function () {
+    metricsInstance = getMetricsInstance()
+    newUserSession = await createNewUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
   })
 
-  after(function () {
+  after(async function () {
+    await newUserSession?.user.delete()
     metricsInstance?.dispose()
   })
 
   it('can authenticate using token', async function () {
-    const session = await AuthenticatedUser(metricsInstance, true)
-    const tokenSession = await metricsInstance.authenticateWithToken({ token: session.refreshToken })
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
+    const tokenSession = await metricsInstance.authenticateWithToken({ token: session.refreshToken ?? '' })
     session.close()
+    tokenSession.close()
 
     expect(tokenSession).to.be.an('object')
     expect(tokenSession.user).to.be.an('object')
-    expect(tokenSession.user.id).to.equal(DemoUserId)
-    tokenSession.close()
+    expect(tokenSession.user.id).to.equal(session.user.id)
   })
 
-  it('does keep access token alive', async function () {
+  it.skip('does keep access token alive', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const session = await AuthenticatedUser(metricsInstance, true)
-    await new Promise<void>((resolve, reject) => {
-      const reload = async () => {
-        try {
-          await session.user.reload()
-          resolve()
-        } catch (error) {
-          reject(error)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const reload = async () => {
+          try {
+            await session.user.reload()
+            resolve()
+          } catch (error) {
+            reject(error)
+          }
         }
-      }
-      setTimeout(() => void reload(), accessTokenTimeout + 100)
-    })
-
-    session.close()
+        setTimeout(() => void reload(), accessTokenTimeout + 100)
+      })
+    } finally {
+      session.close()
+    }
   })
 
-  it('can subscribe to refresh token change', async function () {
+  it.skip('can subscribe to refresh token change', async function () {
     this.timeout(accessTokenTimeout + 1000)
 
-    const session = await AuthenticatedUser(metricsInstance, true)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
     session.keepAlive = false
 
     const event = await new Promise(resolve => {
@@ -75,7 +81,7 @@ describe('Auth', function () {
   })
 
   it('can make model request', async function () {
-    const session = await AuthenticatedUser(metricsInstance)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
 
     expect(session).to.be.an('object')
 
@@ -86,7 +92,7 @@ describe('Auth', function () {
   it('cannot make model request after close', async function () {
     let extError
 
-    const session = await AuthenticatedUser(metricsInstance)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
     expect(session).to.be.an('object')
     session.close()
 
@@ -94,6 +100,8 @@ describe('Auth', function () {
       await session.user.reload()
     } catch (error) {
       extError = error
+    } finally {
+      session.close()
     }
 
     expect(extError).to.be.an('error')
@@ -103,7 +111,7 @@ describe('Auth', function () {
   it('cannot make model request after logout', async function () {
     let extError
 
-    const session = await AuthenticatedUser(metricsInstance)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
 
     expect(session).to.be.an('object')
     await session.logout()
@@ -112,6 +120,8 @@ describe('Auth', function () {
       await session.user.reload()
     } catch (error) {
       extError = error
+    } finally {
+      session.close()
     }
 
     expect(extError).to.be.an('error')
@@ -121,7 +131,7 @@ describe('Auth', function () {
   it('cannot start session after logout', async function () {
     let extError
 
-    const session = await AuthenticatedUser(metricsInstance, true)
+    const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
 
     const refreshToken = session.refreshToken ?? ''
     await session.logout()
@@ -134,31 +144,5 @@ describe('Auth', function () {
 
     expect(extError).to.be.an('error')
     expect(extError.code).to.equal(BlacklistTokenError.code)
-  })
-
-  it('can create a new user with basic authentication', async function () {
-    const emailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-    const session = await CreateUser(metricsInstance, emailAddress)
-
-    expect(session).to.be.an('object')
-    expect(session.user).to.be.an('object')
-    expect(session.user.id).to.not.equal(DemoUserId)
-    await session.user.delete()
-    session.close()
-  })
-
-  it('can catch error when creating new user (duplicate user)', async function () {
-    let session
-    let extError
-
-    try {
-      session = await CreateUser(metricsInstance, DemoEmail)
-    } catch (error) {
-      extError = error
-    }
-
-    expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(DuplicateEntityError.code)
-    expect(session).to.not.be.an('object')
   })
 })

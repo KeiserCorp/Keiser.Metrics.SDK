@@ -1,28 +1,23 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityMemberUser } from '../src/models/user'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('User InBody Integration', function () {
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
   let user: FacilityMemberUser
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const facility = facilities[0]?.eagerFacility()
-    if (typeof facility !== 'undefined') {
-      await facility.setActive()
-      user = (await facility.getMemberRelationships())[0].eagerUser()
-    }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    const privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
+    user = (await privilegedFacility.getMemberRelationships())[0].eagerUser()
   })
 
   after(function () {

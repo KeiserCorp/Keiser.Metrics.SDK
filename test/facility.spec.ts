@@ -1,24 +1,19 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { Facility, FacilitySorting, PrivilegedFacility } from '../src/models/facility'
 import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility', function () {
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
   let userSession: UserSession
   let facility: Facility | undefined
   let existingFacility: Facility
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await AuthenticatedUser(metricsInstance)
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
     facility = (await userSession.user.getFacilityEmploymentRelationships())[0].eagerFacility()
   })
 
@@ -99,6 +94,7 @@ describe('Facility', function () {
   it('can reload facility profile with active', async function () {
     const profile = facility?.eagerFacilityProfile()
     if (typeof profile !== 'undefined') {
+      console.log(profile)
       const facilityProfile = await profile.reload()
 
       expect(typeof facilityProfile).to.equal('object')

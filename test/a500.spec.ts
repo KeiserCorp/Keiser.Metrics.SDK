@@ -1,19 +1,14 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
 import { a500SetDataSample, a500TimeSeriesDataPointSamples } from './samples/a500'
+import { randomEmailAddress, randomNumberSequence } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance, setActiveEmployeeFacility } from './utils/fixtures'
 
 describe('A500', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
-  let machineSession: StrengthMachineSession
-  let userSession: FacilityUserSession
-  let a500ResultId: number
   const strengthMachineIdentifier: StrengthMachineIdentifier = {
     machineModel: '1399',
     firmwareVersion: '00000000',
@@ -23,74 +18,71 @@ describe('A500', function () {
     leftCylinderSerial: '01234567',
     rightCylinderSerial: '23456789'
   }
-  const newUserEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newUserMemberId = [...Array(6)].map(i => (~~(Math.random() * 10)).toString()).join('')
+  const newUserEmailAddress = randomEmailAddress()
+  const newUserMemberId = randomNumberSequence(6)
+
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
+  let strengthMachineSession: StrengthMachineSession
+  let facilityUserSession: FacilityUserSession
+  let a500ResultId: number
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    privilegedFacility = await setActiveEmployeeFacility(demoUserSession)
   })
 
   after(async function () {
-    await userSession.user.delete()
+    await facilityUserSession?.user.delete()
     metricsInstance?.dispose()
   })
 
   it('can initialize machine session with facility using JWT', async function () {
-    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
-    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: machineInitializerToken.initializerToken, strengthMachineIdentifier })
+    const machineInitializerToken = await privilegedFacility.getFacilityStrengthMachineInitializerJWTToken()
+    strengthMachineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: machineInitializerToken.initializerToken, strengthMachineIdentifier })
 
-    expect(typeof machineSession).to.not.equal('undefined')
-    expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof machineSession.sessionHandler.accessToken).to.equal('string')
+    expect(typeof strengthMachineSession).to.not.equal('undefined')
+    expect(typeof strengthMachineSession.sessionHandler).to.not.equal('undefined')
+    expect(typeof strengthMachineSession.sessionHandler.accessToken).to.equal('string')
   })
 
   it('can initialize machine session with facility using OTP', async function () {
-    const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerOTPToken()
-    machineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: `otp:${machineInitializerToken.initializerToken}`, strengthMachineIdentifier })
+    const machineInitializerToken = await privilegedFacility.getFacilityStrengthMachineInitializerOTPToken()
+    const strengthMachineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: `otp:${machineInitializerToken.initializerToken}`, strengthMachineIdentifier })
 
-    expect(typeof machineSession).to.not.equal('undefined')
-    expect(typeof machineSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof machineSession.sessionHandler.accessToken).to.equal('string')
+    expect(typeof strengthMachineSession).to.not.equal('undefined')
+    expect(typeof strengthMachineSession.sessionHandler).to.not.equal('undefined')
+    expect(typeof strengthMachineSession.sessionHandler.accessToken).to.equal('string')
   })
 
   it('can create new machine session with access token', async function () {
-    const newMachineSession = await metricsInstance.authenticateWithMachineToken({ machineToken: machineSession.accessToken, strengthMachineIdentifier })
+    const newMachineSession = await metricsInstance.authenticateWithMachineToken({ machineToken: strengthMachineSession.accessToken, strengthMachineIdentifier })
 
     expect(typeof newMachineSession).to.not.equal('undefined')
     expect(typeof newMachineSession.sessionHandler).to.not.equal('undefined')
     expect(typeof newMachineSession.sessionHandler.accessToken).to.equal('string')
-    expect(newMachineSession.sessionHandler.accessToken).to.not.equal(machineSession.accessToken)
+    expect(newMachineSession.sessionHandler.accessToken).to.not.equal(strengthMachineSession.accessToken)
   })
 
   it('can use machine session to login user', async function () {
-    const facilityRelationship = await facility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Archie Richards', memberIdentifier: newUserMemberId })
-    userSession = await machineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier as string })
+    const facilityRelationship = await privilegedFacility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Archie Richards', memberIdentifier: newUserMemberId })
+    facilityUserSession = await strengthMachineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier as string })
 
-    expect(typeof userSession).to.not.equal('undefined')
-    expect(typeof userSession.user).to.not.equal('undefined')
-    expect(userSession.user.id).to.equal(facilityRelationship.userId)
+    expect(typeof facilityUserSession).to.not.equal('undefined')
+    expect(typeof facilityUserSession.user).to.not.equal('undefined')
+    expect(facilityUserSession.user.id).to.equal(facilityRelationship.userId)
   })
 
   it('can create A500 utilization instance', async function () {
-    await machineSession.createA500UtilizationInstance({ takenAt: new Date(), repetitionCount: 15 })
+    await strengthMachineSession.createA500UtilizationInstance({ takenAt: new Date(), repetitionCount: 15 })
   })
 
   it('can create A500 data set', async function () {
     this.timeout(10000)
 
-    const response = await userSession.user.createA500Set({
-      strengthMachineSession: machineSession,
+    const response = await facilityUserSession.user.createA500Set({
+      strengthMachineSession,
       setData: a500SetDataSample,
       sampleData: a500TimeSeriesDataPointSamples
     })
@@ -101,13 +93,13 @@ describe('A500', function () {
     a500ResultId = response.id
   })
 
-  it('can create retrieve a500 data set', async function () {
+  it('can retrieve a500 data set', async function () {
     this.timeout(10000)
     if (typeof a500ResultId === 'undefined') {
       this.skip()
     }
 
-    const response = await userSession.user.getStrengthMachineDataSet({ id: a500ResultId })
+    const response = await facilityUserSession.user.getStrengthMachineDataSet({ id: a500ResultId })
 
     expect(typeof response).to.not.equal('undefined')
     expect(response.id).to.equal(a500ResultId)

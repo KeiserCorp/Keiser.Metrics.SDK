@@ -1,11 +1,10 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 const generateHeartRateDataSet = () => {
   const startTime = (new Date()).getTime()
@@ -16,18 +15,14 @@ const generateHeartRateDataSet = () => {
 }
 
 describe('Heart Rate Data Set', function () {
-  let metricsInstance: MetricsSSO
+  let metricsInstance: Metrics
   let user: User
   let createdHeartRateDataSet: HeartRateDataSet
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    user = userSession.user
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    user = demoUserSession.user
   })
 
   after(function () {

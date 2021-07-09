@@ -1,5 +1,5 @@
 import { MetricsConnection } from './connection'
-import { JWT_TTL_LIMIT, Units } from './constants'
+import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT, Units } from './constants'
 import { ClientSideActionPrevented, SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
@@ -161,13 +161,13 @@ export module Authentication {
   }
 
   /** @hidden */
-  export async function elevateUserSession (params: { userSession: UserSession, otpToken: string, refreshable?: boolean }) {
-    const response = await params.userSession.sessionHandler.action('auth:elevate', { optToken: params.otpToken, refreshable: params.refreshable }) as ExchangeableUserResponse
+  export async function elevateUserSession (userSession: UserSession, params: { otpToken: string, refreshable?: boolean }) {
+    const response = await userSession.sessionHandler.action('auth:elevate', params) as ExchangeableUserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
     }
-    return new ExchangeableAdminSession(response, params.userSession.sessionHandler.connection, accessToken.globalAccessControl)
+    return new ExchangeableAdminSession(response, userSession.sessionHandler.connection, accessToken.globalAccessControl)
   }
 
   /** @hidden */
@@ -334,6 +334,9 @@ export abstract class BaseSessionHandler {
   }
 
   close () {
+    if (this._accessTokenTimeout !== null) {
+      clearTimeout(this._accessTokenTimeout)
+    }
     this.keepAlive = false
     this._accessToken = ''
     this._refreshToken = null
@@ -343,6 +346,9 @@ export abstract class BaseSessionHandler {
 
   async action (action: string, params: Object = { }) {
     let response
+    if (this._keepAlive && this._accessTokenTimeout !== null && this.decodedAccessToken.exp * 1000 - Date.now() <= JWT_TTL_LIMIT + DEFAULT_REQUEST_TIMEOUT) {
+      clearTimeout(this._accessTokenTimeout)
+    }
     try {
       const authParams = { authorization: this._accessToken, ...params }
       response = await this._connection.action(action, authParams) as AuthenticatedResponse

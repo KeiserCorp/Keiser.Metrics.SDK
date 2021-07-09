@@ -1,19 +1,12 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { Units } from '../src/constants'
 import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { CreateUser } from './persistent/user'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Profile', function () {
-  let metricsInstance: MetricsSSO
-  let userSession: UserSession
-  let user: User
-  const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-
   const userProfile = {
     name: 'Test',
     birthday: '1990-01-01',
@@ -22,19 +15,30 @@ describe('Profile', function () {
     units: Units.Imperial
   }
 
+  let metricsInstance: Metrics
+  let user: User
+
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await CreateUser(metricsInstance, newUserEmail)
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 
   after(async function () {
     await user.delete()
     metricsInstance?.dispose()
+  })
+
+  it('can update profile', async function () {
+    const params = { ...userProfile }
+    const profile = await user.eagerProfile().update(params)
+
+    expect(profile).to.be.an('object')
+    expect(profile.name).to.equal(params.name)
+    expect(profile.birthday).to.equal(params.birthday)
+    expect(profile.gender).to.equal(params.gender)
+    expect(profile.language).to.equal(params.language)
+    expect(profile.units).to.equal(params.units)
   })
 
   it('can reload profile', async function () {
@@ -49,7 +53,7 @@ describe('Profile', function () {
     expect(profile.units).to.equal(userProfile.units)
   })
 
-  it('can update profile', async function () {
+  it('can update profile again', async function () {
     const prevUpdatedAt = user.eagerProfile().updatedAt
     const params = {
       name: 'test',

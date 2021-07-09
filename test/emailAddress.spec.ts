@@ -1,28 +1,22 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { EmailAddress } from '../src/models/emailAddress'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { CreateUser } from './persistent/user'
+import { randomEmailAddress } from './utils/dummy'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Email Address', function () {
-  let metricsInstance: MetricsSSO
-  let userSession: UserSession
+  const newEmail = randomEmailAddress()
+
+  let metricsInstance: Metrics
   let user: User
   let emailAddress: EmailAddress
-  const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
-  const newEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await CreateUser(metricsInstance, newUserEmail)
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 

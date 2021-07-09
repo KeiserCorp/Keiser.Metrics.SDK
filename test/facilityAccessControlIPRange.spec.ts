@@ -1,32 +1,25 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControl } from '../src/models/facilityAccessControl'
 import { FacilityAccessControlIPRange } from '../src/models/facilityAccessControlIPRange'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Access Control IP Range', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
   let accessControl: FacilityAccessControl
   let createdAccessControlIPRange: FacilityAccessControlIPRange
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(function () {
@@ -34,7 +27,7 @@ describe('Facility Access Control IP Range', function () {
   })
 
   it('can access preloaded facility access control IP ranges', async function () {
-    accessControl = await facility.getAccessControl()
+    accessControl = await privilegedFacility.getAccessControl()
 
     expect(typeof accessControl).to.not.equal('undefined')
     expect(Array.isArray(accessControl.eagerFacilityAccessControlIPRanges())).to.equal(true)

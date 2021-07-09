@@ -1,19 +1,15 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { FacilityUserSession, KioskSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { randomEchipId } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Kiosk Token', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
-  let kioskSession: KioskSession
-  let userSession: FacilityUserSession
-  const echipId = [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
+  const echipId = randomEchipId()
   const echipData = {
     1621: {
       position: {
@@ -44,27 +40,27 @@ describe('Facility Kiosk Token', function () {
     }
   }
 
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
+  let kioskSession: KioskSession
+  let facilityUserSession: FacilityUserSession
+
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-      const accessControl = await facility.getAccessControl()
-      const facilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
-      if (typeof facilityAccessControlKiosk !== 'undefined') {
-        await facilityAccessControlKiosk.update({
-          kioskModeAllowed: true,
-          primaryIdentification: PrimaryIdentification.UUID,
-          secondaryIdentification: SecondaryIdentification.None
-        })
-      }
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
+
+    const accessControl = await privilegedFacility.getAccessControl()
+    const facilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
+    if (typeof facilityAccessControlKiosk !== 'undefined') {
+      await facilityAccessControlKiosk.update({
+        kioskModeAllowed: true,
+        primaryIdentification: PrimaryIdentification.UUID,
+        secondaryIdentification: SecondaryIdentification.None
+      })
     }
   })
 
@@ -73,7 +69,7 @@ describe('Facility Kiosk Token', function () {
   })
 
   it('can start kiosk session', async function () {
-    kioskSession = await facility.createKioskSession()
+    kioskSession = await privilegedFacility.createKioskSession()
 
     expect(typeof kioskSession).to.not.equal('undefined')
     expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
@@ -90,15 +86,15 @@ describe('Facility Kiosk Token', function () {
   })
 
   it('can use kiosk session to login user', async function () {
-    userSession = await kioskSession.userLogin({ primaryIdentification: 1 })
+    facilityUserSession = await kioskSession.userLogin({ primaryIdentification: 1 })
 
-    expect(typeof userSession).to.not.equal('undefined')
-    expect(typeof userSession.user).to.not.equal('undefined')
-    expect(userSession.user.id).to.equal(1)
+    expect(typeof facilityUserSession).to.not.equal('undefined')
+    expect(typeof facilityUserSession.user).to.not.equal('undefined')
+    expect(facilityUserSession.user.id).to.equal(1)
   })
 
   it('can use start workout session (facility user session)', async function () {
-    const { session, echipData } = await userSession.user.startSession({ echipId, forceEndPrevious: true })
+    const { session, echipData } = await facilityUserSession.user.startSession({ echipId, forceEndPrevious: true })
 
     expect(typeof session).to.not.equal('undefined')
     expect(typeof echipData).to.not.equal('undefined')

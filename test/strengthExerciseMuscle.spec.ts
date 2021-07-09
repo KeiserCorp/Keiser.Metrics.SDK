@@ -1,39 +1,30 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin, MetricsSSO } from '../src'
+import Metrics, { MetricsSSO } from '../src'
 import { UnknownEntityError } from '../src/error'
 import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseMuscle } from '../src/models/strengthExerciseMuscle'
 import { AdminSession, UserSession } from '../src/session'
-import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AdminUser, AuthenticatedUser } from './persistent/user'
-
-const newNameGen = () => [...Array(16)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+import { randomCharacterSequence } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Strength Exercise Muscle', function () {
-  let metricsInstance: MetricsSSO
-  let metricsAdminInstance: MetricsAdmin
+  let metricsInstance: Metrics
+  let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
   let createdStrengthExercise: PrivilegedStrengthExercise
   let createdStrengthExerciseMuscle: PrivilegedStrengthExerciseMuscle
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    metricsAdminInstance = new MetricsAdmin({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await AuthenticatedUser(metricsInstance)
-    adminSession = await AdminUser(metricsAdminInstance)
+    metricsInstance = getMetricsInstance()
+    userSession = await getDemoUserSession(metricsInstance)
+    metricsSSOInstance = getMetricsSSOInstance()
+    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+
     createdStrengthExercise = await adminSession.createStrengthExercise({
-      defaultExerciseAlias: newNameGen(),
+      defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
       plane: StrengthExercisePlane.Sagittal
@@ -43,7 +34,7 @@ describe('Strength Exercise Muscle', function () {
   after(async function () {
     await createdStrengthExercise.delete()
     metricsInstance?.dispose()
-    metricsAdminInstance?.dispose()
+    metricsSSOInstance?.dispose()
   })
 
   it('can create strength exercise muscle', async function () {

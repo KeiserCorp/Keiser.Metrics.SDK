@@ -162,13 +162,18 @@ export class User extends Model {
     return typeof this._userData.oauthServices !== 'undefined' ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
   }
 
+  /** @deprecated Remove once facility moves to an SDK greater than v2.0.2 */
   async createOAuthService (params: { service: OAuthProviders, redirect: string }) {
+    return (await this.initiateOAuthService(params)).redirectUrl
+  }
+
+  async initiateOAuthService (params: { service: OAuthProviders, redirect: string }) {
     if (!this._isSessionUser) {
-      throw new ClientSideActionPrevented({ explanation: 'Cannot initialized OAuth connection for other users' })
+      throw new ClientSideActionPrevented({ explanation: 'Cannot initiate OAuth connection for other users' })
     }
 
     const response = await this.action('oauth:initiate', { ...params, type: 'connect' }) as OAuthConnectResponse
-    return response.url
+    return { redirectUrl: response.url }
   }
 
   async getOAuthService (params: { id: number }) {

@@ -1,17 +1,13 @@
 import { expect } from 'chai'
 
 import Metrics from '../src'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
+import { getMetricsInstance } from './utils/fixtures'
 
 describe('Core', function () {
   let metricsInstance: Metrics
 
   before(function () {
-    metricsInstance = new Metrics({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
+    metricsInstance = getMetricsInstance()
   })
 
   after(function () {

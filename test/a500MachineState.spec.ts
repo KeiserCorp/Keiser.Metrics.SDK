@@ -1,19 +1,13 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { ForceUnit } from '../src/constants'
 import { A500MachineState } from '../src/models/a500MachineState'
-import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { StrengthMachineSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { getDemoUserSession, getMetricsInstance, setActiveEmployeeFacility } from './utils/fixtures'
 
 describe('A500 Machine State', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
-  let strengthMachineSession: StrengthMachineSession
-  let a500MachineState: A500MachineState
   const strengthMachineIdentifier: StrengthMachineIdentifier = {
     machineModel: '1399',
     firmwareVersion: '00000000',
@@ -24,22 +18,16 @@ describe('A500 Machine State', function () {
     rightCylinderSerial: '23456789'
   }
 
-  before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
+  let metricsInstance: Metrics
+  let strengthMachineSession: StrengthMachineSession
+  let a500MachineState: A500MachineState
 
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-      const machineInitializerToken = await facility.getFacilityStrengthMachineInitializerJWTToken()
-      strengthMachineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: machineInitializerToken.initializerToken, strengthMachineIdentifier })
-    }
+  before(async function () {
+    metricsInstance = getMetricsInstance()
+    const demoUserSession = await getDemoUserSession(metricsInstance)
+    const privilegedFacility = await setActiveEmployeeFacility(demoUserSession)
+    const machineInitializerToken = await privilegedFacility.getFacilityStrengthMachineInitializerJWTToken()
+    strengthMachineSession = await metricsInstance.authenticateWithMachineInitializerToken({ machineInitializerToken: machineInitializerToken.initializerToken, strengthMachineIdentifier })
   })
 
   after(function () {

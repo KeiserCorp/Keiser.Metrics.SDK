@@ -1,27 +1,20 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { AcceptedTermsVersion } from '../src/models/acceptedTermsVersion'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { CreateUser } from './persistent/user'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Accepted Terms Version', function () {
-  let metricsInstance: MetricsSSO
-  let userSession: UserSession
-  let user: User
-  let acceptedTermsVersion: AcceptedTermsVersion
-  const newUserEmail = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
   const revision = '2020-01-01'
 
+  let metricsInstance: Metrics
+  let user: User
+  let acceptedTermsVersion: AcceptedTermsVersion
+
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    userSession = await CreateUser(metricsInstance, newUserEmail)
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
     user = userSession.user
   })
 
@@ -31,7 +24,7 @@ describe('Accepted Terms Version', function () {
   })
 
   it('can create accepted terms version', async function () {
-    acceptedTermsVersion = await user.createAcceptedTermsVersion({ revision: '2020-01-01' })
+    acceptedTermsVersion = await user.createAcceptedTermsVersion({ revision })
 
     expect(acceptedTermsVersion).to.be.an('object')
     expect(acceptedTermsVersion.updatedAt instanceof Date).to.equal(true)
@@ -55,5 +48,6 @@ describe('Accepted Terms Version', function () {
     expect(acceptedTermsVersion.updatedAt instanceof Date).to.equal(true)
     expect(acceptedTermsVersion.updatedAt).to.not.equal(prevUpdatedAt)
     expect(acceptedTermsVersion.revision).to.not.equal(revision)
+    expect(acceptedTermsVersion.revision).to.equal('2020-02-02')
   })
 })

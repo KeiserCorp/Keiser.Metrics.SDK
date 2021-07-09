@@ -1,37 +1,22 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
-import { BlacklistTokenError } from '../src/error'
+import Metrics from '../src'
+import { BlacklistTokenError, UnknownEntityError } from '../src/error'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
-import { DemoUserId, DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { CreateUser } from './persistent/user'
+import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('User', function () {
-  let metricsInstance: MetricsSSO
-  let userSession: UserSession
+  let metricsInstance: Metrics
   let user: User
-  const userEmailAddress = [...Array(50)].map(i => (~~(Math.random() * 36)).toString(36)).join('') + '@fake.com'
 
   before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
+    metricsInstance = getMetricsInstance()
+    const userSession = await createNewUserSession(metricsInstance)
+    user = userSession.user
   })
 
   after(function () {
     metricsInstance?.dispose()
-  })
-
-  it('can create new user', async function () {
-    userSession = await CreateUser(metricsInstance, userEmailAddress)
-    expect(userSession).to.be.an('object')
-    expect(userSession.user).to.be.an('object')
-    expect(userSession.user.id).to.not.equal(DemoUserId)
-
-    user = userSession.user
   })
 
   it('can access user profile properties', async function () {
@@ -64,6 +49,6 @@ describe('User', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(BlacklistTokenError.code)
+    expect(extError.code).to.be.oneOf([UnknownEntityError.code, BlacklistTokenError.code])
   })
 })

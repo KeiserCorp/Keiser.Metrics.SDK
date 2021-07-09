@@ -1,19 +1,15 @@
 import { expect } from 'chai'
 
-import { MetricsSSO } from '../src'
+import Metrics from '../src'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilitySession, SessionSorting } from '../src/models/session'
 import { FacilityMemberUser } from '../src/models/user'
-import { DevRestEndpoint, DevSocketEndpoint } from './constants'
-import { AuthenticatedUser } from './persistent/user'
+import { randomEchipId } from './utils/dummy'
+import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Session', function () {
-  let metricsInstance: MetricsSSO
-  let facility: PrivilegedFacility
-  let user: FacilityMemberUser
-  let createdSession: FacilitySession
-  const echipId = [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
+  const echipId = randomEchipId()
   const echipData = {
     1621: {
       position: {
@@ -44,31 +40,30 @@ describe('Facility Session', function () {
     }
   }
 
-  before(async function () {
-    metricsInstance = new MetricsSSO({
-      restEndpoint: DevRestEndpoint,
-      socketEndpoint: DevSocketEndpoint,
-      persistConnection: true
-    })
-    const userSession = await AuthenticatedUser(metricsInstance)
-    const facilities = await userSession.user.getFacilityEmploymentRelationships()
-    const tmpFacility = facilities[0]?.eagerFacility()
-    if (typeof tmpFacility !== 'undefined') {
-      facility = tmpFacility
-      await facility.setActive()
-    }
+  let metricsInstance: Metrics
+  let privilegedFacility: PrivilegedFacility
+  let user: FacilityMemberUser
+  let createdSession: FacilitySession
 
-    user = (await facility.getMemberRelationships())[0]?.eagerUser()
+  before(async function () {
+    metricsInstance = getMetricsInstance()
+    const userSession = await getDemoUserSession(metricsInstance)
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
+    user = (await privilegedFacility.getMemberRelationships())[0].eagerUser()
   })
 
-  after(function () {
+  after(async function () {
+    await createdSession?.delete()
     metricsInstance?.dispose()
   })
 
   it('can list latest sessions', async function () {
     this.timeout(5000)
 
-    const sessions = await facility.getSessions()
+    const sessions = await privilegedFacility.getSessions()
 
     expect(Array.isArray(sessions)).to.equal(true)
     expect(sessions.meta.sort).to.equal(SessionSorting.StartedAt)
@@ -120,7 +115,7 @@ describe('Facility Session', function () {
   })
 
   it('can get specific session', async function () {
-    const session = await facility.getSession({ id: createdSession.id })
+    const session = await privilegedFacility.getSession({ id: createdSession.id })
 
     expect(typeof session).to.equal('object')
     expect(session.id).to.equal(createdSession.id)
@@ -161,7 +156,7 @@ describe('Facility Session', function () {
   })
 
   it('can get session using eChip', async function () {
-    const echipSession = await facility.getSession({ echipId })
+    const echipSession = await privilegedFacility.getSession({ echipId })
 
     expect(typeof echipSession).to.equal('object')
     expect(echipSession.id).to.equal(createdSession.id)
@@ -201,6 +196,5 @@ describe('Facility Session', function () {
     expect(typeof createdSession).to.equal('object')
     expect(createdSession.endedAt).to.not.equal(null)
     expect(createdSession.eagerStrengthMachineDataSets()?.length).to.equal(2)
-    await createdSession.delete()
   })
 })
