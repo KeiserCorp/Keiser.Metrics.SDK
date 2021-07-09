@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -26,7 +26,7 @@
     "lint": "npx eslint .",
     "dev": "webpack serve --config webpack.config.js",
     "build": "rollup --config",
-    "release": "node .bin/publish-npm.js",
+    "release": "node .bin/publish-npm.cjs",
     "docs": "typedoc",
     "changelog": "npx auto-changelog -t keepachangelog -p --commit-limit false"
   },
