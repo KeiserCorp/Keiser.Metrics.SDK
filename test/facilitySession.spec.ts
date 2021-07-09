@@ -161,7 +161,7 @@ describe('Facility Session', function () {
   })
 
   it('can get session using eChip', async function () {
-    const echipSession = await facility.getSessionByEChip({ echipId })
+    const echipSession = await facility.getSession({ echipId })
 
     expect(typeof echipSession).to.equal('object')
     expect(echipSession.id).to.equal(createdSession.id)
