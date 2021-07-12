@@ -21,9 +21,9 @@ export interface FacilityAccessControlIPRangeListResponse extends AuthenticatedR
 }
 
 export interface FacilityAccessControlIPRangeListResponseMeta extends ListMeta {
-  cidr: string | undefined
-  from: string | undefined
-  to: string | undefined
+  cidr?: string
+  from?: string
+  to?: string
   source: string
   sort: FacilityAccessControlIPRangeSorting
 }

@@ -39,7 +39,7 @@ export interface CardioMachineListResponse extends AuthenticatedResponse {
 }
 
 export interface CardioMachineListResponseMeta extends ListMeta {
-  name: string | undefined
+  name?: string
   sort: CardioMachineSorting
 }
 

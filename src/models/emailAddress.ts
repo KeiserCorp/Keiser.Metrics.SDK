@@ -22,7 +22,7 @@ export interface EmailAddressListResponse extends AuthenticatedResponse {
 }
 
 export interface EmailAddressListResponseMeta extends ListMeta {
-  email: string | undefined
+  email?: string
   sort: EmailAddressSorting
 }
 

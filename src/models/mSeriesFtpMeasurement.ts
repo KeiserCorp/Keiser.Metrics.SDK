@@ -25,8 +25,8 @@ export interface MSeriesFtpMeasurementListResponse extends AuthenticatedResponse
 }
 
 export interface MSeriesFtpMeasurementListResponseMeta extends ListMeta {
-  from: string | undefined
-  to: string | undefined
+  from?: string
+  to?: string
   source: string
   machineType: string
   sort: MSeriesFtpMeasurementSorting

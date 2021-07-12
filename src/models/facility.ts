@@ -36,13 +36,13 @@ export interface FacilityListResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityListResponseMeta extends ListMeta {
-  name: string | undefined
-  phone: string | undefined
-  address: string | undefined
-  city: string | undefined
-  postcode: string | undefined
-  state: string | undefined
-  country: string | undefined
+  name?: string
+  phone?: string
+  address?: string
+  city?: string
+  postcode?: string
+  state?: string
+  country?: string
   sort: FacilitySorting
 }
 

@@ -111,7 +111,7 @@ interface IPropagationStatus {
 export type IEvent<TypedEventArgument> = ISubscribable<IEventHandler<TypedEventArgument>>
 
 export class EventDispatcher<TypedEventArgument> implements IEvent<TypedEventArgument> {
-  private _asEventWrapper: DispatcherAsEventWrapper<TypedEventHandler> | undefined
+  private _asEventWrapper?: DispatcherAsEventWrapper<TypedEventHandler>
 
   protected _subscriptions = new Array<ISubscription<TypedEventHandler>>()
 
