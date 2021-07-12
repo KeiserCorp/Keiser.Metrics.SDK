@@ -1,6 +1,6 @@
 import { MetricsConnection } from './connection'
-import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT, Units } from './constants'
-import { ClientSideActionPrevented, SessionError } from './error'
+import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT } from './constants'
+import { SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
@@ -18,8 +18,6 @@ import { KioskSessionResponse } from './models/facilityKiosk'
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
 import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
-import { OAuthProviders } from './models/oauthService'
-import { Gender } from './models/profile'
 import { StaticSession } from './models/session'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
 import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
@@ -119,134 +117,6 @@ export interface StrengthMachineToken extends JWTToken{
   facilityRole: string
   facilityStrengthMachineId: number
   type: 'machine'
-}
-export module Authentication {
-  export async function useExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
-    const response = await connection.action('auth:exchange', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  /** @deprecated */
-  export async function useCredentialsDeprecated (connection: MetricsConnection, params: { email: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:login', params) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function useToken (connection: MetricsConnection, params: { token: string }) {
-    const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
-    return new UserSession(response, connection)
-  }
-
-  export async function useKioskToken (connection: MetricsConnection, params: { kioskToken: string }) {
-    await connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
-    return new KioskSession({ accessToken: params.kioskToken }, connection)
-  }
-
-  export async function useMachineToken (connection: MetricsConnection, params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    const initializationParams = {
-      ...params.strengthMachineIdentifier,
-      authorization: params.machineToken
-    }
-    const response = await connection.action('a500:initialize', initializationParams) as StrengthMachineInitializeResponse
-    return new StrengthMachineSession(response, connection)
-  }
-
-  export async function useMachineInitializerToken (connection: MetricsConnection, params: { machineInitializerToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {
-    const initializationParams = {
-      ...params.strengthMachineIdentifier,
-      authorization: params.machineInitializerToken
-    }
-    const response = await connection.action('a500:initialize', initializationParams) as StrengthMachineInitializeResponse
-    return new StrengthMachineSession(response, connection)
-  }
-
-  /** @hidden */
-  export async function elevateUserSession (userSession: UserSession, params: { otpToken: string, refreshable?: boolean }) {
-    const response = await userSession.sessionHandler.action('auth:elevate', params) as ExchangeableUserResponse
-    const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
-    }
-    return new ExchangeableAdminSession(response, userSession.sessionHandler.connection, accessToken.globalAccessControl)
-  }
-
-  /** @hidden */
-  export async function isReturnRouteValid (connection: MetricsConnection, params: { returnUrl: string }) {
-    const response = await connection.action('auth:validateReturnRoute', params) as CheckReturnRouteResponse
-    return response.valid
-  }
-
-  /** @hidden */
-  export async function useCredentials (connection: MetricsConnection, params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
-    const response = await connection.action('auth:login', { apiVersion: 1, ...params }) as ExchangeableUserResponse
-    return new ExchangeableUserSession(response, connection)
-  }
-
-  /** @hidden */
-  export async function initializeUserCreation (connection: MetricsConnection, params: { email: string, returnUrl: string, refreshable?: boolean, requiresElevated?: boolean, name?: string, birthday?: string, gender?: Gender, language?: string, units?: Units, metricWeight?: number, metricHeight?: number }) {
-    await connection.action('auth:userInit', params)
-  }
-
-  /** @hidden */
-  export async function useUserCreationToken (connection: MetricsConnection, params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
-    const response = await connection.action('auth:userInitFulfillment', params) as ExchangeableUserResponse
-    return new ExchangeableUserSession(response, connection)
-  }
-
-  /** @hidden */
-  export async function useWelcomeToken (connection: MetricsConnection, params: { welcomeToken: string, password: string, refreshable: boolean }) {
-    const response = await connection.action('auth:facilityWelcomeFulfillment', params) as ExchangeableUserResponse
-    return new ExchangeableUserSession(response, connection)
-  }
-
-  /** @hidden */
-  export async function initiateOAuth (connection: MetricsConnection, params: { service: OAuthProviders, redirect: string }) {
-    const response = await connection.action('oauth:initiate', { ...params, type: 'login' }) as RedirectResponse
-    return { redirectUrl: response.url }
-  }
-
-  /** @hidden */
-  export async function initiatePasswordReset (connection: MetricsConnection, params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
-    await connection.action('auth:resetRequest', { apiVersion: 1, ...params })
-  }
-
-  /** @hidden */
-  export async function useResetToken (connection: MetricsConnection, params: { resetToken: string, password: string, refreshable: boolean, requiresElevated?: boolean }) {
-    const response = await connection.action('auth:resetFulfillment', { apiVersion: 1, ...params }) as ExchangeableUserResponse
-    return new ExchangeableUserSession(response, connection)
-  }
-
-  /**
-   * @deprecated
-   * @hidden
-   */
-  export async function useAdminCredentials (connection: MetricsConnection, params: { email: string, password: string, token: string, refreshable: boolean }) {
-    const response = await connection.action('admin:login', params) as UserResponse
-    const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
-    }
-    return new AdminSession(response, connection, accessToken.globalAccessControl)
-  }
-
-  /** @hidden */
-  export async function useAdminToken (connection: MetricsConnection, params: { token: string }) {
-    const response = await connection.action('user:show', { authorization: params.token }) as UserResponse
-    const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
-    }
-    return new AdminSession(response, connection, accessToken.globalAccessControl)
-  }
-
-  export async function useAdminExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
-    const response = await connection.action('auth:exchange', params) as UserResponse
-    const accessToken = DecodeJWT(response.accessToken) as AccessToken
-    if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
-      throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
-    }
-    return new AdminSession(response, connection, accessToken.globalAccessControl)
-  }
 }
 
 export abstract class BaseSessionHandler {

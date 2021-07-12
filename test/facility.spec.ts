@@ -94,7 +94,6 @@ describe('Facility', function () {
   it('can reload facility profile with active', async function () {
     const profile = facility?.eagerFacilityProfile()
     if (typeof profile !== 'undefined') {
-      console.log(profile)
       const facilityProfile = await profile.reload()
 
       expect(typeof facilityProfile).to.equal('object')
