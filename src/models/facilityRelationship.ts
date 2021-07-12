@@ -50,8 +50,8 @@ export interface UserFacilityRelationshipListResponse extends AuthenticatedRespo
 }
 
 export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
-  member: boolean | undefined
-  employee: boolean | undefined
+  member?: boolean
+  employee?: boolean
   employeeRole?: FacilityEmployeeRole
   sort: UserFacilityRelationshipSorting
 }

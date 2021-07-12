@@ -62,7 +62,7 @@ export interface GlobalAccessControlListResponse extends AuthenticatedResponse {
 }
 
 export interface GlobalAccessControlListResponseMeta extends ListMeta {
-  name: string | undefined
+  name?: string
   sort: GlobalAccessControlSorting
 }
 

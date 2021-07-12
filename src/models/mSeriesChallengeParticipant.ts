@@ -13,7 +13,7 @@ export interface MSeriesChallengeParticipantData {
   mSeriesChallengeId: number
   joinedAt: string
   currentValue: number
-  rank: number | undefined
+  rank?: number
   name: string
 }
 

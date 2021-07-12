@@ -65,8 +65,8 @@ export interface UserListResponse extends AuthenticatedResponse {
 
 /** @hidden */
 export interface UserListResponseMeta extends ListMeta {
-  name: string | undefined
-  email: string | undefined
+  name?: string
+  email?: string
   sort: UserSorting
 }
 

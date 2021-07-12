@@ -52,9 +52,9 @@ export interface StrengthMachineListResponse extends AuthenticatedResponse {
 }
 
 export interface StrengthMachineListResponseMeta extends ListMeta {
-  name: string | undefined
-  line: string | undefined
-  variant: string | undefined
+  name?: string
+  line?: string
+  variant?: string
   sort: StrengthMachineSorting
 }
 

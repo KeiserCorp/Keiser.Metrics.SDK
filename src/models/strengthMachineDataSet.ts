@@ -71,8 +71,8 @@ export interface StrengthMachineDataSetListResponse extends AuthenticatedRespons
 }
 
 export interface StrengthMachineDataSetListResponseMeta extends ListMeta {
-  from: string | undefined
-  to: string | undefined
+  from?: string
+  to?: string
   sort: StrengthMachineDataSetSorting
 }
 

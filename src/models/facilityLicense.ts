@@ -38,7 +38,7 @@ export interface FacilityLicenseListResponse extends AuthenticatedResponse {
 }
 
 export interface FacilityLicenseListResponseMeta extends ListMeta {
-  name: string | undefined
+  name?: string
   sort: FacilityLicenseSorting
 }
 

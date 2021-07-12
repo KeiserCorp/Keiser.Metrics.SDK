@@ -34,8 +34,8 @@ export interface FacilityRelationshipRequestResponse extends AuthenticatedRespon
 }
 
 export interface FacilityRelationshipRequestListResponseMeta extends ListMeta {
-  facilityId: number | undefined
-  name: string | undefined
+  facilityId?: number
+  name?: string
   sort: UserInitiatedFacilityRelationshipRequestSorting
 }
 

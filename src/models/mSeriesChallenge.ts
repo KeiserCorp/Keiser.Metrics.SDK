@@ -52,8 +52,8 @@ export interface MSeriesChallengeListResponse extends AuthenticatedResponse {
 }
 
 export interface MSeriesChallengeListResponseMeta extends ListMeta {
-  from: string | undefined
-  to: string | undefined
+  from?: string
+  to?: string
   isCompleted: boolean
   relationship: MSeriesChallengeRelationship
   sort: MSeriesChallengeSorting
