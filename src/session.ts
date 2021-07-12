@@ -122,7 +122,7 @@ export interface StrengthMachineToken extends JWTToken{
 }
 export module Authentication {
   export async function useExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
-    const response = await connection.action('auth:exchange', params) as UserResponse
+    const response = await connection.action('auth:exchangeFulfillment', params) as UserResponse
     return new UserSession(response, connection)
   }
 
@@ -158,6 +158,12 @@ export module Authentication {
     }
     const response = await connection.action('a500:initialize', initializationParams) as StrengthMachineInitializeResponse
     return new StrengthMachineSession(response, connection)
+  }
+
+  /** @hidden */
+  export async function getExchangeableUserSession (userSession: UserSession) {
+    const response = await userSession.sessionHandler.action('auth:exchangeInit') as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, userSession.sessionHandler.connection)
   }
 
   /** @hidden */
@@ -240,7 +246,7 @@ export module Authentication {
   }
 
   export async function useAdminExchangeToken (connection: MetricsConnection, params: { exchangeToken: string}) {
-    const response = await connection.action('auth:exchange', params) as UserResponse
+    const response = await connection.action('auth:exchangeFulfillment', params) as UserResponse
     const accessToken = DecodeJWT(response.accessToken) as AccessToken
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })

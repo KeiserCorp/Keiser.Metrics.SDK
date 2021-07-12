@@ -30,7 +30,27 @@ describe('SSO', function () {
     expect(session.user.id).to.equal(DemoUserId)
   })
 
-  it('can authenticate without refresh token', async function () {
+  it('can request exchangeable session', async function () {
+    const userSession = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
+    expect(userSession).to.be.an('object')
+
+    if (userSession.refreshToken === null) {
+      throw new Error('Missing Refresh Token')
+    }
+
+    const refreshedUserSession = await metricsSSOInstance.authenticateWithToken({ token: userSession.refreshToken })
+    expect(refreshedUserSession).to.be.an('object')
+
+    const exchangeableUserSession = await metricsSSOInstance.getExchangeableUserSession(refreshedUserSession)
+    expect(exchangeableUserSession).to.be.an('object')
+    expect(exchangeableUserSession.exchangeToken).to.be.a('string')
+
+    const exchangedSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: exchangeableUserSession.exchangeToken })
+    expect(exchangedSession.user).to.be.an('object')
+    expect(exchangedSession.user.id).to.equal(DemoUserId)
+  })
+
+  it('can authenticate with exchange token', async function () {
     const userSession = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: false })
     expect(userSession).to.be.an('object')
     expect(userSession.exchangeToken).to.be.a('string')

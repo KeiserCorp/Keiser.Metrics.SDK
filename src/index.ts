@@ -111,6 +111,10 @@ export class MetricsSSO extends Metrics {
     return await Authentication.useResetToken(this._connection, { refreshable: true, ...params })
   }
 
+  async getExchangeableUserSession (userSession: UserSession) {
+    return await Authentication.getExchangeableUserSession(userSession)
+  }
+
   async elevateUserSession (userSession: UserSession, params: { otpToken: string, refreshable?: boolean }) {
     return await Authentication.elevateUserSession(userSession, params)
   }
