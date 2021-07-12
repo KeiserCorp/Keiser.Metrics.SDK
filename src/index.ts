@@ -99,6 +99,11 @@ export class MetricsSSO extends Metrics {
     return response.valid
   }
 
+  async authenticateWithToken (params: { token: string }) {
+    const response = await this._connection.action('auth:exchangeInit', { authorization: params.token }) as ExchangeableUserResponse
+    return new ExchangeableUserSession(response, this._connection)
+  }
+
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
     const response = await this._connection.action('auth:login', { refreshable: true, ...params, apiVersion: 1 }) as ExchangeableUserResponse
     return new ExchangeableUserSession(response, this._connection)
@@ -142,6 +147,7 @@ export class MetricsSSO extends Metrics {
     return new ExchangeableUserSession(response, this._connection)
   }
 
+  /** @deprecated */
   async getExchangeableUserSession (userSession: UserSession) {
     const response = await userSession.sessionHandler.action('auth:exchangeInit') as ExchangeableUserResponse
     return new ExchangeableUserSession(response, userSession.sessionHandler.connection)

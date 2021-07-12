@@ -30,6 +30,19 @@ describe('SSO', function () {
     expect(session.user.id).to.equal(DemoUserId)
   })
 
+  it('can authenticate using existing token', async function () {
+    const userSession = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
+    expect(userSession).to.be.an('object')
+
+    if (userSession.refreshToken === null) {
+      throw new Error('Missing Refresh Token')
+    }
+
+    const exchangeableUserSession = await metricsSSOInstance.authenticateWithToken({ token: userSession.refreshToken })
+    expect(exchangeableUserSession).to.be.an('object')
+    expect(exchangeableUserSession.exchangeToken).to.be.a('string')
+  })
+
   it('can request exchangeable session', async function () {
     const userSession = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
     expect(userSession).to.be.an('object')
