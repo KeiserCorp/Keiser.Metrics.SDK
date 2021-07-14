@@ -12,7 +12,6 @@ export interface WeightMeasurementData {
   source: string
   takenAt: string
   metricWeight: number
-  imperialWeight: number
   bodyFatPercentage: number
   bodyCompositionMeasurement?: BodyCompositionMeasurementData
 }
@@ -112,13 +111,6 @@ export class WeightMeasurement extends Model {
    */
   get metricWeight () {
     return this._weightMeasurementData.metricWeight
-  }
-
-  /**
-   * @returns Weight in pounds
-   */
-  get imperialWeight () {
-    return this._weightMeasurementData.imperialWeight
   }
 
   get bodyFatPercentage () {

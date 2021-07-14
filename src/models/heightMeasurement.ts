@@ -12,7 +12,6 @@ export interface HeightMeasurementData {
   source: string
   takenAt: string
   metricHeight: number
-  imperialHeight: number
 }
 
 export interface HeightMeasurementResponse extends AuthenticatedResponse {
@@ -75,12 +74,5 @@ export class HeightMeasurement extends Model {
    */
   get metricHeight () {
     return this._heightMeasurementData.metricHeight
-  }
-
-  /**
-   * @returns Height in inches
-   */
-  get imperialHeight () {
-    return this._heightMeasurementData.imperialHeight
   }
 }
