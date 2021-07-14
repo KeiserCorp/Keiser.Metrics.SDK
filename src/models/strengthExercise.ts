@@ -5,7 +5,7 @@ import { MuscleData, MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '
 import { PrivilegedStrengthExerciseMuscle, PrivilegedStrengthExerciseMuscles, StrengthExerciseMuscle, StrengthExerciseMuscleListResponse, StrengthExerciseMuscleResponse, StrengthExerciseMuscles } from './strengthExerciseMuscle'
 import { PrivilegedStrengthExerciseVariant, PrivilegedStrengthExerciseVariants, StrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantData, StrengthExerciseVariantListResponse, StrengthExerciseVariantResponse, StrengthExerciseVariants, StrengthExerciseVariantSorting, StrengthExerciseVariantType } from './strengthExerciseVariant'
 
-export const enum StrengthExerciseCategory {
+export enum StrengthExerciseCategory {
   LowerBody = 'lowerBody',
   UpperBody = 'upperBody',
   Core = 'core',
@@ -13,18 +13,18 @@ export const enum StrengthExerciseCategory {
   Complex = 'complex'
 }
 
-export const enum StrengthExerciseMovement {
+export enum StrengthExerciseMovement {
   Isolation = 'isolation',
   Compound = 'compound'
 }
 
-export const enum StrengthExercisePlane {
+export enum StrengthExercisePlane {
   Sagittal = 'sagittal',
   Frontal = 'frontal',
   Transverse = 'transverse'
 }
 
-export const enum StrengthExerciseSorting {
+export enum StrengthExerciseSorting {
   ID = 'id',
   DefaultAlias = 'defaultAlias',
   Category = 'category',

@@ -4,12 +4,12 @@ import { FacilityData } from './facility'
 import { FacilityEmployeeRole } from './facilityRelationship'
 import { UserData } from './user'
 
-export const enum FacilityInitiatedFacilityRelationshipRequestSorting {
+export enum FacilityInitiatedFacilityRelationshipRequestSorting {
   ID = 'id',
   Name = 'name'
 }
 
-export const enum UserInitiatedFacilityRelationshipRequestSorting {
+export enum UserInitiatedFacilityRelationshipRequestSorting {
   ID = 'id',
   Name = 'name',
   MemberIdentifier = 'memberIdentifier',

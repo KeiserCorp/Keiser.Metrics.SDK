@@ -1,12 +1,12 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum OAuthServiceSorting {
+export enum OAuthServiceSorting {
   ID = 'id',
   Name = 'name'
 }
 
-export const enum OAuthProviders {
+export enum OAuthProviders {
   Apple = 'apple',
   Google = 'google',
   Facebook = 'facebook',

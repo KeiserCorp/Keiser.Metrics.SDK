@@ -5,7 +5,7 @@ import { MuscleData, MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '
 import { PrivilegedStretchExerciseMuscle, PrivilegedStretchExerciseMuscles, StretchExerciseMuscle, StretchExerciseMuscleListResponse, StretchExerciseMuscleResponse, StretchExerciseMuscles } from './stretchExerciseMuscle'
 import { PrivilegedStretchExerciseVariant, PrivilegedStretchExerciseVariants, StretchExerciseVariant, StretchExerciseVariantData, StretchExerciseVariantListResponse, StretchExerciseVariantResponse, StretchExerciseVariants, StretchExerciseVariantSorting, StretchExerciseVariantType } from './stretchExerciseVariant'
 
-export const enum StretchExerciseSorting {
+export enum StretchExerciseSorting {
   ID = 'id',
   DefaultAlias = 'defaultAlias'
 }

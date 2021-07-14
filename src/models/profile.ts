@@ -2,7 +2,7 @@ import { Units } from '../constants'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum Gender {
+export enum Gender {
   Male = 'm',
   Female = 'f',
   Other = 'o'

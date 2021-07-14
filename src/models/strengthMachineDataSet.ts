@@ -6,19 +6,19 @@ import { Session, SessionData } from './session'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
-export const enum ResistancePrecision {
+export enum ResistancePrecision {
   Integer = 'int',
   Decimal = 'dec'
 }
 
-export const enum StrengthTestType {
+export enum StrengthTestType {
   Power6Rep = 'power6r',
   A4206Rep = 'a4206r',
   A42010Rep = 'a42010r',
   A50010Rep = 'a50010r'
 }
 
-export const enum StrengthMachineDataSetSorting {
+export enum StrengthMachineDataSetSorting {
   ID = 'id',
   CompletedAt = 'completedAt'
 }

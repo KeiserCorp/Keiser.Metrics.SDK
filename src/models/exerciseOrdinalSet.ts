@@ -10,7 +10,7 @@ export interface ExerciseOrdinalSetData {
   exerciseOrdinalSetAssignments?: ExerciseOrdinalSetAssignmentData[]
 }
 
-export const enum ExerciseOrdinalSetSorting {
+export enum ExerciseOrdinalSetSorting {
   ID = 'id',
   Name = 'name',
   Code = 'code'

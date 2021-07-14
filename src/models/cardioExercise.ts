@@ -5,7 +5,7 @@ import { CardioExerciseVariant, CardioExerciseVariantData, CardioExerciseVariant
 import { ExerciseAlias, ExerciseAliasData, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, PrivilegedExerciseAlias, PrivilegedExerciseAliases } from './exerciseAlias'
 import { MuscleData, MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from './muscle'
 
-export const enum CardioExerciseSorting {
+export enum CardioExerciseSorting {
   ID = 'id',
   DefaultAlias = 'defaultAlias'
 }

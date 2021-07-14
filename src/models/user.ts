@@ -25,7 +25,7 @@ import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBo
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
 /** @hidden */
-export const enum UserSorting {
+export enum UserSorting {
   ID = 'id',
   Name = 'name',
   CreatedAt = 'createdAt'

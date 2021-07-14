@@ -2,25 +2,25 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { User, UserData } from './user'
 
-export const enum Permission {
+export enum Permission {
   View = 'view',
   Edit = 'edit'
 }
 
-export const enum MSeriesGuidedSessionPermission {
+export enum MSeriesGuidedSessionPermission {
   Access = 'access',
   Publish = 'publish'
 }
 
-export const enum ExercisePermission {
+export enum ExercisePermission {
   Edit = 'edit'
 }
 
-export const enum AnalyticPermission {
+export enum AnalyticPermission {
   View = 'view'
 }
 
-export const enum GlobalAccessControlSorting {
+export enum GlobalAccessControlSorting {
   ID = 'id',
   Name = 'name'
 }

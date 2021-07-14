@@ -1,14 +1,14 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum PrimaryIdentification {
+export enum PrimaryIdentification {
   UUID = 'uuid',
   MemberIdentifier = 'memberIdentifier',
   EmailAddress = 'emailAddress',
   FullName = 'fullName'
 }
 
-export const enum SecondaryIdentification {
+export enum SecondaryIdentification {
   None = 'none',
   UUID = 'uuid',
   MemberIdentifier = 'memberIdentifier',

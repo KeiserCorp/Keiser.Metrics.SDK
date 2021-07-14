@@ -13,7 +13,7 @@ import { MachineInitializerOTPToken, MachineInitializerToken } from './machineIn
 import { Gender } from './profile'
 import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
 
-export const enum FacilitySorting {
+export enum FacilitySorting {
   ID = 'id',
   Name = 'name'
 }

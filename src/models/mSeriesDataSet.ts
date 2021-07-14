@@ -4,7 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementData } from './mSeriesFtpMeasurement'
 import { Session, SessionData } from './session'
 
-export const enum MSeriesDataSetSorting {
+export enum MSeriesDataSetSorting {
   ID = 'id',
   StartedAt = 'startedAt',
   EndedAt = 'endedAt'
