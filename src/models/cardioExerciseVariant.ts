@@ -4,11 +4,11 @@ import { CardioExercise, CardioExerciseData } from './cardioExercise'
 import { CardioMachine, CardioMachineData } from './cardioMachine'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
 
-export const enum CardioExerciseVariantType {
+export enum CardioExerciseVariantType {
   Normal = 'normal'
 }
 
-export const enum CardioExerciseVariantSorting {
+export enum CardioExerciseVariantSorting {
   ID = 'id',
   Variant = 'variant'
 }

@@ -4,7 +4,7 @@ import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from '
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
-export const enum StrengthExerciseVariantType {
+export enum StrengthExerciseVariantType {
   Normal = 'normal',
   SingleArm = 'singleArm',
   SingleLeg = 'singleLeg',
@@ -13,7 +13,7 @@ export const enum StrengthExerciseVariantType {
   Alternate = 'alternate'
 }
 
-export const enum StrengthExerciseVariantAttachment {
+export enum StrengthExerciseVariantAttachment {
   Bar = 'bar',
   Rope = 'rope',
   SingleHandles = 'singleHandles',
@@ -23,7 +23,7 @@ export const enum StrengthExerciseVariantAttachment {
   Belt = 'belt'
 }
 
-export const enum StrengthExerciseVariantSorting {
+export enum StrengthExerciseVariantSorting {
   ID = 'id',
   Variant = 'variant',
   Attachment = 'attachment'

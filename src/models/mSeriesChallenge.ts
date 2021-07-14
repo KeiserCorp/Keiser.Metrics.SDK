@@ -2,24 +2,24 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesChallengeLeaderboardParticipants, MSeriesChallengeLeaderboardResponse, MSeriesChallengeParticipant, MSeriesChallengeParticipantListResponse, MSeriesChallengeParticipantResponse, MSeriesChallengeParticipants, MSeriesChallengeParticipantSorting } from './mSeriesChallengeParticipant'
 
-export const enum MSeriesChallengeType {
+export enum MSeriesChallengeType {
   TimeBased = 'timeBased',
   GoalBased = 'goalBased',
 }
 
-export const enum MSeriesChallengeFocus {
+export enum MSeriesChallengeFocus {
   Points = 'points',
   CaloricBurn = 'caloricBurn',
   Distance = 'distance',
   Duration = 'duration',
 }
 
-export const enum MSeriesChallengeRelationship {
+export enum MSeriesChallengeRelationship {
   Owned = 'owned',
   Joined = 'joined'
 }
 
-export const enum MSeriesChallengeSorting {
+export enum MSeriesChallengeSorting {
   ID = 'id',
   StartAt = 'startAt',
   EndAt = 'endAt',

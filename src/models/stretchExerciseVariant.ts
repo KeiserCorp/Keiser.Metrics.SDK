@@ -3,11 +3,11 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
 import { StretchExercise, StretchExerciseData } from './stretchExercise'
 
-export const enum StretchExerciseVariantType {
+export enum StretchExerciseVariantType {
   Normal = 'normal'
 }
 
-export const enum StretchExerciseVariantSorting {
+export enum StretchExerciseVariantSorting {
   ID = 'id',
   Variant = 'variant'
 }

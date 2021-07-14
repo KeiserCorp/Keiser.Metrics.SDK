@@ -4,13 +4,13 @@ import { CardioExercise, CardioExerciseData } from './cardioExercise'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StretchExercise, StretchExerciseData } from './stretchExercise'
 
-export const enum ExerciseAliasType {
+export enum ExerciseAliasType {
   Cardio = 'cardio',
   Strength = 'strength',
   Stretch = 'stretch'
 }
 
-export const enum ExerciseAliasSorting {
+export enum ExerciseAliasSorting {
   ID = 'id',
   Alias = 'alias'
 }

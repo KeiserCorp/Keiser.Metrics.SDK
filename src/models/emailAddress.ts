@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum EmailAddressSorting {
+export enum EmailAddressSorting {
   ID = 'id',
   Email = 'email'
 }

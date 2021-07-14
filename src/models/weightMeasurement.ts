@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum WeightMeasurementSorting {
+export enum WeightMeasurementSorting {
   ID = 'id',
   Source = 'source',
   TakenAt = 'takenAt'

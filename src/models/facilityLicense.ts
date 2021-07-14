@@ -4,13 +4,13 @@ import { Facility, FacilityData } from './facility'
 
 const msPerDay = 86400000
 
-export const enum LicenseType {
+export enum LicenseType {
   Normal = 'normal',
   Demo = 'demo',
   Test = 'test'
 }
 
-export const enum FacilityLicenseSorting {
+export enum FacilityLicenseSorting {
   ID = 'id',
   Type = 'type',
   Term = 'term',

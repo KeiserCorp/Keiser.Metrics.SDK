@@ -1,7 +1,7 @@
 import { Model } from '../model'
 import { SessionHandler } from '../session'
 
-export const enum MuscleIdentifier {
+export enum MuscleIdentifier {
   Omohyoid = 'omohyoid',
   LevatorScapulae = 'levatorScapulae',
   Sternohyoid = 'sternohyoid',
@@ -69,7 +69,7 @@ export const enum MuscleIdentifier {
   Multifidus = 'multifidus'
 }
 
-export const enum MuscleGroup {
+export enum MuscleGroup {
   Abs = 'abs',
   Back = 'back',
   Biceps = 'biceps',
@@ -85,19 +85,19 @@ export const enum MuscleGroup {
   UpperBack = 'upperBack'
 }
 
-export const enum MuscleArea {
+export enum MuscleArea {
   LowerBody = 'lowerBody',
   UpperBody = 'upperBody',
   Core = 'core'
 }
 
-export const enum MuscleTargetLevel {
+export enum MuscleTargetLevel {
   Primary = 'primary',
   Secondary = 'secondary',
   Stabilizer = 'stabilizer'
 }
 
-export const enum MuscleSorting {
+export enum MuscleSorting {
   ID = 'id',
   Muscle = 'muscle',
   TargetLevel = 'targetLevel'

@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum MSeriesChallengeParticipantSorting {
+export enum MSeriesChallengeParticipantSorting {
   ID = 'id',
   Name = 'name',
   JoinedAt = 'joinedAt'

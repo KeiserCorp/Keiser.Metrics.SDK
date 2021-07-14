@@ -1,7 +1,7 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum CompositionType {
+export enum CompositionType {
   Numeric = 'numeric',
   Alpha = 'alpha'
 }

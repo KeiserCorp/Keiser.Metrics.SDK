@@ -4,19 +4,19 @@ import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { Session, SessionData } from './session'
 import { FacilityEmployeeUser, FacilityMemberUser, User, UserData } from './user'
 
-export const enum UserFacilityRelationshipSorting {
+export enum UserFacilityRelationshipSorting {
   ID = 'id',
   EmployeeRole = 'employeeRole'
 }
 
-export const enum FacilityUserRelationshipSorting {
+export enum FacilityUserRelationshipSorting {
   ID = 'id',
   Name = 'name',
   MemberIdentifier = 'memberIdentifier',
   EmployeeRole = 'employeeRole'
 }
 
-export const enum FacilityEmployeeRole {
+export enum FacilityEmployeeRole {
   Admin = 'admin',
   CustomerSupport = 'customerSupport',
   Trainer = 'trainer',

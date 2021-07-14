@@ -2,7 +2,7 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { StrengthExercise, StrengthExerciseData, StrengthExerciseResponse } from './strengthExercise'
 
-export const enum StrengthMachineLine {
+export enum StrengthMachineLine {
   A250 = 'a250',
   A300 = 'a300',
   A350 = 'a350',
@@ -11,7 +11,7 @@ export const enum StrengthMachineLine {
   A500 = 'a500'
 }
 
-export const enum StrengthMachineSorting {
+export enum StrengthMachineSorting {
   ID = 'id',
   Name = 'name',
   Line = 'line'

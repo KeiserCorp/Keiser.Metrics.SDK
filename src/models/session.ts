@@ -8,13 +8,13 @@ import { StrengthMachineDataSet, StrengthMachineDataSetData } from './strengthMa
 import { User, UserData } from './user'
 import { WeightMeasurement, WeightMeasurementData } from './weightMeasurement'
 
-export const enum SessionSorting {
+export enum SessionSorting {
   ID = 'id',
   StartedAt = 'startedAt',
   EndedAt = 'endedAt'
 }
 
-export const enum SessionRequireExtendedDataType {
+export enum SessionRequireExtendedDataType {
   MSeries = 'mSeries',
   Strength = 'strength',
   HeartRate = 'heartRate',

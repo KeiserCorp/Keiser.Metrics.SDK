@@ -2,16 +2,16 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { CardioExercise, CardioExerciseData, CardioExerciseResponse } from './cardioExercise'
 
-export const enum CardioMachineLine {
+export enum CardioMachineLine {
   MSeries = 'mSeries'
 }
 
-export const enum CardioMachineParseCode {
+export enum CardioMachineParseCode {
   MSeries6 = 'ms6',
   MSeries6Extended = 'ms6e'
 }
 
-export const enum CardioMachineSorting {
+export enum CardioMachineSorting {
   ID = 'id',
   Name = 'name'
 }

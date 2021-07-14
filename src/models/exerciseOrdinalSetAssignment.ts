@@ -14,7 +14,7 @@ export interface ExerciseOrdinalSetAssignmentData {
   stretchExerciseVariant?: StretchExerciseVariantData
 }
 
-export const enum ExerciseOrdinalSetAssignmentSorting {
+export enum ExerciseOrdinalSetAssignmentSorting {
   ID = 'id',
   OrdinalIdentifier = 'ordinalIdentifier'
 }

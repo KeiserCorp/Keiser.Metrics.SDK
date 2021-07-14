@@ -3,7 +3,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 import { A500MachineState, A500MachineStateData } from './a500MachineState'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
-export const enum FacilityStrengthMachineSorting {
+export enum FacilityStrengthMachineSorting {
   ID = 'id',
   Model = 'model'
 }

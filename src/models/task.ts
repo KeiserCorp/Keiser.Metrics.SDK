@@ -1,12 +1,12 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum Queue {
+export enum Queue {
   High= 'high',
   Low = 'low'
 }
 
-export const enum TaskSorting {
+export enum TaskSorting {
   ID = 'id'
 }
 

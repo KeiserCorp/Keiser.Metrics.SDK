@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export const enum FacilityAccessControlIPRangeSorting {
+export enum FacilityAccessControlIPRangeSorting {
   ID = 'id',
   Name = 'name'
 }

@@ -2,7 +2,7 @@ import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
 
-export const enum HeartRateDataSetSorting {
+export enum HeartRateDataSetSorting {
   ID = 'id',
   StartedAt = 'startedAt',
   EndedAt = 'endedAt',
