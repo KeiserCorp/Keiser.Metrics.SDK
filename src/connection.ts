@@ -229,8 +229,9 @@ export class MetricsConnection {
       })
       callback(response.data)
     } catch (error) {
-      if (typeof error?.response?.data !== 'undefined') {
-        const errorInstance = GetErrorInstance(error.response.data.error as ActionErrorProperties)
+      const actionError = error?.response?.data?.error as ActionErrorProperties | undefined
+      if (typeof actionError !== 'undefined') {
+        const errorInstance = GetErrorInstance(actionError)
         if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
           callback(errorInstance)
         } else {
