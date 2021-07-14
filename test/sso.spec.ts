@@ -105,7 +105,7 @@ describe('SSO', function () {
 
   it('can request a new user account', async function () {
     const emailAddress = randomEmailAddress()
-    const response = await metricsSSOInstance.initializeUserCreation({ email: emailAddress, returnUrl: 'localhost:8080' })
+    const response = await metricsSSOInstance.initializeUserCreation({ email: emailAddress, returnUrl: 'http://localhost:4200/sso' })
     expect(response).to.be.equal(undefined)
   })
 
@@ -114,7 +114,7 @@ describe('SSO', function () {
     let extError
 
     try {
-      session = await metricsSSOInstance.initializeUserCreation({ email: DemoEmail, returnUrl: 'localhost:8080' })
+      session = await metricsSSOInstance.initializeUserCreation({ email: DemoEmail, returnUrl: 'http://localhost:4200/sso' })
     } catch (error) {
       extError = error
     }
@@ -125,6 +125,6 @@ describe('SSO', function () {
   })
 
   it('can request password reset', async function () {
-    await metricsSSOInstance.initiatePasswordReset({ email: DemoEmail, returnUrl: 'localhost:8080' })
+    await metricsSSOInstance.initiatePasswordReset({ email: DemoEmail, returnUrl: 'http://localhost:4200/sso' })
   })
 })
