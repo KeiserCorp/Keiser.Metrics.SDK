@@ -232,7 +232,7 @@ export class User extends Model {
     return typeof this._userData.heightMeasurements !== 'undefined' ? this._userData.heightMeasurements.map(heightMeasurement => new HeightMeasurement(heightMeasurement, this.sessionHandler)) : undefined
   }
 
-  async createHeightMeasurement (params: { source: string, takenAt: Date, bodyFatPercentage?: number } & XOR<{ metricHeight: number }, { imperialHeight: number }>) {
+  async createHeightMeasurement (params: { source: string, takenAt: Date } & XOR<{ metricHeight: number }, { imperialHeight: number }>) {
     const { heightMeasurement } = await this.action('heightMeasurement:create', { ...params, userId: this.id }) as HeightMeasurementResponse
     return new HeightMeasurement(heightMeasurement, this.sessionHandler)
   }
