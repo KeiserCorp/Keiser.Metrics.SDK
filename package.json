@@ -1,6 +1,6 @@
 {
   "name": "@keiser/metrics-sdk",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "Keiser Metrics SDK",
   "keywords": [
     "keiser",
@@ -69,10 +69,9 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "assert": "^2.0.0",
     "axios": "^0.21.1",
     "buffer": "^6.0.3",
-    "cockatiel": "^2.0.1",
-    "pako": "^2.0.3"
+    "cockatiel": "^2.0.2",
+    "pako": "^2.0.4"
   }
 }
