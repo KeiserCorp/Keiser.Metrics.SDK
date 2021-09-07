@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
 import { UnknownEntityError } from '../src/error'
-import { AdminSession } from '../src/session'
 import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
 import { elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 

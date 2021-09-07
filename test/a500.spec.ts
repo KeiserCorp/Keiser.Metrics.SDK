@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'

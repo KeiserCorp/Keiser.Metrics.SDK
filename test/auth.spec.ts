@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { BlacklistTokenError, UnauthorizedTokenError } from '../src/error'
 import { UserSession } from '../src/session'
 import { randomCharacterSequence, randomEmailAddress } from './utils/dummy'

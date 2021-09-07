@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { AcceptedTermsVersion } from '../src/models/acceptedTermsVersion'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'

@@ -1,16 +1,19 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseSorting } from '../src/models/strengthExercise'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Strength Exercise', function () {
   const newExerciseName = randomCharacterSequence(16)
 
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -20,12 +23,15 @@ describe('Strength Exercise', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
   })
 
   after(async function () {
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create strength exercise', async function () {

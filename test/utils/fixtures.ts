@@ -1,6 +1,8 @@
-import Metrics, { MetricsAdmin, MetricsSSO } from '../../src'
+import MetricsAdmin from '../../src/admin'
+import Metrics from '../../src/core'
 import { UserResponse } from '../../src/models/user'
 import { UserSession } from '../../src/session'
+import MetricsSSO from '../../src/sso'
 import { DemoEmail, DemoPassword, DevRestEndpoint, DevSocketEndpoint } from './constants'
 import { randomCharacterSequence, randomEmailAddress } from './dummy'
 

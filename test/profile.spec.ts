@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
 import { Units } from '../src/constants'
+import Metrics from '../src/core'
 import { Gender } from '../src/models/profile'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
@@ -17,7 +17,8 @@ describe('Session', function () {
     user = userSession.user
   })
 
-  after(function () {
+  after(async function () {
+    await user.delete()
     metricsInstance?.dispose()
   })
 

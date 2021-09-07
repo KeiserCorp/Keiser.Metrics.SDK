@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'

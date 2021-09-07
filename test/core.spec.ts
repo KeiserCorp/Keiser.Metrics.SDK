@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { getMetricsInstance } from './utils/fixtures'
 
 describe('Core', function () {

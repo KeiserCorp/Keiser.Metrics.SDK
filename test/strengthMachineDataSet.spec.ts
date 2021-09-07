@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
 import { ForceUnit } from '../src/constants'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'

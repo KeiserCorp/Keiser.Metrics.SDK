@@ -1,15 +1,18 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedCardioExercise } from '../src/models/cardioExercise'
 import { CardioExerciseVariantSorting, CardioExerciseVariantType, PrivilegedCardioExerciseVariant } from '../src/models/cardioExerciseVariant'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Cardio Exercise Variant', function () {
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -20,7 +23,9 @@ describe('Cardio Exercise Variant', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
     createdCardioExercise = await adminSession.createCardioExercise({ defaultExerciseAlias: randomCharacterSequence(16) })
   })
 
@@ -28,6 +33,7 @@ describe('Cardio Exercise Variant', function () {
     await createdCardioExercise.delete()
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create cardio exercise variants', async function () {

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
 import { ForceUnit } from '../src/constants'
+import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachinesConfiguration'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'

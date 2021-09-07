@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { UserSession } from '../src/session'
 import { randomNumberSequence } from './utils/dummy'

@@ -1,19 +1,22 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedExerciseOrdinalSet } from '../src/models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignmentSorting, PrivilegedExerciseOrdinalSetAssignment } from '../src/models/exerciseOrdinalSetAssignment'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Exercise Ordinal Set Assignment', function () {
   const identifier = randomCharacterSequence(6)
 
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -26,7 +29,9 @@ describe('Exercise Ordinal Set Assignment', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
 
     createdExerciseOrdinalSet = await adminSession.createExerciseOrdinalSet({ code: randomLetterSequence(6), name: randomCharacterSequence(16), description: 'test' })
     createdStrengthExercise = await adminSession.createStrengthExercise({
@@ -47,6 +52,7 @@ describe('Exercise Ordinal Set Assignment', function () {
     await createdExerciseOrdinalSet.delete()
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create exercise ordinal set assignment', async function () {

@@ -1,10 +1,9 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
 import { UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
 import { User } from '../src/models/user'
-import { AdminSession } from '../src/session'
 import { createNewUserSession, elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('GlobalAccessControl', function () {

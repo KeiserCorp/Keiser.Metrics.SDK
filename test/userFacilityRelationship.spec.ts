@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityUserRelationshipSorting, UserFacilityEmployeeRelationship, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'

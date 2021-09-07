@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeRelationship, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from '../src/models/mSeriesChallenge'
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallengeParticipant'

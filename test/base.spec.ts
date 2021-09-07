@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './utils/constants'
 
 describe('Base', function () {

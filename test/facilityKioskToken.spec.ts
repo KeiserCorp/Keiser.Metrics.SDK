@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'

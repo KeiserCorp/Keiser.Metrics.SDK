@@ -1,23 +1,26 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import MetricsAdmin from '../src/admin'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole, FacilityUserEmployeeRelationship, FacilityUserMemberRelationship, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
 import { FacilityMemberUser } from '../src/models/user'
 import { randomEmailAddress } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Facility to User Relationship', function () {
   const newUserEmailAddress = randomEmailAddress()
 
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let privilegedFacility: PrivilegedFacility
   let existingFacilityRelationship: FacilityUserMemberRelationship
   let createdUser: FacilityMemberUser
 
   before(async function () {
     metricsInstance = getMetricsInstance()
+    metricsAdminInstance = getMetricsAdminInstance()
     const userSession = await getDemoUserSession(metricsInstance)
     const tmpPrivilegedFacility = (await userSession.user.getFacilityEmploymentRelationships())[0].eagerFacility()
     if (typeof tmpPrivilegedFacility !== 'undefined') {
@@ -29,10 +32,12 @@ describe('Facility to User Relationship', function () {
   after(async function () {
     const metricsSSOInstance = getMetricsSSOInstance()
     const userSession = await getDemoUserSession(metricsInstance)
-    const adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    const adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
     await (await adminSession.getUser({ userId: createdUser.id })).delete()
     metricsSSOInstance.dispose()
     metricsInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can get list of member relationships', async function () {

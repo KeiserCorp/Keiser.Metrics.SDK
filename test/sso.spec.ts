@@ -1,7 +1,8 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import Metrics from '../src/core'
 import { DuplicateEntityError, InvalidCredentialsError } from '../src/error'
+import MetricsSSO from '../src/sso'
 import { DemoEmail, DemoPassword, DemoUserId } from './utils/constants'
 import { randomEmailAddress } from './utils/dummy'
 import { getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
@@ -41,26 +42,6 @@ describe('SSO', function () {
     const exchangeableUserSession = await metricsSSOInstance.authenticateWithToken({ token: userSession.refreshToken })
     expect(exchangeableUserSession).to.be.an('object')
     expect(exchangeableUserSession.exchangeToken).to.be.a('string')
-  })
-
-  it('can request exchangeable session', async function () {
-    const userSession = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: DemoPassword, refreshable: true })
-    expect(userSession).to.be.an('object')
-
-    if (userSession.refreshToken === null) {
-      throw new Error('Missing Refresh Token')
-    }
-
-    const refreshedUserSession = await metricsSSOInstance.authenticateWithToken({ token: userSession.refreshToken })
-    expect(refreshedUserSession).to.be.an('object')
-
-    const exchangeableUserSession = await metricsSSOInstance.getExchangeableUserSession(refreshedUserSession)
-    expect(exchangeableUserSession).to.be.an('object')
-    expect(exchangeableUserSession.exchangeToken).to.be.a('string')
-
-    const exchangedSession = await metricsInstance.authenticateWithExchangeToken({ exchangeToken: exchangeableUserSession.exchangeToken })
-    expect(exchangedSession.user).to.be.an('object')
-    expect(exchangedSession.user.id).to.equal(DemoUserId)
   })
 
   it('can authenticate with exchange token', async function () {
