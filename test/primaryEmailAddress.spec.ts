@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { EmailAddress } from '../src/models/emailAddress'
 import { PrimaryEmailAddress } from '../src/models/primaryEmailAddress'
 import { User } from '../src/models/user'

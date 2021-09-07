@@ -1,10 +1,9 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
-import { UnknownEntityError } from '../src/error'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { GlobalAccessControl, Permission } from '../src/models/globalAccessControl'
 import { User } from '../src/models/user'
-import { AdminSession } from '../src/session'
 import { createNewUserSession, elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('GlobalAccessControl', function () {
@@ -78,10 +77,12 @@ describe('GlobalAccessControl', function () {
     try {
       await globalAccessControl.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

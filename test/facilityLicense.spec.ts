@@ -1,13 +1,14 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { UnknownEntityError } from '../src/error'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { FacilityLicense, LicenseType } from '../src/models/facilityLicense'
-import { AdminSession } from '../src/session'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Facility License', function () {
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let adminSession: AdminSession
   let createdFacilityLicense: FacilityLicense
 
@@ -15,12 +16,15 @@ describe('Facility License', function () {
     metricsInstance = getMetricsInstance()
     const userSession = await getDemoUserSession(metricsInstance)
     const metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
     metricsSSOInstance.dispose()
   })
 
   after(function () {
     metricsInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can get facility licenses', async function () {
@@ -61,10 +65,12 @@ describe('Facility License', function () {
     try {
       await createdFacilityLicense.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

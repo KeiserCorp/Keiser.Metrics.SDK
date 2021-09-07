@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
-import { UnknownEntityError } from '../src/error'
-import { AdminSession } from '../src/session'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
 import { elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
@@ -94,10 +93,12 @@ describe('Cache', function () {
     try {
       await adminSession.getCacheKey(randomKey)
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

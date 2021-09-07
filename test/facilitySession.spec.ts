@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, ActionPreventedError, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilitySession, SessionSorting } from '../src/models/session'
 import { FacilityMemberUser } from '../src/models/user'
@@ -84,11 +84,13 @@ describe('Facility Session', function () {
     try {
       await user.startSession({ forceEndPrevious: false })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(ActionPreventedError.code)
+    expect(extError?.code).to.equal(ActionPreventedError.code)
   })
 
   it('can get session status', async function () {
@@ -130,11 +132,13 @@ describe('Facility Session', function () {
     try {
       await createdSession.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 
   it('assets user session status undefined', async function () {

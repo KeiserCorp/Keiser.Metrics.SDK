@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { BlacklistTokenError, UnauthorizedTokenError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, BlacklistTokenError, UnauthorizedTokenError } from '../src/error'
 import { UserSession } from '../src/session'
 import { randomCharacterSequence, randomEmailAddress } from './utils/dummy'
 import { createNewUserSession, getAuthenticatedUserSession, getMetricsInstance } from './utils/fixtures'
@@ -99,13 +99,15 @@ describe('Auth', function () {
     try {
       await session.user.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     } finally {
       session.close()
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnauthorizedTokenError.code)
+    expect(extError?.code).to.equal(UnauthorizedTokenError.code)
   })
 
   it('cannot make model request after logout', async function () {
@@ -119,13 +121,15 @@ describe('Auth', function () {
     try {
       await session.user.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     } finally {
       session.close()
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnauthorizedTokenError.code)
+    expect(extError?.code).to.equal(UnauthorizedTokenError.code)
   })
 
   it('cannot start session after logout', async function () {
@@ -139,10 +143,12 @@ describe('Auth', function () {
     try {
       await metricsInstance.authenticateWithToken({ token: refreshToken })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(BlacklistTokenError.code)
+    expect(extError?.code).to.equal(BlacklistTokenError.code)
   })
 })

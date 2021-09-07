@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
 import { ForceUnit } from '../src/constants'
+import Metrics from '../src/core'
 import { A500MachineState } from '../src/models/a500MachineState'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { StrengthMachineSession } from '../src/session'

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { CardioMachine, CardioMachineSorting } from '../src/models/cardioMachine'
 import { UserSession } from '../src/session'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
@@ -15,7 +15,8 @@ describe('Cardio Machine', function () {
     userSession = await createNewUserSession(metricsInstance)
   })
 
-  after(function () {
+  after(async function () {
+    await userSession?.user.delete()
     metricsInstance?.dispose()
   })
 

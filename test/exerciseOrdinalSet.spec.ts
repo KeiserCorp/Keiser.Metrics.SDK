@@ -1,17 +1,20 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
-import { UnknownEntityError } from '../src/error'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { ExerciseOrdinalSetSorting, PrivilegedExerciseOrdinalSet } from '../src/models/exerciseOrdinalSet'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence, randomLetterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Exercise Ordinal Set', function () {
   const newName = randomCharacterSequence(16)
   const newCode = randomLetterSequence(6)
 
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -21,12 +24,15 @@ describe('Exercise Ordinal Set', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
   })
 
   after(async function () {
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create exercise ordinal set', async function () {
@@ -87,10 +93,12 @@ describe('Exercise Ordinal Set', function () {
     try {
       await createdExerciseOrdinalSet.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

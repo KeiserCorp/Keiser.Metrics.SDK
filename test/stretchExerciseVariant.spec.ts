@@ -1,15 +1,18 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
-import { UnknownEntityError } from '../src/error'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedStretchExercise } from '../src/models/stretchExercise'
 import { PrivilegedStretchExerciseVariant, StretchExerciseVariantSorting, StretchExerciseVariantType } from '../src/models/stretchExerciseVariant'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Stretch Exercise Variant', function () {
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -20,7 +23,9 @@ describe('Stretch Exercise Variant', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
 
     createdStretchExercise = await adminSession.createStretchExercise({ defaultExerciseAlias: randomCharacterSequence(16) })
   })
@@ -29,6 +34,7 @@ describe('Stretch Exercise Variant', function () {
     await createdStretchExercise.delete()
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create stretch exercise variants', async function () {
@@ -97,10 +103,12 @@ describe('Stretch Exercise Variant', function () {
     try {
       await createdStretchExerciseVariant.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

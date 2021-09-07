@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { CompositionType, FacilityConfiguration } from '../src/models/facilityConfiguration'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'

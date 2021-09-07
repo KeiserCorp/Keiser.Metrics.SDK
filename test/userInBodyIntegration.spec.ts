@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, ActionPreventedError, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityMemberUser } from '../src/models/user'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -30,11 +30,13 @@ describe('User InBody Integration', function () {
     try {
       await user.getInBodyIntegration()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 
   it('can try to create InBody integration', async function () {
@@ -43,10 +45,12 @@ describe('User InBody Integration', function () {
     try {
       await user.createInBodyIntegration({ userToken: '1234567890' })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(ActionPreventedError.code)
+    expect(extError?.code).to.equal(ActionPreventedError.code)
   })
 })

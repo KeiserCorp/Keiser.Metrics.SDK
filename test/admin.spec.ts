@@ -1,13 +1,16 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
 import { StatSorting } from '../src/models/stat'
 import { User, UserSorting } from '../src/models/user'
-import { AdminSession, UserSession } from '../src/session'
-import { createNewUserSession, getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
+import { createNewUserSession, getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Admin', function () {
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let demoUserSession: UserSession
   let adminSession: AdminSession
@@ -16,15 +19,19 @@ describe('Admin', function () {
     metricsInstance = getMetricsInstance()
     demoUserSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
+    metricsAdminInstance = getMetricsAdminInstance()
   })
 
   after(function () {
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can elevate to admin using token', async function () {
-    adminSession = await metricsSSOInstance.elevateUserSession(demoUserSession, { otpToken: '123456' })
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(demoUserSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
+
     expect(adminSession).to.be.an('object')
     expect(adminSession instanceof AdminSession).to.equal(true)
     expect(adminSession.user).to.be.an('object')

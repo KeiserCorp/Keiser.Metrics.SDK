@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityAccessControl } from '../src/models/facilityAccessControl'
 import { FacilityAccessControlIPRange } from '../src/models/facilityAccessControlIPRange'
@@ -66,10 +66,12 @@ describe('Facility Access Control IP Range', function () {
     try {
       await createdAccessControlIPRange.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

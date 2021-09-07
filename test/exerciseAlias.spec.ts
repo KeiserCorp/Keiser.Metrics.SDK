@@ -1,17 +1,20 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
-import { UnknownEntityError } from '../src/error'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { ExerciseAliasSorting, PrivilegedExerciseAlias } from '../src/models/exerciseAlias'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomLetterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Exercise Alias', function () {
   const newAlias = randomLetterSequence(26)
 
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -22,7 +25,9 @@ describe('Exercise Alias', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
 
     newStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomLetterSequence(26),
@@ -36,6 +41,7 @@ describe('Exercise Alias', function () {
     await newStrengthExercise.delete()
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create exercise alias', async function () {
@@ -95,10 +101,12 @@ describe('Exercise Alias', function () {
     try {
       await exerciseAlias.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

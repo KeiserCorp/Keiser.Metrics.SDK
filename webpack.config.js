@@ -27,7 +27,9 @@ export default {
   },
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: './dev',
+    static: {
+      directory: './dev'
+    },
     hot: true
   },
   plugins: [
@@ -36,8 +38,7 @@ export default {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    }),
-    new webpack.HotModuleReplacementPlugin()
+    })
   ],
   output: {
     filename: 'index.js',

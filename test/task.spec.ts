@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 
-import { MetricsAdmin } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
 import { Queue, TaskSorting } from '../src/models/task'
-import { AdminSession } from '../src/session'
 import { elevateUserSession, getDemoUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('Task', function () {

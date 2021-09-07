@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
+import Metrics from '../src/core'
 import { User } from '../src/models/user'
 import { WeightMeasurement, WeightMeasurementSorting } from '../src/models/weightMeasurement'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'

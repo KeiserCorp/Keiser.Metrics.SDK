@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachine, FacilityStrengthMachineSorting } from '../src/models/facilityStrengthMachine'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -116,11 +116,13 @@ describe('Facility Strength Machine', function () {
     try {
       await addedMachine.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 
   it('can add facility strength machines by eChip', async function () {

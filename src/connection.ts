@@ -1,4 +1,4 @@
-import Axios from 'axios'
+import Axios, { AxiosError } from 'axios'
 import { BrokenCircuitError, ConsecutiveBreaker, Policy } from 'cockatiel'
 
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
@@ -229,17 +229,18 @@ export class MetricsConnection {
       })
       callback(response.data)
     } catch (error) {
-      const actionError = error?.response?.data?.error as ActionErrorProperties | undefined
-      if (typeof actionError !== 'undefined') {
-        const errorInstance = GetErrorInstance(actionError)
-        if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
-          callback(errorInstance)
-        } else {
-          callback(null, errorInstance)
+      if (error instanceof Error) {
+        const actionError = (error as AxiosError<{error: ActionErrorProperties }>)?.response?.data?.error
+        if (typeof actionError !== 'undefined') {
+          const errorInstance = GetErrorInstance(actionError)
+          if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
+            callback(errorInstance)
+          } else {
+            callback(null, errorInstance)
+          }
         }
-      } else {
-        callback(null, { error })
       }
+      callback(null, { error })
     }
   }
 }

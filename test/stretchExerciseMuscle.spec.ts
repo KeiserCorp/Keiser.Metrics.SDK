@@ -1,16 +1,19 @@
 import { expect } from 'chai'
 
-import Metrics, { MetricsSSO } from '../src'
+import MetricsAdmin, { AdminSession } from '../src/admin'
+import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
 import { PrivilegedStretchExercise } from '../src/models/stretchExercise'
 import { PrivilegedStretchExerciseMuscle } from '../src/models/stretchExerciseMuscle'
-import { AdminSession, UserSession } from '../src/session'
+import { UserSession } from '../src/session'
+import MetricsSSO from '../src/sso'
 import { randomCharacterSequence } from './utils/dummy'
-import { getDemoUserSession, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
+import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
 describe('Stretch Exercise Muscle', function () {
   let metricsInstance: Metrics
+  let metricsAdminInstance: MetricsAdmin
   let metricsSSOInstance: MetricsSSO
   let userSession: UserSession
   let adminSession: AdminSession
@@ -21,7 +24,9 @@ describe('Stretch Exercise Muscle', function () {
     metricsInstance = getMetricsInstance()
     userSession = await getDemoUserSession(metricsInstance)
     metricsSSOInstance = getMetricsSSOInstance()
-    adminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    metricsAdminInstance = getMetricsAdminInstance()
+    const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
+    adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
 
     createdStretchExercise = await adminSession.createStretchExercise({
       defaultExerciseAlias: randomCharacterSequence(16)
@@ -32,6 +37,7 @@ describe('Stretch Exercise Muscle', function () {
     await createdStretchExercise.delete()
     metricsInstance?.dispose()
     metricsSSOInstance?.dispose()
+    metricsAdminInstance?.dispose()
   })
 
   it('can create stretch exercise muscle', async function () {
@@ -96,12 +102,12 @@ describe('Stretch Exercise Muscle', function () {
 
       try {
         await createdStretchExerciseMuscle.reload()
-      } catch (error) {
+      } catch (error: any) {
         extError = error
       }
 
       expect(extError).to.be.an('error')
-      expect(extError.code).to.equal(UnknownEntityError.code)
+      expect(extError?.code).to.equal(UnknownEntityError.code)
     }
   })
 })

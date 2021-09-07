@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { BlacklistTokenError, UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, BlacklistTokenError, UnknownEntityError } from '../src/error'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
@@ -45,10 +45,12 @@ describe('User', function () {
     try {
       await user.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.be.oneOf([UnknownEntityError.code, BlacklistTokenError.code])
+    expect(extError?.code).to.be.oneOf([UnknownEntityError.code, BlacklistTokenError.code])
   })
 })
