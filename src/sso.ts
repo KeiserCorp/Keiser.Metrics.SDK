@@ -5,7 +5,7 @@ import { DecodeJWT } from './lib/jwt'
 import { OAuthProviders } from './models/oauthService'
 import { Gender } from './models/profile'
 import { ExchangeableUserResponse } from './models/user'
-import { CheckReturnRouteResponse, ExchangeableAdminSession, ExchangeableUserSession, RedirectResponse, UserSession } from './session'
+import { CheckReturnRouteResponse, ExchangeableUserSession, RedirectResponse, UserSession } from './session'
 
 export default class MetricsSSO extends Metrics {
   async isReturnRouteValid (params: {returnUrl: string}) {
@@ -73,6 +73,6 @@ export default class MetricsSSO extends Metrics {
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
     }
-    return new ExchangeableAdminSession(response, userSession.sessionHandler.connection, accessToken.globalAccessControl)
+    return new ExchangeableUserSession(response, userSession.sessionHandler.connection)
   }
 }
