@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementSorting } from '../src/models/mSeriesFtpMeasurement'
 import { User } from '../src/models/user'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -64,10 +64,12 @@ describe('M Series FTP Measurement', function () {
     try {
       await createdMSeriesFtpMeasurement.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

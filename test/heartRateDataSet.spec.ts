@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -71,10 +71,12 @@ describe('Heart Rate Data Set', function () {
     try {
       await createdHeartRateDataSet.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

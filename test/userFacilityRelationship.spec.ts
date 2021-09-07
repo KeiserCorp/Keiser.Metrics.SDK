@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionPreventedError } from '../src/error'
+import { ActionErrorProperties, ActionPreventedError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityUserRelationshipSorting, UserFacilityEmployeeRelationship, UserFacilityMemberRelationship } from '../src/models/facilityRelationship'
 import { User } from '../src/models/user'
@@ -89,10 +89,12 @@ describe('User to Facility Relationship', function () {
     try {
       await existingFacilityRelationship.delete()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(ActionPreventedError.code)
+    expect(extError?.code).to.equal(ActionPreventedError.code)
   })
 })

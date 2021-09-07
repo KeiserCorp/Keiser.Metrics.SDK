@@ -69,7 +69,7 @@ describe('Facility', function () {
 
       try {
         await profile.reload()
-      } catch (error) {
+      } catch (error: any) {
         extError = error
       }
       expect(typeof extError).to.not.equal('undefined')

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeRelationship, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from '../src/models/mSeriesChallenge'
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantSorting } from '../src/models/mSeriesChallengeParticipant'
 import { User } from '../src/models/user'
@@ -72,7 +72,9 @@ describe('M Series Challenge', function () {
     try {
       await createdUser.getMSeriesChallenge({ id: createdMSeriesChallenge.id })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
@@ -173,11 +175,13 @@ describe('M Series Challenge', function () {
     try {
       await joinedMSeriesChallenge.getCurrentParticipant()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 
   it('can delete M Series Challenge', async function () {
@@ -188,10 +192,12 @@ describe('M Series Challenge', function () {
     try {
       await createdMSeriesChallenge.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

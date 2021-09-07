@@ -102,12 +102,12 @@ describe('Cardio Exercise Muscle', function () {
 
       try {
         await createdCardioExerciseMuscle.reload()
-      } catch (error) {
+      } catch (error: any) {
         extError = error
       }
 
       expect(extError).to.be.an('error')
-      expect(extError.code).to.equal(UnknownEntityError.code)
+      expect(extError?.code).to.equal(UnknownEntityError.code)
     }
   })
 })

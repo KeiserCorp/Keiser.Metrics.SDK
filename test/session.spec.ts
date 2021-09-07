@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, ActionPreventedError, UnknownEntityError } from '../src/error'
 import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
@@ -46,11 +46,13 @@ describe('Session', function () {
     try {
       await user.startSession({ forceEndPrevious: false })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(ActionPreventedError.code)
+    expect(extError?.code).to.equal(ActionPreventedError.code)
   })
 
   it('can get specific session', async function () {
@@ -85,10 +87,12 @@ describe('Session', function () {
     try {
       await createdSession.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

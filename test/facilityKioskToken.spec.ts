@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { UnauthorizedTokenError } from '../src/error'
+import { ActionErrorProperties, UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { FacilityUserSession, KioskSession } from '../src/session'
@@ -136,10 +136,12 @@ describe('Facility Kiosk Token', function () {
     try {
       await kioskSession.userLogin({ primaryIdentification: 1 })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnauthorizedTokenError.code)
+    expect(extError?.code).to.equal(UnauthorizedTokenError.code)
   })
 })

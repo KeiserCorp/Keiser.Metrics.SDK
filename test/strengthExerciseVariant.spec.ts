@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
-import { UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantSorting, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
 import { UserSession } from '../src/session'
@@ -114,10 +114,12 @@ describe('Strength Exercise Variant', function () {
     try {
       await createdStrengthExerciseVariant.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

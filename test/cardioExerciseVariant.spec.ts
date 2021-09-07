@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
-import { UnknownEntityError } from '../src/error'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedCardioExercise } from '../src/models/cardioExercise'
 import { CardioExerciseVariantSorting, CardioExerciseVariantType, PrivilegedCardioExerciseVariant } from '../src/models/cardioExerciseVariant'
 import { UserSession } from '../src/session'
@@ -102,10 +102,12 @@ describe('Cardio Exercise Variant', function () {
     try {
       await createdCardioExerciseVariant.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { DuplicateEntityError, InvalidCredentialsError } from '../src/error'
+import { ActionErrorProperties, DuplicateEntityError, InvalidCredentialsError } from '../src/error'
 import MetricsSSO from '../src/sso'
 import { DemoEmail, DemoPassword, DemoUserId } from './utils/constants'
 import { randomEmailAddress } from './utils/dummy'
@@ -61,11 +61,13 @@ describe('SSO', function () {
     try {
       session = await metricsSSOInstance.authenticateWithCredentials({ email: DemoEmail, password: 'wrongPassword' })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(InvalidCredentialsError.code)
+    expect(extError?.code).to.equal(InvalidCredentialsError.code)
     expect(session).to.not.be.an('object')
   })
 
@@ -97,11 +99,13 @@ describe('SSO', function () {
     try {
       session = await metricsSSOInstance.initializeUserCreation({ email: DemoEmail, returnUrl: 'http://localhost:4200/sso' })
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(DuplicateEntityError.code)
+    expect(extError?.code).to.equal(DuplicateEntityError.code)
     expect(session).to.not.be.an('object')
   })
 
