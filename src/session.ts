@@ -24,7 +24,7 @@ import { StrengthMachine, StrengthMachineIdentifier, StrengthMachineListResponse
 import { StretchExercise, StretchExerciseListResponse, StretchExerciseResponse, StretchExercises, StretchExerciseSorting } from './models/stretchExercise'
 import { StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/stretchExerciseMuscle'
 import { StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
-import { ExchangeableUserResponse, FacilityMemberUser, FacilityUserResponse, User, UserResponse } from './models/user'
+import { FacilityMemberUser, FacilityUserResponse, User, UserResponse } from './models/user'
 
 export interface AuthenticatedResponse {
   accessToken: string
@@ -554,19 +554,6 @@ export class UserSession extends UserSessionBase<User> {
   constructor (userResponse: UserResponse, connection: MetricsConnection) {
     super(userResponse, connection)
     this._user = new User(userResponse.user, this._sessionHandler)
-  }
-}
-
-export class ExchangeableUserSession extends UserSession {
-  protected readonly _exchangeToken: string
-
-  constructor (exchangeableUserResponse: ExchangeableUserResponse, connection: MetricsConnection) {
-    super(exchangeableUserResponse, connection)
-    this._exchangeToken = exchangeableUserResponse.exchangeToken
-  }
-
-  get exchangeToken () {
-    return this._exchangeToken
   }
 }
 

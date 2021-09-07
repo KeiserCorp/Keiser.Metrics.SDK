@@ -1,11 +1,13 @@
+import { MetricsConnection } from './connection'
 import { Units } from './constants'
 import Metrics from './core'
 import { ClientSideActionPrevented } from './error'
 import { DecodeJWT } from './lib/jwt'
+import { GlobalAccessControl, GlobalAccessControlData } from './models/globalAccessControl'
 import { OAuthProviders } from './models/oauthService'
 import { Gender } from './models/profile'
 import { ExchangeableUserResponse } from './models/user'
-import { CheckReturnRouteResponse, ExchangeableUserSession, RedirectResponse, UserSession } from './session'
+import { CheckReturnRouteResponse, RedirectResponse, UserSession } from './session'
 
 export default class MetricsSSO extends Metrics {
   async isReturnRouteValid (params: {returnUrl: string}) {
@@ -61,18 +63,38 @@ export default class MetricsSSO extends Metrics {
     return new ExchangeableUserSession(response, this._connection)
   }
 
-  /** @deprecated */
-  async getExchangeableUserSession (userSession: UserSession) {
-    const response = await userSession.sessionHandler.action('auth:exchangeInit') as ExchangeableUserResponse
-    return new ExchangeableUserSession(response, userSession.sessionHandler.connection)
-  }
-
   async elevateUserSession (userSession: UserSession, params: { otpToken: string, refreshable?: boolean }) {
     const response = await userSession.sessionHandler.action('auth:elevate', { refreshable: true, ...params }) as ExchangeableUserResponse
     const accessToken = DecodeJWT(response.accessToken)
     if (typeof accessToken.globalAccessControl === 'undefined' || accessToken.globalAccessControl === null) {
       throw new ClientSideActionPrevented({ explanation: 'Session token is not valid for admin session.' })
     }
-    return new ExchangeableUserSession(response, userSession.sessionHandler.connection)
+    return new ExchangeableAdminSession(response, userSession.sessionHandler.connection, accessToken.globalAccessControl)
+  }
+}
+
+export class ExchangeableUserSession extends UserSession {
+  protected readonly _exchangeToken: string
+
+  constructor (exchangeableUserResponse: ExchangeableUserResponse, connection: MetricsConnection) {
+    super(exchangeableUserResponse, connection)
+    this._exchangeToken = exchangeableUserResponse.exchangeToken
+  }
+
+  get exchangeToken () {
+    return this._exchangeToken
+  }
+}
+
+export class ExchangeableAdminSession extends ExchangeableUserSession {
+  private readonly _globalAccessControl: GlobalAccessControl
+
+  constructor (exchangeableUserResponse: ExchangeableUserResponse, connection: MetricsConnection, globalAccessControlData: GlobalAccessControlData) {
+    super(exchangeableUserResponse, connection)
+    this._globalAccessControl = new GlobalAccessControl(globalAccessControlData, this.sessionHandler)
+  }
+
+  get globalAccessControl () {
+    return this._globalAccessControl
   }
 }
