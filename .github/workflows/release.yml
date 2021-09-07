@@ -112,20 +112,52 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Bundle Files
+      - name: Bundle Core Files
         uses: papeloto/action-zip@v1
         with:
-          files: dist
-          dest: v${{ needs.version-check.outputs.version }}.dist.zip
-      
-      - name: Archive Libraries
+          files: dist/core
+          dest: Keiser.Metrics.SDK-${{ needs.version-check.outputs.version }}.dist.zip
+
+      - name: Archive Core Bundle
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.version-check.outputs.upload_url }}
-          asset_path: ./v${{ needs.version-check.outputs.version }}.dist.zip
-          asset_name: v${{ needs.version-check.outputs.version }}.dist.zip
+          asset_path: ./Keiser.Metrics.SDK-${{ needs.version-check.outputs.version }}.dist.zip
+          asset_name: Keiser.Metrics.SDK-${{ needs.version-check.outputs.version }}.dist.zip
+          asset_content_type: application/zip
+
+      - name: Bundle Admin Files
+        uses: papeloto/action-zip@v1
+        with:
+          files: dist/admin
+          dest: Keiser.Metrics.SDK.Admin-${{ needs.version-check.outputs.version }}.dist.zip
+
+      - name: Archive Admin Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.version-check.outputs.upload_url }}
+          asset_path: ./Keiser.Metrics.SDK.Admin-${{ needs.version-check.outputs.version }}.dist.zip
+          asset_name: Keiser.Metrics.SDK.Admin-${{ needs.version-check.outputs.version }}.dist.zip
+          asset_content_type: application/zip
+
+      - name: Bundle SSO Files
+        uses: papeloto/action-zip@v1
+        with:
+          files: dist/sso
+          dest: Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
+
+      - name: Archive SSO Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.version-check.outputs.upload_url }}
+          asset_path: ./Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
+          asset_name: Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
           asset_content_type: application/zip
 
       - name: Release to NPM

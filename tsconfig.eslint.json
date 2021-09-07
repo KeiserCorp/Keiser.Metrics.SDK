@@ -1,7 +1,13 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "dev/**/*.ts",
-    "test/**/*.ts"
+    "./src/global.ts",
+    "./src/core.ts",
+    "./src/admin.ts",
+    "./src/sso.ts",
+    "./src/**/*.ts",
+    "./dev/**/*.ts",
+    "./test/**/*.ts",
+    "./types/**/*.d.ts"
   ]
 }
