@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "./src/**/*.ts",
+    "./types/**/*.d.ts"
+  ],
+  "typedocOptions": {
+    "entryPoints": [
+      "./src/"
+    ],
+    "exclude": [
+      "./src/sso.ts",
+      "./src/admin.ts",
+      "./src/models/cache.ts",
+      "./src/models/stat.ts",
+      "./src/models/task.ts",
+      "./src/models/facilityLicense.ts",
+      "./src/models/globalAccessControl.ts"
+    ],
+    "out": "dist/docs",
+    "theme": "default",
+    "name": "Keiser Metrics SDK API",
+    "readme": "none",
+    "includeVersion": true,
+    "hideGenerator": true,
+    "excludePrivate": true,
+    "excludeProtected": true
+  }
+}

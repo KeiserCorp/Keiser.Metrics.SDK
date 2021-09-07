@@ -178,7 +178,7 @@ jobs:
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: docs
+          FOLDER: dist/docs
           SINGLE_COMMIT: true
           CLEAN: true
           COMMIT_MESSAGE: v${{ needs.version-check.outputs.version }}

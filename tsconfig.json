@@ -29,26 +29,5 @@
   "exclude": [
     "./node_modules",
     "./dist"
-  ],
-  "typedocOptions": {
-    "mode": "file",
-    "out": "docs",
-    "theme": "default",
-    "name": "Keiser Metrics SDK",
-    "readme": "none",
-    "exclude": [
-      "src/lib/*",
-      "src/models/cache.ts",
-      "src/models/stat.ts",
-      "src/models/task.ts",
-      "src/models/facilityLicense.ts",
-      "src/models/globalAccessControl.ts"
-    ],
-    "includeVersion": true,
-    "includeDeclarations": false,
-    "excludeExternals": true,
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "hideGenerator": true
-  }
+  ]
 }
