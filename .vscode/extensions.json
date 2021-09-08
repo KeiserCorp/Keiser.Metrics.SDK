@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "coenraads.bracket-pair-colorizer-2",
     "streetsidesoftware.code-spell-checker",
     "eg2.vscode-npm-script",
     "dbaeumer.vscode-eslint",
