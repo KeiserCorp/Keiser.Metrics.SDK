@@ -1,5 +1,5 @@
 import { Units } from '../constants'
-import { Model } from '../model'
+import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum Gender {
@@ -22,7 +22,7 @@ export interface ProfileResponse extends AuthenticatedResponse {
   profile: ProfileData
 }
 
-export class Profile extends Model {
+export class Profile extends SubscribableModel {
   private _profileData: ProfileData
 
   constructor (profileData: ProfileData, sessionHandler: SessionHandler) {
@@ -50,6 +50,14 @@ export class Profile extends Model {
     const { profile } = await this.action('profile:update', { ...params, userId: this._profileData.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
+  }
+
+  async subscribe () {
+    await this._subscribe('profile', { userId: this._profileData.userId })
+  }
+
+  async unsubscribe () {
+    await this._unsubscribe('profile', { userId: this._profileData.userId })
   }
 
   get updatedAt () {

@@ -1,4 +1,4 @@
-import { BaseSessionHandler, SessionHandler } from './session'
+import { AuthenticatedResponse, BaseSessionHandler, SessionHandler } from './session'
 
 export interface ListMeta {
   sort: string
@@ -6,6 +6,10 @@ export interface ListMeta {
   limit: number
   offset: number
   totalCount: number
+}
+
+export interface SubscriptionResponse extends AuthenticatedResponse {
+  subscriptionKey: string
 }
 
 export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandler> {
@@ -17,6 +21,29 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
 
   protected async action (action: string, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
+  }
+}
+
+export class SubscribableModel extends Model {
+  private _subscriptionKey: string | null = null
+
+  protected async _subscribe (model: string, params: Object) {
+    const { subscriptionKey } = await this.action(`${model}:subscribe`, params) as SubscriptionResponse
+    console.log(subscriptionKey)
+    this._subscriptionKey = subscriptionKey
+  }
+
+  protected async _unsubscribe (model: string, params: Object) {
+    await this.action(`${model}:unsubscribe`, params)
+    this._subscriptionKey = null
+  }
+
+  get subscriptionKey () {
+    return this._subscriptionKey
+  }
+
+  get isSubscribed () {
+    return this._subscriptionKey !== null
   }
 }
 
