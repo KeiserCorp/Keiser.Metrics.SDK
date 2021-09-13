@@ -35,11 +35,16 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
 }
 
 export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHandler = SessionHandler> extends Model<SessionHandlerType> {
+  private readonly _modelName: string
+  private readonly _subscriptionParams: Object
   private _subscriptionKey: string | null = null
   private readonly _onModelChangeEvent = new EventDispatcher<ModelChangeEvent>()
 
-  constructor (sessionHandler: SessionHandlerType) {
+  constructor (modelName: string, subscriptionParams: Object, sessionHandler: SessionHandlerType) {
     super(sessionHandler)
+    this._modelName = modelName
+    this._subscriptionParams = subscriptionParams
+
     sessionHandler.connection.onConnectionChangeEvent.subscribe(e => void this.onConnectionChangeEvent(e))
     this._onModelChangeEvent.onSubscriptionCountChangeEvent.subscribe(e => void this.onSubscriptionCountChangeEvent(e))
   }
@@ -49,33 +54,35 @@ export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHa
   }
 
   private async onSubscriptionCountChangeEvent ({ count }: {count: number}) {
-    console.log(count)
+    console.log(count, this.isSubscribed)
+    if (count === 0 && this.isSubscribed) {
+      await this.unsubscribe()
+    } else if (count > 0 && !this.isSubscribed) {
+      await this.subscribe()
+    }
   }
 
-  protected async _subscribe (model: string, params: Object) {
-    const { subscriptionKey } = await this.action(`${model}:subscribe`, params) as SubscriptionResponse
+  private get isSubscribed () {
+    return this._subscriptionKey !== null
+  }
+
+  private async subscribe () {
+    const { subscriptionKey } = await this.action(`${this._modelName}:subscribe`, this._subscriptionParams) as SubscriptionResponse
     this._subscriptionKey = subscriptionKey
   }
 
-  protected async _unsubscribe (model: string, params: Object) {
-    await this.action(`${model}:unsubscribe`, params)
+  private async unsubscribe () {
+    await this.action(`${this._modelName}:unsubscribe`, this._subscriptionParams)
     this._subscriptionKey = null
   }
-
-  abstract subscribe (): Promise<void>
-  abstract unsubscribe (): Promise<void>
 
   get onModelChangeEvent () {
     return this._onModelChangeEvent.asEvent()
   }
 
-  get subscriptionKey () {
-    return this._subscriptionKey
-  }
-
-  get isSubscribed () {
-    return this._subscriptionKey !== null
-  }
+  // get subscriptionKey () {
+  //   return this._subscriptionKey
+  // }
 }
 
 export type ModelClass<Model> = new(x: any, sessionHandler: any) => Model

@@ -26,7 +26,7 @@ export class Profile extends SubscribableModel {
   private _profileData: ProfileData
 
   constructor (profileData: ProfileData, sessionHandler: SessionHandler) {
-    super(sessionHandler)
+    super('profile', { userId: profileData.userId }, sessionHandler)
     this._profileData = profileData
   }
 
@@ -50,14 +50,6 @@ export class Profile extends SubscribableModel {
     const { profile } = await this.action('profile:update', { ...params, userId: this._profileData.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
-  }
-
-  async subscribe () {
-    await this._subscribe('profile', { userId: this._profileData.userId })
-  }
-
-  async unsubscribe () {
-    await this._unsubscribe('profile', { userId: this._profileData.userId })
   }
 
   get updatedAt () {
