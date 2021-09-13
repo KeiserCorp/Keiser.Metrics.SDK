@@ -35,16 +35,13 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
 }
 
 export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHandler = SessionHandler> extends Model<SessionHandlerType> {
-  private readonly _modelName: string
-  private readonly _subscriptionParams: Object
+  protected abstract readonly _modelName: string
+  protected abstract readonly _subscriptionParams: Object
   private _subscriptionKey: string | null = null
   private readonly _onModelChangeEvent = new EventDispatcher<ModelChangeEvent>()
 
-  constructor (modelName: string, subscriptionParams: Object, sessionHandler: SessionHandlerType) {
+  constructor (sessionHandler: SessionHandlerType) {
     super(sessionHandler)
-    this._modelName = modelName
-    this._subscriptionParams = subscriptionParams
-
     sessionHandler.connection.onConnectionChangeEvent.subscribe(e => void this.onConnectionChangeEvent(e))
     this._onModelChangeEvent.onSubscriptionCountChangeEvent.subscribe(e => void this.onSubscriptionCountChangeEvent(e))
   }

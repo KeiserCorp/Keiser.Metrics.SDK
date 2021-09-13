@@ -24,10 +24,13 @@ export interface ProfileResponse extends AuthenticatedResponse {
 
 export class Profile extends SubscribableModel {
   private _profileData: ProfileData
+  protected readonly _modelName = 'profile'
+  protected readonly _subscriptionParams
 
   constructor (profileData: ProfileData, sessionHandler: SessionHandler) {
-    super('profile', { userId: profileData.userId }, sessionHandler)
+    super(sessionHandler)
     this._profileData = profileData
+    this._subscriptionParams = { userId: this._profileData.userId }
   }
 
   private setProfileData (profileData: ProfileData) {
