@@ -1,3 +1,5 @@
+import { ConnectionEvent } from './connection'
+import { EventDispatcher } from './lib/event'
 import { AuthenticatedResponse, BaseSessionHandler, SessionHandler } from './session'
 
 export interface ListMeta {
@@ -6,6 +8,14 @@ export interface ListMeta {
   limit: number
   offset: number
   totalCount: number
+}
+
+export interface ModelChangeEvent {
+  model: string
+  modelId: number
+  mutation: 'create' | 'update' | 'delete'
+  userId: number
+  occurredAt: number
 }
 
 export interface SubscriptionResponse extends AuthenticatedResponse {
@@ -24,18 +34,39 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
   }
 }
 
-export class SubscribableModel extends Model {
+export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHandler = SessionHandler> extends Model<SessionHandlerType> {
   private _subscriptionKey: string | null = null
+  private readonly _onModelChangeEvent = new EventDispatcher<ModelChangeEvent>()
+
+  constructor (sessionHandler: SessionHandlerType) {
+    super(sessionHandler)
+    sessionHandler.connection.onConnectionChangeEvent.subscribe(e => void this.onConnectionChangeEvent(e))
+    this._onModelChangeEvent.onSubscriptionCountChangeEvent.subscribe(e => void this.onSubscriptionCountChangeEvent(e))
+  }
+
+  private async onConnectionChangeEvent (connectionEvent: ConnectionEvent) {
+    console.log(connectionEvent)
+  }
+
+  private async onSubscriptionCountChangeEvent ({ count }: {count: number}) {
+    console.log(count)
+  }
 
   protected async _subscribe (model: string, params: Object) {
     const { subscriptionKey } = await this.action(`${model}:subscribe`, params) as SubscriptionResponse
-    console.log(subscriptionKey)
     this._subscriptionKey = subscriptionKey
   }
 
   protected async _unsubscribe (model: string, params: Object) {
     await this.action(`${model}:unsubscribe`, params)
     this._subscriptionKey = null
+  }
+
+  abstract subscribe (): Promise<void>
+  abstract unsubscribe (): Promise<void>
+
+  get onModelChangeEvent () {
+    return this._onModelChangeEvent.asEvent()
   }
 
   get subscriptionKey () {
