@@ -24,13 +24,10 @@ export interface ProfileResponse extends AuthenticatedResponse {
 
 export class Profile extends SubscribableModel {
   private _profileData: ProfileData
-  protected readonly _modelName = 'profile'
-  protected readonly _subscriptionParams
 
   constructor (profileData: ProfileData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._profileData = profileData
-    this._subscriptionParams = { userId: this._profileData.userId }
   }
 
   private setProfileData (profileData: ProfileData) {
@@ -53,6 +50,10 @@ export class Profile extends SubscribableModel {
     const { profile } = await this.action('profile:update', { ...params, userId: this._profileData.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'profile', userId: this._profileData.userId }
   }
 
   get updatedAt () {

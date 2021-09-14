@@ -1,6 +1,5 @@
-import { ConnectionEvent } from './connection'
 import { EventDispatcher } from './lib/event'
-import { AuthenticatedResponse, BaseSessionHandler, SessionHandler } from './session'
+import { BaseSessionHandler, ModelChangeEvent, ModelSubscribeParameters, SessionHandler } from './session'
 
 export interface ListMeta {
   sort: string
@@ -8,18 +7,6 @@ export interface ListMeta {
   limit: number
   offset: number
   totalCount: number
-}
-
-export interface ModelChangeEvent {
-  model: string
-  modelId: number
-  mutation: 'create' | 'update' | 'delete'
-  userId: number
-  occurredAt: number
-}
-
-export interface SubscriptionResponse extends AuthenticatedResponse {
-  subscriptionKey: string
 }
 
 export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandler> {
@@ -35,23 +22,18 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
 }
 
 export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHandler = SessionHandler> extends Model<SessionHandlerType> {
-  protected abstract readonly _modelName: string
-  protected abstract readonly _subscriptionParams: Object
-  private _subscriptionKey: string | null = null
+  private _isSubscribed = false
+  private _unsubscribe: (() => Promise<void>) | null = null
   private readonly _onModelChangeEvent = new EventDispatcher<ModelChangeEvent>()
 
   constructor (sessionHandler: SessionHandlerType) {
     super(sessionHandler)
-    sessionHandler.connection.onConnectionChangeEvent.subscribe(e => void this.onConnectionChangeEvent(e))
     this._onModelChangeEvent.onSubscriptionCountChangeEvent.subscribe(e => void this.onSubscriptionCountChangeEvent(e))
   }
 
-  private async onConnectionChangeEvent (connectionEvent: ConnectionEvent) {
-    console.log(connectionEvent)
-  }
+  protected abstract get subscribeParameters (): ModelSubscribeParameters
 
   private async onSubscriptionCountChangeEvent ({ count }: {count: number}) {
-    console.log(count, this.isSubscribed)
     if (count === 0 && this.isSubscribed) {
       await this.unsubscribe()
     } else if (count > 0 && !this.isSubscribed) {
@@ -59,27 +41,30 @@ export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHa
     }
   }
 
-  private get isSubscribed () {
-    return this._subscriptionKey !== null
+  private dispatchModelChangeEvent (modelChangeEvent: ModelChangeEvent) {
+    this._onModelChangeEvent.dispatchAsync(modelChangeEvent)
   }
 
   private async subscribe () {
-    const { subscriptionKey } = await this.action(`${this._modelName}:subscribe`, this._subscriptionParams) as SubscriptionResponse
-    this._subscriptionKey = subscriptionKey
+    this._isSubscribed = true
+    this._unsubscribe = await this.sessionHandler.subscribeToModel(this.subscribeParameters, e => this.dispatchModelChangeEvent(e))
   }
 
   private async unsubscribe () {
-    await this.action(`${this._modelName}:unsubscribe`, this._subscriptionParams)
-    this._subscriptionKey = null
+    if (this._unsubscribe !== null) {
+      await this._unsubscribe()
+      this._unsubscribe = null
+    }
+    this._isSubscribed = false
+  }
+
+  protected get isSubscribed () {
+    return this._isSubscribed
   }
 
   get onModelChangeEvent () {
     return this._onModelChangeEvent.asEvent()
   }
-
-  // get subscriptionKey () {
-  //   return this._subscriptionKey
-  // }
 }
 
 export type ModelClass<Model> = new(x: any, sessionHandler: any) => Model

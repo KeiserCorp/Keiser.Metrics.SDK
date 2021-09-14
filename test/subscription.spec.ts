@@ -1,72 +1,186 @@
-// import { expect } from 'chai'
+import { expect } from 'chai'
 
 import Metrics from '../src/core'
+import { Profile } from '../src/models/profile'
 import { User } from '../src/models/user'
-import { createNewUserSession, getDemoUserSession, getMetricsInstance } from './utils/fixtures'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
+import { randomCharacterSequence, randomEmailAddress, randomLetterSequence } from './utils/dummy'
+import { createNewUserSession, getAuthenticatedUserSession, getMetricsInstance } from './utils/fixtures'
 
-describe('Event System', function () {
-  let metricsInstance: Metrics
-  let user: User
-  let demoUser: User
+describe('Subscription System', function () {
+  let alphaMetricsInstance: Metrics
+  let alphaUser: User
+  let alphaProfile: Profile
+
+  let betaMetricsInstance: Metrics
+  let betaUser: User
+  let betaProfile: Profile
 
   before(async function () {
-    metricsInstance = getMetricsInstance()
-    const userSession = await createNewUserSession(metricsInstance)
-    user = userSession.user
+    if (!IsBrowser) {
+      this.skip()
+    }
 
-    const demoSession = await getDemoUserSession(metricsInstance)
-    demoUser = demoSession.user
+    const params = {
+      email: randomEmailAddress(),
+      password: randomCharacterSequence(20)
+    }
+    alphaMetricsInstance = getMetricsInstance()
+    const alphaSession = await createNewUserSession(alphaMetricsInstance, params)
+    alphaUser = alphaSession.user
+    alphaProfile = alphaUser.eagerProfile()
+
+    betaMetricsInstance = getMetricsInstance()
+    const betaSession = await getAuthenticatedUserSession(betaMetricsInstance, params)
+    betaUser = betaSession.user
+    betaProfile = betaUser.eagerProfile()
   })
 
   after(async function () {
-    await user.delete()
-    // metricsInstance?.dispose()
+    if (IsBrowser) {
+      await alphaUser.delete()
+      alphaMetricsInstance?.dispose()
+      betaMetricsInstance?.dispose()
+    }
   })
 
-  // it('can update to demo profile', async function () {
-  //   const profile = demoUser.eagerProfile()
-  //   await profile.update({ name: 'Tested Profile' })
-  // })
+  it('can subscribe and receive model change event', async function () {
+    this.timeout(10000)
 
-  // it('can subscribe to user profile', async function () {
-  //   const profile = user.eagerProfile()
-  //   // const initialProfileName = profile.name
-  //   expect(profile.isSubscribed).to.equal(false)
-  //   expect(profile.subscriptionKey).to.equal(null)
-  //   await profile.subscribe()
-  //   expect(profile.isSubscribed).to.equal(true)
-  //   expect(profile.subscriptionKey).to.not.equal(null)
-  //   await profile.update({ name: 'Test Name' })
-  // })
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      alphaProfile.onModelChangeEvent.one(e => resolve(e))
+    }))
 
-  it('can subscribe to demo profile', async function () {
-    const profile = demoUser.eagerProfile()
-    const handler = (e: any) => { console.log(e) }
-    const unSub1 = profile.onModelChangeEvent.subscribe(handler)
-    profile.onModelChangeEvent.subscribe(handler)
+    await alphaProfile.update({ name: randomLetterSequence(20) })
 
-    unSub1()
-
-    setTimeout(() => void profile.update({ name: 'Retesting Profile' }), 20000)
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.model).to.equal('profile')
+    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
+    expect(modelChangeEvent.mutation).to.equal('update')
   })
 
-  // it('can re-subscribe to user', async function () {
-  //   const profile = user.eagerProfile()
-  //   await profile.subscribe()
-  //   expect(profile.isSubscribed).to.equal(true)
-  // })
+  it('can handle subscribing while disconnected', async function () {
+    this.timeout(30000)
 
-  // it('can unsubscribe to user profile', async function () {
-  //   const profile = user.eagerProfile()
-  //   // const initialProfileName = profile.name
-  //   expect(profile.isSubscribed).to.equal(false)
-  //   expect(profile.subscriptionKey).to.equal(null)
-  //   await profile.subscribe()
-  //   expect(profile.isSubscribed).to.equal(true)
-  //   expect(profile.subscriptionKey).to.not.equal(null)
-  //   await profile.update({ name: 'Test Name' })
-  //   await profile.unsubscribe()
-  //   expect(profile.isSubscribed).to.equal(false)
-  //   expect(profile.subscriptionKey).to.equal(null)
-  // })
+    const socketDisconnectEventPromise = new Promise(resolve => {
+      const unsubscribe = alphaMetricsInstance.onConnectionChangeEvent.subscribe(e => {
+        if (!e.socketConnection) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    })
+
+    const socketReconnectEventPromise = new Promise(resolve => {
+      const unsubscribe = alphaMetricsInstance.onConnectionChangeEvent.subscribe(e => {
+        if (e.socketConnection) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    })
+
+    void alphaMetricsInstance.action('dev:serverRestart').catch(e => {})
+    await socketDisconnectEventPromise
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      alphaProfile.onModelChangeEvent.one(e => resolve(e))
+    }))
+
+    await socketReconnectEventPromise
+
+    await alphaProfile.update({ name: randomLetterSequence(20) })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.model).to.equal('profile')
+    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
+    expect(modelChangeEvent.mutation).to.equal('update')
+  })
+
+  it('can maintain subscription across disconnect', async function () {
+    this.timeout(30000)
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      alphaProfile.onModelChangeEvent.one(e => resolve(e))
+    }))
+
+    const socketReconnectEventPromise = new Promise(resolve => {
+      const unsubscribe = alphaMetricsInstance.onConnectionChangeEvent.subscribe(e => {
+        if (e.socketConnection) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    })
+
+    void alphaMetricsInstance.action('dev:serverRestart').catch(e => {})
+    await socketReconnectEventPromise
+
+    await alphaProfile.update({ name: randomLetterSequence(20) })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.model).to.equal('profile')
+    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
+    expect(modelChangeEvent.mutation).to.equal('update')
+  })
+
+  it('can subscribe and receive model change event triggered by another session', async function () {
+    this.timeout(10000)
+
+    const alphaModelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      alphaProfile.onModelChangeEvent.one(e => resolve(e))
+    }))
+
+    await betaProfile.update({ name: randomLetterSequence(20) })
+
+    const alphaModelChangeEvent = await alphaModelChangeEventPromise
+    expect(alphaModelChangeEvent).to.be.an('object')
+    expect(alphaModelChangeEvent.model).to.equal('profile')
+    expect(alphaModelChangeEvent.modelId).to.equal(alphaUser.id)
+    expect(alphaModelChangeEvent.mutation).to.equal('update')
+  })
+
+  it('can unsubscribe to event and still receive change event on another session', async function () {
+    this.timeout(10000)
+    let capturedEvent: any
+
+    const alphaUnsubscribe = alphaProfile.onModelChangeEvent.subscribe(e => { capturedEvent = e })
+    alphaUnsubscribe()
+
+    const betaModelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      betaProfile.onModelChangeEvent.one(e => resolve(e))
+    }))
+
+    await betaProfile.update({ name: randomLetterSequence(20) })
+
+    const betaModelChangeEvent = await betaModelChangeEventPromise
+    expect(betaModelChangeEvent).to.be.an('object')
+    expect(betaModelChangeEvent.model).to.equal('profile')
+    expect(betaModelChangeEvent.modelId).to.equal(alphaUser.id)
+    expect(betaModelChangeEvent.mutation).to.equal('update')
+
+    expect(typeof capturedEvent).to.equal('undefined')
+  })
+
+  it('can unsubscribe to event across all sessions', async function () {
+    this.timeout(12000)
+    let alphaCapturedEvent: any
+    let betaCapturedEvent: any
+
+    const alphaUnsubscribe = alphaProfile.onModelChangeEvent.subscribe(e => { alphaCapturedEvent = e })
+    const betaUnsubscribe = betaProfile.onModelChangeEvent.subscribe(e => { betaCapturedEvent = e })
+
+    alphaUnsubscribe()
+    betaUnsubscribe()
+
+    await alphaProfile.update({ name: randomLetterSequence(20) })
+    await (new Promise(resolve => setTimeout(() => resolve(null), 10000)))
+
+    expect(typeof alphaCapturedEvent).to.equal('undefined')
+    expect(typeof betaCapturedEvent).to.equal('undefined')
+  })
 })
