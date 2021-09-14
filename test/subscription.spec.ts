@@ -142,6 +142,9 @@ describe('Subscription System', function () {
     expect(alphaModelChangeEvent.model).to.equal('profile')
     expect(alphaModelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(alphaModelChangeEvent.mutation).to.equal('update')
+
+    await alphaProfile.reload()
+    expect(alphaProfile.name).to.equal(betaProfile.name)
   })
 
   it('can unsubscribe to event and still receive change event on another session', async function () {
