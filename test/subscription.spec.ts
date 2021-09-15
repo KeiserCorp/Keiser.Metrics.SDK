@@ -56,8 +56,6 @@ describe('Subscription System', function () {
 
     const modelChangeEvent = await modelChangeEventPromise
     expect(modelChangeEvent).to.be.an('object')
-    expect(modelChangeEvent.model).to.equal('profile')
-    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(modelChangeEvent.mutation).to.equal('update')
   })
 
@@ -95,8 +93,6 @@ describe('Subscription System', function () {
 
     const modelChangeEvent = await modelChangeEventPromise
     expect(modelChangeEvent).to.be.an('object')
-    expect(modelChangeEvent.model).to.equal('profile')
-    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(modelChangeEvent.mutation).to.equal('update')
   })
 
@@ -123,8 +119,6 @@ describe('Subscription System', function () {
 
     const modelChangeEvent = await modelChangeEventPromise
     expect(modelChangeEvent).to.be.an('object')
-    expect(modelChangeEvent.model).to.equal('profile')
-    expect(modelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(modelChangeEvent.mutation).to.equal('update')
   })
 
@@ -139,8 +133,6 @@ describe('Subscription System', function () {
 
     const alphaModelChangeEvent = await alphaModelChangeEventPromise
     expect(alphaModelChangeEvent).to.be.an('object')
-    expect(alphaModelChangeEvent.model).to.equal('profile')
-    expect(alphaModelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(alphaModelChangeEvent.mutation).to.equal('update')
 
     await alphaProfile.reload()
@@ -162,8 +154,6 @@ describe('Subscription System', function () {
 
     const betaModelChangeEvent = await betaModelChangeEventPromise
     expect(betaModelChangeEvent).to.be.an('object')
-    expect(betaModelChangeEvent.model).to.equal('profile')
-    expect(betaModelChangeEvent.modelId).to.equal(alphaUser.id)
     expect(betaModelChangeEvent.mutation).to.equal('update')
 
     expect(typeof capturedEvent).to.equal('undefined')

@@ -122,10 +122,7 @@ export interface StrengthMachineToken extends JWTToken{
 }
 
 export interface ModelChangeEvent {
-  model: string
-  modelId: number
   mutation: 'create' | 'update' | 'delete'
-  userId: number
   occurredAt: number
 }
 

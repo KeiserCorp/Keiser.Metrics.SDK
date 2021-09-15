@@ -104,8 +104,6 @@ describe('Profile', function () {
 
     const modelChangeEvent = await modelChangeEventPromise
     expect(modelChangeEvent).to.be.an('object')
-    expect(modelChangeEvent.model).to.equal('profile')
-    expect(modelChangeEvent.modelId).to.equal(user.id)
     expect(modelChangeEvent.mutation).to.equal('update')
   })
 })
