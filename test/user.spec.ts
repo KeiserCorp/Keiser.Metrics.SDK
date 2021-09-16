@@ -3,6 +3,8 @@ import { expect } from 'chai'
 import Metrics from '../src/core'
 import { ActionErrorProperties, BlacklistTokenError, UnknownEntityError } from '../src/error'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { randomLetterSequence } from './utils/dummy'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('User', function () {
@@ -35,6 +37,26 @@ describe('User', function () {
   it('can change user password', async function () {
     const newPassword = 'p@$$w0r|)'
     await user.changePassword({ password: newPassword })
+  })
+
+  it('can subscribe to associated model changes', async function () {
+    this.timeout(10000)
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = user.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update' && e.name === 'profile') {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await user.eagerProfile().update({ name: randomLetterSequence(20) })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.name).to.equal('profile')
+    expect(modelChangeEvent.mutation).to.equal('update')
   })
 
   it('can delete user', async function () {

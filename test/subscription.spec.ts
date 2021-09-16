@@ -59,6 +59,26 @@ describe('Subscription System', function () {
     expect(modelChangeEvent.mutation).to.equal('update')
   })
 
+  it('can subscribe and receive model change event from association', async function () {
+    this.timeout(10000)
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = alphaUser.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update' && e.name === 'profile') {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await alphaProfile.update({ name: randomLetterSequence(20) })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.name).to.equal('profile')
+    expect(modelChangeEvent.mutation).to.equal('update')
+  })
+
   it('can handle subscribing while disconnected', async function () {
     this.timeout(30000)
 

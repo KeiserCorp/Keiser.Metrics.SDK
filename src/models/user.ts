@@ -1,7 +1,7 @@
 import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
 import { compressDeflateToB64 } from '../lib/compress'
-import { ListMeta, Model, ModelList } from '../model'
+import { ListMeta, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
@@ -81,7 +81,7 @@ export interface OAuthConnectResponse extends AuthenticatedResponse {
   url: string
 }
 
-export class User extends Model {
+export class User extends SubscribableModel {
   private _userData: UserData
   private readonly _isSessionUser: boolean
 
@@ -93,6 +93,10 @@ export class User extends Model {
 
   private setUserData (userData: UserData) {
     this._userData = userData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'user', id: this.id }
   }
 
   async reload () {
