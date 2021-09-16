@@ -3,6 +3,8 @@ import { expect } from 'chai'
 import Metrics from '../src/core'
 import { User } from '../src/models/user'
 import { WeightMeasurement, WeightMeasurementSorting } from '../src/models/weightMeasurement'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Weight Measurement', function () {
@@ -107,5 +109,56 @@ describe('Weight Measurement', function () {
     expect(weightMeasurement.metricWeight).to.equal(87.5)
 
     await weightMeasurements[0].delete()
+  })
+
+  it('can subscribe to weight measurement changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const weightMeasurement = (await user.getWeightMeasurements({ limit: 1 }))[0]
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = weightMeasurement.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === weightMeasurement.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await weightMeasurement.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(weightMeasurement.id)
+  })
+
+  it('can subscribe to weight measurement list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const weightMeasurements = await user.getWeightMeasurements({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = weightMeasurements.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (weightMeasurements.length === 0 || e.id !== weightMeasurements[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const weightMeasurement = await user.createWeightMeasurement({ source: 'test', takenAt: new Date(Date.now() + 5000), metricWeight: 80 })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(weightMeasurement.id)
   })
 })

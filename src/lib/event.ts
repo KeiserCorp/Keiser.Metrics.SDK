@@ -227,7 +227,7 @@ export class EventDispatcher<TypedEventArgument> extends BaseEventDispatcher<Typ
   subscribe (handler: TypedEventHandler): () => void {
     if (typeof handler !== 'undefined') {
       this._subscriptions.push(this.createSubscription(handler, false))
-      this._onSubscriptionCountChangeEvent.dispatchAsync({ count: this.count })
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
     }
     return () => {
       this.unsubscribe(handler)
@@ -237,7 +237,7 @@ export class EventDispatcher<TypedEventArgument> extends BaseEventDispatcher<Typ
   one (handler: TypedEventHandler): () => void {
     if (typeof handler !== 'undefined') {
       this._subscriptions.push(this.createSubscription(handler, true))
-      this._onSubscriptionCountChangeEvent.dispatchAsync({ count: this.count })
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
     }
     return () => {
       this.unsubscribe(handler)
@@ -255,13 +255,13 @@ export class EventDispatcher<TypedEventArgument> extends BaseEventDispatcher<Typ
         break
       }
     }
-    this._onSubscriptionCountChangeEvent.dispatchAsync({ count: this.count })
+    this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
   }
 
   clear (): void {
     if (this._subscriptions.length !== 0) {
       this._subscriptions.splice(0, this._subscriptions.length)
-      this._onSubscriptionCountChangeEvent.dispatchAsync({ count: this.count })
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
     }
   }
 }

@@ -27,7 +27,7 @@ import { StretchExerciseVariant, StretchExerciseVariantResponse } from './models
 import { FacilityMemberUser, FacilityUserResponse, User, UserResponse } from './models/user'
 
 /** @ignore */
-const MODEL_UPDATE_ROOM_REGEX = /^sub:[^:]*:\d*$/
+const MODEL_UPDATE_ROOM_REGEX = /^sub:/
 export interface AuthenticatedResponse {
   accessToken: string
   refreshToken?: string
@@ -122,6 +122,8 @@ export interface StrengthMachineToken extends JWTToken{
 }
 
 export interface ModelChangeEvent {
+  id: number
+  name: string
   mutation: 'create' | 'update' | 'delete'
   occurredAt: number
 }
@@ -142,6 +144,12 @@ export interface UserModelSubscribeParameters {
 }
 
 export type ModelSubscribeParameters = XOR<GenericModelSubscribeParameters, UserModelSubscribeParameters>
+
+export interface ListSubscribeParameters {
+  parentModel: string
+  parentId: number
+  model: string
+}
 
 export abstract class BaseSessionHandler {
   protected readonly _connection: MetricsConnection
@@ -279,7 +287,16 @@ export abstract class BaseSessionHandler {
   async subscribeToModel (subscribeParameters: ModelSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.userId ?? subscribeParameters.id}`
     const subscribe = async () => await this.action(`${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId }) as SubscriptionResponse
+    return await this.subscribe(subscriptionKey, subscribe, callback)
+  }
 
+  async subscribeToModelList (subscribeParameters: ListSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
+    const subscriptionKey = `sub:${subscribeParameters.parentModel}:${subscribeParameters.parentId}:${subscribeParameters.model}`
+    const subscribe = async () => await this.action(`${subscribeParameters.model}:subscribe`, (subscribeParameters.parentModel === 'user') ? { userId: subscribeParameters.parentId } : { id: subscribeParameters.parentId }) as SubscriptionResponse
+    return await this.subscribe(subscriptionKey, subscribe, callback)
+  }
+
+  private async subscribe (subscriptionKey: NamedCurve, subscribe: () => Promise<SubscriptionResponse>, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const modelChangeEventHandler = this._modelChangeEventHandlerMap.get(subscriptionKey)
     if (typeof modelChangeEventHandler !== 'undefined') {
       if (!modelChangeEventHandler.onChangeCallbacks.has(callback)) {
