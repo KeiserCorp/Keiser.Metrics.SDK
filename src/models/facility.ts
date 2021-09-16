@@ -11,7 +11,7 @@ import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, Fac
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachinesConfiguration'
 import { MachineInitializerOTPToken, MachineInitializerToken } from './machineInitializerToken'
 import { Gender } from './profile'
-import { FacilitySession, FacilitySessions, SessionListResponse, SessionResponse, SessionSorting } from './session'
+import { FacilitySession, FacilitySessionListResponse, FacilitySessions, SessionResponse, SessionSorting } from './session'
 
 export enum FacilitySorting {
   ID = 'id',
@@ -162,7 +162,7 @@ export class PrivilegedFacility extends Facility {
   }
 
   async getSessions (options: { open?: boolean, name?: string, from?: Date, to?: Date, sort?: SessionSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
-    const { sessions, sessionsMeta } = await this.action('facilitySession:list', options) as SessionListResponse
+    const { sessions, sessionsMeta } = await this.action('facilitySession:list', options) as FacilitySessionListResponse
     return new FacilitySessions(sessions, sessionsMeta, this.sessionHandler)
   }
 

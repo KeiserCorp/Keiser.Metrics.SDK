@@ -13,6 +13,10 @@ export interface UserListMeta extends ListMeta {
   userId: number
 }
 
+export interface FacilityListMeta extends ListMeta {
+  facilityId: number
+}
+
 export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandler> {
   protected sessionHandler: SessionHandlerType
 
