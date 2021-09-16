@@ -122,6 +122,8 @@ describe('Session', function () {
     expect(modelChangeEvent).to.be.an('object')
     expect(modelChangeEvent.mutation).to.equal('update')
     expect(modelChangeEvent.id).to.equal(session.id)
+
+    await session.delete()
   })
 
   it('can subscribe to session list changes', async function () {
@@ -147,5 +149,7 @@ describe('Session', function () {
     expect(modelListChangeEvent).to.be.an('object')
     expect(modelListChangeEvent.mutation).to.equal('create')
     expect(modelListChangeEvent.id).to.equal(session.id)
+
+    await session.delete()
   })
 })

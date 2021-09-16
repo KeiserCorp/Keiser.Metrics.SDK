@@ -149,6 +149,7 @@ export interface ListSubscribeParameters {
   parentModel: string
   parentId: number
   model: string
+  actionOverride?: string
 }
 
 export abstract class BaseSessionHandler {
@@ -292,7 +293,17 @@ export abstract class BaseSessionHandler {
 
   async subscribeToModelList (subscribeParameters: ListSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const subscriptionKey = `sub:${subscribeParameters.parentModel}:${subscribeParameters.parentId}:${subscribeParameters.model}`
-    const subscribe = async () => await this.action(`${subscribeParameters.model}:subscribe`, (subscribeParameters.parentModel === 'user') ? { userId: subscribeParameters.parentId } : { id: subscribeParameters.parentId }) as SubscriptionResponse
+    console.log(subscriptionKey)
+    let params = {}
+    switch (subscribeParameters.parentModel) {
+      case 'user':
+        params = { userId: subscribeParameters.parentId }
+        break
+      case 'facility':
+        params = { facilityId: subscribeParameters.parentId }
+        break
+    }
+    const subscribe = async () => await this.action(`${subscribeParameters.actionOverride ?? subscribeParameters.model}:subscribe`, params) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 
