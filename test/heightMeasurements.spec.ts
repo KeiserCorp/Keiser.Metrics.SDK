@@ -3,6 +3,8 @@ import { expect } from 'chai'
 import Metrics from '../src/core'
 import { HeightMeasurement, HeightMeasurementSorting } from '../src/models/heightMeasurement'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Height Measurement', function () {
@@ -90,5 +92,56 @@ describe('Height Measurement', function () {
     const heightMeasurements = await user.getHeightMeasurements({ limit: 1 })
 
     expect(heightMeasurements[0].id).to.not.equal(createdHeightMeasurement.id)
+  })
+
+  it('can subscribe to height measurement changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const heightMeasurement = (await user.getHeightMeasurements({ limit: 1 }))[0]
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = heightMeasurement.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === heightMeasurement.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await heightMeasurement.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(heightMeasurement.id)
+  })
+
+  it('can subscribe to height measurement list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const heightMeasurements = await user.getHeightMeasurements({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = heightMeasurements.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (heightMeasurements.length === 0 || e.id !== heightMeasurements[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const heightMeasurement = await user.createHeightMeasurement({ source: 'test', takenAt: new Date(), metricHeight: 180 })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(heightMeasurement.id)
   })
 })
