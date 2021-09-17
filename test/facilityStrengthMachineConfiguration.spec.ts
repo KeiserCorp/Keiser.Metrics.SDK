@@ -3,10 +3,12 @@ import { expect } from 'chai'
 import { ForceUnit } from '../src/constants'
 import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
-import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachinesConfiguration'
+import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachineConfiguration'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
-describe('Facility Machines Configuration', function () {
+describe('Facility Machine Configuration', function () {
   let metricsInstance: Metrics
   let privilegedFacility: PrivilegedFacility
   let facilityStrengthMachineConfiguration: FacilityStrengthMachineConfiguration
@@ -34,7 +36,7 @@ describe('Facility Machines Configuration', function () {
     expect(typeof facilityStrengthMachineConfiguration.secondaryFocus).to.equal('string')
   })
 
-  it('can update facility machines configuration', async function () {
+  it('can update facility machine configuration', async function () {
     facilityStrengthMachineConfiguration = await facilityStrengthMachineConfiguration.update({
       timeZone: 'America/Denver',
       forceUnit: ForceUnit.Kilograms,
@@ -51,7 +53,7 @@ describe('Facility Machines Configuration', function () {
     expect(facilityStrengthMachineConfiguration.locale).to.equal('en-us')
   })
 
-  it('can reload facility machines configuration', async function () {
+  it('can reload facility machine configuration', async function () {
     facilityStrengthMachineConfiguration = await facilityStrengthMachineConfiguration.reload()
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
@@ -60,5 +62,35 @@ describe('Facility Machines Configuration', function () {
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
     expect(facilityStrengthMachineConfiguration.secondaryFocus).to.equal('force')
     expect(facilityStrengthMachineConfiguration.locale).to.equal('en-us')
+  })
+
+  it('can subscribe to facility machine configuration changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = facilityStrengthMachineConfiguration.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update') {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await facilityStrengthMachineConfiguration.update({
+      timeZone: 'America/Denver',
+      forceUnit: ForceUnit.Kilograms,
+      primaryFocus: 'power',
+      secondaryFocus: 'force',
+      locale: 'en-us'
+    })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('update')
+    expect(modelChangeEvent.id).to.equal(privilegedFacility.id)
   })
 })

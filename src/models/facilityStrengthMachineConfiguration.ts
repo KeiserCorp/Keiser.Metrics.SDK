@@ -1,8 +1,9 @@
 import { ForceUnit } from '../constants'
-import { Model } from '../model'
+import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface FacilityStrengthMachineConfigurationData {
+  facilityId: number
   timeZone: string
   forceUnit: ForceUnit
   primaryFocus: string
@@ -14,7 +15,7 @@ export interface FacilityStrengthMachineConfigurationResponse extends Authentica
   facilityStrengthMachineConfiguration: FacilityStrengthMachineConfigurationData
 }
 
-export class FacilityStrengthMachineConfiguration extends Model {
+export class FacilityStrengthMachineConfiguration extends SubscribableModel {
   private _facilityStrengthMachineConfigurationData: FacilityStrengthMachineConfigurationData
 
   constructor (facilityStrengthMachineConfigurationData: FacilityStrengthMachineConfigurationData, sessionHandler: SessionHandler) {
@@ -24,6 +25,10 @@ export class FacilityStrengthMachineConfiguration extends Model {
 
   private setFacilityStrengthMachineConfiguration (facilityStrengthMachineConfigurationData: FacilityStrengthMachineConfigurationData) {
     this._facilityStrengthMachineConfigurationData = facilityStrengthMachineConfigurationData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'facilityStrengthMachineConfiguration', id: this._facilityStrengthMachineConfigurationData.facilityId }
   }
 
   async reload () {
