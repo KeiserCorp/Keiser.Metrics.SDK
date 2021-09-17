@@ -277,7 +277,7 @@ export class FacilitySessions extends SubscribableModelList<FacilitySession, Ses
   }
 
   protected get subscribeParameters () {
-    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'session', actionOverride: 'facilitySession' }
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'session', actionOverride: 'facilitySession:subscribe' }
   }
 }
 

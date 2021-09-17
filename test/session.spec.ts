@@ -154,7 +154,7 @@ describe('Session', function () {
     await session.delete()
   })
 
-  it('can subscribe to session changes and observe nested assocations', async function () {
+  it('can subscribe to session changes and observe nested associations', async function () {
     this.timeout(10000)
     if (!IsBrowser) {
       this.skip()

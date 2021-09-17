@@ -7,7 +7,7 @@ import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
-import { FacilityRelationship, FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse } from './facilityRelationshipRequest'
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
@@ -263,7 +263,7 @@ export class User extends SubscribableModel {
 
   async getFacilityRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:userShow', { ...params, userId: this.id }) as FacilityRelationshipResponse
-    return new FacilityRelationship(facilityRelationship, this.sessionHandler)
+    return new UserFacilityRelationship(facilityRelationship, this.sessionHandler)
   }
 
   async getFacilityMembershipRelationship (params: { id: number }) {

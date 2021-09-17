@@ -136,11 +136,13 @@ interface ModelChangeEventHandler {
 export interface GenericModelSubscribeParameters {
   model: string
   id: number
+  actionOverride?: string
 }
 
 export interface UserModelSubscribeParameters {
   model: string
   userId: number
+  actionOverride?: string
 }
 
 export type ModelSubscribeParameters = XOR<GenericModelSubscribeParameters, UserModelSubscribeParameters>
@@ -287,7 +289,7 @@ export abstract class BaseSessionHandler {
 
   async subscribeToModel (subscribeParameters: ModelSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.userId ?? subscribeParameters.id}`
-    const subscribe = async () => await this.action(`${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId }) as SubscriptionResponse
+    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId }) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 
@@ -302,7 +304,7 @@ export abstract class BaseSessionHandler {
         params = { facilityId: subscribeParameters.parentId }
         break
     }
-    const subscribe = async () => await this.action(`${subscribeParameters.actionOverride ?? subscribeParameters.model}:subscribe`, params) as SubscriptionResponse
+    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, params) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 

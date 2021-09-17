@@ -6,6 +6,8 @@ import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityEmployeeRole, FacilityUserEmployeeRelationship, FacilityUserMemberRelationship, FacilityUserRelationship, FacilityUserRelationshipSorting } from '../src/models/facilityRelationship'
 import { FacilityMemberUser } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { randomEmailAddress } from './utils/dummy'
 import { getDemoUserSession, getMetricsAdminInstance, getMetricsInstance, getMetricsSSOInstance } from './utils/fixtures'
 
@@ -16,7 +18,7 @@ describe('Facility to User Relationship', function () {
   let metricsAdminInstance: MetricsAdmin
   let privilegedFacility: PrivilegedFacility
   let existingFacilityRelationship: FacilityUserMemberRelationship
-  let createdUser: FacilityMemberUser
+  const createdUsers: FacilityMemberUser[] = []
 
   before(async function () {
     metricsInstance = getMetricsInstance()
@@ -34,7 +36,7 @@ describe('Facility to User Relationship', function () {
     const userSession = await getDemoUserSession(metricsInstance)
     const exchangeableAdminSession = await metricsSSOInstance.elevateUserSession(userSession, { otpToken: '123456' })
     const adminSession = await metricsAdminInstance.authenticateAdminWithExchangeToken({ exchangeToken: exchangeableAdminSession.exchangeToken })
-    await (await adminSession.getUser({ userId: createdUser.id })).delete()
+    await Promise.all(createdUsers.map(async user => await (await adminSession.getUser({ userId: user.id })).delete()))
     metricsSSOInstance.dispose()
     metricsInstance?.dispose()
     metricsAdminInstance?.dispose()
@@ -81,7 +83,7 @@ describe('Facility to User Relationship', function () {
 
   it('can create new facility member user', async function () {
     const facilityRelationship = await privilegedFacility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
-    createdUser = facilityRelationship.eagerUser()
+    createdUsers.push(facilityRelationship.eagerUser())
 
     expect(typeof facilityRelationship).to.equal('object')
     expect(facilityRelationship.member).to.equal(true)
@@ -154,5 +156,62 @@ describe('Facility to User Relationship', function () {
 
     expect(extError).to.be.an('error')
     expect(extError?.code).to.equal(UnknownEntityError.code)
+  })
+
+  it('can subscribe to facility relationship changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const facilityRelationship = await privilegedFacility.createFacilityMemberUser({ email: randomEmailAddress(), name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
+    createdUsers.push(facilityRelationship.eagerUser())
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = facilityRelationship.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update' && e.id === facilityRelationship.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await facilityRelationship.update({ employeeRole: FacilityEmployeeRole.CustomerSupport })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('update')
+    expect(modelChangeEvent.id).to.equal(facilityRelationship.id)
+
+    await facilityRelationship.delete()
+  })
+
+  it('can subscribe to facility relationship list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const employeeRelationships = await privilegedFacility.getEmployeeRelationships({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = employeeRelationships.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (employeeRelationships.length === 0 || e.id !== employeeRelationships[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const facilityRelationship = await privilegedFacility.createFacilityMemberUser({ email: randomEmailAddress(), name: 'Tester', employeeRole: FacilityEmployeeRole.Trainer })
+    createdUsers.push(facilityRelationship.eagerUser())
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(facilityRelationship.id)
+
+    await facilityRelationship.delete()
   })
 })
