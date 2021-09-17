@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { FacilityListMeta, SubscribableModel, SubscribableModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { A500MachineState, A500MachineStateData } from './a500MachineState'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
@@ -46,19 +46,23 @@ export interface FacilityStrengthMachineBulkCreateResponse extends Authenticated
   unknownMachines: FacilityStrengthMachineData[]
 }
 
-export interface FacilityStrengthMachineListResponseMeta extends ListMeta {
+export interface FacilityStrengthMachineListResponseMeta extends FacilityListMeta {
   model: string
   source: string
   sort: FacilityStrengthMachineSorting
 }
 
-export class FacilityStrengthMachines extends ModelList<FacilityStrengthMachine, FacilityStrengthMachineData, FacilityStrengthMachineListResponseMeta> {
+export class FacilityStrengthMachines extends SubscribableModelList<FacilityStrengthMachine, FacilityStrengthMachineData, FacilityStrengthMachineListResponseMeta> {
   constructor (facilityStrengthMachines: FacilityStrengthMachineData[], facilityStrengthMachinesMeta: FacilityStrengthMachineListResponseMeta, sessionHandler: SessionHandler) {
     super(FacilityStrengthMachine, facilityStrengthMachines, facilityStrengthMachinesMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityStrengthMachine' }
+  }
 }
 
-export class FacilityStrengthMachine extends Model {
+export class FacilityStrengthMachine extends SubscribableModel {
   private _facilityStrengthMachineData: FacilityStrengthMachineData
 
   constructor (facilityStrengthMachineData: FacilityStrengthMachineData, sessionHandler: SessionHandler) {
@@ -68,6 +72,10 @@ export class FacilityStrengthMachine extends Model {
 
   private setFacilityStrengthMachineData (facilityStrengthMachineData: FacilityStrengthMachineData) {
     this._facilityStrengthMachineData = facilityStrengthMachineData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'facilityStrengthMachine', id: this.id }
   }
 
   async reload () {

@@ -4,6 +4,8 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachine, FacilityStrengthMachineSorting } from '../src/models/facilityStrengthMachine'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Strength Machine', function () {
@@ -135,5 +137,70 @@ describe('Facility Strength Machine', function () {
     expect(importResults.strengthMachines[0].model).to.equal('001621')
 
     await importResults.strengthMachines[0].delete()
+  })
+
+  it('can subscribe to facility strength machines changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const facilityStrengthMachine = await privilegedFacility.createFacilityStrengthMachine({
+      strengthMachineId: 1000,
+      model: '1121',
+      version: '4D2C55A5',
+      serial: '0816 2020 1234 5678',
+      location: 'Next to the water fountain'
+    })
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = facilityStrengthMachine.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === facilityStrengthMachine.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await facilityStrengthMachine.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(facilityStrengthMachine.id)
+  })
+
+  it('can subscribe to facility strength machines list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const facilityStrengthMachines = await privilegedFacility.getFacilityStrengthMachines({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = facilityStrengthMachines.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (facilityStrengthMachines.length === 0 || e.id !== facilityStrengthMachines[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const facilityStrengthMachine = await privilegedFacility.createFacilityStrengthMachine({
+      strengthMachineId: 1000,
+      model: '1121',
+      version: '4D2C55A5',
+      serial: '0816 2020 1234 5678',
+      location: 'Next to the water fountain'
+    })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(facilityStrengthMachine.id)
+
+    await facilityStrengthMachine.delete()
   })
 })
