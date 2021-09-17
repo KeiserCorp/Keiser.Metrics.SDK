@@ -4,6 +4,8 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { HeartRateDataSet, HeartRateDataSetSorting } from '../src/models/heartRateDataSet'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 const generateHeartRateDataSet = () => {
@@ -78,5 +80,66 @@ describe('Heart Rate Data Set', function () {
 
     expect(extError).to.be.an('error')
     expect(extError?.code).to.equal(UnknownEntityError.code)
+  })
+
+  it('can subscribe to heart rate data set changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const genDataSet = generateHeartRateDataSet()
+    const heartRateDataSet = await user.createHeartRateDataSet({
+      source: 'test',
+      heartRateDataPoints: genDataSet
+    })
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = heartRateDataSet.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === heartRateDataSet.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await heartRateDataSet.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(heartRateDataSet.id)
+  })
+
+  it('can subscribe to heart rate data set list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const heartRateDataSets = await user.getHeartRateDataSets({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = heartRateDataSets.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (heartRateDataSets.length === 0 || e.id !== heartRateDataSets[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const genDataSet = generateHeartRateDataSet()
+    const heartRateDataSet = await user.createHeartRateDataSet({
+      source: 'test',
+      heartRateDataPoints: genDataSet
+    })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(heartRateDataSet.id)
+
+    await heartRateDataSet.delete()
   })
 })
