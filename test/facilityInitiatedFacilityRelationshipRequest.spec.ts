@@ -36,7 +36,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
   })
 
   it('can request member relationship', async function () {
-    const facilityRelationshipRequest = await privilegedFacility.createRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
+    const facilityRelationshipRequest = await privilegedFacility.createFacilityInitiatedRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(false)
@@ -64,7 +64,7 @@ describe('Facility Initiated Facility Relationship Request', function () {
   })
 
   it('can re-request relationship', async function () {
-    const facilityRelationshipRequest = await privilegedFacility.createRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
+    const facilityRelationshipRequest = await privilegedFacility.createFacilityInitiatedRelationshipRequest({ email: newUserEmailAddress.email, member: true, memberIdentifier: newUserMemberIdentifier, employeeRole: FacilityEmployeeRole.FrontDesk })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(false)

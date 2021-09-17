@@ -1,15 +1,15 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { FacilityListMeta, ModelList, SubscribableModel, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { FacilityData } from './facility'
 import { FacilityEmployeeRole } from './facilityRelationship'
 import { UserData } from './user'
 
-export enum FacilityInitiatedFacilityRelationshipRequestSorting {
+export enum FacilityRelationshipRequestSorting {
   ID = 'id',
   Name = 'name'
 }
 
-export enum UserInitiatedFacilityRelationshipRequestSorting {
+export enum PrivilegedFacilityRelationshipRequestSorting {
   ID = 'id',
   Name = 'name',
   MemberIdentifier = 'memberIdentifier',
@@ -33,10 +33,19 @@ export interface FacilityRelationshipRequestResponse extends AuthenticatedRespon
   facilityRelationshipRequest: FacilityRelationshipRequestData
 }
 
-export interface FacilityRelationshipRequestListResponseMeta extends ListMeta {
-  facilityId?: number
+export interface PrivilegedFacilityRelationshipRequestListResponseMeta extends FacilityListMeta {
   name?: string
-  sort: UserInitiatedFacilityRelationshipRequestSorting
+  sort: PrivilegedFacilityRelationshipRequestSorting
+}
+
+export interface FacilityRelationshipRequestListResponseMeta extends UserListMeta {
+  name?: string
+  sort: FacilityRelationshipRequestSorting
+}
+
+export interface PrivilegedFacilityRelationshipRequestListResponse extends AuthenticatedResponse {
+  facilityRelationshipRequests: FacilityRelationshipRequestData[]
+  facilityRelationshipRequestsMeta: PrivilegedFacilityRelationshipRequestListResponseMeta
 }
 
 export interface FacilityRelationshipRequestListResponse extends AuthenticatedResponse {
@@ -44,7 +53,7 @@ export interface FacilityRelationshipRequestListResponse extends AuthenticatedRe
   facilityRelationshipRequestsMeta: FacilityRelationshipRequestListResponseMeta
 }
 
-export class FacilityRelationshipRequest extends Model {
+export abstract class BaseFacilityRelationshipRequest extends SubscribableModel {
   protected _facilityRelationshipRequestData: FacilityRelationshipRequestData
 
   constructor (facilityRelationshipRequestData: FacilityRelationshipRequestData, sessionHandler: SessionHandler) {
@@ -89,7 +98,11 @@ export class FacilityRelationshipRequest extends Model {
   }
 }
 
-export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelationshipRequest {
+export class FacilityRelationshipRequest extends BaseFacilityRelationshipRequest {
+  protected get subscribeParameters () {
+    return { model: 'facilityRelationshipRequest', id: this.id, actionOverride: 'facilityRelationshipRequest:userSubscribe' }
+  }
+
   async approve () {
     return await this.update({ approval: true })
   }
@@ -105,7 +118,11 @@ export class FacilityInitiatedFacilityRelationshipRequest extends FacilityRelati
   }
 }
 
-export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationshipRequest {
+export class PrivilegedFacilityRelationshipRequest extends BaseFacilityRelationshipRequest {
+  protected get subscribeParameters () {
+    return { model: 'facilityRelationshipRequest', id: this.id, actionOverride: 'facilityRelationshipRequest:facilitySubscribe' }
+  }
+
   async approve (params: { memberIdentifier: string }) {
     return await this.update({ ...params, approval: true })
   }
@@ -121,14 +138,22 @@ export class UserInitiatedFacilityRelationshipRequest extends FacilityRelationsh
   }
 }
 
-export class FacilityInitiatedFacilityRelationshipRequests extends ModelList<FacilityInitiatedFacilityRelationshipRequest, FacilityRelationshipRequestData, FacilityRelationshipRequestListResponseMeta> {
+export class FacilityRelationshipRequests extends ModelList<FacilityRelationshipRequest, FacilityRelationshipRequestData, FacilityRelationshipRequestListResponseMeta> {
   constructor (facilityRelationshipRequests: FacilityRelationshipRequestData[], facilityRelationshipRequestsMeta: FacilityRelationshipRequestListResponseMeta, sessionHandler: SessionHandler) {
-    super(FacilityInitiatedFacilityRelationshipRequest, facilityRelationshipRequests, facilityRelationshipRequestsMeta, sessionHandler)
+    super(FacilityRelationshipRequest, facilityRelationshipRequests, facilityRelationshipRequestsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:userSubscribe' }
   }
 }
 
-export class UserInitiatedFacilityRelationshipRequests extends ModelList<UserInitiatedFacilityRelationshipRequest, FacilityRelationshipRequestData, FacilityRelationshipRequestListResponseMeta> {
-  constructor (facilityRelationshipRequests: FacilityRelationshipRequestData[], facilityRelationshipRequestsMeta: FacilityRelationshipRequestListResponseMeta, sessionHandler: SessionHandler) {
-    super(UserInitiatedFacilityRelationshipRequest, facilityRelationshipRequests, facilityRelationshipRequestsMeta, sessionHandler)
+export class PrivilegedFacilityRelationshipRequests extends ModelList<PrivilegedFacilityRelationshipRequest, FacilityRelationshipRequestData, PrivilegedFacilityRelationshipRequestListResponseMeta> {
+  constructor (facilityRelationshipRequests: FacilityRelationshipRequestData[], facilityRelationshipRequestsMeta: PrivilegedFacilityRelationshipRequestListResponseMeta, sessionHandler: SessionHandler) {
+    super(PrivilegedFacilityRelationshipRequest, facilityRelationshipRequests, facilityRelationshipRequestsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:facilitySubscribe' }
   }
 }

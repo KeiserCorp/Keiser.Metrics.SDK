@@ -8,7 +8,7 @@ import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
-import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse } from './facilityRelationshipRequest'
+import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, FacilityRelationshipRequests, FacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
@@ -253,12 +253,12 @@ export class User extends SubscribableModel {
 
   async getFacilityRelationshipRequest (params: { id: number }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userShow', { ...params, userId: this.id }) as FacilityRelationshipRequestResponse
-    return new FacilityInitiatedFacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
+    return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 
-  async getFacilityRelationshipRequests (options: { memberIdentifier?: string, name?: string, sort?: FacilityInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getFacilityRelationshipRequests (options: { memberIdentifier?: string, name?: string, sort?: FacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationshipRequests, facilityRelationshipRequestsMeta } = await this.action('facilityRelationshipRequest:userList', options) as FacilityRelationshipRequestListResponse
-    return new FacilityInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
+    return new FacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
   }
 
   async getFacilityRelationship (params: { id: number }) {
