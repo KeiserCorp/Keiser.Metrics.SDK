@@ -23,6 +23,10 @@ export function randomEchipId () {
   return [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
 }
 
+export function randomByte () {
+  return Math.floor(Math.random() * 255)
+}
+
 export function generateMSeriesDataSet () {
   const startTime = (new Date()).getTime()
   return [...new Array(1000)].map((v, index) => ({

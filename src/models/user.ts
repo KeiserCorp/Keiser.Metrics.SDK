@@ -1,6 +1,6 @@
 import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
-import { compressDeflateToB64 } from '../lib/compress'
+import { deflateToB64 } from '../lib/compress'
 import { ListMeta, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
@@ -445,7 +445,7 @@ export class FacilityMemberUser extends FacilityUser {
   async createA500Set (params: { strengthMachineSession: StrengthMachineSession, setData: A500SetData, sampleData?: A500TimeSeriesPointSample[] }) {
     const machineToken = params.strengthMachineSession.sessionHandler.accessToken
     const setData = JSON.stringify(params.setData)
-    const deflatedSampleData = typeof params.sampleData !== 'undefined' ? compressDeflateToB64(params.sampleData) : null
+    const deflatedSampleData = typeof params.sampleData !== 'undefined' ? deflateToB64(params.sampleData) : null
     const response = await this.action('strengthMachineDataSet:createA500', { userId: this.id, machineToken, setData, deflatedSampleData }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(response.strengthMachineDataSet, this.sessionHandler)
   }

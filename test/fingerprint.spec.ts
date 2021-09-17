@@ -1,13 +1,16 @@
 import { expect } from 'chai'
 
-import Metrics from '../src'
-import { UnknownEntityError } from '../src/error'
+import Metrics from '../src/core'
+import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { Fingerprint, FingerprintReaderModel } from '../src/models/fingerprint'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
+import { randomByte } from './utils/dummy'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Fingerprint', function () {
-  const fingerprintTemplate = Array(498).fill(0)
+  let fingerprintTemplate = (new Uint8Array(498).fill(0)).map(v => randomByte())
 
   let metricsInstance: Metrics
   let user: User
@@ -27,6 +30,7 @@ describe('Fingerprint', function () {
     const facilityRelationships = await user.getFacilityMembershipRelationships()
     expect(Array.isArray(facilityRelationships)).to.equal(true)
     expect(typeof facilityRelationships[0]).to.equal('object')
+
     const facilityRelationship = facilityRelationships[0]
     expect(typeof facilityRelationship).to.equal('object')
 
@@ -35,17 +39,29 @@ describe('Fingerprint', function () {
     expect(typeof fingerprint).to.equal('object')
     expect(fingerprint.facilityRelationshipId).to.equal(facilityRelationship.id)
     expect(fingerprint.template).to.not.equal(null)
-    expect(fingerprint.template[0]).to.equal(0)
+    expect(fingerprint.template[0]).to.equal(fingerprintTemplate[0])
+    expect(fingerprint.hash).to.not.equal(null)
+    expect(fingerprint.fingerprintReaderModel).to.equal(FingerprintReaderModel.GT521F5)
+  })
+
+  it('can get fingerprint', async function () {
+    const facilityRelationship = (await user.getFacilityMembershipRelationships())[0]
+    const fingerprint = await facilityRelationship.getFingerprint()
+
+    expect(typeof fingerprint).to.equal('object')
+    expect(fingerprint.template).to.not.equal(null)
+    expect(fingerprint.template[0]).to.equal(fingerprintTemplate[0])
     expect(fingerprint.hash).to.not.equal(null)
     expect(fingerprint.fingerprintReaderModel).to.equal(FingerprintReaderModel.GT521F5)
   })
 
   it('can update fingerprint', async function () {
-    fingerprint = await fingerprint.update({ template: Array(498).fill(1), fingerprintReaderModel: FingerprintReaderModel.GT521F5 })
+    fingerprintTemplate = (new Uint8Array(498).fill(0)).map(v => randomByte())
+    fingerprint = await fingerprint.update({ template: fingerprintTemplate, fingerprintReaderModel: FingerprintReaderModel.GT521F5 })
 
     expect(typeof fingerprint).to.equal('object')
     expect(fingerprint.template).to.not.equal(null)
-    expect(fingerprint.template[0]).to.equal(1)
+    expect(fingerprint.template[0]).to.equal(fingerprintTemplate[0])
     expect(fingerprint.hash).to.not.equal(null)
     expect(fingerprint.fingerprintReaderModel).to.equal(FingerprintReaderModel.GT521F5)
   })
@@ -55,9 +71,32 @@ describe('Fingerprint', function () {
 
     expect(typeof fingerprint).to.equal('object')
     expect(fingerprint.template).to.not.equal(null)
-    expect(fingerprint.template[0]).to.equal(1)
+    expect(fingerprint.template[0]).to.equal(fingerprintTemplate[0])
     expect(fingerprint.hash).to.not.equal(null)
     expect(fingerprint.fingerprintReaderModel).to.equal(FingerprintReaderModel.GT521F5)
+  })
+
+  it('can subscribe to fingerprint changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = fingerprint.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update') {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    fingerprintTemplate = (new Uint8Array(498).fill(0)).map(v => randomByte())
+    fingerprint = await fingerprint.update({ template: fingerprintTemplate, fingerprintReaderModel: FingerprintReaderModel.GT521F5 })
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('update')
   })
 
   it('can delete fingerprint', async function () {
@@ -68,10 +107,12 @@ describe('Fingerprint', function () {
     try {
       await fingerprint.reload()
     } catch (error) {
-      extError = error
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
     }
 
     expect(extError).to.be.an('error')
-    expect(extError.code).to.equal(UnknownEntityError.code)
+    expect(extError?.code).to.equal(UnknownEntityError.code)
   })
 })

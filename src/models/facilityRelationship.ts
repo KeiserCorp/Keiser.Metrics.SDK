@@ -117,11 +117,8 @@ export abstract class FacilityRelationship extends SubscribableModel {
     return new Fingerprint(fingerprint, this.sessionHandler)
   }
 
-  async createFingerprint (params: { template: any, fingerprintReaderModel: FingerprintReaderModel}) {
-    if (Array.isArray(params.template)) {
-      params.template = JSON.stringify(params.template)
-    }
-    const { fingerprint } = await this.action('fingerprint:update', { ...params, userId: this.userId, facilityRelationshipId: this.id }) as FingerprintResponse
+  async createFingerprint (params: { template: Uint8Array, fingerprintReaderModel: FingerprintReaderModel}) {
+    const { fingerprint } = await this.action('fingerprint:update', { fingerprintReaderModel: params.fingerprintReaderModel, template: JSON.stringify(Array.from(params.template)), facilityRelationshipId: this.id }) as FingerprintResponse
     return new Fingerprint(fingerprint, this.sessionHandler)
   }
 }
