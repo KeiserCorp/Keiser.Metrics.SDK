@@ -1,5 +1,5 @@
 import { ForceUnit } from '../constants'
-import { ListMeta, Model, ModelList } from '../model'
+import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { A500DataSet, A500DataSetData } from './a500DataSet'
 import { Session, SessionData } from './session'
@@ -70,19 +70,23 @@ export interface StrengthMachineDataSetListResponse extends AuthenticatedRespons
   strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta
 }
 
-export interface StrengthMachineDataSetListResponseMeta extends ListMeta {
+export interface StrengthMachineDataSetListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   sort: StrengthMachineDataSetSorting
 }
 
-export class StrengthMachineDataSets extends ModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
+export class StrengthMachineDataSets extends SubscribableModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
   constructor (strengthMachineDataSets: StrengthMachineDataSetData[], strengthMachineDataSetsMeta: StrengthMachineDataSetListResponseMeta, sessionHandler: SessionHandler) {
     super(StrengthMachineDataSet, strengthMachineDataSets, strengthMachineDataSetsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'strengthMachineDataSet' }
+  }
 }
 
-export class StrengthMachineDataSet extends Model {
+export class StrengthMachineDataSet extends SubscribableModel {
   private _strengthMachineDataSetData: StrengthMachineDataSetData
   private _test?: StrengthMachineDataSetTest
 
@@ -95,6 +99,10 @@ export class StrengthMachineDataSet extends Model {
   private setStrengthMachineDataSet (strengthMachineDataSetData: StrengthMachineDataSetData) {
     this._strengthMachineDataSetData = strengthMachineDataSetData
     this._test = typeof this._strengthMachineDataSetData.test !== 'undefined' ? new StrengthMachineDataSetTest(this._strengthMachineDataSetData.test) : undefined
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'strengthMachineDataSet', id: this.id }
   }
 
   async reload () {
