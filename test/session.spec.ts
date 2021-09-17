@@ -6,6 +6,7 @@ import { Session, SessionSorting } from '../src/models/session'
 import { User } from '../src/models/user'
 import { ModelChangeEvent } from '../src/session'
 import { IsBrowser } from './utils/constants'
+import { generateMSeriesDataSet } from './utils/dummy'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Session', function () {
@@ -151,5 +152,42 @@ describe('Session', function () {
     expect(modelListChangeEvent.id).to.equal(session.id)
 
     await session.delete()
+  })
+
+  it('can subscribe to session changes and observe nested assocations', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const session = (await user.startSession({ forceEndPrevious: false })).session
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = session.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update' && e.name === 'mSeriesDataSet') {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const genDataSet = generateMSeriesDataSet()
+    const mSeriesDataSet = await user.createMSeriesDataSet({
+      sessionId: session.id,
+      source: 'test',
+      machineType: 'm3i',
+      ordinalId: 0,
+      buildMajor: 6,
+      buildMinor: 30,
+      mSeriesDataPoints: genDataSet
+    })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    /** @todo Once issues with M Series Data set creation are resolve this should be changed to `create` */
+    expect(modelListChangeEvent.mutation).to.equal('update')
+    expect(modelListChangeEvent.id).to.equal(mSeriesDataSet.id)
+
+    await mSeriesDataSet.delete()
   })
 })

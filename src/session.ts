@@ -293,7 +293,6 @@ export abstract class BaseSessionHandler {
 
   async subscribeToModelList (subscribeParameters: ListSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const subscriptionKey = `sub:${subscribeParameters.parentModel}:${subscribeParameters.parentId}:${subscribeParameters.model}`
-    console.log(subscriptionKey)
     let params = {}
     switch (subscribeParameters.parentModel) {
       case 'user':

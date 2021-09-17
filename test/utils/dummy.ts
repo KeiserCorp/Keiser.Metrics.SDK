@@ -22,3 +22,19 @@ export function randomName () {
 export function randomEchipId () {
   return [...Array(14)].map(i => (~~(Math.random() * 16)).toString(16)).join('') + '0c'
 }
+
+export function generateMSeriesDataSet () {
+  const startTime = (new Date()).getTime()
+  return [...new Array(1000)].map((v, index) => ({
+    takenAt: new Date(startTime + (333 * index)),
+    realTime: true,
+    interval: 0,
+    cadence: (Math.random() * 20) + 80,
+    power: (Math.random() * 150) + 100,
+    caloricBurn: (index / 10),
+    duration: ((index / 3) * 1000) + 8000,
+    distance: (index / 300),
+    heartRate: 60 + (index % 100),
+    gear: (Math.random() * 10) + 10
+  }))
+}

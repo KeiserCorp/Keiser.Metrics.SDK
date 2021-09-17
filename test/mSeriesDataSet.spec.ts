@@ -4,23 +4,10 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { MSeriesDataSet, MSeriesDataSetSorting } from '../src/models/mSeriesDataSet'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
+import { generateMSeriesDataSet } from './utils/dummy'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
-
-const generateMSeriesDataSet = () => {
-  const startTime = (new Date()).getTime()
-  return [...new Array(1000)].map((v, index) => ({
-    takenAt: new Date(startTime + (333 * index)),
-    realTime: true,
-    interval: 0,
-    cadence: (Math.random() * 20) + 80,
-    power: (Math.random() * 150) + 100,
-    caloricBurn: (index / 10),
-    duration: ((index / 3) * 1000) + 8000,
-    distance: (index / 300),
-    heartRate: 60 + (index % 100),
-    gear: (Math.random() * 10) + 10
-  }))
-}
 
 describe('M Series Data Set', function () {
   let metricsInstance: Metrics
@@ -92,5 +79,74 @@ describe('M Series Data Set', function () {
 
     expect(extError).to.be.an('error')
     expect(extError?.code).to.equal(UnknownEntityError.code)
+  })
+
+  it('can subscribe to M Series data set changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const genDataSet = generateMSeriesDataSet()
+    const mSeriesDataSet = await user.createMSeriesDataSet({
+      source: 'test',
+      machineType: 'm3i',
+      ordinalId: 0,
+      buildMajor: 6,
+      buildMinor: 30,
+      mSeriesDataPoints: genDataSet
+    })
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = mSeriesDataSet.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === mSeriesDataSet.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await mSeriesDataSet.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(mSeriesDataSet.id)
+  })
+
+  it('can subscribe to M Series data set list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const mSeriesDataSets = await user.getMSeriesDataSets({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = mSeriesDataSets.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (mSeriesDataSets.length === 0 || e.id !== mSeriesDataSets[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const genDataSet = generateMSeriesDataSet()
+    const mSeriesDataSet = await user.createMSeriesDataSet({
+      source: 'test',
+      machineType: 'm3i',
+      ordinalId: 0,
+      buildMajor: 6,
+      buildMinor: 30,
+      mSeriesDataPoints: genDataSet
+    })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(mSeriesDataSet.id)
+
+    await mSeriesDataSet.delete()
   })
 })
