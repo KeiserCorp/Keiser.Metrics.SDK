@@ -6,8 +6,9 @@ const semverPrerelease = require('semver/functions/prerelease')
 
 const rootTargetPath = 'dist'
 const args = process.argv.slice(2)
+const packages = ['core', 'admin', 'sso']
 
-['core', 'admin', 'sso'].forEach(target => {
+packages.forEach(target => {
   const targetPath = join(rootTargetPath, target)
   const version = require(join(process.cwd(), targetPath, 'package.json')).version
 
