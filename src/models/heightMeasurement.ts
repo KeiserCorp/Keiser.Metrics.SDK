@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum HeightMeasurementSorting {
@@ -23,19 +23,23 @@ export interface HeightMeasurementListResponse extends AuthenticatedResponse {
   heightMeasurementsMeta: HeightMeasurementListResponseMeta
 }
 
-export interface HeightMeasurementListResponseMeta extends ListMeta {
+export interface HeightMeasurementListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   sort: HeightMeasurementSorting
 }
 
-export class HeightMeasurements extends ModelList<HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponseMeta> {
+export class HeightMeasurements extends SubscribableModelList<HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponseMeta> {
   constructor (heightMeasurements: HeightMeasurementData[], heightMeasurementsMeta: HeightMeasurementListResponseMeta, sessionHandler: SessionHandler) {
     super(HeightMeasurement, heightMeasurements, heightMeasurementsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'heightMeasurement' }
+  }
 }
 
-export class HeightMeasurement extends Model {
+export class HeightMeasurement extends SubscribableModel {
   private _heightMeasurementData: HeightMeasurementData
 
   constructor (heightMeasurementData: HeightMeasurementData, sessionHandler: SessionHandler) {
@@ -45,6 +49,10 @@ export class HeightMeasurement extends Model {
 
   private setHeightMeasurementData (heightMeasurementData: HeightMeasurementData) {
     this._heightMeasurementData = heightMeasurementData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'heightMeasurement', id: this.id }
   }
 
   async reload () {

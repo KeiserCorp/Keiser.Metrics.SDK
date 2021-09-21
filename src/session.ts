@@ -1,5 +1,5 @@
-import { MetricsConnection } from './connection'
-import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT } from './constants'
+import { ConnectionEvent, MetricsConnection, PushDataEvent } from './connection'
+import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT, XOR } from './constants'
 import { SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
@@ -26,6 +26,8 @@ import { StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/s
 import { StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
 import { FacilityMemberUser, FacilityUserResponse, User, UserResponse } from './models/user'
 
+/** @ignore */
+const MODEL_UPDATE_ROOM_REGEX = /^sub:/
 export interface AuthenticatedResponse {
   accessToken: string
   refreshToken?: string
@@ -37,6 +39,10 @@ export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
 
 export interface StrengthMachineInitializeResponse extends AuthenticatedResponse {
   facilityStrengthMachine: FacilityStrengthMachineData
+}
+
+export interface SubscriptionResponse extends AuthenticatedResponse {
+  subscriptionKey: string
 }
 
 export interface RedirectResponse {
@@ -115,12 +121,46 @@ export interface StrengthMachineToken extends JWTToken{
   type: 'machine'
 }
 
+export interface ModelChangeEvent {
+  id: number
+  name: string
+  mutation: 'create' | 'update' | 'delete'
+  occurredAt: number
+}
+
+interface ModelChangeEventHandler {
+  onChangeCallbacks: Set<(modelChangeEvent: ModelChangeEvent) => void>
+  onReconnectCallback: () => Promise<SubscriptionResponse>
+}
+
+export interface GenericModelSubscribeParameters {
+  model: string
+  id: number
+  actionOverride?: string
+}
+
+export interface UserModelSubscribeParameters {
+  model: string
+  userId: number
+  actionOverride?: string
+}
+
+export type ModelSubscribeParameters = XOR<GenericModelSubscribeParameters, UserModelSubscribeParameters>
+
+export interface ListSubscribeParameters {
+  parentModel: string
+  parentId: number
+  model: string
+  actionOverride?: string
+}
+
 export abstract class BaseSessionHandler {
   protected readonly _connection: MetricsConnection
   private _keepAlive: boolean = true
   private _accessToken: string = ''
   private _refreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
+  private readonly _modelChangeEventHandlerMap = new Map<string, ModelChangeEventHandler>()
   private readonly _onAccessTokenChangeEvent = new EventDispatcher<AccessTokenChangeEvent>()
   private readonly _onRefreshTokenChangeEvent = new EventDispatcher<RefreshTokenChangeEvent>()
 
@@ -128,6 +168,8 @@ export abstract class BaseSessionHandler {
     this._connection = connection
     this._keepAlive = keepAlive
     this._connection.onDisposeEvent.one(() => this.close())
+    this._connection.onConnectionChangeEvent.subscribe(connectionEvent => this.handleConnectionEvent(connectionEvent))
+    this._connection.onPushDataEvent.subscribe(data => this.dispatchPushData(data))
     this.updateTokens(authenticatedResponse)
   }
 
@@ -156,6 +198,21 @@ export abstract class BaseSessionHandler {
         await this.action('auth:keepAlive')
       } catch (error) {
 
+      }
+    }
+  }
+
+  private handleConnectionEvent (connectionEvent: ConnectionEvent) {
+    if (connectionEvent.socketConnection) {
+      this._modelChangeEventHandlerMap.forEach(e => void e.onReconnectCallback())
+    }
+  }
+
+  private dispatchPushData (pushData: PushDataEvent) {
+    if (MODEL_UPDATE_ROOM_REGEX.test(pushData.room)) {
+      const modelChangeEventHandler = this._modelChangeEventHandlerMap.get(pushData.room)
+      if (typeof modelChangeEventHandler !== 'undefined') {
+        modelChangeEventHandler.onChangeCallbacks.forEach(e => e(pushData.message))
       }
     }
   }
@@ -228,6 +285,56 @@ export abstract class BaseSessionHandler {
     }
     this.updateTokens(response)
     return response
+  }
+
+  async subscribeToModel (subscribeParameters: ModelSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
+    const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.userId ?? subscribeParameters.id}`
+    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId }) as SubscriptionResponse
+    return await this.subscribe(subscriptionKey, subscribe, callback)
+  }
+
+  async subscribeToModelList (subscribeParameters: ListSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
+    const subscriptionKey = `sub:${subscribeParameters.parentModel}:${subscribeParameters.parentId}:${subscribeParameters.model}`
+    let params = {}
+    switch (subscribeParameters.parentModel) {
+      case 'user':
+        params = { userId: subscribeParameters.parentId }
+        break
+      case 'facility':
+        params = { facilityId: subscribeParameters.parentId }
+        break
+    }
+    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, params) as SubscriptionResponse
+    return await this.subscribe(subscriptionKey, subscribe, callback)
+  }
+
+  private async subscribe (subscriptionKey: NamedCurve, subscribe: () => Promise<SubscriptionResponse>, callback: (modelChangeEvent: ModelChangeEvent) => void) {
+    const modelChangeEventHandler = this._modelChangeEventHandlerMap.get(subscriptionKey)
+    if (typeof modelChangeEventHandler !== 'undefined') {
+      if (!modelChangeEventHandler.onChangeCallbacks.has(callback)) {
+        modelChangeEventHandler.onChangeCallbacks.add(callback)
+      }
+    } else {
+      this._modelChangeEventHandlerMap.set(subscriptionKey, {
+        onChangeCallbacks: new Set([callback]),
+        onReconnectCallback: subscribe
+      })
+      try {
+        await subscribe()
+      } catch (e) {}
+    }
+
+    return async () => {
+      const modelChangeEventHandler = this._modelChangeEventHandlerMap.get(subscriptionKey)
+      if (typeof modelChangeEventHandler !== 'undefined') {
+        modelChangeEventHandler.onChangeCallbacks.delete(callback)
+
+        if (modelChangeEventHandler.onChangeCallbacks.size === 0) {
+          await this.action('core:unsubscribe', { subscriptionKey })
+          this._modelChangeEventHandlerMap.delete(subscriptionKey)
+        }
+      }
+    }
   }
 }
 

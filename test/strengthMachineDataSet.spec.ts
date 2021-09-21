@@ -5,6 +5,8 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Strength Machine Data Set', function () {
@@ -82,5 +84,88 @@ describe('Strength Machine Data Set', function () {
 
     expect(extError).to.be.an('error')
     expect(extError?.code).to.equal(UnknownEntityError.code)
+  })
+
+  it('can subscribe to Strength Machine data set changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const strengthMachineDataSet = await user.createStrengthMachineDataSet({
+      strengthMachineId: 1000,
+      version: '3EC8495A',
+      serial: '0124 2013 0858 4743',
+      completedAt: new Date(),
+      chest: 1,
+      rom1: 2,
+      rom2: 3,
+      seat: 4,
+      resistance: 100,
+      resistancePrecision: ResistancePrecision.Integer,
+      repetitionCount: 12,
+      forceUnit: ForceUnit.Pounds,
+      peakPower: 1234,
+      work: 2.3
+    })
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = strengthMachineDataSet.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'delete' && e.id === strengthMachineDataSet.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await strengthMachineDataSet.delete()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('delete')
+    expect(modelChangeEvent.id).to.equal(strengthMachineDataSet.id)
+  })
+
+  it('can subscribe to Strength Machine data set list changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const strengthMachineDataSets = await user.getStrengthMachineDataSets({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = strengthMachineDataSets.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (strengthMachineDataSets.length === 0 || e.id !== strengthMachineDataSets[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const strengthMachineDataSet = await user.createStrengthMachineDataSet({
+      strengthMachineId: 1000,
+      version: '3EC8495A',
+      serial: '0124 2013 0858 4743',
+      completedAt: new Date(),
+      chest: 1,
+      rom1: 2,
+      rom2: 3,
+      seat: 4,
+      resistance: 100,
+      resistancePrecision: ResistancePrecision.Integer,
+      repetitionCount: 12,
+      forceUnit: ForceUnit.Pounds,
+      peakPower: 1234,
+      work: 2.3
+    })
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(strengthMachineDataSet.id)
+
+    await strengthMachineDataSet.delete()
   })
 })

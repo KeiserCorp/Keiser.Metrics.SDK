@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum WeightMeasurementSorting {
@@ -59,17 +59,21 @@ export interface WeightMeasurementListResponse extends AuthenticatedResponse {
   weightMeasurementsMeta: WeightMeasurementListResponseMeta
 }
 
-export interface WeightMeasurementListResponseMeta extends ListMeta {
+export interface WeightMeasurementListResponseMeta extends UserListMeta {
   sort: WeightMeasurementSorting
 }
 
-export class WeightMeasurements extends ModelList<WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponseMeta> {
+export class WeightMeasurements extends SubscribableModelList<WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponseMeta> {
   constructor (weightMeasurements: WeightMeasurementData[], weightMeasurementsMeta: WeightMeasurementListResponseMeta, sessionHandler: SessionHandler) {
     super(WeightMeasurement, weightMeasurements, weightMeasurementsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'weightMeasurement' }
+  }
 }
 
-export class WeightMeasurement extends Model {
+export class WeightMeasurement extends SubscribableModel {
   private _weightMeasurementData: WeightMeasurementData
   private _bodyCompositionMeasurement?: BodyCompositionMeasurement
 
@@ -82,6 +86,10 @@ export class WeightMeasurement extends Model {
   private setWeightMeasurementData (weightMeasurementData: WeightMeasurementData) {
     this._weightMeasurementData = weightMeasurementData
     this._bodyCompositionMeasurement = typeof this._weightMeasurementData.bodyCompositionMeasurement !== 'undefined' ? new BodyCompositionMeasurement(this._weightMeasurementData.bodyCompositionMeasurement) : undefined
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'weightMeasurement', id: this.id }
   }
 
   async reload () {

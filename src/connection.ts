@@ -31,6 +31,28 @@ export interface ConnectionEvent {
   socketConnection: boolean
 }
 
+export interface PushDataEvent {
+  context: string
+  from: number
+  message: any
+  room: string
+  sentAt: number
+}
+
+interface SocketResponseMessage {
+  context: 'response'
+  messageId?: number
+  error?: any
+}
+
+interface SocketPushMessage {
+  context: 'user'
+  from: number
+  message: any
+  room: string
+  sentAt: number
+}
+
 export class MetricsConnection {
   private readonly _restEndpoint: string
   private readonly _socketEndpoint: string
@@ -48,6 +70,7 @@ export class MetricsConnection {
 
   private readonly _onDisposeEvent = new EventDispatcher<void>()
   private readonly _onConnectionChangeEvent = new EventDispatcher<ConnectionEvent>()
+  private readonly _onPushDataEvent = new EventDispatcher<PushDataEvent>()
 
   constructor (options: ConnectionOptions) {
     this._restEndpoint = options.restEndpoint ?? DEFAULT_REST_ENDPOINT
@@ -83,6 +106,10 @@ export class MetricsConnection {
     return this._onConnectionChangeEvent.asEvent()
   }
 
+  get onPushDataEvent () {
+    return this._onPushDataEvent.asEvent()
+  }
+
   private async openConnection () {
     if (this._persistConnection) {
       this.checkCallbacks()
@@ -100,8 +127,8 @@ export class MetricsConnection {
   }
 
   private onSocketClosed () {
-    this.dispatchConnectionChange()
     this._socket = null
+    this.dispatchConnectionChange()
 
     const retryTimeout = this._socketRetryAttempts++ < 3 ? 0 : (this._socketRetryAttempts < 24 ? 2000 : 30000)
     setTimeout(() => void this.openConnection(), retryTimeout)
@@ -120,7 +147,7 @@ export class MetricsConnection {
 
   private onSocketMessage (messageEvent: MessageEvent) {
     try {
-      const data = JSON.parse(messageEvent.data) as { context?: string, messageId?: number, error?: any } | string
+      const data = JSON.parse(messageEvent.data) as SocketResponseMessage | SocketPushMessage | string
       if (typeof data === 'string') {
         if (PING_REGEX.test(data)) {
           const pingResults = PING_REGEX.exec(data)
@@ -130,6 +157,8 @@ export class MetricsConnection {
         }
       } else if (data.context === 'response') {
         this.parseResponse(data)
+      } else if (data.context === 'user') {
+        this.parseMessage(data)
       }
     } catch (error) {
       console.error('Unparsable Response', error)
@@ -187,7 +216,7 @@ export class MetricsConnection {
     this._socket?.send(`"primus::pong::${time}"`)
   }
 
-  private parseResponse (data: { messageId?: number, error?: any }) {
+  private parseResponse (data: { context: 'response', messageId?: number, error?: any }) {
     if (typeof data.messageId !== 'undefined' && this._callbacks.has(data.messageId)) {
       if (typeof data.error !== 'undefined') {
         const errorInstance = GetErrorInstance(data.error as ActionErrorProperties)
@@ -201,6 +230,10 @@ export class MetricsConnection {
       }
       this._callbacks.delete(data.messageId)
     }
+  }
+
+  private parseMessage (data: {context: 'user', message: any, room: string, from: number, sentAt: number}) {
+    this._onPushDataEvent.dispatchAsync(data as PushDataEvent)
   }
 
   private actionSocket (action: string, params: Object, callback: (success: any, fail?: any) => void) {

@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { FacilityListMeta, SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
 import { HeartRateDataSet, HeartRateDataSetData } from './heartRateDataSet'
@@ -62,16 +62,33 @@ export interface SessionListResponse extends AuthenticatedResponse {
   sessionsMeta: SessionListResponseMeta
 }
 
-export interface SessionListResponseMeta extends ListMeta {
+export interface FacilitySessionListResponse extends AuthenticatedResponse {
+  sessions: SessionData[]
+  sessionsMeta: FacilitySessionListResponseMeta
+}
+
+export interface SessionListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   open?: boolean
   sort: SessionSorting
 }
 
-export class Sessions extends ModelList<Session, SessionData, SessionListResponseMeta> {
+export interface FacilitySessionListResponseMeta extends FacilityListMeta {
+  open?: boolean
+  name?: string
+  from?: string
+  to?: string
+  sort: SessionSorting
+}
+
+export class Sessions extends SubscribableModelList<Session, SessionData, SessionListResponseMeta> {
   constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler) {
     super(Session, sessions, sessionsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'session' }
   }
 }
 
@@ -152,7 +169,7 @@ export class StaticSession {
   }
 }
 
-export class Session extends Model {
+export class Session extends SubscribableModel {
   private _sessionData: SessionData
 
   constructor (sessionData: SessionData, sessionHandler: SessionHandler) {
@@ -162,6 +179,10 @@ export class Session extends Model {
 
   protected setSessionData (session: SessionData) {
     this._sessionData = session
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'session', id: this.id }
   }
 
   async end () {
@@ -250,9 +271,13 @@ export class Session extends Model {
   }
 }
 
-export class FacilitySessions extends ModelList<FacilitySession, SessionData, SessionListResponseMeta> {
-  constructor (sessions: SessionData[], sessionsMeta: SessionListResponseMeta, sessionHandler: SessionHandler) {
+export class FacilitySessions extends SubscribableModelList<FacilitySession, SessionData, FacilitySessionListResponseMeta> {
+  constructor (sessions: SessionData[], sessionsMeta: FacilitySessionListResponseMeta, sessionHandler: SessionHandler) {
     super(FacilitySession, sessions, sessionsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'session', actionOverride: 'facilitySession:subscribe' }
   }
 }
 

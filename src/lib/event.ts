@@ -110,7 +110,7 @@ interface IPropagationStatus {
 
 export type IEvent<TypedEventArgument> = ISubscribable<IEventHandler<TypedEventArgument>>
 
-export class EventDispatcher<TypedEventArgument> implements IEvent<TypedEventArgument> {
+class BaseEventDispatcher<TypedEventArgument> implements IEvent<TypedEventArgument> {
   private _asEventWrapper?: DispatcherAsEventWrapper<TypedEventHandler>
 
   protected _subscriptions = new Array<ISubscription<TypedEventHandler>>()
@@ -214,5 +214,54 @@ export class EventDispatcher<TypedEventArgument> implements IEvent<TypedEventArg
     }
 
     return this._asEventWrapper
+  }
+}
+
+export class EventDispatcher<TypedEventArgument> extends BaseEventDispatcher<TypedEventArgument> {
+  private readonly _onSubscriptionCountChangeEvent = new BaseEventDispatcher<{ count: number}>()
+
+  get onSubscriptionCountChangeEvent () {
+    return this._onSubscriptionCountChangeEvent.asEvent()
+  }
+
+  subscribe (handler: TypedEventHandler): () => void {
+    if (typeof handler !== 'undefined') {
+      this._subscriptions.push(this.createSubscription(handler, false))
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
+    }
+    return () => {
+      this.unsubscribe(handler)
+    }
+  }
+
+  one (handler: TypedEventHandler): () => void {
+    if (typeof handler !== 'undefined') {
+      this._subscriptions.push(this.createSubscription(handler, true))
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
+    }
+    return () => {
+      this.unsubscribe(handler)
+    }
+  }
+
+  unsubscribe (handler: TypedEventHandler): void {
+    if (typeof handler === 'undefined') {
+      return
+    }
+
+    for (let i = 0; i < this._subscriptions.length; i++) {
+      if (this._subscriptions[i].handler === handler) {
+        this._subscriptions.splice(i, 1)
+        break
+      }
+    }
+    this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
+  }
+
+  clear (): void {
+    if (this._subscriptions.length !== 0) {
+      this._subscriptions.splice(0, this._subscriptions.length)
+      this._onSubscriptionCountChangeEvent.dispatch({ count: this.count })
+    }
   }
 }

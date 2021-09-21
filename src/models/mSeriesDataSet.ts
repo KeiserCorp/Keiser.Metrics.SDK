@@ -1,5 +1,5 @@
 import { durationToSeconds } from '../lib/time'
-import { ListMeta, Model, ModelList } from '../model'
+import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementData } from './mSeriesFtpMeasurement'
 import { Session, SessionData } from './session'
@@ -47,20 +47,24 @@ export interface MSeriesDataSetListResponse extends AuthenticatedResponse {
   mSeriesDataSetsMeta: MSeriesDataSetListResponseMeta
 }
 
-export interface MSeriesDataSetListResponseMeta extends ListMeta {
+export interface MSeriesDataSetListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   source: string
   sort: MSeriesDataSetSorting
 }
 
-export class MSeriesDataSets extends ModelList<MSeriesDataSet, MSeriesDataSetData, MSeriesDataSetListResponseMeta> {
+export class MSeriesDataSets extends SubscribableModelList<MSeriesDataSet, MSeriesDataSetData, MSeriesDataSetListResponseMeta> {
   constructor (mSeriesDataSets: MSeriesDataSetData[], mSeriesDataSetsMeta: MSeriesDataSetListResponseMeta, sessionHandler: SessionHandler) {
     super(MSeriesDataSet, mSeriesDataSets, mSeriesDataSetsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'mSeriesDataSet' }
+  }
 }
 
-export class MSeriesDataSet extends Model {
+export class MSeriesDataSet extends SubscribableModel {
   private _mSeriesDataSetData: MSeriesDataSetData
   private _graphData?: MSeriesDataPoint[]
 
@@ -73,6 +77,10 @@ export class MSeriesDataSet extends Model {
   private setMSeriesDataSet (mSeriesDataSetData: MSeriesDataSetData) {
     this._mSeriesDataSetData = mSeriesDataSetData
     this._graphData = typeof this._mSeriesDataSetData.graphData !== 'undefined' ? this._mSeriesDataSetData.graphData.map(mSeriesDataPointData => new MSeriesDataPoint(mSeriesDataPointData)) : undefined
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'mSeriesDataSet', id: this.id }
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {

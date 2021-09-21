@@ -5,6 +5,8 @@ import { ActionErrorProperties, ActionPreventedError, UnknownEntityError } from 
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilitySession, SessionSorting } from '../src/models/session'
 import { FacilityMemberUser } from '../src/models/user'
+import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { randomEchipId } from './utils/dummy'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
@@ -200,5 +202,60 @@ describe('Facility Session', function () {
     expect(typeof createdSession).to.equal('object')
     expect(createdSession.endedAt).to.not.equal(null)
     expect(createdSession.eagerStrengthMachineDataSets()?.length).to.equal(2)
+  })
+
+  it('can subscribe to session changes', async function () {
+    this.timeout(10000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const session = (await user.startSession({ forceEndPrevious: false })).session
+
+    const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = session.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'update' && e.id === session.id) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    await new Promise(resolve => setTimeout(() => resolve(null), 1000))
+    await session.end()
+
+    const modelChangeEvent = await modelChangeEventPromise
+    expect(modelChangeEvent).to.be.an('object')
+    expect(modelChangeEvent.mutation).to.equal('update')
+    expect(modelChangeEvent.id).to.equal(session.id)
+
+    await session.delete()
+  })
+
+  it('can subscribe to session list changes', async function () {
+    this.timeout(20000)
+    if (!IsBrowser) {
+      this.skip()
+    }
+
+    const sessions = await privilegedFacility.getSessions({ limit: 1 })
+
+    const modelListChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
+      const unsubscribe = sessions.onModelChangeEvent.subscribe(e => {
+        if (e.mutation === 'create' && (sessions.length === 0 || e.id !== sessions[0].id)) {
+          unsubscribe()
+          resolve(e)
+        }
+      })
+    }))
+
+    const session = (await user.startSession({ forceEndPrevious: false })).session
+
+    const modelListChangeEvent = await modelListChangeEventPromise
+    expect(modelListChangeEvent).to.be.an('object')
+    expect(modelListChangeEvent.mutation).to.equal('create')
+    expect(modelListChangeEvent.id).to.equal(session.id)
+
+    await session.delete()
   })
 })

@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { FacilityListMeta, SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
 import { Fingerprint, FingerprintReaderModel, FingerprintResponse } from './fingerprint'
@@ -50,7 +50,7 @@ export interface UserFacilityRelationshipListResponse extends AuthenticatedRespo
   facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta
 }
 
-export interface UserFacilityRelationshipListResponseMeta extends ListMeta {
+export interface UserFacilityRelationshipListResponseMeta extends UserListMeta {
   member?: boolean
   employee?: boolean
   employeeRole?: FacilityEmployeeRole
@@ -62,7 +62,7 @@ export interface FacilityUserRelationshipListResponse extends AuthenticatedRespo
   facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta
 }
 
-export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
+export interface FacilityUserRelationshipListResponseMeta extends FacilityListMeta {
   member?: boolean
   employee?: boolean
   name?: string
@@ -72,7 +72,7 @@ export interface FacilityUserRelationshipListResponseMeta extends ListMeta {
   sort: FacilityUserRelationshipSorting
 }
 
-export class FacilityRelationship extends Model {
+export abstract class FacilityRelationship extends SubscribableModel {
   protected _facilityRelationshipData: FacilityRelationshipData
 
   constructor (facilityRelationshipData: FacilityRelationshipData, sessionHandler: SessionHandler) {
@@ -117,28 +117,37 @@ export class FacilityRelationship extends Model {
     return new Fingerprint(fingerprint, this.sessionHandler)
   }
 
-  async createFingerprint (params: { template: any, fingerprintReaderModel: FingerprintReaderModel}) {
-    if (Array.isArray(params.template)) {
-      params.template = JSON.stringify(params.template)
-    }
-    const { fingerprint } = await this.action('fingerprint:update', { ...params, userId: this.userId, facilityRelationshipId: this.id }) as FingerprintResponse
+  async createFingerprint (params: { template: Uint8Array, fingerprintReaderModel: FingerprintReaderModel}) {
+    const { fingerprint } = await this.action('fingerprint:update', { fingerprintReaderModel: params.fingerprintReaderModel, template: JSON.stringify(Array.from(params.template)), facilityRelationshipId: this.id }) as FingerprintResponse
     return new Fingerprint(fingerprint, this.sessionHandler)
   }
 }
 
-export class UserFacilityMemberRelationships extends ModelList<UserFacilityMemberRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+export class UserFacilityMemberRelationships extends SubscribableModelList<UserFacilityMemberRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler) {
     super(UserFacilityMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:userSubscribe' }
+  }
 }
 
-export class UserFacilityEmployeeRelationships extends ModelList<UserFacilityEmployeeRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
+export class UserFacilityEmployeeRelationships extends SubscribableModelList<UserFacilityEmployeeRelationship, FacilityRelationshipData, UserFacilityRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: UserFacilityRelationshipListResponseMeta, sessionHandler: SessionHandler) {
     super(UserFacilityEmployeeRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:userSubscribe' }
   }
 }
 
 export class UserFacilityRelationship extends FacilityRelationship {
+  protected get subscribeParameters () {
+    return { model: 'facilityRelationship', id: this.id, actionOverride: 'facilityRelationship:userSubscribe' }
+  }
+
   async reload () {
     const { facilityRelationship } = await this.action('facilityRelationship:userShow', { userId: this.userId, id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)
@@ -174,19 +183,31 @@ export class UserFacilityEmployeeRelationship extends UserFacilityRelationship {
   }
 }
 
-export class FacilityUserMemberRelationships extends ModelList<FacilityUserMemberRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+export class FacilityUserMemberRelationships extends SubscribableModelList<FacilityUserMemberRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
     super(FacilityUserMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:facilitySubscribe' }
+  }
 }
 
-export class FacilityUserEmployeeRelationships extends ModelList<FacilityUserEmployeeRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+export class FacilityUserEmployeeRelationships extends SubscribableModelList<FacilityUserEmployeeRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
     super(FacilityUserEmployeeRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:facilitySubscribe' }
   }
 }
 
 export class FacilityUserRelationship extends FacilityRelationship {
+  protected get subscribeParameters () {
+    return { model: 'facilityRelationship', id: this.id, actionOverride: 'facilityRelationship:facilitySubscribe' }
+  }
+
   async reload () {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { id: this.id }) as FacilityRelationshipResponse
     this.setFacilityRelationshipData(facilityRelationship)

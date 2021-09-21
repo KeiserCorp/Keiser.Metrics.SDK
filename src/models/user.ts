@@ -1,14 +1,14 @@
 import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
-import { compressDeflateToB64 } from '../lib/compress'
-import { ListMeta, Model, ModelList } from '../model'
+import { deflateToB64 } from '../lib/compress'
+import { ListMeta, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
 import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
-import { FacilityRelationship, FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
-import { FacilityInitiatedFacilityRelationshipRequest, FacilityInitiatedFacilityRelationshipRequests, FacilityInitiatedFacilityRelationshipRequestSorting, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse } from './facilityRelationshipRequest'
+import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, FacilityRelationshipRequests, FacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
@@ -19,7 +19,7 @@ import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMea
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData, StaticProfile } from './profile'
-import { FacilitySession, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
+import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
@@ -81,7 +81,7 @@ export interface OAuthConnectResponse extends AuthenticatedResponse {
   url: string
 }
 
-export class User extends Model {
+export class User extends SubscribableModel {
   private _userData: UserData
   private readonly _isSessionUser: boolean
 
@@ -93,6 +93,10 @@ export class User extends Model {
 
   private setUserData (userData: UserData) {
     this._userData = userData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'user', id: this.id }
   }
 
   async reload () {
@@ -249,17 +253,17 @@ export class User extends Model {
 
   async getFacilityRelationshipRequest (params: { id: number }) {
     const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userShow', { ...params, userId: this.id }) as FacilityRelationshipRequestResponse
-    return new FacilityInitiatedFacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
+    return new FacilityRelationshipRequest(facilityRelationshipRequest, this.sessionHandler)
   }
 
-  async getFacilityRelationshipRequests (options: { memberIdentifier?: string, name?: string, sort?: FacilityInitiatedFacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getFacilityRelationshipRequests (options: { memberIdentifier?: string, name?: string, sort?: FacilityRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationshipRequests, facilityRelationshipRequestsMeta } = await this.action('facilityRelationshipRequest:userList', options) as FacilityRelationshipRequestListResponse
-    return new FacilityInitiatedFacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
+    return new FacilityRelationshipRequests(facilityRelationshipRequests, facilityRelationshipRequestsMeta, this.sessionHandler)
   }
 
   async getFacilityRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:userShow', { ...params, userId: this.id }) as FacilityRelationshipResponse
-    return new FacilityRelationship(facilityRelationship, this.sessionHandler)
+    return new UserFacilityRelationship(facilityRelationship, this.sessionHandler)
   }
 
   async getFacilityMembershipRelationship (params: { id: number }) {
@@ -424,7 +428,7 @@ export class FacilityMemberUser extends FacilityUser {
   }
 
   async getCurrentSessions () {
-    const { sessions, sessionsMeta } = await this.action('facilitySession:status', { userId: this.id }) as SessionListResponse
+    const { sessions, sessionsMeta } = await this.action('facilitySession:status', { userId: this.id }) as FacilitySessionListResponse
     return new FacilitySessions(sessions, sessionsMeta, this.sessionHandler)
   }
 
@@ -441,7 +445,7 @@ export class FacilityMemberUser extends FacilityUser {
   async createA500Set (params: { strengthMachineSession: StrengthMachineSession, setData: A500SetData, sampleData?: A500TimeSeriesPointSample[] }) {
     const machineToken = params.strengthMachineSession.sessionHandler.accessToken
     const setData = JSON.stringify(params.setData)
-    const deflatedSampleData = typeof params.sampleData !== 'undefined' ? compressDeflateToB64(params.sampleData) : null
+    const deflatedSampleData = typeof params.sampleData !== 'undefined' ? deflateToB64(params.sampleData) : null
     const response = await this.action('strengthMachineDataSet:createA500', { userId: this.id, machineToken, setData, deflatedSampleData }) as StrengthMachineDataSetResponse
     return new StrengthMachineDataSet(response.strengthMachineDataSet, this.sessionHandler)
   }

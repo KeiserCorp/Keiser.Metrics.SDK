@@ -1,4 +1,4 @@
-import { ListMeta, Model, ModelList } from '../model'
+import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Session, SessionData } from './session'
 
@@ -31,20 +31,24 @@ export interface HeartRateDataSetListResponse extends AuthenticatedResponse {
   heartRateDataSetsMeta: HeartRateDataSetListResponseMeta
 }
 
-export interface HeartRateDataSetListResponseMeta extends ListMeta {
+export interface HeartRateDataSetListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   source?: string
   sort: HeartRateDataSetSorting
 }
 
-export class HeartRateDataSets extends ModelList<HeartRateDataSet, HeartRateDataSetData, HeartRateDataSetListResponseMeta> {
+export class HeartRateDataSets extends SubscribableModelList<HeartRateDataSet, HeartRateDataSetData, HeartRateDataSetListResponseMeta> {
   constructor (heartRateDataSets: HeartRateDataSetData[], heartRateDataSetsMeta: HeartRateDataSetListResponseMeta, sessionHandler: SessionHandler) {
     super(HeartRateDataSet, heartRateDataSets, heartRateDataSetsMeta, sessionHandler)
   }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'heartRateDataSet' }
+  }
 }
 
-export class HeartRateDataSet extends Model {
+export class HeartRateDataSet extends SubscribableModel {
   private _heartRateDataSetData: HeartRateDataSetData
   private _graphData?: HeartRateDataPoint[]
 
@@ -57,6 +61,10 @@ export class HeartRateDataSet extends Model {
   private setHeartRateDataSet (heartRateDataSetData: HeartRateDataSetData) {
     this._heartRateDataSetData = heartRateDataSetData
     this._graphData = typeof this._heartRateDataSetData.graphData !== 'undefined' ? this._heartRateDataSetData.graphData.map(heartRateDataPointData => new HeartRateDataPoint(heartRateDataPointData)) : undefined
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'heartRateDataSet', id: this.id }
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {

@@ -30,7 +30,7 @@ describe('User Initiated Facility Relationship Request', function () {
   })
 
   it('can request facility relationship', async function () {
-    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberIdentifier })
+    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createUserInitiatedRelationshipRequest({ memberIdentifier: newUserMemberIdentifier })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(true)
@@ -58,7 +58,7 @@ describe('User Initiated Facility Relationship Request', function () {
   })
 
   it('can re-request relationship', async function () {
-    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createRelationshipRequest({ memberIdentifier: newUserMemberIdentifier })
+    const facilityRelationshipRequest = await (await newUserSession.getFacilities())[0].createUserInitiatedRelationshipRequest({ memberIdentifier: newUserMemberIdentifier })
 
     expect(typeof facilityRelationshipRequest).to.equal('object')
     expect(facilityRelationshipRequest.userApproval).to.equal(true)
