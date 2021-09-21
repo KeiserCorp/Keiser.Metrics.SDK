@@ -34,12 +34,12 @@ export default class MetricsSSO extends Metrics {
   }
 
   async fulfillUserCreation (params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language: string, units: Units, metricWeight?: number, metricHeight?: number}) {
-    const response = await this._connection.action('auth:userInitFulfillment', { refreshable: true, params }) as ExchangeableUserResponse
+    const response = await this._connection.action('auth:userInitFulfillment', { refreshable: true, ...params }) as ExchangeableUserResponse
     return new ExchangeableUserSession(response, this._connection)
   }
 
   async authenticateWithWelcomeToken (params: { welcomeToken: string, password: string, refreshable?: boolean }) {
-    const response = await this._connection.action('auth:facilityWelcomeFulfillment', { refreshable: true, params }) as ExchangeableUserResponse
+    const response = await this._connection.action('auth:facilityWelcomeFulfillment', { refreshable: true, ...params }) as ExchangeableUserResponse
     return new ExchangeableUserSession(response, this._connection)
   }
 
