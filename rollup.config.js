@@ -15,6 +15,7 @@ const buildConfig = (entryPoint) => {
   const DIST = path.resolve(__dirname, './dist', entryPoint)
   const ESNEXT_DIST = path.resolve(DIST, 'esnext')
   const SRC = path.resolve(__dirname, 'src', entryPoint + '.ts')
+  const MODELS = path.resolve(__dirname, 'src', 'models', '*')
   const TYPES = path.resolve(__dirname, 'types', '*.d.ts')
 
   const pkg = Object.assign({}, packageInfo, {
@@ -95,7 +96,7 @@ const buildConfig = (entryPoint) => {
         json(),
         typescript({
           tsconfigOverride: {
-            include: [SRC, TYPES],
+            include: [SRC, TYPES, MODELS],
             compilerOptions: {
               target: 'es2017',
               module: 'esnext',
@@ -153,7 +154,7 @@ const buildConfig = (entryPoint) => {
         json(),
         typescript({
           tsconfigOverride: {
-            include: [SRC, TYPES],
+            include: [SRC, TYPES, MODELS],
             compilerOptions: {
               target: 'esnext',
               module: 'esnext',
