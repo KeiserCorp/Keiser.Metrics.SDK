@@ -184,7 +184,7 @@ jobs:
           FOLDER: dist/docs
           SINGLE_COMMIT: true
           CLEAN: true
-          COMMIT_MESSAGE: v${{ needs.version-check.outputs.version }}
+          COMMIT_MESSAGE: 'v${{ steps.check.outputs.version }} Release'
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
