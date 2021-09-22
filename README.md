@@ -1,6 +1,8 @@
 # Keiser Metrics SDK
 ![Release](https://github.com/KeiserCorp/Keiser.Metrics.SDK/workflows/Release/badge.svg)
 
+**[Changelog](https://github.com/KeiserCorp/Keiser.Metrics.SDK/blob/changelog/CHANGELOG.md)**
+
 ## Project
 This SDK facilitates communication between a client system (_ie: phone app, website, server_) and [Keiser Metrics](https://metrics.keiser.com). The SDK is written in [TypeScript](https://www.typescriptlang.org) and supports both [browser](https://caniuse.com/#feat=es6) and [NodeJS](https://nodejs.org) platforms.
 
