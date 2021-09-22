@@ -68,12 +68,6 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: npm run changelog
 
-      - name: Push changelog file
-        uses: EndBug/add-and-commit@v7
-        if: steps.check.outputs.changed == 'true'
-        with:
-          message: 'Updates Changelog'
-
       - name: Create Release
         id: release
         uses: actions/create-release@v1
@@ -83,6 +77,14 @@ jobs:
         with:
           tag_name: v${{ steps.check.outputs.version }}
           release_name: Release v${{ steps.check.outputs.version }}
+
+      - name: Push changelog file
+        uses: EndBug/add-and-commit@v7
+        if: steps.check.outputs.changed == 'true'
+        with:
+          add: 'CHANGELOG.md'
+          branch: changelog
+          message: 'Adds v${{ steps.check.outputs.version }} releases'
 
   release:
     name: Release
