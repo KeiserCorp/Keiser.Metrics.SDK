@@ -75,16 +75,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          prerelease: github.ref != 'refs/heads/master'
           tag_name: v${{ steps.check.outputs.version }}
           release_name: Release v${{ steps.check.outputs.version }}
 
       - name: Push changelog file
-        uses: EndBug/add-and-commit@v7
-        if: steps.check.outputs.changed == 'true'
+        uses: dfm/force-push-branch-action@v1
+        if: steps.check.outputs.changed == 'true' && github.ref == 'refs/heads/master'
         with:
-          add: 'CHANGELOG.md'
-          branch: changelog
-          message: 'Adds v${{ steps.check.outputs.version }} releases'
+          path: CHANGELOG.md
+          target-branch: changelog
+          commit-message: 'v${{ steps.check.outputs.version }} Release'
 
   release:
     name: Release
