@@ -1,8 +1,35 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
+import { Units } from './constants'
 import { Core } from './models/core'
+import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
 import { UserResponse } from './models/user'
 import { KioskSession, StrengthMachineInitializeResponse, StrengthMachineSession, UserSession } from './session'
+
+interface SSORequestParameters {
+  returnUrl: string
+  requiresElevated?: boolean
+  refreshable?: boolean
+}
+
+interface UserSSOParameters {
+  email?: string
+  name?: string
+  gender?: Gender
+  language?: string
+  birthday?: string
+  units?: Units
+  metricHeight?: number
+  metricWeight?: number
+}
+
+interface CoreEndpointResponse {
+  endpoints: {
+    sso: string
+    metricsApp: string
+    facility: string
+  }
+}
 
 export default class Metrics {
   protected readonly _connection: MetricsConnection
@@ -39,6 +66,15 @@ export default class Metrics {
 
   get onConnectionChangeEvent () {
     return this._connection.onConnectionChangeEvent
+  }
+
+  async generateSSORequestUrl (requestParameters: SSORequestParameters, userParameters?: UserSSOParameters) {
+    const response = await this._connection.action('core:endpoints') as CoreEndpointResponse
+    const ssoUrl = new URL(response.endpoints.sso)
+    for (const [name, value] of [...Object.entries(requestParameters), ...Object.entries(userParameters ?? {})]) {
+      ssoUrl.searchParams.append(name, value)
+    }
+    return ssoUrl
   }
 
   async authenticateWithExchangeToken (params: { exchangeToken: string}) {

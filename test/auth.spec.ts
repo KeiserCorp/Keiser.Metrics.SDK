@@ -30,6 +30,13 @@ describe('Auth', function () {
     metricsInstance?.dispose()
   })
 
+  it('can generate SSO request url', async function () {
+    const requestUrl = await metricsInstance.generateSSORequestUrl({ returnUrl: 'http://test.keiser.com/app' })
+
+    expect(requestUrl.toString()).to.be.a('string')
+    expect(requestUrl.toString()).to.equal('http://localhost:4200/sso/?returnUrl=http%3A%2F%2Ftest.keiser.com%2Fapp')
+  })
+
   it('can authenticate using token', async function () {
     const session = await getAuthenticatedUserSession(metricsInstance, { email: newUserEmail, password: newUserPassword })
     const tokenSession = await metricsInstance.authenticateWithToken({ token: session.refreshToken ?? '' })
