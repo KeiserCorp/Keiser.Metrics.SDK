@@ -44,6 +44,11 @@ export async function getAuthenticatedUserSession (metrics: Metrics, params: { e
   return await metrics.authenticateWithExchangeToken({ exchangeToken: exchangeableUserSession.exchangeToken })
 }
 
+export async function createUserSession (metrics: Metrics, params: { email: string }) {
+  const userResponse = await metrics.action('dev:login', params) as UserResponse
+  return await metrics.authenticateWithToken({ token: userResponse.refreshToken ?? '' })
+}
+
 export async function createNewUserSession (metrics: Metrics, params?: { email: string, password: string }) {
   if (typeof params === 'undefined') {
     params = {
