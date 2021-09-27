@@ -12,11 +12,12 @@ import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAlia
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
-import { FacilityConfigurationResponse, StaticFacilityConfiguration } from './models/facilityConfiguration'
+import { FacilityConfiguration, FacilityConfigurationResponse } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
-import { FacilityStrengthMachineData } from './models/facilityStrengthMachine'
+import { FacilityStrengthMachine, FacilityStrengthMachineData } from './models/facilityStrengthMachine'
+import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './models/facilityStrengthMachineConfiguration'
 import { GlobalAccessControlData } from './models/globalAccessControl'
-import { StaticSession } from './models/session'
+import { Session } from './models/session'
 import { StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
 import { StrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './models/strengthExerciseMuscle'
 import { StrengthExerciseVariant, StrengthExerciseVariantResponse } from './models/strengthExerciseVariant'
@@ -232,9 +233,7 @@ export abstract class BaseSessionHandler {
     }
   }
 
-  get decodedAccessToken () {
-    return DecodeJWT(this._accessToken) as AccessToken
-  }
+  abstract get decodedAccessToken (): any
 
   get accessToken () {
     return this._accessToken
@@ -338,11 +337,15 @@ export abstract class BaseSessionHandler {
   }
 }
 
-export class SessionHandler extends BaseSessionHandler {
+export class UserSessionHandler extends BaseSessionHandler {
   private _userId: number | null = null
 
   constructor (connection: MetricsConnection, userResponse: UserResponse) {
     super(connection, userResponse, true)
+  }
+
+  get decodedAccessToken () {
+    return DecodeJWT(this.accessToken) as AccessToken
   }
 
   get userId () {
@@ -359,6 +362,10 @@ export class SessionHandler extends BaseSessionHandler {
 export class KioskSessionHandler extends BaseSessionHandler {
   constructor (connection: MetricsConnection, { accessToken }: { accessToken: string }) {
     super(connection, { accessToken }, false)
+  }
+
+  get decodedAccessToken () {
+    return DecodeJWT(this.accessToken) as KioskToken
   }
 
   async logout () {
@@ -408,18 +415,22 @@ export class KioskSession {
 
   async sessionUpdate (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
-    return new StaticSession(session)
+    return new Session(session, this.sessionHandler)
   }
 
   async sessionEnd (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
-    return new StaticSession(session)
+    return new Session(session, this.sessionHandler)
   }
 }
 
 export class StrengthMachineSessionHandler extends BaseSessionHandler {
   constructor (connection: MetricsConnection, authenticatedResponse: AuthenticatedResponse) {
     super(connection, authenticatedResponse, false)
+  }
+
+  get decodedAccessToken () {
+    return DecodeJWT(this.accessToken) as StrengthMachineToken
   }
 
   async logout () {
@@ -458,12 +469,8 @@ export class StrengthMachineSession {
     return response
   }
 
-  get facilityId () {
-    return this._facilityStrengthMachineData.id
-  }
-
-  eagerA500MachineState () {
-    return typeof this._facilityStrengthMachineData.a500MachineState !== 'undefined' ? new A500MachineState(this._facilityStrengthMachineData.a500MachineState, this.sessionHandler) : undefined
+  facilityStrengthMachine () {
+    return new FacilityStrengthMachine(this._facilityStrengthMachineData, this.sessionHandler)
   }
 
   async userLogin (params: { memberIdentifier: string | number }) {
@@ -487,7 +494,12 @@ export class StrengthMachineSession {
 
   async getFacilityConfiguration () {
     const { facilityConfiguration } = await this.action('facilityConfiguration:show') as FacilityConfigurationResponse
-    return new StaticFacilityConfiguration(facilityConfiguration)
+    return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
+  }
+
+  async getFacilityStrengthMachineConfiguration () {
+    const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:show') as FacilityStrengthMachineConfigurationResponse
+    return new FacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration, this.sessionHandler)
   }
 }
 
@@ -496,7 +508,7 @@ export abstract class UserSessionBase<UserType extends User = User> {
   protected abstract readonly _user: UserType
 
   constructor (userResponse: UserResponse, connection: MetricsConnection) {
-    this._sessionHandler = new SessionHandler(connection, userResponse)
+    this._sessionHandler = new UserSessionHandler(connection, userResponse)
   }
 
   get sessionHandler () {
@@ -532,7 +544,7 @@ export abstract class UserSessionBase<UserType extends User = User> {
   }
 
   eagerActiveFacility () {
-    return typeof this._sessionHandler.decodedAccessToken.facility !== 'undefined' && this._sessionHandler.decodedAccessToken.facility !== null ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
+    return this._sessionHandler instanceof UserSessionHandler && typeof this._sessionHandler.decodedAccessToken.facility !== 'undefined' && this._sessionHandler.decodedAccessToken.facility !== null ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 
   protected async action (action: string, params: Object = { }) {
@@ -672,3 +684,5 @@ export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
     this._user = new FacilityMemberUser(facilityUserResponse.user, this._sessionHandler, facilityUserResponse.facilityRelationshipId)
   }
 }
+
+export type SessionHandler = UserSessionHandler | KioskSessionHandler | StrengthMachineSessionHandler

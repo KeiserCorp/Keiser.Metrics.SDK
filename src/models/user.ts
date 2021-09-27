@@ -2,7 +2,7 @@ import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
 import { deflateToB64 } from '../lib/compress'
 import { ListMeta, ModelList, SubscribableModel } from '../model'
-import { AuthenticatedResponse, SessionHandler, StrengthMachineSession } from '../session'
+import { AuthenticatedResponse, SessionHandler, StrengthMachineSession, UserSessionHandler } from '../session'
 import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
@@ -18,7 +18,7 @@ import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, M
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
 import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
-import { Profile, ProfileData, StaticProfile } from './profile'
+import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
@@ -88,7 +88,7 @@ export class User extends SubscribableModel {
   constructor (userData: UserData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._userData = userData
-    this._isSessionUser = this.id === this.sessionHandler.userId
+    this._isSessionUser = (this.sessionHandler instanceof UserSessionHandler) && this.id === this.sessionHandler.userId
   }
 
   private setUserData (userData: UserData) {
@@ -453,16 +453,4 @@ export class FacilityMemberUser extends FacilityUser {
 
 export class FacilityEmployeeUser extends FacilityUser {
 
-}
-
-export class StaticUser {
-  private readonly _userData: UserData
-
-  constructor (userData: UserData) {
-    this._userData = userData
-  }
-
-  get profile () {
-    return new StaticProfile(this._userData.profile)
-  }
 }

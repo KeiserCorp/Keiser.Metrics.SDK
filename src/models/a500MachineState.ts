@@ -1,6 +1,6 @@
 import { ForceUnit } from '../constants'
 import { Model } from '../model'
-import { AuthenticatedResponse, StrengthMachineSessionHandler } from '../session'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface A500MachineStateData {
   forceUnit: ForceUnit
@@ -12,10 +12,10 @@ export interface A500MachineStateResponse extends AuthenticatedResponse {
   a500MachineState: A500MachineStateData
 }
 
-export class A500MachineState extends Model<StrengthMachineSessionHandler> {
+export class A500MachineState extends Model {
   private _a500MachineState: A500MachineStateData
 
-  constructor (a500MachineStateData: A500MachineStateData, sessionHandler: StrengthMachineSessionHandler) {
+  constructor (a500MachineStateData: A500MachineStateData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._a500MachineState = a500MachineStateData
   }

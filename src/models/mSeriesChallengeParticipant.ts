@@ -76,7 +76,7 @@ export class MSeriesChallengeParticipant extends Model {
   }
 
   async reload () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: this._mSeriesChallengeParticipantData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeParticipantId: this._mSeriesChallengeParticipantData.id }) as MSeriesChallengeParticipantResponse
     this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
   }
 

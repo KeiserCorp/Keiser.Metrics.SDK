@@ -72,7 +72,7 @@ export abstract class MSeriesChallenge extends Model {
   }
 
   async reload () {
-    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { id: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeResponse
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:show', { id: this._mSeriesChallengeData.id }) as MSeriesChallengeResponse
     this.setMSeriesChallenge(mSeriesChallenge)
     return this
   }
@@ -85,7 +85,6 @@ export abstract class MSeriesChallenge extends Model {
      */
   async getParticipant (params: { mSeriesChallengeParticipantId: number }) {
     const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', {
-      userId: this.sessionHandler.userId,
       mSeriesChallengeParticipantId: params.mSeriesChallengeParticipantId,
       joinCode: this._mSeriesChallengeData.isJoined ? undefined : this._mSeriesChallengeData.joinCode
     }) as MSeriesChallengeParticipantResponse
@@ -112,7 +111,6 @@ export abstract class MSeriesChallenge extends Model {
     const queryId = this._mSeriesChallengeData.isJoined ? { mSeriesChallengeId: this._mSeriesChallengeData.id } : { joinCode: this._mSeriesChallengeData.joinCode }
 
     const participants = await this.action('mSeriesChallengeParticipant:list', {
-      userId: this.sessionHandler.userId,
       ...queryId,
       ...options
     }) as MSeriesChallengeParticipantListResponse
@@ -136,7 +134,6 @@ export abstract class MSeriesChallenge extends Model {
   } = {}) {
     const queryId = this._mSeriesChallengeData.isJoined ? { id: this._mSeriesChallengeData.id } : { joinCode: this._mSeriesChallengeData.joinCode }
     const leaderboard = await this.action('mSeriesChallenge:leaderboard', {
-      userId: this.sessionHandler.userId,
       ...queryId,
       ...options
     }) as MSeriesChallengeLeaderboardResponse
@@ -236,7 +233,7 @@ export class JoinableMSeriesChallenge extends MSeriesChallenge {
    * Method to join a challenge
    */
   async join () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:create', { joinCode: this._mSeriesChallengeData.joinCode }) as MSeriesChallengeParticipantResponse
     return {
       mSeriesChallengeParticipant: new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler),
       joinedMSeriesChallenge: new JoinedMSeriesChallenge(this._mSeriesChallengeData, this.sessionHandler)
@@ -248,7 +245,7 @@ export class JoinedMSeriesChallenge extends MSeriesChallenge {
    * Method to leave a challenge
    */
   async leave () {
-    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId })
+    await this.action('mSeriesChallengeParticipant:delete', { mSeriesChallengeId: this._mSeriesChallengeData.id })
     return new JoinableMSeriesChallenge(this._mSeriesChallengeData, this.sessionHandler)
   }
 
@@ -258,7 +255,7 @@ export class JoinedMSeriesChallenge extends MSeriesChallenge {
    * @returns An MSeries Challenge Participant
    */
   async getCurrentParticipant () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id }) as MSeriesChallengeParticipantResponse
     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 }
@@ -276,7 +273,7 @@ export class PrivilegedMSeriesChallenge extends MSeriesChallenge {
    * @returns An MSeries Challenge Participant
    */
   async getCurrentParticipant () {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id, userId: this.sessionHandler.userId }) as MSeriesChallengeParticipantResponse
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { mSeriesChallengeId: this._mSeriesChallengeData.id }) as MSeriesChallengeParticipantResponse
     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 

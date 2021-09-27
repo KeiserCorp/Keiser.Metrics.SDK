@@ -52,10 +52,10 @@ export class Facilities extends ModelList<Facility, FacilityData, FacilityListRe
   }
 }
 
-export class Facility extends Model {
+export class Facility<SessionHandlerType extends SessionHandler = SessionHandler> extends Model<SessionHandlerType> {
   protected _facilityData: FacilityData
 
-  constructor (facilityData: FacilityData, sessionHandler: SessionHandler) {
+  constructor (facilityData: FacilityData, sessionHandler: SessionHandlerType) {
     super(sessionHandler)
     this._facilityData = facilityData
   }
@@ -74,7 +74,7 @@ export class Facility extends Model {
     return this._facilityData.id
   }
 
-  eagerFacilityProfile () {
+  eagerFacilityProfile (): FacilityProfile | undefined {
     return typeof this._facilityData.facilityProfile !== 'undefined' ? new FacilityProfile(this._facilityData.facilityProfile, this, this.sessionHandler) : undefined
   }
 
