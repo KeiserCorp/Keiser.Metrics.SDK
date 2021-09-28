@@ -124,10 +124,6 @@ export class User extends SubscribableModel {
   }
 
   async delete () {
-    if (!this._isSessionUser) {
-      throw new ClientSideActionPrevented({ explanation: 'Cannot delete other user without admin privileges' })
-    }
-
     await this.action('user:delete', { userId: this.id })
   }
 
@@ -332,7 +328,7 @@ export class User extends SubscribableModel {
     return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler)
   }
 
-  async createMSeriesChallenge (params: { userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number, isPublic?: boolean }) {
+  async createMSeriesChallenge (params: { userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, isPublic: boolean, startAt?: Date, endAt?: Date, goal?: number }) {
     const { mSeriesChallenge } = await this.action('mSeriesChallenge:create', { ...params }) as MSeriesChallengeResponse
     return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
   }

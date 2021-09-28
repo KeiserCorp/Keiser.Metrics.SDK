@@ -35,7 +35,8 @@ describe('M Series Challenge', function () {
       name: 'SDK Test Challenge',
       challengeType: MSeriesChallengeType.GoalBased,
       focus: MSeriesChallengeFocus.Points,
-      goal: 1000
+      goal: 1000,
+      isPublic: false
     })
 
     expect(mSeriesChallenge).to.be.an('object')

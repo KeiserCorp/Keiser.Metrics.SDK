@@ -79,7 +79,10 @@ export abstract class MSeriesChallenge extends Model {
   }
 
   async getParticipant (params: { mSeriesChallengeParticipantId: number }) {
-    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', { ...params, userId: this.userId, mSeriesChallengeId: this.id }) as MSeriesChallengeParticipantResponse
+    const { mSeriesChallengeParticipant } = await this.action('mSeriesChallengeParticipant:show', {
+      ...params,
+      joinCode: this._mSeriesChallengeData.isJoined ? undefined : this._mSeriesChallengeData.joinCode
+    }) as MSeriesChallengeParticipantResponse
     return new MSeriesChallengeParticipant(mSeriesChallengeParticipant, this.sessionHandler)
   }
 
