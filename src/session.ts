@@ -1,5 +1,5 @@
 import { ConnectionEvent, MetricsConnection, PushDataEvent } from './connection'
-import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT, XOR } from './constants'
+import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT } from './constants'
 import { SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
@@ -134,19 +134,13 @@ interface ModelChangeEventHandler {
   onReconnectCallback: () => Promise<SubscriptionResponse>
 }
 
-export interface GenericModelSubscribeParameters {
+export interface ModelSubscribeParameters {
   model: string
   id: number
+  userId?: number
+  facilityRelationshipId?: number
   actionOverride?: string
 }
-
-export interface UserModelSubscribeParameters {
-  model: string
-  userId: number
-  actionOverride?: string
-}
-
-export type ModelSubscribeParameters = XOR<GenericModelSubscribeParameters, UserModelSubscribeParameters>
 
 export interface ListSubscribeParameters {
   parentModel: string
@@ -287,8 +281,8 @@ export abstract class BaseSessionHandler {
   }
 
   async subscribeToModel (subscribeParameters: ModelSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
-    const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.userId ?? subscribeParameters.id}`
-    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId }) as SubscriptionResponse
+    const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.id}`
+    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId, facilityRelationshipId: subscribeParameters.facilityRelationshipId }) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 

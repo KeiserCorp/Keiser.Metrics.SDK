@@ -24,15 +24,19 @@ export class AcceptedTermsVersion extends Model {
   }
 
   async reload () {
-    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:show', { userId: this._acceptedTermsVersionData.userId }) as AcceptedTermsVersionResponse
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:show', { userId: this.userId }) as AcceptedTermsVersionResponse
     this.setAcceptedTermsVersionData(acceptedTermsVersion)
     return this
   }
 
   async update (params: { revision: string }) {
-    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { ...params, userId: this._acceptedTermsVersionData.userId }) as AcceptedTermsVersionResponse
+    const { acceptedTermsVersion } = await this.action('acceptedTermsVersion:update', { ...params, userId: this.userId }) as AcceptedTermsVersionResponse
     this.setAcceptedTermsVersionData(acceptedTermsVersion)
     return this
+  }
+
+  get userId () {
+    return this._acceptedTermsVersionData.userId
   }
 
   get updatedAt () {

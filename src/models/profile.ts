@@ -35,7 +35,7 @@ export class Profile extends SubscribableModel {
   }
 
   async reload () {
-    const { profile } = await this.action('profile:show', { userId: this._profileData.userId }) as ProfileResponse
+    const { profile } = await this.action('profile:show', { userId: this.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
   }
@@ -47,13 +47,17 @@ export class Profile extends SubscribableModel {
     language?: string | null
     units?: Units | null
   }) {
-    const { profile } = await this.action('profile:update', { ...params, userId: this._profileData.userId }) as ProfileResponse
+    const { profile } = await this.action('profile:update', { ...params, userId: this.userId }) as ProfileResponse
     this.setProfileData(profile)
     return this
   }
 
   protected get subscribeParameters () {
-    return { model: 'profile', userId: this._profileData.userId }
+    return { model: 'profile', id: this.userId, userId: this.userId }
+  }
+
+  get userId () {
+    return this._profileData.userId
   }
 
   get updatedAt () {

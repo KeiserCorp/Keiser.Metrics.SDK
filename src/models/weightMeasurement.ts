@@ -9,6 +9,7 @@ export enum WeightMeasurementSorting {
 
 export interface WeightMeasurementData {
   id: number
+  userId: number
   source: string
   takenAt: string
   metricWeight: number
@@ -89,21 +90,25 @@ export class WeightMeasurement extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'weightMeasurement', id: this.id }
+    return { model: 'weightMeasurement', id: this.id, userId: this.userId }
   }
 
   async reload () {
-    const { weightMeasurement } = await this.action('weightMeasurement:show', { id: this.id }) as WeightMeasurementResponse
+    const { weightMeasurement } = await this.action('weightMeasurement:show', { id: this.id, userId: this.userId }) as WeightMeasurementResponse
     this.setWeightMeasurementData(weightMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('weightMeasurement:delete', { id: this.id })
+    await this.action('weightMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._weightMeasurementData.id
+  }
+
+  get userId () {
+    return this._weightMeasurementData.userId
   }
 
   get source () {

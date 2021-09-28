@@ -24,13 +24,13 @@ export class PrimaryEmailAddress extends Model {
   }
 
   async reload () {
-    const { primaryEmailAddress } = await this.action('primaryEmailAddress:show', { userId: this._primaryEmailAddressData.userId }) as PrimaryEmailAddressResponse
+    const { primaryEmailAddress } = await this.action('primaryEmailAddress:show', { userId: this.userId }) as PrimaryEmailAddressResponse
     this.setPrimaryEmailAddressData(primaryEmailAddress)
     return this
   }
 
   async update (params: { emailAddressId: number }) {
-    const { primaryEmailAddress } = await this.action('primaryEmailAddress:update', { ...params, userId: this._primaryEmailAddressData.userId }) as PrimaryEmailAddressResponse
+    const { primaryEmailAddress } = await this.action('primaryEmailAddress:update', { ...params, userId: this.userId }) as PrimaryEmailAddressResponse
     this.setPrimaryEmailAddressData(primaryEmailAddress)
     return this
   }
@@ -39,8 +39,12 @@ export class PrimaryEmailAddress extends Model {
     return this._primaryEmailAddressData.emailAddressId
   }
 
+  get userId () {
+    return this._primaryEmailAddressData.userId
+  }
+
   async getEmailAddress () {
-    const { emailAddress } = await this.action('emailAddress:show', { userId: this._primaryEmailAddressData.userId, id: this.emailAddressId }) as EmailAddressResponse
+    const { emailAddress } = await this.action('emailAddress:show', { id: this.emailAddressId, userId: this.userId }) as EmailAddressResponse
     return new EmailAddress(emailAddress, this.sessionHandler)
   }
 }

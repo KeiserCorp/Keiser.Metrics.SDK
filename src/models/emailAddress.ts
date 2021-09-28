@@ -8,6 +8,7 @@ export enum EmailAddressSorting {
 
 export interface EmailAddressData {
   id: number
+  userId: number
   email: string
   validated: boolean
 }
@@ -45,25 +46,25 @@ export class EmailAddress extends Model {
   }
 
   async reload () {
-    const { emailAddress } = await this.action('emailAddress:show', { id: this.id }) as EmailAddressResponse
+    const { emailAddress } = await this.action('emailAddress:show', { id: this.id, userId: this.userId }) as EmailAddressResponse
     this.setEmailAddressData(emailAddress)
     return this
   }
 
   async requestValidation () {
-    await this.action('emailAddress:validationRequest', { id: this.id })
-  }
-
-  async fulfillValidation (token: string) {
-    await this.action('emailAddress:validationFulfillment', { validationToken: token })
+    await this.action('emailAddress:validationRequest', { id: this.id, userId: this.userId })
   }
 
   async delete () {
-    await this.action('emailAddress:delete', { id: this.id })
+    await this.action('emailAddress:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._emailAddressData.id
+  }
+
+  get userId () {
+    return this._emailAddressData.userId
   }
 
   get email () {

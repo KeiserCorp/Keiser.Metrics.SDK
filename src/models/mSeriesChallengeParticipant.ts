@@ -32,7 +32,8 @@ export interface MSeriesChallengeLeaderboardResponse extends AuthenticatedRespon
 }
 
 export interface MSeriesChallengeParticipantListResponseMeta extends ListMeta {
-  nameSearchQuery: string
+  userId?: number
+  nameSearchQuery?: string
   sort: MSeriesChallengeParticipantSorting
 }
 

@@ -9,6 +9,7 @@ export enum HeightMeasurementSorting {
 
 export interface HeightMeasurementData {
   id: number
+  userId: number
   source: string
   takenAt: string
   metricHeight: number
@@ -52,21 +53,25 @@ export class HeightMeasurement extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'heightMeasurement', id: this.id }
+    return { model: 'heightMeasurement', id: this.id, userId: this.userId }
   }
 
   async reload () {
-    const { heightMeasurement } = await this.action('heightMeasurement:show', { id: this.id }) as HeightMeasurementResponse
+    const { heightMeasurement } = await this.action('heightMeasurement:show', { id: this.id, userId: this.userId }) as HeightMeasurementResponse
     this.setHeightMeasurementData(heightMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('heightMeasurement:delete', { id: this.id })
+    await this.action('heightMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._heightMeasurementData.id
+  }
+
+  get userId () {
+    return this._heightMeasurementData.userId
   }
 
   get source () {

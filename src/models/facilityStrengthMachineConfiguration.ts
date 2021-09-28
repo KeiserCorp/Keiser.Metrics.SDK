@@ -43,6 +43,10 @@ export class FacilityStrengthMachineConfiguration extends SubscribableModel {
     return this
   }
 
+  ejectData () {
+    return { ...this._facilityStrengthMachineConfigurationData }
+  }
+
   get timeZone () {
     return this._facilityStrengthMachineConfigurationData.timeZone
   }
