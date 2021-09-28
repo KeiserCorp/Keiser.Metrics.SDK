@@ -9,6 +9,7 @@ export enum MSeriesFtpMeasurementSorting {
 
 export interface MSeriesFtpMeasurementData {
   id: number
+  userId: number
   source: string | null
   takenAt: string
   machineType: string
@@ -51,17 +52,21 @@ export class MSeriesFtpMeasurement extends Model {
   }
 
   async reload () {
-    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:show', { id: this.id }) as MSeriesFtpMeasurementResponse
+    const { mSeriesFtpMeasurement } = await this.action('mSeriesFtpMeasurement:show', { id: this.id, userId: this.userId }) as MSeriesFtpMeasurementResponse
     this.setMSeriesFtpMeasurement(mSeriesFtpMeasurement)
     return this
   }
 
   async delete () {
-    await this.action('mSeriesFtpMeasurement:delete', { id: this.id })
+    await this.action('mSeriesFtpMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._mSeriesFtpMeasurement.id
+  }
+
+  get userId () {
+    return this._mSeriesFtpMeasurement.userId
   }
 
   get source () {

@@ -100,7 +100,7 @@ export abstract class BaseFacilityRelationshipRequest extends SubscribableModel 
 
 export class FacilityRelationshipRequest extends BaseFacilityRelationshipRequest {
   protected get subscribeParameters () {
-    return { model: 'facilityRelationshipRequest', id: this.id, actionOverride: 'facilityRelationshipRequest:userSubscribe' }
+    return { model: 'facilityRelationshipRequest', id: this.id, userId: this.userId, actionOverride: 'facilityRelationshipRequest:userSubscribe' }
   }
 
   async approve () {
@@ -112,7 +112,7 @@ export class FacilityRelationshipRequest extends BaseFacilityRelationshipRequest
   }
 
   private async update (params: { approval: boolean }) {
-    const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userUpdate', { ...params, id: this.id }) as FacilityRelationshipRequestResponse
+    const { facilityRelationshipRequest } = await this.action('facilityRelationshipRequest:userUpdate', { ...params, id: this.id, userId: this.userId }) as FacilityRelationshipRequestResponse
     this.setFacilityRelationshipRequestData(facilityRelationshipRequest)
     return this
   }
@@ -144,7 +144,7 @@ export class FacilityRelationshipRequests extends ModelList<FacilityRelationship
   }
 
   protected get subscribeParameters () {
-    return { parentModel: 'user', parentId: this.meta.userId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:userSubscribe' }
+    return { parentModel: 'user', parentId: this.meta.userId, model: 'facilityRelationshipRequest', actionOverride: 'facilityRelationshipRequest:userSubscribe' }
   }
 }
 
@@ -154,6 +154,6 @@ export class PrivilegedFacilityRelationshipRequests extends ModelList<Privileged
   }
 
   protected get subscribeParameters () {
-    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:facilitySubscribe' }
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationshipRequest', actionOverride: 'facilityRelationshipRequest:facilitySubscribe' }
   }
 }

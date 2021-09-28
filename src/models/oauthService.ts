@@ -16,6 +16,7 @@ export enum OAuthProviders {
 
 export interface OAuthServiceData {
   id: number
+  userId: number
   service: OAuthProviders
   remoteUserId: string
   lastTransaction: string | null
@@ -67,6 +68,10 @@ export class OAuthService extends Model {
 
   get id () {
     return this._oauthServiceData.id
+  }
+
+  get userId () {
+    return this._oauthServiceData.userId
   }
 
   get service () {

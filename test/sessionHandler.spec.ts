@@ -3,11 +3,11 @@ import { expect } from 'chai'
 import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { User } from '../src/models/user'
-import { UserSession } from '../src/session'
+import { ModelChangeEvent, UserSession } from '../src/session'
 import { randomCharacterSequence, randomEmailAddress } from './utils/dummy'
 import { createUserSession, getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
-describe.only('Session Handler (Facility)', function () {
+describe('Session Handler (Facility)', function () {
   let metricsInstance: Metrics
   let privilegedFacility: PrivilegedFacility
   let newUser: User
@@ -32,14 +32,54 @@ describe.only('Session Handler (Facility)', function () {
     metricsInstance?.dispose()
   })
 
-  it('cannot reload height measurement', async function () {
+  it('can access email address', async function () {
+    const emailAddress = (await newUser.getEmailAddresses())[0]
+
+    expect(typeof emailAddress).to.equal('object')
+    expect(emailAddress.userId).to.equal(newUser.id)
+
+    await emailAddress.reload()
+  })
+
+  it('can access height measurement', async function () {
+    this.timeout(10000)
+    let heightMeasurements = await newUser.getHeightMeasurements()
+
+    const heightMeasurementChangeEventPromise = new Promise<ModelChangeEvent>(resolve => {
+      heightMeasurements.onModelChangeEvent.one(e => resolve(e))
+    })
+
     const heightMeasurement = await newUserSession.user.createHeightMeasurement({ source: 'test', takenAt: new Date(), metricHeight: 100 })
+
+    const heightMeasurementChangeEvent = await heightMeasurementChangeEventPromise
 
     expect(typeof heightMeasurement).to.equal('object')
     expect(heightMeasurement.metricHeight).to.equal(100)
+    expect(heightMeasurementChangeEvent.id).to.equal(heightMeasurement.id)
 
-    const heightMeasurements = await newUser.getHeightMeasurements()
+    heightMeasurements = await newUser.getHeightMeasurements()
     expect(heightMeasurements.length).to.equal(1)
     await heightMeasurements[0].reload()
+  })
+
+  it('can access weight measurement', async function () {
+    this.timeout(10000)
+    let weightMeasurements = await newUser.getWeightMeasurements()
+
+    const weightMeasurementChangeEventPromise = new Promise<ModelChangeEvent>(resolve => {
+      weightMeasurements.onModelChangeEvent.one(e => resolve(e))
+    })
+
+    const weightMeasurement = await newUserSession.user.createWeightMeasurement({ source: 'test', takenAt: new Date(), metricWeight: 100 })
+
+    const weightMeasurementChangeEvent = await weightMeasurementChangeEventPromise
+
+    expect(typeof weightMeasurement).to.equal('object')
+    expect(weightMeasurement.metricWeight).to.equal(100)
+    expect(weightMeasurementChangeEvent.id).to.equal(weightMeasurement.id)
+
+    weightMeasurements = await newUser.getWeightMeasurements()
+    expect(weightMeasurements.length).to.equal(1)
+    await weightMeasurements[0].reload()
   })
 })

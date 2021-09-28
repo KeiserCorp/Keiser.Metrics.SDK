@@ -124,7 +124,7 @@ export class User extends SubscribableModel {
   }
 
   async delete () {
-    if (!this._isSessionUser && this.id !== this._userData.id) {
+    if (!this._isSessionUser) {
       throw new ClientSideActionPrevented({ explanation: 'Cannot delete other user without admin privileges' })
     }
 
@@ -137,6 +137,10 @@ export class User extends SubscribableModel {
 
   get id () {
     return this._userData.id
+  }
+
+  async fulfillEmailValidation (token: string) {
+    await this.action('emailAddress:validationFulfillment', { validationToken: token })
   }
 
   async createEmailAddress (params: { email: string }) {
@@ -164,11 +168,6 @@ export class User extends SubscribableModel {
 
   eagerOAuthServices () {
     return typeof this._userData.oauthServices !== 'undefined' ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
-  }
-
-  /** @deprecated Remove once facility moves to an SDK greater than v2.0.2 */
-  async createOAuthService (params: { service: OAuthProviders, redirect: string }) {
-    return (await this.initiateOAuthService(params)).redirectUrl
   }
 
   async initiateOAuthService (params: { service: OAuthProviders, redirect: string }) {
@@ -333,8 +332,8 @@ export class User extends SubscribableModel {
     return new MSeriesFtpMeasurements(mSeriesFtpMeasurements, mSeriesFtpMeasurementsMeta, this.sessionHandler)
   }
 
-  async createMSeriesChallenge (params: { userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number }) {
-    const { mSeriesChallenge } = await this.action('mSeriesChallenge:create', { ...params, isPublic: false }) as MSeriesChallengeResponse
+  async createMSeriesChallenge (params: { userLimit: number, name: string, challengeType: MSeriesChallengeType, focus: MSeriesChallengeFocus, startAt?: Date, endAt?: Date, goal?: number, isPublic?: boolean }) {
+    const { mSeriesChallenge } = await this.action('mSeriesChallenge:create', { ...params }) as MSeriesChallengeResponse
     return new PrivilegedMSeriesChallenge(mSeriesChallenge, this.sessionHandler)
   }
 

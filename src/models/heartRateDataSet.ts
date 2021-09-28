@@ -13,6 +13,7 @@ export enum HeartRateDataSetSorting {
 
 export interface HeartRateDataSetData {
   id: number
+  userId: number
   source: string | null
   startedAt: string
   endedAt: string
@@ -64,21 +65,25 @@ export class HeartRateDataSet extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'heartRateDataSet', id: this.id }
+    return { model: 'heartRateDataSet', id: this.id, userId: this.userId }
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
-    const { heartRateDataSet } = await this.action('heartRateDataSet:show', { id: this.id, graph: options.graphResolution }) as HeartRateDataSetResponse
+    const { heartRateDataSet } = await this.action('heartRateDataSet:show', { id: this.id, userId: this.userId, graph: options.graphResolution }) as HeartRateDataSetResponse
     this.setHeartRateDataSet(heartRateDataSet)
     return this
   }
 
   async delete () {
-    await this.action('heartRateDataSet:delete', { id: this.id })
+    await this.action('heartRateDataSet:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._heartRateDataSetData.id
+  }
+
+  get userId () {
+    return this._heartRateDataSetData.userId
   }
 
   get source () {

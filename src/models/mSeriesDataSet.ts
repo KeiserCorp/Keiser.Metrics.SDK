@@ -12,6 +12,7 @@ export enum MSeriesDataSetSorting {
 
 export interface MSeriesDataSetData {
   id: number
+  userId: number
   source: string | null
   startedAt: string
   endedAt: string
@@ -80,21 +81,25 @@ export class MSeriesDataSet extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'mSeriesDataSet', id: this.id }
+    return { model: 'mSeriesDataSet', id: this.id, userId: this.userId }
   }
 
   async reload (options: { graphResolution?: number } = { graphResolution: 200 }) {
-    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { id: this.id, graph: options.graphResolution }) as MSeriesDataSetResponse
+    const { mSeriesDataSet } = await this.action('mSeriesDataSet:show', { id: this.id, userId: this.userId, graph: options.graphResolution }) as MSeriesDataSetResponse
     this.setMSeriesDataSet(mSeriesDataSet)
     return this
   }
 
   async delete () {
-    await this.action('mSeriesDataSet:delete', { id: this.id })
+    await this.action('mSeriesDataSet:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._mSeriesDataSetData.id
+  }
+
+  get userId () {
+    return this._mSeriesDataSetData.userId
   }
 
   get source () {

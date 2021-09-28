@@ -24,6 +24,7 @@ export enum SessionRequireExtendedDataType {
 
 export interface SessionData {
   id: number
+  userId: number
   echipId: string | null
   hash: string
   startedAt: string
@@ -101,6 +102,10 @@ export class StaticSession {
 
   get id () {
     return this._sessionData.id
+  }
+
+  get userId () {
+    return this._sessionData.userId
   }
 
   get echipId () {
@@ -182,27 +187,31 @@ export class Session extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'session', id: this.id }
+    return { model: 'session', id: this.id, userId: this.userId }
   }
 
   async end () {
-    const { session } = await this.action('session:end', { id: this.id }) as SessionResponse
+    const { session } = await this.action('session:end', { id: this.id, userId: this.userId }) as SessionResponse
     this.setSessionData(session)
     return this
   }
 
   async reload () {
-    const { session } = await this.action('session:show', { id: this.id }) as SessionResponse
+    const { session } = await this.action('session:show', { id: this.id, userId: this.userId }) as SessionResponse
     this.setSessionData(session)
     return this
   }
 
   async delete () {
-    await this.action('session:delete', { id: this.id })
+    await this.action('session:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._sessionData.id
+  }
+
+  get userId () {
+    return this._sessionData.userId
   }
 
   get echipId () {

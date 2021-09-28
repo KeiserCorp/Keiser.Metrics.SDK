@@ -113,7 +113,7 @@ export abstract class FacilityRelationship extends SubscribableModel {
   }
 
   async getFingerprint () {
-    const { fingerprint } = await this.action('fingerprint:show', { userId: this.userId, facilityRelationshipId: this.id }) as FingerprintResponse
+    const { fingerprint } = await this.action('fingerprint:show', { facilityRelationshipId: this.id }) as FingerprintResponse
     return new Fingerprint(fingerprint, this.sessionHandler)
   }
 
@@ -145,7 +145,7 @@ export class UserFacilityEmployeeRelationships extends SubscribableModelList<Use
 
 export class UserFacilityRelationship extends FacilityRelationship {
   protected get subscribeParameters () {
-    return { model: 'facilityRelationship', id: this.id, actionOverride: 'facilityRelationship:userSubscribe' }
+    return { model: 'facilityRelationship', id: this.id, userId: this.userId, actionOverride: 'facilityRelationship:userSubscribe' }
   }
 
   async reload () {

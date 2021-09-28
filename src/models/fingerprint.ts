@@ -32,23 +32,23 @@ export class Fingerprint extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'fingerprint', id: this.facilityRelationshipId }
+    return { model: 'fingerprint', id: this.facilityRelationshipId, facilityRelationshipId: this.facilityRelationshipId }
   }
 
   async reload () {
-    const { fingerprint } = await this.action('fingerprint:show', { facilityRelationshipId: this._fingerprintData.facilityRelationshipId }) as FingerprintResponse
+    const { fingerprint } = await this.action('fingerprint:show', { facilityRelationshipId: this.facilityRelationshipId }) as FingerprintResponse
     this.setFingerprintData(fingerprint)
     return this
   }
 
   async update (params: { template: Uint8Array, fingerprintReaderModel: FingerprintReaderModel }) {
-    const { fingerprint } = await this.action('fingerprint:update', { fingerprintReaderModel: params.fingerprintReaderModel, template: JSON.stringify(Array.from(params.template)), facilityRelationshipId: this._fingerprintData.facilityRelationshipId }) as FingerprintResponse
+    const { fingerprint } = await this.action('fingerprint:update', { fingerprintReaderModel: params.fingerprintReaderModel, template: JSON.stringify(Array.from(params.template)), facilityRelationshipId: this.facilityRelationshipId }) as FingerprintResponse
     this.setFingerprintData(fingerprint)
     return this
   }
 
   async delete () {
-    await this.action('fingerprint:delete', { facilityRelationshipId: this._fingerprintData.facilityRelationshipId })
+    await this.action('fingerprint:delete', { facilityRelationshipId: this.facilityRelationshipId })
   }
 
   get facilityRelationshipId () {

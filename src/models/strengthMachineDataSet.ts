@@ -25,6 +25,7 @@ export enum StrengthMachineDataSetSorting {
 
 export interface StrengthMachineDataSetData {
   id: number
+  userId: number
   updatedAt: string
   version: string
   serial: string
@@ -102,21 +103,25 @@ export class StrengthMachineDataSet extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'strengthMachineDataSet', id: this.id }
+    return { model: 'strengthMachineDataSet', id: this.id, userId: this.userId }
   }
 
   async reload () {
-    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:show', { id: this.id }) as StrengthMachineDataSetResponse
+    const { strengthMachineDataSet } = await this.action('strengthMachineDataSet:show', { id: this.id, userId: this.userId }) as StrengthMachineDataSetResponse
     this.setStrengthMachineDataSet(strengthMachineDataSet)
     return this
   }
 
   async delete () {
-    await this.action('strengthMachineDataSet:delete', { id: this.id })
+    await this.action('strengthMachineDataSet:delete', { id: this.id, userId: this.userId })
   }
 
   get id () {
     return this._strengthMachineDataSetData.id
+  }
+
+  get userId () {
+    return this._strengthMachineDataSetData.userId
   }
 
   get updatedAt () {
