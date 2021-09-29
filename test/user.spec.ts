@@ -4,6 +4,7 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, BlacklistTokenError, UnknownEntityError } from '../src/error'
 import { User } from '../src/models/user'
 import { ModelChangeEvent } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { randomLetterSequence } from './utils/dummy'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
@@ -40,6 +41,9 @@ describe('User', function () {
   })
 
   it('can subscribe to associated model changes', async function () {
+    if (!IsBrowser) {
+      this.skip()
+    }
     this.timeout(10000)
 
     const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {

@@ -101,7 +101,7 @@ export default class Metrics {
 
   async authenticateWithKioskToken (params: { kioskToken: string }) {
     await this._connection.action('facilityKioskToken:check', { authorization: params.kioskToken })
-    return new KioskSession({ accessToken: params.kioskToken }, this._connection)
+    return new KioskSession({ kioskToken: params.kioskToken }, this._connection)
   }
 
   async authenticateWithMachineToken (params: { machineToken: string, strengthMachineIdentifier: StrengthMachineIdentifier }) {

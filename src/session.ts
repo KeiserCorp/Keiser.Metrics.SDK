@@ -354,16 +354,27 @@ export class UserSessionHandler extends BaseSessionHandler {
 }
 
 export class KioskSessionHandler extends BaseSessionHandler {
-  constructor (connection: MetricsConnection, { accessToken }: { accessToken: string }) {
-    super(connection, { accessToken }, false)
+  private readonly _kioskToken: string
+
+  constructor (connection: MetricsConnection, { kioskToken }: { kioskToken: string }) {
+    super(connection, { accessToken: '' }, false)
+    this._kioskToken = kioskToken
+  }
+
+  get kioskToken () {
+    return this._kioskToken
   }
 
   get decodedAccessToken () {
-    return DecodeJWT(this.accessToken) as KioskToken
+    return DecodeJWT(this.kioskToken) as KioskToken
+  }
+
+  get decodedKioskToken () {
+    return DecodeJWT(this.kioskToken) as KioskToken
   }
 
   async logout () {
-    const authParams = { authorization: this.accessToken }
+    const authParams = { authorization: this.kioskToken }
     await this._connection.action('facilityKioskToken:delete', authParams)
     this.close()
   }
@@ -372,20 +383,16 @@ export class KioskSessionHandler extends BaseSessionHandler {
 export class KioskSession {
   private readonly _sessionHandler: KioskSessionHandler
 
-  constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
-    this._sessionHandler = new KioskSessionHandler(connection, { accessToken })
+  constructor ({ kioskToken }: { kioskToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new KioskSessionHandler(connection, { kioskToken })
   }
 
   get sessionHandler () {
     return this._sessionHandler
   }
 
-  get accessToken () {
-    return this._sessionHandler.accessToken
-  }
-
-  get onAccessTokenChangeEvent () {
-    return this._sessionHandler.onAccessTokenChangeEvent
+  get kioskToken () {
+    return this._sessionHandler.kioskToken
   }
 
   close () {
@@ -397,7 +404,7 @@ export class KioskSession {
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
+    const authParams = { authorization: this.sessionHandler.kioskToken, ...params }
     const response = await this.sessionHandler.connection.action(action, authParams)
     return response
   }
