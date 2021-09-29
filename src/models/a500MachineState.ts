@@ -1,11 +1,12 @@
 import { ForceUnit } from '../constants'
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface A500MachineStateData {
   forceUnit: ForceUnit
-  primaryFocus: string
-  secondaryFocus: string
+  primaryFocus: StrengthMachineFocusableAttribute
+  secondaryFocus: StrengthMachineFocusableAttribute
 }
 
 export interface A500MachineStateResponse extends AuthenticatedResponse {
