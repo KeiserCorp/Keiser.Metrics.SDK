@@ -14,6 +14,7 @@ import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse } fr
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
+import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './models/facilityRelationship'
 import { FacilityStrengthMachine, FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './models/facilityStrengthMachineConfiguration'
 import { GlobalAccessControlData } from './models/globalAccessControl'
@@ -373,6 +374,12 @@ export class KioskSessionHandler extends BaseSessionHandler {
     return DecodeJWT(this.kioskToken) as KioskToken
   }
 
+  async action (action: string, params: Object = { }) {
+    const authParams = { authorization: this.kioskToken, ...params }
+    const response = await this.connection.action(action, authParams) as AuthenticatedResponse
+    return response
+  }
+
   async logout () {
     const authParams = { authorization: this.kioskToken }
     await this._connection.action('facilityKioskToken:delete', authParams)
@@ -422,6 +429,16 @@ export class KioskSession {
   async sessionEnd (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new Session(session, this.sessionHandler)
+  }
+
+  async getMemberRelationship (params: { id: number }) {
+    const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
+    return new FacilityUserMemberRelationship(facilityRelationship, this.sessionHandler)
+  }
+
+  async getMemberRelationships (options: { name?: string, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
+    return new FacilityUserMemberRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 }
 
