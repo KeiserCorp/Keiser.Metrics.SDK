@@ -11,6 +11,13 @@ export enum StrengthMachineLine {
   A500 = 'a500'
 }
 
+export enum StrengthMachineFocusableAttribute {
+  Power = 'power',
+  Force = 'force',
+  Velocity = 'velocity',
+  RangeOfMotion = 'rom'
+}
+
 export enum StrengthMachineSorting {
   ID = 'id',
   Name = 'name',
