@@ -1,10 +1,10 @@
-import { ForceUnit } from '../constants'
+import { ForceUnit, TimeZone } from '../constants'
 import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export interface FacilityStrengthMachineConfigurationData {
   facilityId: number
-  timeZone: string
+  timeZone: TimeZone
   forceUnit: ForceUnit
   primaryFocus: string
   secondaryFocus: string
@@ -63,6 +63,10 @@ export class FacilityStrengthMachineConfiguration extends SubscribableModel {
     return this._facilityStrengthMachineConfigurationData.secondaryFocus
   }
 
+  /**
+   * @description Parses to a `Intl.Locale` object
+   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale
+   */
   get locale () {
     return this._facilityStrengthMachineConfigurationData.locale
   }
