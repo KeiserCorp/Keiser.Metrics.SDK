@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionErrorProperties, BlacklistTokenError } from '../src/error'
+import { ActionErrorProperties, UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
 import { FacilityUserSession, KioskSession } from '../src/session'
@@ -73,16 +73,16 @@ describe('Facility Kiosk Token', function () {
 
     expect(typeof kioskSession).to.not.equal('undefined')
     expect(typeof kioskSession.sessionHandler).to.not.equal('undefined')
-    expect(typeof kioskSession.sessionHandler.kioskToken).to.equal('string')
+    expect(typeof kioskSession.sessionHandler.accessToken).to.equal('string')
   })
 
   it('can restore kiosk session from token', async function () {
-    const token = kioskSession.sessionHandler.kioskToken
+    const token = kioskSession.sessionHandler.accessToken
     const restoredKioskSession = await metricsInstance.authenticateWithKioskToken({ kioskToken: token })
 
     expect(typeof restoredKioskSession).to.not.equal('undefined')
     expect(typeof restoredKioskSession.sessionHandler).to.not.equal('undefined')
-    expect(restoredKioskSession.sessionHandler.kioskToken).to.equal(token)
+    expect(restoredKioskSession.sessionHandler.accessToken).to.equal(token)
   })
 
   it('can use kiosk session to login user', async function () {
@@ -142,6 +142,6 @@ describe('Facility Kiosk Token', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError?.code).to.equal(BlacklistTokenError.code)
+    expect(extError?.code).to.equal(UnauthorizedTokenError.code)
   })
 })

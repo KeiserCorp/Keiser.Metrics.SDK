@@ -355,33 +355,21 @@ export class UserSessionHandler extends BaseSessionHandler {
 }
 
 export class KioskSessionHandler extends BaseSessionHandler {
-  private readonly _kioskToken: string
-
-  constructor (connection: MetricsConnection, { kioskToken }: { kioskToken: string }) {
-    super(connection, { accessToken: '' }, false)
-    this._kioskToken = kioskToken
-  }
-
-  get kioskToken () {
-    return this._kioskToken
+  constructor (connection: MetricsConnection, { accessToken }: { accessToken: string }) {
+    super(connection, { accessToken }, false)
   }
 
   get decodedAccessToken () {
-    return DecodeJWT(this.kioskToken) as KioskToken
-  }
-
-  get decodedKioskToken () {
-    return DecodeJWT(this.kioskToken) as KioskToken
+    return DecodeJWT(this.accessToken) as KioskToken
   }
 
   async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.kioskToken, ...params }
+    const authParams = { authorization: this.accessToken, ...params }
     return await this.connection.action(action, authParams) as any
   }
 
   async logout () {
-    const authParams = { authorization: this.kioskToken }
-    await this._connection.action('facilityKioskToken:delete', authParams)
+    await this.action('facilityKioskToken:delete')
     this.close()
   }
 }
@@ -389,8 +377,8 @@ export class KioskSessionHandler extends BaseSessionHandler {
 export class KioskSession {
   private readonly _sessionHandler: KioskSessionHandler
 
-  constructor ({ kioskToken }: { kioskToken: string }, connection: MetricsConnection) {
-    this._sessionHandler = new KioskSessionHandler(connection, { kioskToken })
+  constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
+    this._sessionHandler = new KioskSessionHandler(connection, { accessToken })
   }
 
   get sessionHandler () {
@@ -398,7 +386,7 @@ export class KioskSession {
   }
 
   get kioskToken () {
-    return this._sessionHandler.kioskToken
+    return this._sessionHandler.accessToken
   }
 
   close () {
