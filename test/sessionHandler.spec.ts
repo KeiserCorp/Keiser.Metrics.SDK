@@ -4,6 +4,7 @@ import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { User } from '../src/models/user'
 import { ModelChangeEvent, UserSession } from '../src/session'
+import { IsBrowser } from './utils/constants'
 import { randomCharacterSequence, randomEmailAddress } from './utils/dummy'
 import { createUserSession, getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
@@ -50,12 +51,13 @@ describe('Session Handler (Facility)', function () {
     })
 
     const heightMeasurement = await newUserSession.user.createHeightMeasurement({ source: 'test', takenAt: new Date(), metricHeight: 100 })
-
-    const heightMeasurementChangeEvent = await heightMeasurementChangeEventPromise
-
     expect(typeof heightMeasurement).to.equal('object')
     expect(heightMeasurement.metricHeight).to.equal(100)
-    expect(heightMeasurementChangeEvent.id).to.equal(heightMeasurement.id)
+
+    if (IsBrowser) {
+      const heightMeasurementChangeEvent = await heightMeasurementChangeEventPromise
+      expect(heightMeasurementChangeEvent.id).to.equal(heightMeasurement.id)
+    }
 
     heightMeasurements = await newUser.getHeightMeasurements()
     expect(heightMeasurements.length).to.equal(1)
@@ -71,12 +73,13 @@ describe('Session Handler (Facility)', function () {
     })
 
     const weightMeasurement = await newUserSession.user.createWeightMeasurement({ source: 'test', takenAt: new Date(), metricWeight: 100 })
-
-    const weightMeasurementChangeEvent = await weightMeasurementChangeEventPromise
-
     expect(typeof weightMeasurement).to.equal('object')
     expect(weightMeasurement.metricWeight).to.equal(100)
-    expect(weightMeasurementChangeEvent.id).to.equal(weightMeasurement.id)
+
+    if (IsBrowser) {
+      const weightMeasurementChangeEvent = await weightMeasurementChangeEventPromise
+      expect(weightMeasurementChangeEvent.id).to.equal(weightMeasurement.id)
+    }
 
     weightMeasurements = await newUser.getWeightMeasurements()
     expect(weightMeasurements.length).to.equal(1)
