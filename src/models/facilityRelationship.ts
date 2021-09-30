@@ -183,6 +183,16 @@ export class UserFacilityEmployeeRelationship extends UserFacilityRelationship {
   }
 }
 
+export class FacilityUserRelationships extends SubscribableModelList<FacilityUserRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
+  constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(FacilityUserRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)
+  }
+
+  protected get subscribeParameters () {
+    return { parentModel: 'facility', parentId: this.meta.facilityId, model: 'facilityRelationship', actionOverride: 'facilityRelationship:facilitySubscribe' }
+  }
+}
+
 export class FacilityUserMemberRelationships extends SubscribableModelList<FacilityUserMemberRelationship, FacilityRelationshipData, FacilityUserRelationshipListResponseMeta> {
   constructor (facilityRelationships: FacilityRelationshipData[], facilityRelationshipsMeta: FacilityUserRelationshipListResponseMeta, sessionHandler: SessionHandler) {
     super(FacilityUserMemberRelationship, facilityRelationships, facilityRelationshipsMeta, sessionHandler)

@@ -5,7 +5,7 @@ import { FacilityAccessControl, FacilityAccessControlResponse } from './facility
 import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
 import { FacilityLicenseData } from './facilityLicense'
 import { FacilityProfile, FacilityProfileData, PrivilegedFacilityProfile } from './facilityProfile'
-import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './facilityRelationship'
+import { FacilityEmployeeRole, FacilityRelationshipResponse, FacilityUserEmployeeRelationship, FacilityUserEmployeeRelationships, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestResponse, PrivilegedFacilityRelationshipRequest, PrivilegedFacilityRelationshipRequestListResponse, PrivilegedFacilityRelationshipRequests, PrivilegedFacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { FacilityStrengthMachine, FacilityStrengthMachineBulkCreateResponse, FacilityStrengthMachineInitializerOTPTokenResponse, FacilityStrengthMachineInitializerTokenResponse, FacilityStrengthMachineListResponse, FacilityStrengthMachineResponse, FacilityStrengthMachines, FacilityStrengthMachineSorting } from './facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './facilityStrengthMachineConfiguration'
@@ -134,6 +134,11 @@ export class PrivilegedFacility extends Facility {
   async getRelationship (params: { id: number }) {
     const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
     return new FacilityUserRelationship(facilityRelationship, this.sessionHandler)
+  }
+
+  async getRelationships (options: { name?: string, member?: boolean, employee?: boolean, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
   async getMemberRelationship (params: { id: number }) {

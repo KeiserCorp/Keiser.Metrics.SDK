@@ -14,7 +14,7 @@ import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse } fr
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
-import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationshipListResponse, FacilityUserRelationshipSorting } from './models/facilityRelationship'
+import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './models/facilityRelationship'
 import { FacilityStrengthMachine, FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './models/facilityStrengthMachineConfiguration'
 import { GlobalAccessControlData } from './models/globalAccessControl'
@@ -376,8 +376,7 @@ export class KioskSessionHandler extends BaseSessionHandler {
 
   async action (action: string, params: Object = { }) {
     const authParams = { authorization: this.kioskToken, ...params }
-    const response = await this.connection.action(action, authParams) as AuthenticatedResponse
-    return response
+    return await this.connection.action(action, authParams) as any
   }
 
   async logout () {
@@ -410,10 +409,8 @@ export class KioskSession {
     await this._sessionHandler.logout()
   }
 
-  async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.kioskToken, ...params }
-    const response = await this.sessionHandler.connection.action(action, authParams)
-    return response
+  private async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 
   async userLogin (params: { primaryIdentification: string | number, secondaryIdentification?: string | number }) {
@@ -429,6 +426,16 @@ export class KioskSession {
   async sessionEnd (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new Session(session, this.sessionHandler)
+  }
+
+  async getRelationship (params: { id: number }) {
+    const { facilityRelationship } = await this.action('facilityRelationship:facilityShow', { ...params }) as FacilityRelationshipResponse
+    return new FacilityUserRelationship(facilityRelationship, this.sessionHandler)
+  }
+
+  async getRelationships (options: { name?: string, member?: boolean, employee?: boolean, memberIdentifier?: string, includeSession?: boolean, sort?: FacilityUserRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+    const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:facilityList', { ...options, member: true }) as FacilityUserRelationshipListResponse
+    return new FacilityUserRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
   async getMemberRelationship (params: { id: number }) {
@@ -449,6 +456,11 @@ export class StrengthMachineSessionHandler extends BaseSessionHandler {
 
   get decodedAccessToken () {
     return DecodeJWT(this.accessToken) as StrengthMachineToken
+  }
+
+  async action (action: string, params: Object = { }) {
+    const authParams = { authorization: this.accessToken, ...params }
+    return await this.connection.action(action, authParams) as any
   }
 
   async logout () {
@@ -481,10 +493,8 @@ export class StrengthMachineSession {
     this._sessionHandler.close()
   }
 
-  async action (action: string, params: Object = { }) {
-    const authParams = { authorization: this.sessionHandler.accessToken, ...params }
-    const response = await this.sessionHandler.connection.action(action, authParams) as AuthenticatedResponse
-    return response
+  private async action (action: string, params: Object = { }) {
+    return await this.sessionHandler.action(action, params)
   }
 
   facilityStrengthMachine () {
