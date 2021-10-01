@@ -1,5 +1,5 @@
 import { Units, XOR } from '../constants'
-import { ListMeta, Model, ModelList } from '../model'
+import { ListMeta, Model, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
@@ -52,12 +52,16 @@ export class Facilities extends ModelList<Facility, FacilityData, FacilityListRe
   }
 }
 
-export class Facility<SessionHandlerType extends SessionHandler = SessionHandler> extends Model<SessionHandlerType> {
+export class Facility<SessionHandlerType extends SessionHandler = SessionHandler> extends SubscribableModel<SessionHandlerType> {
   protected _facilityData: FacilityData
 
   constructor (facilityData: FacilityData, sessionHandler: SessionHandlerType) {
     super(sessionHandler)
     this._facilityData = facilityData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'facility', id: this.id }
   }
 
   protected setFacilityData (facilityData: FacilityData) {
