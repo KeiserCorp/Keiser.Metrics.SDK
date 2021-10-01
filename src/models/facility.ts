@@ -1,5 +1,5 @@
 import { Units, XOR } from '../constants'
-import { ListMeta, Model, ModelList, SubscribableModel } from '../model'
+import { ListMeta, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './facilityConfiguration'
