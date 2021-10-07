@@ -8,6 +8,10 @@ export default {
   module: {
     rules: [
       {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader'
+      },
+      {
         test: /\.ts$/,
         loader: 'ts-loader',
         options: {
@@ -23,7 +27,7 @@ export default {
     alias: {
       buffer: 'buffer'
     },
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.ts', '.js']
   },
   devtool: 'inline-source-map',
   devServer: {
