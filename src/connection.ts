@@ -60,7 +60,7 @@ export class MetricsConnection {
   private readonly _requestTimeout: number
   private _socket: WebSocket | null = null
   private _lastMessageId = 0
-  private _checkCallbacksTimeoutInstance: number | null = null
+  private _checkCallbacksTimeoutInstance: NodeJS.Timeout | null = null
   private _socketRetryAttempts: number = 0
   private readonly _callbacks: Map<number, { expiresAt: number | null, callback: (success: any, fail?: any) => void }> = new Map()
   private readonly _retryStrategy = Policy.wrap(
@@ -78,7 +78,7 @@ export class MetricsConnection {
     this._persistConnection = !(options.persistConnection === false)
     this._requestTimeout = options.requestTimeout ?? DEFAULT_REQUEST_TIMEOUT
 
-    if (typeof (window as any) === 'undefined' || typeof window.WebSocket === 'undefined') {
+    if (typeof WebSocket === 'undefined') {
       this._persistConnection = false
     }
     void this.openConnection()
@@ -208,7 +208,7 @@ export class MetricsConnection {
     })
 
     if (!clear) {
-      this._checkCallbacksTimeoutInstance = window.setTimeout(() => this.checkCallbacks(), 100)
+      this._checkCallbacksTimeoutInstance = setTimeout(() => this.checkCallbacks(), 100)
     }
   }
 

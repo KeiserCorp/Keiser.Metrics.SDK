@@ -20,7 +20,8 @@
       "node"
     ],
     "lib": [
-      "dom"
+      "DOM",
+      "WebWorker"
     ]
   },
   "include": [
