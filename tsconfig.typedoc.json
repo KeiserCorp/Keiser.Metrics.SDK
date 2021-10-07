@@ -4,6 +4,9 @@
     "./src/**/*.ts",
     "./types/**/*.d.ts"
   ],
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
   "typedocOptions": {
     "entryPoints": [
       "./src/"
