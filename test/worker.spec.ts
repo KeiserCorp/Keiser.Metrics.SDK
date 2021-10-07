@@ -9,7 +9,7 @@ enum TestActions {
   RUN_TEST = 'runTest'
 }
 
-describe.only('Worker', function () {
+describe('Worker', function () {
   let worker: Worker
 
   before(async function () {
@@ -30,6 +30,22 @@ describe.only('Worker', function () {
   })
 
   it('can open socket in worker', async function () {
-    expect(false).to.equal(true)
+    const responsePromise: Promise<{type: TestActions, result: boolean}> = new Promise(resolve => { worker.onmessage = (e) => resolve(e.data as {type: TestActions, result: boolean}) })
+
+    worker.postMessage(TestActions.CHECK_SOCKET)
+
+    const response = await responsePromise
+    expect(response.type).to.equal(TestActions.CHECK_SOCKET)
+    expect(response.result).to.equal(true)
+  })
+
+  it('can perform actions on socket in worker', async function () {
+    const responsePromise: Promise<{type: TestActions, result: boolean}> = new Promise(resolve => { worker.onmessage = (e) => resolve(e.data as {type: TestActions, result: boolean}) })
+
+    worker.postMessage(TestActions.RUN_TEST)
+
+    const response = await responsePromise
+    expect(response.type).to.equal(TestActions.RUN_TEST)
+    expect(response.result).to.equal(true)
   })
 })
