@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 
+import { ConnectionEvent } from '../src/connection'
 import Metrics from '../src/core'
 import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './utils/constants'
 
@@ -85,9 +86,107 @@ describe.skip('Connection', function () {
       it('can make request to server before connection event', async function () {
         this.timeout(connectionTimeout)
 
+        const metricsInstance = new Metrics({
+          restEndpoint: DevRestEndpoint,
+          socketEndpoint: DevSocketEndpoint,
+          persistConnection: true
+        })
+
         const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
+        metricsInstance.dispose()
+      })
+
+      it('can handle server restart', async function () {
+        this.timeout(30000)
+
+        const metricsInstance = new Metrics({
+          restEndpoint: DevRestEndpoint,
+          socketEndpoint: DevSocketEndpoint,
+          persistConnection: true
+        })
+
+        if (!metricsInstance.socketConnected) {
+          await (new Promise(resolve => {
+            metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
+          }))
+        }
+
+        const socketDisconnectEventPromise: Promise<ConnectionEvent> = new Promise(resolve => {
+          const unsubscribe = metricsInstance.onConnectionChangeEvent.subscribe(e => {
+            if (!e.socketConnection) {
+              unsubscribe()
+              resolve(e)
+            }
+          })
+        })
+
+        const socketReconnectEventPromise: Promise<ConnectionEvent> = new Promise(resolve => {
+          const unsubscribe = metricsInstance.onConnectionChangeEvent.subscribe(e => {
+            if (e.socketConnection) {
+              unsubscribe()
+              resolve(e)
+            }
+          })
+        })
+
+        void metricsInstance.action('dev:serverRestart').catch(() => {})
+
+        const socketDisconnectEvent = await socketDisconnectEventPromise
+        expect(socketDisconnectEvent.socketConnection).to.equal(false)
+
+        const socketReconnectEvent = await socketReconnectEventPromise
+        expect(socketReconnectEvent.socketConnection).to.equal(true)
+
+        const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
+        expect(typeof healthResponse.error).to.equal('undefined')
+        expect(healthResponse.healthy).to.equal(true)
+
+        metricsInstance.dispose()
+      })
+
+      it('can handle server connection close', async function () {
+        this.timeout(10000)
+
+        const metricsInstance = new Metrics({
+          restEndpoint: DevRestEndpoint,
+          socketEndpoint: DevSocketEndpoint,
+          persistConnection: true
+        })
+
+        if (!metricsInstance.socketConnected) {
+          await (new Promise(resolve => {
+            metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
+          }))
+        }
+
+        const socketConnectionEventPromise: Promise<ConnectionEvent> = new Promise(resolve => {
+          metricsInstance.onConnectionChangeEvent.one(event => resolve(event))
+        })
+
+        const socketReconnectEventPromise: Promise<ConnectionEvent> = new Promise(resolve => {
+          const unsubscribe = metricsInstance.onConnectionChangeEvent.subscribe(e => {
+            if (e.socketConnection) {
+              unsubscribe()
+              resolve(e)
+            }
+          })
+        })
+
+        void metricsInstance.action('dev:connectionClose').catch(() => {})
+
+        const socketConnectionEvent = await socketConnectionEventPromise
+        expect(socketConnectionEvent.socketConnection).to.equal(false)
+
+        const socketReconnectEvent = await socketReconnectEventPromise
+        expect(socketReconnectEvent.socketConnection).to.equal(true)
+
+        const healthResponse = await (metricsInstance.action('core:health') as Promise<{ healthy: boolean, error?: any }>)
+        expect(typeof healthResponse.error).to.equal('undefined')
+        expect(healthResponse.healthy).to.equal(true)
+
+        metricsInstance.dispose()
       })
     })
 

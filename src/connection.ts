@@ -154,6 +154,8 @@ export class MetricsConnection {
           if (pingResults !== null) {
             this.pong(pingResults[1])
           }
+        } else if (data === 'primus::server::close') {
+          this._socket?.close()
         }
       } else if (data.context === 'response') {
         this.parseResponse(data)
