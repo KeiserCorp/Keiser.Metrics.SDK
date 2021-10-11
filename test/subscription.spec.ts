@@ -100,7 +100,7 @@ describe('Subscription System', function () {
       })
     })
 
-    void alphaMetricsInstance.action('dev:serverRestart').catch(e => {})
+    void alphaMetricsInstance.action('dev:connectionClose').catch(() => {})
     await socketDisconnectEventPromise
 
     const modelChangeEventPromise: Promise<ModelChangeEvent> = (new Promise(resolve => {
@@ -132,7 +132,7 @@ describe('Subscription System', function () {
       })
     })
 
-    void alphaMetricsInstance.action('dev:serverRestart').catch(e => {})
+    void alphaMetricsInstance.action('dev:connectionClose').catch(() => {})
     await socketReconnectEventPromise
 
     await alphaProfile.update({ name: randomLetterSequence(20) })
