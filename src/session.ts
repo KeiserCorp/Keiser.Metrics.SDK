@@ -12,6 +12,7 @@ import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAlia
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse } from './models/exerciseOrdinalSetAssignment'
 import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityResponse, FacilitySorting, PrivilegedFacility } from './models/facility'
+import { FacilityAccessControl, FacilityAccessControlResponse } from './models/facilityAccessControl'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
 import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './models/facilityRelationship'
@@ -406,6 +407,11 @@ export class KioskSession {
     return new FacilityUserSession(response, this.sessionHandler.connection)
   }
 
+  async fingerprintLogin (params: { facilityRelationshipId: number, hash: string }) {
+    const response = await this.action('facilityKiosk:fingerprintLogin', params) as FacilityUserResponse
+    return new FacilityUserSession(response, this.sessionHandler.connection)
+  }
+
   async sessionUpdate (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionUpdateEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new Session(session, this.sessionHandler)
@@ -414,6 +420,21 @@ export class KioskSession {
   async sessionEnd (params: { echipId: string, echipData: object }) {
     const { session } = await this.action('facilityKiosk:sessionEndEchip', { echipId: params.echipId, echipData: JSON.stringify(params.echipData) }) as KioskSessionResponse
     return new Session(session, this.sessionHandler)
+  }
+
+  async getFacility () {
+    const { facility } = await this.action('facility:show') as FacilityResponse
+    return new Facility(facility, this.sessionHandler)
+  }
+
+  async getAccessControl () {
+    const { facilityAccessControl } = await this.action('facilityAccessControl:show') as FacilityAccessControlResponse
+    return new FacilityAccessControl(facilityAccessControl, this.sessionHandler)
+  }
+
+  async getConfiguration () {
+    const { facilityConfiguration } = await this.action('facilityConfiguration:show') as FacilityConfigurationResponse
+    return new FacilityConfiguration(facilityConfiguration, this.sessionHandler)
   }
 
   async getRelationship (params: { id: number }) {

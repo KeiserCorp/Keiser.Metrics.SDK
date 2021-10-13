@@ -40,23 +40,42 @@ describe('Facility Access Control Kiosk', function () {
   it('can update facility access control kiosk', async function () {
     facilityAccessControlKiosk = await facilityAccessControlKiosk.update({
       kioskModeAllowed: true,
+      allowFingerprint: true,
       primaryIdentification: PrimaryIdentification.MemberIdentifier,
       secondaryIdentification: SecondaryIdentification.MemberSecret
     })
 
     expect(typeof facilityAccessControlKiosk).to.equal('object')
     expect(facilityAccessControlKiosk.kioskModeAllowed).to.equal(true)
+    expect(facilityAccessControlKiosk.allowFingerprint).to.equal(true)
+    expect(facilityAccessControlKiosk.primaryIdentification).to.equal(PrimaryIdentification.MemberIdentifier)
+    expect(facilityAccessControlKiosk.secondaryIdentification).to.equal(SecondaryIdentification.MemberSecret)
+  })
+
+  it('can update facility access control kiosk to disable fingerprint', async function () {
+    facilityAccessControlKiosk = await facilityAccessControlKiosk.update({
+      kioskModeAllowed: true,
+      allowFingerprint: false,
+      primaryIdentification: PrimaryIdentification.MemberIdentifier,
+      secondaryIdentification: SecondaryIdentification.MemberSecret
+    })
+
+    expect(typeof facilityAccessControlKiosk).to.equal('object')
+    expect(facilityAccessControlKiosk.kioskModeAllowed).to.equal(true)
+    expect(facilityAccessControlKiosk.allowFingerprint).to.equal(false)
     expect(facilityAccessControlKiosk.primaryIdentification).to.equal(PrimaryIdentification.MemberIdentifier)
     expect(facilityAccessControlKiosk.secondaryIdentification).to.equal(SecondaryIdentification.MemberSecret)
   })
 
   it('can update facility access control kiosk to disabled', async function () {
     facilityAccessControlKiosk = await facilityAccessControlKiosk.update({
-      kioskModeAllowed: false
+      kioskModeAllowed: false,
+      allowFingerprint: false
     })
 
     expect(typeof facilityAccessControlKiosk).to.equal('object')
     expect(facilityAccessControlKiosk.kioskModeAllowed).to.equal(false)
+    expect(facilityAccessControlKiosk.allowFingerprint).to.equal(false)
     expect(facilityAccessControlKiosk.primaryIdentification).to.equal(PrimaryIdentification.MemberIdentifier)
     expect(facilityAccessControlKiosk.secondaryIdentification).to.equal(SecondaryIdentification.None)
   })
