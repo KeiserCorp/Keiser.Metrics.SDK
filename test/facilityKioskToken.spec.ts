@@ -61,8 +61,8 @@ describe('Facility Kiosk Token', function () {
     const facilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
     if (typeof facilityAccessControlKiosk !== 'undefined') {
       await facilityAccessControlKiosk.update({
-        kioskModeAllowed: true,
-        allowFingerprint: true,
+        isKioskModeAllowed: true,
+        isFingerprintAuthenticationAllowed: true,
         primaryIdentification: PrimaryIdentification.UUID,
         secondaryIdentification: SecondaryIdentification.None
       })
