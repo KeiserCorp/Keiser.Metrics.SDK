@@ -4,8 +4,10 @@ import Metrics from '../src/core'
 import { ActionErrorProperties, UnauthorizedTokenError } from '../src/error'
 import { PrivilegedFacility } from '../src/models/facility'
 import { PrimaryIdentification, SecondaryIdentification } from '../src/models/facilityAccessControlKiosk'
+import { FingerprintReaderModel } from '../src/models/fingerprint'
+import { User } from '../src/models/user'
 import { FacilityUserSession, KioskSession } from '../src/session'
-import { randomEchipId } from './utils/dummy'
+import { randomByte, randomEchipId } from './utils/dummy'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
 
 describe('Facility Kiosk Token', function () {
@@ -43,13 +45,15 @@ describe('Facility Kiosk Token', function () {
   let metricsInstance: Metrics
   let privilegedFacility: PrivilegedFacility
   let kioskSession: KioskSession
+  let user: User
   let facilityUserSession: FacilityUserSession
 
   before(async function () {
     metricsInstance = getMetricsInstance()
     const userSession = await getDemoUserSession(metricsInstance)
+    user = userSession.user
 
-    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    const relationship = (await user.getFacilityEmploymentRelationships())[0]
     privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
     await privilegedFacility.setActive()
 
@@ -57,7 +61,8 @@ describe('Facility Kiosk Token', function () {
     const facilityAccessControlKiosk = accessControl.eagerFacilityAccessControlKiosk()
     if (typeof facilityAccessControlKiosk !== 'undefined') {
       await facilityAccessControlKiosk.update({
-        kioskModeAllowed: true,
+        isKioskModeAllowed: true,
+        isFingerprintAuthenticationAllowed: true,
         primaryIdentification: PrimaryIdentification.UUID,
         secondaryIdentification: SecondaryIdentification.None
       })
@@ -119,6 +124,40 @@ describe('Facility Kiosk Token', function () {
     expect(session.echipId).to.equal(echipId)
     expect(session.startedAt).to.not.equal(null)
     expect(session.endedAt).to.not.equal(null)
+  })
+
+  it('can use kiosk session to get facility', async function () {
+    const facility = await kioskSession.getFacility()
+
+    expect(typeof facility).to.not.equal('undefined')
+    expect(facility.id).to.equal(privilegedFacility.id)
+  })
+
+  it('can use kiosk session to get facility access control', async function () {
+    const accessControl = await kioskSession.getAccessControl()
+
+    expect(typeof accessControl).to.not.equal('undefined')
+  })
+
+  it('can use kiosk session to get facility configuration', async function () {
+    const facilityConfiguration = await kioskSession.getConfiguration()
+
+    expect(typeof facilityConfiguration).to.not.equal('undefined')
+  })
+
+  it('can use kiosk session to login user with fingerprint', async function () {
+    const fingerprintTemplate = (new Uint8Array(498).fill(0)).map(v => randomByte())
+
+    const facilityRelationship = (await user.getFacilityMembershipRelationships())[0]
+    const fingerprint = await facilityRelationship.createFingerprint({ template: fingerprintTemplate, fingerprintReaderModel: FingerprintReaderModel.GT521F5 })
+
+    expect(typeof fingerprint).to.equal('object')
+
+    const userSession = await kioskSession.fingerprintLogin({ facilityRelationshipId: facilityRelationship.id, hash: fingerprint.hash })
+
+    expect(typeof userSession).to.not.equal('undefined')
+    expect(typeof userSession.user).to.not.equal('undefined')
+    expect(userSession.user.id).to.equal(1)
   })
 
   it('can end kiosk session', async function () {

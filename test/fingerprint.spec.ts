@@ -2,6 +2,7 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
+import { PrivilegedFacility } from '../src/models/facility'
 import { Fingerprint, FingerprintReaderModel } from '../src/models/fingerprint'
 import { User } from '../src/models/user'
 import { ModelChangeEvent } from '../src/session'
@@ -20,6 +21,10 @@ describe('Fingerprint', function () {
     metricsInstance = getMetricsInstance()
     const userSession = await getDemoUserSession(metricsInstance)
     user = userSession.user
+
+    const relationship = (await userSession.user.getFacilityEmploymentRelationships())[0]
+    const privilegedFacility = (await relationship.eagerFacility()?.reload()) as PrivilegedFacility
+    await privilegedFacility.setActive()
   })
 
   after(async function () {

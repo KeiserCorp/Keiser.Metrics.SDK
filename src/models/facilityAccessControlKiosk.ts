@@ -17,7 +17,8 @@ export enum SecondaryIdentification {
 }
 
 export interface FacilityAccessControlKioskData {
-  kioskModeAllowed: boolean
+  isKioskModeAllowed: boolean
+  isFingerprintAuthenticationAllowed: boolean
   primaryIdentification: PrimaryIdentification
   secondaryIdentification: SecondaryIdentification
 }
@@ -45,17 +46,26 @@ export class FacilityAccessControlKiosk extends Model {
   }
 
   async update (params: {
-    kioskModeAllowed: boolean
+    isKioskModeAllowed: boolean
+    isFingerprintAuthenticationAllowed: boolean
     primaryIdentification?: PrimaryIdentification
     secondaryIdentification?: SecondaryIdentification
   }) {
-    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', params) as FacilityAccessControlKioskResponse
+    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', { apiVersion: 1, ...params }) as FacilityAccessControlKioskResponse
     this.setFacilityAccessControlKioskData(facilityAccessControlKiosk)
     return this
   }
 
   get kioskModeAllowed () {
-    return this._facilityAccessControlKioskData.kioskModeAllowed
+    return this._facilityAccessControlKioskData.isKioskModeAllowed
+  }
+
+  get isKioskModeAllowed () {
+    return this._facilityAccessControlKioskData.isKioskModeAllowed
+  }
+
+  get isFingerprintAuthenticationAllowed () {
+    return this._facilityAccessControlKioskData.isFingerprintAuthenticationAllowed
   }
 
   get primaryIdentification () {
