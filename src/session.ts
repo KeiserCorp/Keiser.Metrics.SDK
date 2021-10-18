@@ -4,10 +4,14 @@ import { SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
+import { Application, ApplicationListResponse, ApplicationResponse, Applications, ApplicationSorting } from './models/application'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting } from './models/cardioExercise'
 import { CardioExerciseMuscle, CardioExerciseMuscleResponse } from './models/cardioExerciseMuscle'
 import { CardioExerciseVariant, CardioExerciseVariantResponse } from './models/cardioExerciseVariant'
 import { CardioMachine, CardioMachineListResponse, CardioMachineResponse, CardioMachines, CardioMachineSorting } from './models/cardioMachine'
+import { DevelopmentAccount, DevelopmentAccountListResponse, DevelopmentAccountResponse, DevelopmentAccounts, DevelopmentAccountSorting } from './models/developmentAccount'
+import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipListResponse, DevelopmentAccountRelationshipResponse, DevelopmentAccountRelationships, DevelopmentAccountRelationshipSorting } from './models/developmentAccountRelationship'
+import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequestResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './models/developmentAccountRelationshipRequest'
 import { ExerciseAlias, ExerciseAliases, ExerciseAliasListResponse, ExerciseAliasResponse, ExerciseAliasSorting, ExerciseAliasType } from './models/exerciseAlias'
 import { ExerciseOrdinalSet, ExerciseOrdinalSetListResponse, ExerciseOrdinalSetResponse, ExerciseOrdinalSets, ExerciseOrdinalSetSorting } from './models/exerciseOrdinalSet'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentResponse } from './models/exerciseOrdinalSetAssignment'
@@ -702,6 +706,46 @@ export abstract class UserSessionBase<UserType extends User = User> {
   async getFacilities (options: { name?: string, phone?: string, address?: string, city?: string, postcode?: string, state?: string, country?: string, sort?: FacilitySorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilities, facilitiesMeta } = await this.action('facility:list', options) as FacilityListResponse
     return new Facilities(facilities, facilitiesMeta, this.sessionHandler)
+  }
+
+  async getApplication (params: { id: number, developmentAccountId: number }) {
+    const { application } = (await this.action('application:show', { ...params })) as ApplicationResponse
+    return new Application(application, this.sessionHandler)
+  }
+
+  async getApplications (options: { developmentAccountId: number, sort?: ApplicationSorting, ascending?: boolean, limit?: number, offset?: number }) {
+    const { applications, applicationsMeta } = (await this.action('application:list', { ...options })) as ApplicationListResponse
+    return new Applications(applications, applicationsMeta, this.sessionHandler)
+  }
+
+  async getDevelopmentAccount (params: { id: number }) {
+    const { developmentAccount } = await this.action('developmentAccount:show', params) as DevelopmentAccountResponse
+    return new DevelopmentAccount(developmentAccount, this.sessionHandler)
+  }
+
+  async getDevelopmentAccounts (options: { sort?: DevelopmentAccountSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { developmentAccounts, developmentAccountsMeta } = await this.action('developmentAccount:list', { ...options }) as DevelopmentAccountListResponse
+    return new DevelopmentAccounts(developmentAccounts, developmentAccountsMeta, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationship (params: { id: number, developmentAccountId: number }) {
+    const { developmentAccountRelationship } = await this.action('developmentAccountRelationship:show', params) as DevelopmentAccountRelationshipResponse
+    return new DevelopmentAccountRelationship(developmentAccountRelationship, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationships (options: { sort?: DevelopmentAccountRelationshipSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { developmentAccountRelationships, developmentAccountRelationshipsMeta } = await this.action('developmentAccountRelationship:list', { ...options }) as DevelopmentAccountRelationshipListResponse
+    return new DevelopmentAccountRelationships(developmentAccountRelationships, developmentAccountRelationshipsMeta, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationshipRequest (params: { id: number, developmentAccountId: number}) {
+    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', params) as DevelopmentAccountRelationshipRequestResponse
+    return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationshipRequests (options: { developmentAccountId?: number, userId?: number, email?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta } = await this.action('developmentAccountRelationshipRequest:list', options) as DevelopmentAccountRelationshipRequestListResponse
+    return new DevelopmentAccountRelationshipRequests(developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta, this.sessionHandler)
   }
 }
 

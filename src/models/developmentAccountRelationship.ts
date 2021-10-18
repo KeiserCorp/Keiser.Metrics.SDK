@@ -1,88 +1,79 @@
-import { Model } from "../model";
-import { AuthenticatedResponse, SessionHandler } from "../session";
+import { ListMeta, Model, ModelList } from '../model'
+import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum DevelopmentAccountRelationshipSorting {
-  ID = "id",
-  UserId = "userId",
-  Role = "role",
+  ID = 'id',
+  UserId = 'userId',
+  Role = 'role',
 }
 
 export enum DevelopmentAccountRelationshipRole {
-  Owner = "owner",
-  Developer = "developer",
+  Owner = 'owner',
+  Developer = 'developer',
 }
 
 export interface DevelopmentAccountRelationshipData {
-  id: number;
-  userId: number;
-  developmentAccountId: number;
-  role: DevelopmentAccountRelationshipRole;
+  id: number
+  userId: number
+  developmentAccountId: number
+  role: DevelopmentAccountRelationshipRole
 }
 
-export interface DevelopmentAccountRelationshipResponse
-  extends AuthenticatedResponse {
-  developmentAccountRelationship: DevelopmentAccountRelationshipData;
+export interface DevelopmentAccountRelationshipResponse extends AuthenticatedResponse {
+  developmentAccountRelationship: DevelopmentAccountRelationshipData
 }
 
-export interface DevelopmentAccountRelationshipListResponse
-  extends AuthenticatedResponse {
-  developmentAccountRelationships: DevelopmentAccountRelationshipData[];
+export interface DevelopmentAccountRelationshipListResponse extends AuthenticatedResponse {
+  developmentAccountRelationships: DevelopmentAccountRelationshipData[]
+  developmentAccountRelationshipsMeta: DevelopmentAccountRelationshipListResponseMeta
 }
 
-export class developmentAccountRelationship extends Model {
-  protected _developmentAccountRelationshipData: DevelopmentAccountRelationshipData;
+export interface DevelopmentAccountRelationshipListResponseMeta extends ListMeta {
+  role?: string
+  sort: DevelopmentAccountRelationshipSorting
+}
 
-  constructor(
-    developmentAccountRelationshipData: DevelopmentAccountRelationshipData,
-    sessionHandler: SessionHandler
-  ) {
-    super(sessionHandler);
-    this._developmentAccountRelationshipData =
-      developmentAccountRelationshipData;
+export class DevelopmentAccountRelationships extends ModelList<DevelopmentAccountRelationship, DevelopmentAccountRelationshipData, DevelopmentAccountRelationshipListResponseMeta> {
+  constructor (developmentAccountRelationships: DevelopmentAccountRelationshipData[], developmentAccountRelationshipMeta: DevelopmentAccountRelationshipListResponseMeta, sessionHandler: SessionHandler) {
+    super(DevelopmentAccountRelationship, developmentAccountRelationships, developmentAccountRelationshipMeta, sessionHandler)
+  }
+}
+
+export class DevelopmentAccountRelationship extends Model {
+  protected _developmentAccountRelationshipData: DevelopmentAccountRelationshipData
+
+  constructor (developmentAccountRelationshipData: DevelopmentAccountRelationshipData, sessionHandler: SessionHandler) {
+    super(sessionHandler)
+    this._developmentAccountRelationshipData = developmentAccountRelationshipData
   }
 
-  get id() {
-    return this._developmentAccountRelationshipData.id;
+  protected setDevelopmentAccountRelationship (developmentAccountRelationshipData: DevelopmentAccountRelationshipData) {
+    this._developmentAccountRelationshipData = developmentAccountRelationshipData
   }
 
-  get userId() {
-    return this._developmentAccountRelationshipData.userId;
+  get id () {
+    return this._developmentAccountRelationshipData.id
   }
 
-  get developmentAccountId() {
-    return this._developmentAccountRelationshipData.developmentAccountId;
+  get userId () {
+    return this._developmentAccountRelationshipData.userId
   }
 
-  get role() {
-    return this._developmentAccountRelationshipData.role;
+  get developmentAccountId () {
+    return this._developmentAccountRelationshipData.developmentAccountId
   }
 
-  async getDevelopmentAccountRelationship(params: {
-    id: number;
-    developmentAccountId: number;
-  }) {
-    const { developmentAccountRelationship } = (await this.action(
-      "developmentAccountRelationship:show",
-      { ...params }
-    )) as DevelopmentAccountRelationshipResponse;
-    return developmentAccountRelationship;
+  get role () {
+    return this._developmentAccountRelationshipData.role
   }
 
-  async getDevelopmentAccountRelationships(options: {
-    id: number;
-    developmentAccountId: number;
-  }) {
-    const { developmentAccountRelationships } = (await this.action(
-      "developmentAccountRelationship:list",
-      { ...options }
-    )) as DevelopmentAccountRelationshipListResponse;
-    return developmentAccountRelationships;
+  async update (params: { id: number, developmentAccountId: number, role: DevelopmentAccountRelationshipRole }) {
+    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationship:update', { ...params })) as DevelopmentAccountRelationshipResponse
+    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
+    return this
   }
 
-  async delete() {
-    await this.action("developmentAccountRelationship", {
-      id: this.id,
-      developmentAccountId: this.developmentAccountId,
-    });
+  async delete () {
+    await this.action('developmentAccountRelationship', { id: this.id, developmentAccountId: this.developmentAccountId })
   }
 }
