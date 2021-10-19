@@ -68,24 +68,18 @@ export class Application extends Model {
     return this._applicationData.clientId
   }
 
-  async createApplication (params: { developmentAccountId: number, applicationName: string, redirectUrl: string }) {
-    const { application } = (await this.action('application:create', { ...params })) as ApplicationResponse
+  get clientSecret () {
+    return this._applicationData.clientSecret
+  }
+
+  async reload () {
+    const { application } = await this.action('application:show', { id: this.id, developmentAccountId: this.developmentAccountId }) as ApplicationResponse
     this.setApplication(application)
     return this
   }
 
-  async getApplication (params: { id: number, developmentAccountId: number }) {
-    const { application } = (await this.action('application:show', { ...params })) as ApplicationResponse
-    return application
-  }
-
-  async getApplications (options: { developmentAccountId: number, sort?: ApplicationSorting, ascending?: boolean, limit?: number, offset?: number }) {
-    const { applications } = (await this.action('application:list', { ...options })) as ApplicationListResponse
-    return applications
-  }
-
-  async update (options: { id: number, developmentAccountId: number, applicationName?: string, redirectUrl?: string }) {
-    const { application } = (await this.action('application:update', { ...options })) as ApplicationResponse
+  async update (options: { applicationName?: string, redirectUrl?: string }) {
+    const { application } = (await this.action('application:update', { ...options, id: this.id, developmentAccountId: this.developmentAccountId })) as ApplicationResponse
     this.setApplication(application)
     return this
   }

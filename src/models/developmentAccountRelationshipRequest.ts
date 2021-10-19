@@ -77,19 +77,13 @@ export class DevelopmentAccountRelationshipRequest extends Model {
     return this._developmentAccountRelationshipRequestData.code
   }
 
-  async initDevelopmentAccountRelationshipRequest (params: { email: string, developmentAccountId: number, role: DevelopmentAccountRelationshipRole }) {
-    const { developmentAccountRelationshipRequest } = (await this.action('developmentAccountRelationshipRequest:init', { ...params })) as DevelopmentAccountRelationshipRequestResponse
-    this.setDevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest)
-    return this
-  }
-
-  async fulfillDevelopmentAccountRelationshipRequest (params: { code: string, shouldAuthorize: boolean }) {
-    const { developmentAccountRelationshipRequest } = (await this.action('developmentAccountRelationshipRequest:fulfill', { ...params })) as DevelopmentAccountRelationshipRequestResponse
+  async reload () {
+    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', { id: this.id }) as DevelopmentAccountRelationshipRequestResponse
     this.setDevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest)
     return this
   }
 
   async delete () {
-    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id, developmentAccountId: this.developmentAccountId })
+    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id })
   }
 }

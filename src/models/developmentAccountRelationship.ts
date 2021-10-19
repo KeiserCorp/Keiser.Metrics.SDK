@@ -67,8 +67,14 @@ export class DevelopmentAccountRelationship extends Model {
     return this._developmentAccountRelationshipData.role
   }
 
-  async update (params: { id: number, developmentAccountId: number, role: DevelopmentAccountRelationshipRole }) {
-    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationship:update', { ...params })) as DevelopmentAccountRelationshipResponse
+  async reload () {
+    const { developmentAccountRelationship } = await this.action('developmentAccountRelationship:show', { id: this.id }) as DevelopmentAccountRelationshipResponse
+    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
+    return this
+  }
+
+  async update (params: { role: DevelopmentAccountRelationshipRole }) {
+    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationship:update', { ...params, id: this.id, developmentAccountId: this.developmentAccountId })) as DevelopmentAccountRelationshipResponse
     this.setDevelopmentAccountRelationship(developmentAccountRelationship)
     return this
   }
