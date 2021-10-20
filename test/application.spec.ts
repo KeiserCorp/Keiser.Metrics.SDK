@@ -28,6 +28,7 @@ describe('Application', function () {
   })
 
   after(async function () {
+    await createdDevelopmentAccount.delete()
     await user.delete()
     metricsInstance?.dispose()
   })

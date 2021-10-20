@@ -38,6 +38,7 @@ describe('Development Account Relationship', function () {
   })
 
   after(async function () {
+    await createdDevelopmentAccount.delete()
     await user?.delete()
     metricsInstance?.dispose()
   })
@@ -68,7 +69,7 @@ describe('Development Account Relationship', function () {
   })
 
   it('can init a Development Account Relationship Request', async function () {
-    const developmentAccountRelationshipRequest = await createdDevelopmentAccount.initDevelopmentAccountRelationshipRequest({
+    const developmentAccountRelationshipRequest = await createdDevelopmentAccount.initializeDevelopmentAccountRelationshipRequest({
       email: 'testemail@keiser.com',
       role: DevelopmentAccountRelationshipRole.Developer
     })

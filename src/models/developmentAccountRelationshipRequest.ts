@@ -16,7 +16,7 @@ export interface DevelopmentAccountRelationshipRequestData {
   userId: number
   displayEmail: string
   role: DevelopmentAccountRelationshipRole
-  code: string
+  code?: string
 }
 
 export interface DevelopmentAccountRelationshipRequestResponse extends AuthenticatedResponse {

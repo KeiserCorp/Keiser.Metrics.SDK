@@ -87,7 +87,7 @@ export class DevelopmentAccount extends Model {
     return new Applications(applications, applicationsMeta, this.sessionHandler)
   }
 
-  async initDevelopmentAccountRelationshipRequest (params: { email: string, role: DevelopmentAccountRelationshipRole }) {
+  async initializeDevelopmentAccountRelationshipRequest (params: { email: string, role: DevelopmentAccountRelationshipRole }) {
     const { developmentAccountRelationshipRequest } = (await this.action('developmentAccountRelationshipRequest:init', { ...params, developmentAccountId: this.id })) as DevelopmentAccountRelationshipRequestResponse
     return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
   }
@@ -112,7 +112,7 @@ export class DevelopmentAccount extends Model {
     return new DevelopmentAccountRelationships(developmentAccountRelationships, developmentAccountRelationshipsMeta, this.sessionHandler)
   }
 
-  async update (options: { company?: string, address?: string, websiteUrl?: string }) {
+  async update (options: { company: string, address: string, websiteUrl: string }) {
     const { developmentAccount } = (await this.action('developmentAccount:update', { ...options, id: this.id })) as DevelopmentAccountResponse
     this.setDevelopmentAccount(developmentAccount)
     return this

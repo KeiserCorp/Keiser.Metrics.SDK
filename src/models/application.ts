@@ -12,7 +12,7 @@ export interface ApplicationData {
   applicationName: string
   redirectUrl: string
   clientId: string
-  clientSecret: string
+  clientSecret?: string
 }
 
 export interface ApplicationResponse extends AuthenticatedResponse {
