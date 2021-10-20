@@ -80,6 +80,6 @@ export class DevelopmentAccountRelationship extends Model {
   }
 
   async delete () {
-    await this.action('developmentAccountRelationship', { id: this.id, developmentAccountId: this.developmentAccountId })
+    await this.action('developmentAccountRelationship:delete', { id: this.id, developmentAccountId: this.developmentAccountId })
   }
 }

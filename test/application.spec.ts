@@ -7,7 +7,7 @@ import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
-describe.only('Application', function () {
+describe('Application', function () {
   let metricsInstance: Metrics
   let user: User
   let createdApplication: Application

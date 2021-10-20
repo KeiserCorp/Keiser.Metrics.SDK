@@ -6,7 +6,7 @@ import { DevelopmentAccount, DevelopmentAccountSorting } from '../src/models/dev
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 
-describe.only('Development Account', function () {
+describe('Development Account', function () {
   let metricsInstance: Metrics
   let user: User
   let createdDevelopmentAccount: DevelopmentAccount
