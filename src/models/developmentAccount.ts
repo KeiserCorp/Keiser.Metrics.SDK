@@ -26,15 +26,12 @@ export interface DevelopmentAccountListResponse extends AuthenticatedResponse {
 }
 
 export interface DevelopmentAccountListResponseMeta extends ListMeta {
-  company?: string
-  address?: string
-  websiteUrl?: string
   sort: DevelopmentAccountSorting
 }
 
 export class DevelopmentAccounts extends ModelList<DevelopmentAccount, DevelopmentAccountData, DevelopmentAccountListResponseMeta> {
-  constructor (developmentAccounts: DevelopmentAccountData[], developmentAccountMeta: DevelopmentAccountListResponseMeta, sessionHandler: SessionHandler) {
-    super(DevelopmentAccount, developmentAccounts, developmentAccountMeta, sessionHandler)
+  constructor (developmentAccounts: DevelopmentAccountData[], developmentAccountsMeta: DevelopmentAccountListResponseMeta, sessionHandler: SessionHandler) {
+    super(DevelopmentAccount, developmentAccounts, developmentAccountsMeta, sessionHandler)
   }
 }
 

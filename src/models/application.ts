@@ -25,14 +25,13 @@ export interface ApplicationListResponse extends AuthenticatedResponse {
 }
 
 export interface ApplicationListResponseMeta extends ListMeta {
-  redirectUrl?: string
-  clientId?: string
+  developmentAccountId: number
   sort: ApplicationSorting
 }
 
 export class Applications extends ModelList<Application, ApplicationData, ApplicationListResponseMeta> {
-  constructor (applications: ApplicationData[], applicationMeta: ApplicationListResponseMeta, sessionHandler: SessionHandler) {
-    super(Application, applications, applicationMeta, sessionHandler)
+  constructor (applications: ApplicationData[], applicationsMeta: ApplicationListResponseMeta, sessionHandler: SessionHandler) {
+    super(Application, applications, applicationsMeta, sessionHandler)
   }
 }
 

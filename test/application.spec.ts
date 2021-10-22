@@ -89,6 +89,7 @@ describe('Application', function () {
 
     expect(Array.isArray(applications)).to.equal(true)
     expect(applications.length).to.be.above(0)
+    expect(applications.meta.sort).to.be.equal(ApplicationSorting.ID)
     expect(applications[0].clientId).to.not.equal(null)
     expect(applications[0].clientSecret).to.not.equal(null)
     expect(applications[0].applicationName).to.be.equal('Updated Application')

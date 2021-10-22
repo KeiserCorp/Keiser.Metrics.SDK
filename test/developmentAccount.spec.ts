@@ -80,6 +80,8 @@ describe('Development Account', function () {
 
     expect(Array.isArray(developmentAccounts)).to.equal(true)
     expect(developmentAccounts.length).to.be.above(0)
+    expect(developmentAccounts.meta.sort).to.be.equal(DevelopmentAccountSorting.ID)
+    expect(developmentAccounts.length).to.be.above(0)
     expect(developmentAccounts[0].company).to.be.equal('Peloton')
   })
 

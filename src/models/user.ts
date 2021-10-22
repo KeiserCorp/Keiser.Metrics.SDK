@@ -8,7 +8,7 @@ import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
 import { DevelopmentAccount, DevelopmentAccountListResponse, DevelopmentAccountResponse, DevelopmentAccounts, DevelopmentAccountSorting } from './developmentAccount'
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipResponse } from './developmentAccountRelationship'
-import { DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './developmentAccountRelationshipRequest'
+import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequestResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './developmentAccountRelationshipRequest'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, FacilityRelationshipRequests, FacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
@@ -297,6 +297,11 @@ export class User extends SubscribableModel {
   async getDevelopmentAccounts (options: { sort?: DevelopmentAccountSorting, ascending?: boolean, limit?: number, offset?: number}) {
     const { developmentAccounts, developmentAccountsMeta } = await this.action('developmentAccount:list', { ...options }) as DevelopmentAccountListResponse
     return new DevelopmentAccounts(developmentAccounts, developmentAccountsMeta, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationshipRequest (params: { id: number, developmentAccountId: number}) {
+    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', params) as DevelopmentAccountRelationshipRequestResponse
+    return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
   }
 
   async getDevelopmentAccountRelationshipRequests (options: { developmentAccountId?: number, email?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {

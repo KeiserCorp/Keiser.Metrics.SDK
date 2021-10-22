@@ -30,8 +30,9 @@ export interface DevelopmentAccountRelationshipRequestListResponse
 }
 
 export interface DevelopmentAccountRelationshipRequestListResponseMeta extends ListMeta {
-  displayEmail?: string
-  role?: string
+  developmentAccountId?: number
+  userId?: number
+  email?: string
   sort: DevelopmentAccountRelationshipRequestSorting
 }
 

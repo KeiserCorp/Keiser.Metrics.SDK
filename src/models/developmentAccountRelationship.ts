@@ -29,7 +29,7 @@ export interface DevelopmentAccountRelationshipListResponse extends Authenticate
 }
 
 export interface DevelopmentAccountRelationshipListResponseMeta extends ListMeta {
-  role?: string
+  developmentAccountId: number
   sort: DevelopmentAccountRelationshipSorting
 }
 

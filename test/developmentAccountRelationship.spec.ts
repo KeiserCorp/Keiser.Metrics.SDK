@@ -2,7 +2,6 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { ActionPreventedError, UnknownEntityError } from '../src/error'
-// import { UnknownEntityError } from '../src/error'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipRole, DevelopmentAccountRelationshipSorting } from '../src/models/developmentAccountRelationship'
 import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestSorting } from '../src/models/developmentAccountRelationshipRequest'
@@ -70,14 +69,27 @@ describe('Development Account Relationship', function () {
 
   it('can init a Development Account Relationship Request', async function () {
     const developmentAccountRelationshipRequest = await createdDevelopmentAccount.initializeDevelopmentAccountRelationshipRequest({
-      email: 'testemail@keiser.com',
+      email: 'demo@keiser.com',
       role: DevelopmentAccountRelationshipRole.Developer
     })
 
     expect(developmentAccountRelationshipRequest).to.be.an('object')
     expect(developmentAccountRelationshipRequest.code).to.not.equal(null)
-    expect(developmentAccountRelationshipRequest.displayEmail).to.equal('testemail@keiser.com')
+    expect(developmentAccountRelationshipRequest.displayEmail).to.equal('demo@keiser.com')
     expect(developmentAccountRelationshipRequest.role).to.be.equal(DevelopmentAccountRelationshipRole.Developer)
+    createdDevelopmentAccountRelationshipRequest = developmentAccountRelationshipRequest
+  })
+
+  it('can get a Development Account Relationship Request', async function () {
+    const developmentAccountRelationshipRequest = await demoUser.getDevelopmentAccountRelationshipRequest({
+      id: createdDevelopmentAccountRelationshipRequest.id,
+      developmentAccountId: createdDevelopmentAccountRelationshipRequest.developmentAccountId
+    })
+
+    expect(developmentAccountRelationshipRequest).to.be.an('object')
+    expect(developmentAccountRelationshipRequest.code).to.not.be.equal(null)
+    expect(developmentAccountRelationshipRequest.developmentAccountId).to.be.equal(createdDevelopmentAccountRelationshipRequest.developmentAccountId)
+    expect(developmentAccountRelationshipRequest.displayEmail).to.be.equal(createdDevelopmentAccountRelationshipRequest.displayEmail)
     createdDevelopmentAccountRelationshipRequest = developmentAccountRelationshipRequest
   })
 
@@ -91,9 +103,10 @@ describe('Development Account Relationship', function () {
 
     expect(Array.isArray(developmentAccountRelationshipRequests)).to.equal(true)
     expect(developmentAccountRelationshipRequests.length).to.be.above(0)
+    expect(developmentAccountRelationshipRequests.meta.sort).to.be.equal(DevelopmentAccountRelationshipRequestSorting.ID)
     expect(developmentAccountRelationshipRequests[0].code).to.not.equal(null)
     expect(developmentAccountRelationshipRequests[0].developmentAccountId).to.be.equal(createdDevelopmentAccount.id)
-    expect(developmentAccountRelationshipRequests[0].displayEmail).to.be.equal('testemail@keiser.com')
+    expect(developmentAccountRelationshipRequests[0].displayEmail).to.be.equal('demo@keiser.com')
   })
 
   it('can fulfill a Development Account Relationship Request', async function () {
@@ -132,6 +145,7 @@ describe('Development Account Relationship', function () {
 
     expect(Array.isArray(developmentAccountRelationships)).to.equal(true)
     expect(developmentAccountRelationships.length).to.be.above(1)
+    expect(developmentAccountRelationships.meta.sort).to.be.equal(DevelopmentAccountRelationshipSorting.ID)
     expect(developmentAccountRelationships[0].userId).to.be.equal(user.id)
     expect(developmentAccountRelationships[1].userId).to.be.equal(demoUser.id)
   })
