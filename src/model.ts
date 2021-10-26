@@ -54,13 +54,19 @@ export abstract class SubscribableModel<SessionHandlerType extends BaseSessionHa
   }
 
   private async subscribe () {
-    this._isSubscribed = true
-    this._unsubscribe = await this.sessionHandler.subscribeToModel(this.subscribeParameters, e => this.dispatchModelChangeEvent(e))
+    try {
+      this._isSubscribed = true
+      this._unsubscribe = await this.sessionHandler.subscribeToModel(this.subscribeParameters, e => this.dispatchModelChangeEvent(e))
+    } catch (error) {
+      this._isSubscribed = false
+    }
   }
 
   private async unsubscribe () {
     if (this._unsubscribe !== null) {
-      await this._unsubscribe()
+      try {
+        await this._unsubscribe()
+      } catch (error) {}
       this._unsubscribe = null
     }
     this._isSubscribed = false
