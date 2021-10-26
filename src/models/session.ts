@@ -1,3 +1,4 @@
+import { eject } from '../lib/eject'
 import { FacilityListMeta, SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData } from './facility'
@@ -98,6 +99,10 @@ export class StaticSession {
 
   constructor (sessionData: SessionData) {
     this._sessionData = sessionData
+  }
+
+  ejectData () {
+    return eject(this._sessionData)
   }
 
   get id () {
@@ -204,6 +209,10 @@ export class Session extends SubscribableModel {
 
   async delete () {
     await this.action('session:delete', { id: this.id, userId: this.userId })
+  }
+
+  ejectData () {
+    return this.eject(this._sessionData)
   }
 
   get id () {

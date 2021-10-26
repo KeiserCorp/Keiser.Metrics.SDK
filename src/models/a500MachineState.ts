@@ -38,7 +38,7 @@ export class A500MachineState extends Model {
   }
 
   ejectData () {
-    return { ...this._a500MachineState }
+    return this.eject(this._a500MachineState)
   }
 
   get forceUnit () {

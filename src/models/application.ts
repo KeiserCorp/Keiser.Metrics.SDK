@@ -47,6 +47,10 @@ export class Application extends Model {
     this._applicationData = applicationData
   }
 
+  ejectData () {
+    return this.eject(this._applicationData)
+  }
+
   get id () {
     return this._applicationData.id
   }

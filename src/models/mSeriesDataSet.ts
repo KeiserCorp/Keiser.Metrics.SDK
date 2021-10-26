@@ -94,6 +94,10 @@ export class MSeriesDataSet extends SubscribableModel {
     await this.action('mSeriesDataSet:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._mSeriesDataSetData)
+  }
+
   get id () {
     return this._mSeriesDataSetData.id
   }

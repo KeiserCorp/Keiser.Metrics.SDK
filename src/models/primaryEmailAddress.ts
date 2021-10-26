@@ -35,6 +35,10 @@ export class PrimaryEmailAddress extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._primaryEmailAddressData)
+  }
+
   get emailAddressId () {
     return this._primaryEmailAddressData.emailAddressId
   }

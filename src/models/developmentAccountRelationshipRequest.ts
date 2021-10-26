@@ -54,6 +54,20 @@ export class DevelopmentAccountRelationshipRequest extends Model {
     this._developmentAccountRelationshipRequestData = developmentAccountRelationshipRequestData
   }
 
+  async reload () {
+    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', { id: this.id }) as DevelopmentAccountRelationshipRequestResponse
+    this.setDevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest)
+    return this
+  }
+
+  async delete () {
+    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id })
+  }
+
+  ejectData () {
+    return this.eject(this._developmentAccountRelationshipRequestData)
+  }
+
   get id () {
     return this._developmentAccountRelationshipRequestData.id
   }
@@ -76,15 +90,5 @@ export class DevelopmentAccountRelationshipRequest extends Model {
 
   get code () {
     return this._developmentAccountRelationshipRequestData.code
-  }
-
-  async reload () {
-    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', { id: this.id }) as DevelopmentAccountRelationshipRequestResponse
-    this.setDevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest)
-    return this
-  }
-
-  async delete () {
-    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id })
   }
 }

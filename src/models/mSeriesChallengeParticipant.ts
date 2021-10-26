@@ -81,6 +81,10 @@ export class MSeriesChallengeParticipant extends Model {
     this.setMSeriesChallengeParticipant(mSeriesChallengeParticipant)
   }
 
+  ejectData () {
+    return this.eject(this._mSeriesChallengeParticipantData)
+  }
+
   get id () {
     return this._mSeriesChallengeParticipantData.id
   }

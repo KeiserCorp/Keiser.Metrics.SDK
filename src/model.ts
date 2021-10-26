@@ -1,3 +1,4 @@
+import { eject } from './lib/eject'
 import { EventDispatcher } from './lib/event'
 import { BaseSessionHandler, ListSubscribeParameters, ModelChangeEvent, ModelSubscribeParameters, SessionHandler } from './session'
 
@@ -18,6 +19,7 @@ export interface FacilityListMeta extends ListMeta {
 }
 
 export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandler> {
+  protected eject = eject
   protected sessionHandler: SessionHandlerType
 
   constructor (sessionHandler: SessionHandlerType) {

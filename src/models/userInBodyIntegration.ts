@@ -39,6 +39,10 @@ export class UserInBodyIntegration extends Model {
     await this.action('userInBodyIntegration:delete', { userId: this._userId })
   }
 
+  ejectData () {
+    return this.eject(this._userInBodyIntegrationData)
+  }
+
   get inBodyId () {
     return this._userInBodyIntegrationData.inBodyId
   }

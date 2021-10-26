@@ -59,6 +59,10 @@ export class EmailAddress extends Model {
     await this.action('emailAddress:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._emailAddressData)
+  }
+
   get id () {
     return this._emailAddressData.id
   }

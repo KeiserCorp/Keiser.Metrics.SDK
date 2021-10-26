@@ -67,6 +67,10 @@ export class CardioMachine extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._cardioMachineData)
+  }
+
   get id () {
     return this._cardioMachineData.id
   }

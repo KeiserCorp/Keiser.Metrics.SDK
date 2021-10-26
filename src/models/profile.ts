@@ -52,6 +52,10 @@ export class Profile extends SubscribableModel {
     return this
   }
 
+  ejectData (): ProfileData {
+    return { ...this._profileData }
+  }
+
   protected get subscribeParameters () {
     return { model: 'profile', id: this.userId, userId: this.userId }
   }

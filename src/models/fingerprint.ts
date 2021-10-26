@@ -51,6 +51,10 @@ export class Fingerprint extends SubscribableModel {
     await this.action('fingerprint:delete', { facilityRelationshipId: this.facilityRelationshipId })
   }
 
+  ejectData () {
+    return this.eject(this._fingerprintData)
+  }
+
   get facilityRelationshipId () {
     return this._fingerprintData.facilityRelationshipId
   }

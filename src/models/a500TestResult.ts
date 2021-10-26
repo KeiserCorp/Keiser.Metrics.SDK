@@ -1,3 +1,4 @@
+import { eject } from '../lib/eject'
 import { AuthenticatedResponse } from '../session'
 export interface A500TestResultData {
   id: number
@@ -24,6 +25,10 @@ export class A500TestResult {
 
   constructor (a500TestResultData: A500TestResultData) {
     this._a500TestResultData = a500TestResultData
+  }
+
+  ejectData () {
+    return eject(this._a500TestResultData)
   }
 
   get id () {

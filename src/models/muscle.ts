@@ -123,6 +123,10 @@ export class Muscle extends Model {
     this._muscleData = muscleData
   }
 
+  ejectData () {
+    return this.eject(this._muscleData)
+  }
+
   get id () {
     return this._muscleData.id
   }

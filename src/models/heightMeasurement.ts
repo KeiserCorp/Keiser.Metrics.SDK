@@ -66,6 +66,10 @@ export class HeightMeasurement extends SubscribableModel {
     await this.action('heightMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._heightMeasurementData)
+  }
+
   get id () {
     return this._heightMeasurementData.id
   }

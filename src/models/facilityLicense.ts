@@ -70,6 +70,10 @@ export class FacilityLicense extends Model {
     await this.action('facilityLicense:delete', { id: this.id })
   }
 
+  ejectData () {
+    return this.eject(this._facilityLicenseData)
+  }
+
   get id () {
     return this._facilityLicenseData.id
   }

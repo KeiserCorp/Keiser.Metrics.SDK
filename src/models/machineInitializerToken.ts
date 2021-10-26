@@ -1,3 +1,5 @@
+import { eject } from '../lib/eject'
+
 export interface MachineInitializerTokenData {
   initializerToken: string
   url: string
@@ -13,6 +15,10 @@ export class MachineInitializerToken {
 
   constructor (machineInitializerTokenData: MachineInitializerTokenData) {
     this._machineInitializerTokenData = machineInitializerTokenData
+  }
+
+  ejectData () {
+    return eject(this._machineInitializerTokenData)
   }
 
   get initializerToken () {

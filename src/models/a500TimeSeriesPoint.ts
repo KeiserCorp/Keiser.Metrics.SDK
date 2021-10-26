@@ -1,3 +1,5 @@
+import { eject } from '../lib/eject'
+
 export interface A500TimeSeriesPointDataDual {
   id: number
   timeSinceEpoch: number
@@ -67,14 +69,14 @@ export class A500TimeSeriesPoint {
   }
 
   ejectData () {
-    return { ...this._a500TimeSeriesPointData }
+    return eject(this._a500TimeSeriesPointData)
   }
 
   get id () {
     return this._a500TimeSeriesPointData.id
   }
 
-  get timeSinceEpoch () {
+  timeSinceEpoch () {
     return this._a500TimeSeriesPointData.timeSinceEpoch
   }
 

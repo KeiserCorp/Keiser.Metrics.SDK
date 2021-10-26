@@ -65,6 +65,10 @@ export class ExerciseAlias extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._exerciseAliasData)
+  }
+
   get id () {
     return this._exerciseAliasData.id
   }

@@ -51,6 +51,26 @@ export class DevelopmentAccountRelationship extends Model {
     this._developmentAccountRelationshipData = developmentAccountRelationshipData
   }
 
+  async update (params: { role: DevelopmentAccountRelationshipRole }) {
+    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationship:update', { ...params, id: this.id, developmentAccountId: this.developmentAccountId })) as DevelopmentAccountRelationshipResponse
+    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
+    return this
+  }
+
+  async delete () {
+    await this.action('developmentAccountRelationship:delete', { id: this.id, developmentAccountId: this.developmentAccountId })
+  }
+
+  async reload () {
+    const { developmentAccountRelationship } = await this.action('developmentAccountRelationship:show', { id: this.id }) as DevelopmentAccountRelationshipResponse
+    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
+    return this
+  }
+
+  ejectData () {
+    return this.eject(this._developmentAccountRelationshipData)
+  }
+
   get id () {
     return this._developmentAccountRelationshipData.id
   }
@@ -65,21 +85,5 @@ export class DevelopmentAccountRelationship extends Model {
 
   get role () {
     return this._developmentAccountRelationshipData.role
-  }
-
-  async reload () {
-    const { developmentAccountRelationship } = await this.action('developmentAccountRelationship:show', { id: this.id }) as DevelopmentAccountRelationshipResponse
-    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
-    return this
-  }
-
-  async update (params: { role: DevelopmentAccountRelationshipRole }) {
-    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationship:update', { ...params, id: this.id, developmentAccountId: this.developmentAccountId })) as DevelopmentAccountRelationshipResponse
-    this.setDevelopmentAccountRelationship(developmentAccountRelationship)
-    return this
-  }
-
-  async delete () {
-    await this.action('developmentAccountRelationship:delete', { id: this.id, developmentAccountId: this.developmentAccountId })
   }
 }

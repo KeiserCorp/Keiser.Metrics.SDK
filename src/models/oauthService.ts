@@ -66,6 +66,10 @@ export class OAuthService extends Model {
     await this.action('oauthService:delete', { id: this.id })
   }
 
+  ejectData () {
+    return this.eject(this._oauthServiceData)
+  }
+
   get id () {
     return this._oauthServiceData.id
   }

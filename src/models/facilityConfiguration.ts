@@ -55,7 +55,7 @@ export class FacilityConfiguration extends Model {
   }
 
   ejectData () {
-    return { ...this._facilityConfigurationData }
+    return this.eject(this._facilityConfigurationData)
   }
 
   get memberIdentificationComposition () {

@@ -131,7 +131,7 @@ export class User extends SubscribableModel {
   }
 
   ejectData () {
-    return { ...this._userData }
+    return this.eject(this._userData)
   }
 
   get id () {

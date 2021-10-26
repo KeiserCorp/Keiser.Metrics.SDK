@@ -35,6 +35,10 @@ export class AcceptedTermsVersion extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._acceptedTermsVersionData)
+  }
+
   get userId () {
     return this._acceptedTermsVersionData.userId
   }

@@ -1,3 +1,4 @@
+import { eject } from '../lib/eject'
 import { SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
@@ -103,6 +104,10 @@ export class WeightMeasurement extends SubscribableModel {
     await this.action('weightMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._weightMeasurementData)
+  }
+
   get id () {
     return this._weightMeasurementData.id
   }
@@ -140,6 +145,10 @@ export class BodyCompositionMeasurement {
 
   constructor (bodyCompositionMeasurementData: BodyCompositionMeasurementData) {
     this._bodyCompositionMeasurementData = bodyCompositionMeasurementData
+  }
+
+  ejectData () {
+    return eject(this._bodyCompositionMeasurementData)
   }
 
   get totalBodyWater () {

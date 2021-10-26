@@ -74,6 +74,10 @@ export class Facility<SessionHandlerType extends SessionHandler = SessionHandler
     return this
   }
 
+  ejectData () {
+    return this.eject(this._facilityData)
+  }
+
   get id () {
     return this._facilityData.id
   }
