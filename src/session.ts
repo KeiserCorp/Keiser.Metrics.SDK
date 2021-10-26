@@ -506,7 +506,7 @@ export class StrengthMachineSession {
     return await this.sessionHandler.action(action, params)
   }
 
-  facilityStrengthMachine () {
+  eagerFacilityStrengthMachine () {
     return new FacilityStrengthMachine(this._facilityStrengthMachineData, this.sessionHandler)
   }
 
