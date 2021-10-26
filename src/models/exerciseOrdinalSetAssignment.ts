@@ -58,6 +58,10 @@ export class ExerciseOrdinalSetAssignment extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._exerciseOrdinalSetAssignmentData)
+  }
+
   get id () {
     return this._exerciseOrdinalSetAssignmentData.id
   }

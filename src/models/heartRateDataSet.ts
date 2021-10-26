@@ -78,6 +78,10 @@ export class HeartRateDataSet extends SubscribableModel {
     await this.action('heartRateDataSet:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._heartRateDataSetData)
+  }
+
   get id () {
     return this._heartRateDataSetData.id
   }

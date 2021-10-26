@@ -105,6 +105,10 @@ export class GlobalAccessControl extends Model {
     return { globalAccessControlSecret }
   }
 
+  ejectData () {
+    return this.eject(this._globalAccessControlData)
+  }
+
   get userId () {
     return this._globalAccessControlData.userId
   }

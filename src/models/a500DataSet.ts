@@ -1,4 +1,5 @@
 import { ForceUnit, Side, TestSide } from '../constants'
+import { eject } from '../lib/eject'
 import { A500RepDataPoint, A500RepDataPointData } from './a500RepDataPoint'
 import { A500TestResult, A500TestResultData } from './a500TestResult'
 import { A500TimeSeriesPoint, A500TimeSeriesPointData } from './a500TimeSeriesPoint'
@@ -54,6 +55,10 @@ export class A500DataSet {
 
   constructor (a500DataSetData: A500DataSetData) {
     this._a500DataSetData = a500DataSetData
+  }
+
+  ejectData () {
+    return eject(this._a500DataSetData)
   }
 
   get id () {

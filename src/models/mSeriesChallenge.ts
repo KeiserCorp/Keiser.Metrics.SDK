@@ -117,6 +117,10 @@ export abstract class MSeriesChallenge extends Model {
     return new MSeriesChallengeLeaderboardParticipants(leaderboard.mSeriesChallengeParticipants, leaderboard.mSeriesChallengeParticipantsMeta, this.sessionHandler)
   }
 
+  ejectData () {
+    return this.eject(this._mSeriesChallengeData)
+  }
+
   get id () {
     return this._mSeriesChallengeData.id
   }

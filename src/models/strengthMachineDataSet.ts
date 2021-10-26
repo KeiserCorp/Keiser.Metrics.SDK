@@ -116,6 +116,10 @@ export class StrengthMachineDataSet extends SubscribableModel {
     await this.action('strengthMachineDataSet:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._strengthMachineDataSetData)
+  }
+
   get id () {
     return this._strengthMachineDataSetData.id
   }

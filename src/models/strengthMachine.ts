@@ -92,6 +92,10 @@ export class StrengthMachine extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._strengthMachineData)
+  }
+
   get id () {
     return this._strengthMachineData.id
   }

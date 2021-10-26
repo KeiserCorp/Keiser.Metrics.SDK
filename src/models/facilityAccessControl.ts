@@ -30,6 +30,10 @@ export class FacilityAccessControl extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._facilityAccessControlData)
+  }
+
   eagerFacilityAccessControlIPRanges () {
     return typeof this._facilityAccessControlData.facilityAccessControlIPRanges !== 'undefined' ? this._facilityAccessControlData.facilityAccessControlIPRanges.map(facilityAccessControlIPRange => new FacilityAccessControlIPRange(facilityAccessControlIPRange, this.sessionHandler)) : undefined
   }

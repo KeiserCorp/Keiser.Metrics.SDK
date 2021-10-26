@@ -56,6 +56,10 @@ export class FacilityAccessControlKiosk extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._facilityAccessControlKioskData)
+  }
+
   get kioskModeAllowed () {
     return this._facilityAccessControlKioskData.isKioskModeAllowed
   }

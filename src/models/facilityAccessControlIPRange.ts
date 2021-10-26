@@ -62,6 +62,10 @@ export class FacilityAccessControlIPRange extends Model {
     await this.action('facilityAccessControlIPRange:delete', { id: this.id })
   }
 
+  ejectData () {
+    return this.eject(this._facilityAccessControlIPRangeData)
+  }
+
   get id () {
     return this._facilityAccessControlIPRangeData.id
   }

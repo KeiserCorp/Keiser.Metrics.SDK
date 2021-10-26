@@ -47,6 +47,16 @@ export class DevelopmentAccount extends Model {
     this._developmentAccountData = developmentAccountData
   }
 
+  async reload () {
+    const { developmentAccount } = await this.action('developmentAccount:show', { id: this.id }) as DevelopmentAccountResponse
+    this.setDevelopmentAccount(developmentAccount)
+    return this
+  }
+
+  ejectData () {
+    return this.eject(this._developmentAccountData)
+  }
+
   get id () {
     return this._developmentAccountData.id
   }
@@ -61,12 +71,6 @@ export class DevelopmentAccount extends Model {
 
   get websiteUrl () {
     return this._developmentAccountData.websiteUrl
-  }
-
-  async reload () {
-    const { developmentAccount } = await this.action('developmentAccount:show', { id: this.id }) as DevelopmentAccountResponse
-    this.setDevelopmentAccount(developmentAccount)
-    return this
   }
 
   async createApplication (params: { applicationName: string, redirectUrl: string }) {

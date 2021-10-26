@@ -61,6 +61,10 @@ export class MSeriesFtpMeasurement extends Model {
     await this.action('mSeriesFtpMeasurement:delete', { id: this.id, userId: this.userId })
   }
 
+  ejectData () {
+    return this.eject(this._mSeriesFtpMeasurement)
+  }
+
   get id () {
     return this._mSeriesFtpMeasurement.id
   }

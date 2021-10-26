@@ -1,4 +1,5 @@
 import { ForceUnit, TestSide } from '../constants'
+import { eject } from '../lib/eject'
 import { AuthenticatedResponse } from '../session'
 
 export interface A500RepDataPointData {
@@ -32,6 +33,10 @@ export class A500RepDataPoint {
 
   constructor (A500RepDataPointData: A500RepDataPointData) {
     this._a500RepDataPointData = A500RepDataPointData
+  }
+
+  ejectData () {
+    return eject(this._a500RepDataPointData)
   }
 
   get id () {

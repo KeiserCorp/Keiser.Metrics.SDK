@@ -63,6 +63,10 @@ export class CardioExerciseVariant extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._cardioExerciseVariantData)
+  }
+
   get id () {
     return this._cardioExerciseVariantData.id
   }

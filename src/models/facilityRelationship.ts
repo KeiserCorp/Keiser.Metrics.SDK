@@ -84,6 +84,10 @@ export abstract class FacilityRelationship extends SubscribableModel {
     this._facilityRelationshipData = facilityRelationshipData
   }
 
+  ejectData () {
+    return this.eject(this._facilityRelationshipData)
+  }
+
   get id () {
     return this._facilityRelationshipData.id
   }

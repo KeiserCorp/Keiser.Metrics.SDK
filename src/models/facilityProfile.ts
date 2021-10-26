@@ -42,6 +42,10 @@ export class FacilityProfile extends Model {
     return facilityProfile
   }
 
+  ejectData () {
+    return this.eject(this._facilityProfileData)
+  }
+
   get name () {
     return this._facilityProfileData.name
   }

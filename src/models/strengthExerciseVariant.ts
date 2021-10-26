@@ -81,6 +81,10 @@ export class StrengthExerciseVariant extends Model {
     return this
   }
 
+  ejectData () {
+    return this.eject(this._strengthExerciseVariantData)
+  }
+
   get id () {
     return this._strengthExerciseVariantData.id
   }

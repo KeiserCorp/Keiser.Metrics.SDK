@@ -94,6 +94,10 @@ export class FacilityStrengthMachine extends SubscribableModel {
     await this.action('facilityStrengthMachine:delete', { id: this.id })
   }
 
+  ejectData () {
+    return this.eject(this._facilityStrengthMachineData)
+  }
+
   get id () {
     return this._facilityStrengthMachineData.id
   }
