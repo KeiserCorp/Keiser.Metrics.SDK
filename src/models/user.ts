@@ -6,6 +6,9 @@ import { AuthenticatedResponse, SessionHandler, StrengthMachineSession, UserSess
 import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
+import { DevelopmentAccount, DevelopmentAccountListResponse, DevelopmentAccountResponse, DevelopmentAccounts, DevelopmentAccountSorting } from './developmentAccount'
+import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipResponse } from './developmentAccountRelationship'
+import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequestResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './developmentAccountRelationshipRequest'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
 import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, FacilityRelationshipRequests, FacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
@@ -279,6 +282,36 @@ export class User extends SubscribableModel {
   async getFacilityEmploymentRelationships (options: { name?: string, sort?: UserFacilityRelationshipSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { facilityRelationships, facilityRelationshipsMeta } = await this.action('facilityRelationship:userList', { ...options, employee: true, userId: this.id }) as UserFacilityRelationshipListResponse
     return new UserFacilityEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
+  }
+
+  async createDevelopmentAccount (options: { company?: string, address?: string, websiteUrl?: string }) {
+    const { developmentAccount } = (await this.action('developmentAccount:create', { ...options })) as DevelopmentAccountResponse
+    return new DevelopmentAccount(developmentAccount, this.sessionHandler)
+  }
+
+  async getDevelopmentAccount (params: { id: number }) {
+    const { developmentAccount } = await this.action('developmentAccount:show', params) as DevelopmentAccountResponse
+    return new DevelopmentAccount(developmentAccount, this.sessionHandler)
+  }
+
+  async getDevelopmentAccounts (options: { sort?: DevelopmentAccountSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { developmentAccounts, developmentAccountsMeta } = await this.action('developmentAccount:list', { ...options }) as DevelopmentAccountListResponse
+    return new DevelopmentAccounts(developmentAccounts, developmentAccountsMeta, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationshipRequest (params: { id: number, developmentAccountId: number}) {
+    const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', params) as DevelopmentAccountRelationshipRequestResponse
+    return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
+  }
+
+  async getDevelopmentAccountRelationshipRequests (options: { developmentAccountId?: number, email?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta } = await this.action('developmentAccountRelationshipRequest:list', { ...options, userId: this.id }) as DevelopmentAccountRelationshipRequestListResponse
+    return new DevelopmentAccountRelationshipRequests(developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta, this.sessionHandler)
+  }
+
+  async fulfillDevelopmentAccountRelationshipRequest (params: { code: string, shouldAuthorize: boolean }) {
+    const { developmentAccountRelationship } = (await this.action('developmentAccountRelationshipRequest:fulfillment', { ...params })) as DevelopmentAccountRelationshipResponse
+    return new DevelopmentAccountRelationship(developmentAccountRelationship, this.sessionHandler)
   }
 
   async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {
