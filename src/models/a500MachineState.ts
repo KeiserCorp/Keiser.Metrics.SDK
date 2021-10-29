@@ -27,7 +27,7 @@ export class A500MachineState extends SubscribableModel {
   }
 
   protected get subscribeParameters () {
-    return { model: 'a500MachineState', id: this._a500MachineState.facilityStrengthMachineId }
+    return { model: 'a500MachineState', id: this._a500MachineState.facilityStrengthMachineId, actionOverride: 'a500:subscribeMachineState' }
   }
 
   async reload () {

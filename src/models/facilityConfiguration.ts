@@ -1,4 +1,4 @@
-import { Model } from '../model'
+import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
 export enum CompositionType {
@@ -7,6 +7,7 @@ export enum CompositionType {
 }
 
 export interface FacilityConfigurationData {
+  facilityId: number
   memberIdentificationComposition: CompositionType
   memberIdentificationForceLength: boolean
   memberIdentificationLength: number
@@ -22,7 +23,7 @@ export interface FacilityConfigurationResponse extends AuthenticatedResponse {
   facilityConfiguration: FacilityConfigurationData
 }
 
-export class FacilityConfiguration extends Model {
+export class FacilityConfiguration extends SubscribableModel {
   private _facilityConfigurationData: FacilityConfigurationData
 
   constructor (facilityConfigurationData: FacilityConfigurationData, sessionHandler: SessionHandler) {
@@ -32,6 +33,10 @@ export class FacilityConfiguration extends Model {
 
   private setFacilityConfigurationData (facilityConfigurationData: FacilityConfigurationData) {
     this._facilityConfigurationData = facilityConfigurationData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'facilityConfiguration', id: this._facilityConfigurationData.facilityId }
   }
 
   async reload () {
