@@ -525,6 +525,11 @@ export class StrengthMachineSession {
     await this.action('a500:createUtilizationInstance', params)
   }
 
+  async getFacility () {
+    const { facility } = await this.action('facility:show') as FacilityResponse
+    return new Facility(facility, this.sessionHandler)
+  }
+
   async getA500MachineState () {
     const response = await this.action('a500:showMachineState') as A500MachineStateResponse
     return new A500MachineState(response.a500MachineState, this.sessionHandler)

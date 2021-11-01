@@ -10,6 +10,7 @@ export enum FacilityStrengthMachineSorting {
 
 export interface FacilityStrengthMachineData {
   id: number
+  updatedAt: string
   model: string
   version: string
   softwareVersion: string | null
@@ -100,6 +101,10 @@ export class FacilityStrengthMachine extends SubscribableModel {
 
   get id () {
     return this._facilityStrengthMachineData.id
+  }
+
+  get updatedAt () {
+    return new Date(this._facilityStrengthMachineData.updatedAt)
   }
 
   get model () {

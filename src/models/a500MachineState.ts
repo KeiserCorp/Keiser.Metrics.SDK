@@ -1,9 +1,10 @@
 import { ForceUnit } from '../constants'
-import { Model } from '../model'
+import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface A500MachineStateData {
+  facilityStrengthMachineId: number
   forceUnit: ForceUnit
   primaryFocus: StrengthMachineFocusableAttribute
   secondaryFocus: StrengthMachineFocusableAttribute
@@ -13,7 +14,7 @@ export interface A500MachineStateResponse extends AuthenticatedResponse {
   a500MachineState: A500MachineStateData
 }
 
-export class A500MachineState extends Model {
+export class A500MachineState extends SubscribableModel {
   private _a500MachineState: A500MachineStateData
 
   constructor (a500MachineStateData: A500MachineStateData, sessionHandler: SessionHandler) {
@@ -23,6 +24,10 @@ export class A500MachineState extends Model {
 
   private setA500MachineState (a500MachineStateData: A500MachineStateData) {
     this._a500MachineState = a500MachineStateData
+  }
+
+  protected get subscribeParameters () {
+    return { model: 'a500MachineState', id: this._a500MachineState.facilityStrengthMachineId, actionOverride: 'a500:subscribeMachineState' }
   }
 
   async reload () {
