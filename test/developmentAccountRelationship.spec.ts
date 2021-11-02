@@ -111,7 +111,7 @@ describe('Development Account Relationship', function () {
 
   it('can fulfill a Development Account Relationship Request', async function () {
     const developmentAccountRelationship = await demoUser.fulfillDevelopmentAccountRelationshipRequest({
-      code: createdDevelopmentAccountRelationshipRequest.code,
+      code: createdDevelopmentAccountRelationshipRequest.code ?? '',
       shouldAuthorize: true
     })
 

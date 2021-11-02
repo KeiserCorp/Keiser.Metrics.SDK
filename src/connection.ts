@@ -1,5 +1,5 @@
 import Axios, { AxiosError } from 'axios'
-import { BrokenCircuitError, ConsecutiveBreaker, Policy } from 'cockatiel'
+import { BrokenCircuitError, BulkheadRejectedError, ConsecutiveBreaker, Policy } from 'cockatiel'
 
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
 import { ActionErrorProperties, ConnectionFaultError, GetErrorInstance, RequestError, SessionError } from './error'
@@ -63,6 +63,7 @@ export class MetricsConnection {
   private _checkCallbacksTimeoutInstance: NodeJS.Timeout | null = null
   private _socketRetryAttempts: number = 0
   private readonly _callbacks: Map<number, { expiresAt: number | null, callback: (success: any, fail?: any) => void }> = new Map()
+  private readonly _socketBulkhead = Policy.bulkhead(5, 25)
   private readonly _retryStrategy = Policy.wrap(
     Policy.handleWhen(ERROR_FILTER).retry().delay([125, 1000, 5000]),
     Policy.handleWhen(ERROR_FILTER).circuitBreaker(15000, new ConsecutiveBreaker(10))
@@ -173,7 +174,7 @@ export class MetricsConnection {
         return await new Promise((resolve, reject) => {
           const callback = (success: any, fail?: any) => typeof fail !== 'undefined' ? reject(fail) : resolve(success)
           if (this.socketConnected) {
-            this.actionSocket(action, params, callback)
+            void this.actionSocket(action, params, callback)
           } else {
             void this.actionRest(action, params, callback)
           }
@@ -238,20 +239,33 @@ export class MetricsConnection {
     this._onPushDataEvent.dispatchAsync(data as PushDataEvent)
   }
 
-  private actionSocket (action: string, params: Object, callback: (success: any, fail?: any) => void) {
-    this._lastMessageId++
-    const args = {
-      messageId: this._lastMessageId,
-      event: 'action',
-      params: { action, ...params }
+  private async actionSocket (action: string, params: Object, callback: (success: any, fail?: any) => void) {
+    try {
+      await this._socketBulkhead.execute(async () => await new Promise<void>(resolve => {
+        this._lastMessageId++
+        const args = {
+          messageId: this._lastMessageId,
+          event: 'action',
+          params: { action, ...params }
+        }
+
+        this._callbacks.set(this._lastMessageId, {
+          callback: (success: any, fail?: any) => {
+            callback(success, fail)
+            resolve()
+          },
+          expiresAt: Date.now() + this._requestTimeout
+        })
+
+        this._socket?.send(JSON.stringify(args))
+      }))
+    } catch (error) {
+      if (error instanceof BulkheadRejectedError) {
+        callback(null, { error: { statusText: 'Socket request queue is full.' } })
+      } else {
+        callback(null, { error })
+      }
     }
-
-    this._callbacks.set(this._lastMessageId, {
-      callback,
-      expiresAt: Date.now() + this._requestTimeout
-    })
-
-    this._socket?.send(JSON.stringify(args))
   }
 
   private async actionRest (action: string, params: Object, callback: (success: any, fail?: any) => void) {
