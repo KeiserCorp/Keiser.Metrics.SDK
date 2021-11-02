@@ -1,6 +1,7 @@
 import { ConnectionEvent, MetricsConnection, PushDataEvent } from './connection'
 import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT } from './constants'
 import { SessionError } from './error'
+import { limitedRunnerQueue } from './lib/async'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
@@ -201,7 +202,7 @@ export abstract class BaseSessionHandler {
 
   private handleConnectionEvent (connectionEvent: ConnectionEvent) {
     if (connectionEvent.socketConnection) {
-      this._modelChangeEventHandlerMap.forEach(e => void e.onReconnectCallback())
+      void limitedRunnerQueue(this._modelChangeEventHandlerMap.values(), 3, async i => { await i.onReconnectCallback() })
     }
   }
 
@@ -325,8 +326,10 @@ export abstract class BaseSessionHandler {
         modelChangeEventHandler.onChangeCallbacks.delete(callback)
 
         if (modelChangeEventHandler.onChangeCallbacks.size === 0) {
-          await this.action('core:unsubscribe', { subscriptionKey })
           this._modelChangeEventHandlerMap.delete(subscriptionKey)
+          try {
+            await this.action('core:unsubscribe', { subscriptionKey })
+          } catch (error) {}
         }
       }
     }
