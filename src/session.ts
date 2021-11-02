@@ -325,8 +325,10 @@ export abstract class BaseSessionHandler {
         modelChangeEventHandler.onChangeCallbacks.delete(callback)
 
         if (modelChangeEventHandler.onChangeCallbacks.size === 0) {
-          await this.action('core:unsubscribe', { subscriptionKey })
           this._modelChangeEventHandlerMap.delete(subscriptionKey)
+          try {
+            await this.action('core:unsubscribe', { subscriptionKey })
+          } catch (error) {}
         }
       }
     }

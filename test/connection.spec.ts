@@ -6,7 +6,7 @@ import { DevRestEndpoint, DevSocketEndpoint, IsBrowser } from './utils/constants
 
 const connectionTimeout = 3000
 
-describe.skip('Connection', function () {
+describe('Connection', function () {
   if (IsBrowser) {
     describe('Socket (Dev Server)', function () {
       let metricsInstance: Metrics
@@ -98,7 +98,7 @@ describe.skip('Connection', function () {
         metricsInstance.dispose()
       })
 
-      it('can handle server restart', async function () {
+      it.skip('can handle server restart', async function () {
         this.timeout(30000)
 
         const metricsInstance = new Metrics({
@@ -146,7 +146,7 @@ describe.skip('Connection', function () {
         metricsInstance.dispose()
       })
 
-      it('can handle server connection close', async function () {
+      it.skip('can handle server connection close', async function () {
         this.timeout(10000)
 
         const metricsInstance = new Metrics({
@@ -186,6 +186,66 @@ describe.skip('Connection', function () {
         expect(typeof healthResponse.error).to.equal('undefined')
         expect(healthResponse.healthy).to.equal(true)
 
+        metricsInstance.dispose()
+      })
+
+      it('can perform 25 actions', async function () {
+        this.timeout(20000)
+
+        const metricsInstance = new Metrics({
+          restEndpoint: DevRestEndpoint,
+          socketEndpoint: DevSocketEndpoint,
+          persistConnection: true
+        })
+
+        if (!metricsInstance.socketConnected) {
+          await (new Promise(resolve => {
+            metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
+          }))
+        }
+
+        const statusRequests = new Array<Promise<any>>()
+        for (let x = 0; x < 25; x++) {
+          statusRequests.push(metricsInstance.core.status())
+        }
+
+        const resolved = await Promise.all(statusRequests)
+        expect(resolved.length).to.equal(25)
+        metricsInstance.dispose()
+      })
+
+      it('cannot perform 50 actions', async function () {
+        this.timeout(20000)
+
+        const metricsInstance = new Metrics({
+          restEndpoint: DevRestEndpoint,
+          socketEndpoint: DevSocketEndpoint,
+          persistConnection: true
+        })
+
+        if (!metricsInstance.socketConnected) {
+          await (new Promise(resolve => {
+            metricsInstance.onConnectionChangeEvent.one(event => resolve(event.socketConnection))
+          }))
+        }
+
+        const statusRequests = new Array<Promise<any>>()
+        for (let x = 0; x < 50; x++) {
+          statusRequests.push(metricsInstance.core.status())
+        }
+
+        let extErrorRef: {error: {statusText: string}} | null = null
+
+        try {
+          await Promise.all(statusRequests)
+        } catch (error) {
+          extErrorRef = error as {error: {statusText: string}}
+        }
+
+        expect(extErrorRef).to.not.equal(null)
+        if (extErrorRef !== null) {
+          expect(extErrorRef.error.statusText).to.equal('Socket request queue is full.')
+        }
         metricsInstance.dispose()
       })
     })
