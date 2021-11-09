@@ -1,13 +1,14 @@
 import { ForceUnit, TimeZone } from '../constants'
 import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface FacilityStrengthMachineConfigurationData {
   facilityId: number
   timeZone: TimeZone
   forceUnit: ForceUnit
-  primaryFocus: string
-  secondaryFocus: string
+  primaryFocus: StrengthMachineFocusableAttribute
+  secondaryFocus: StrengthMachineFocusableAttribute
   locale: string
 }
 
