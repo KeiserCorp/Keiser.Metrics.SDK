@@ -5,6 +5,7 @@ import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface A500MachineStateData {
   facilityStrengthMachineId: number
+  isFacilityConfigurationOverridden: boolean
   forceUnit: ForceUnit
   primaryFocus: StrengthMachineFocusableAttribute
   secondaryFocus: StrengthMachineFocusableAttribute
@@ -36,7 +37,7 @@ export class A500MachineState extends SubscribableModel {
     return this
   }
 
-  async update (params: { forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
+  async update (params: { isFacilityConfigurationOverridden: boolean, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
     const { a500MachineState } = await this.action('a500:updateMachineState', params) as A500MachineStateResponse
     this.setA500MachineState(a500MachineState)
     return this
@@ -44,6 +45,10 @@ export class A500MachineState extends SubscribableModel {
 
   ejectData () {
     return this.eject(this._a500MachineState)
+  }
+
+  get isFacilityConfigurationOverridden () {
+    return this._a500MachineState.isFacilityConfigurationOverridden
   }
 
   get forceUnit () {
