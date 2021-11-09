@@ -37,6 +37,7 @@ describe('A500 Machine State', function () {
   it('can get a500 machine state', async function () {
     a500MachineState = await strengthMachineSession.getA500MachineState()
 
+    expect(typeof a500MachineState.isFacilityConfigurationOverridden).to.equal('boolean')
     expect(typeof a500MachineState).to.not.equal('undefined')
     expect(typeof a500MachineState.forceUnit).to.equal('string')
     expect(typeof a500MachineState.primaryFocus).to.equal('string')
@@ -45,10 +46,12 @@ describe('A500 Machine State', function () {
 
   it('can update a500 machine state', async function () {
     a500MachineState = await a500MachineState.update({
+      isFacilityConfigurationOverridden: true,
       forceUnit: ForceUnit.Pounds,
       primaryFocus: 'rom',
       secondaryFocus: 'velocity'
     })
+    expect(a500MachineState.isFacilityConfigurationOverridden).to.equal(true)
     expect(a500MachineState.forceUnit).to.equal(ForceUnit.Pounds)
     expect(a500MachineState.primaryFocus).to.equal('rom')
     expect(a500MachineState.secondaryFocus).to.equal('velocity')
