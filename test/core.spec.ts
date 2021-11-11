@@ -26,4 +26,14 @@ describe('Core', function () {
     expect(status).to.be.an('object')
     expect(status.name).to.equal('keiser.metrics.api')
   })
+
+  it('can get time', async function () {
+    const time = await metricsInstance.core.time()
+
+    expect(time).to.be.an('object')
+    expect(time.serverTime).to.be.an('date')
+    expect(time.sentAt).to.be.an('date')
+    expect(time.receivedAt).to.be.an('date')
+    expect(time.roundTripTime).to.be.a('number')
+  })
 })

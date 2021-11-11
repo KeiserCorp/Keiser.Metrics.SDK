@@ -8,6 +8,18 @@ export interface HealthResponse {
   healthy: boolean
 }
 
+export interface TimeResponse {
+  isoDate: string
+  unixOffset: number
+}
+
+export interface RelativeTimeResponse {
+  serverTime: Date
+  sentAt: Date
+  receivedAt: Date
+  roundTripTime: number
+}
+
 export interface StatusResponse {
   nodeStatus: string
   problems: string[]
@@ -32,5 +44,12 @@ export class Core {
 
   async status () {
     return await this._connection.action('core:status') as StatusResponse
+  }
+
+  async time (): Promise<RelativeTimeResponse> {
+    const sentAt = new Date()
+    const { unixOffset } = await this._connection.action('core:time') as TimeResponse
+    const receivedAt = new Date()
+    return { serverTime: new Date(unixOffset), sentAt, receivedAt, roundTripTime: receivedAt.valueOf() - sentAt.valueOf() }
   }
 }
