@@ -42,13 +42,17 @@ export function GetErrorInstance (errorProperties: ActionErrorProperties) {
     ServerShutdownError,
     PendingActionOverflowError,
     DataSizeLimitError,
+    OTPTokenExpiredError,
     UnauthorizedTokenError,
+    InvalidAuthorizationCodeError,
     BlacklistTokenError,
     TokenInvalidError,
     ParseError,
     OAuthInvalidLoginError,
+    InvalidExchangeCodeError,
     UnauthorizedResourceError,
     OAuthCollisionError,
+    OAuthRequestError,
     OAuthRefreshTokenError,
     DuplicateActionError,
     ActionPreventedError,
@@ -56,7 +60,10 @@ export function GetErrorInstance (errorProperties: ActionErrorProperties) {
     SessionDataMissingError,
     FacilityLicenseExpiredError,
     FacilityAccessControlError,
-    UnhealthyNodeError
+    UnhealthyNodeError,
+    InvalidReturnUrlError,
+    SubscribePreventedError,
+    DatabaseError
   ].find(c => c.code === errorProperties.code)
 
   if (typeof ErrorType !== 'undefined') {
@@ -131,8 +138,16 @@ export class DataSizeLimitError extends RequestError {
   static readonly code = 611
 }
 
+export class OTPTokenExpiredError extends RequestError {
+  static readonly code = 612
+}
+
 export class UnauthorizedTokenError extends SessionError {
   static readonly code = 613
+}
+
+export class InvalidAuthorizationCodeError extends RequestError {
+  static readonly code = 614
 }
 
 export class BlacklistTokenError extends SessionError {
@@ -151,12 +166,20 @@ export class OAuthInvalidLoginError extends RequestError {
   static readonly code = 618
 }
 
+export class InvalidExchangeCodeError extends RequestError {
+  static readonly code = 619
+}
+
 export class UnauthorizedResourceError extends RequestError {
   static readonly code = 620
 }
 
 export class OAuthCollisionError extends RequestError {
   static readonly code = 621
+}
+
+export class OAuthRequestError extends RequestError {
+  static readonly code = 622
 }
 
 export class OAuthRefreshTokenError extends SessionError {
@@ -189,6 +212,18 @@ export class FacilityAccessControlError extends RequestError {
 
 export class UnhealthyNodeError extends ServerError {
   static readonly code = 630
+}
+
+export class InvalidReturnUrlError extends RequestError {
+  static readonly code = 631
+}
+
+export class SubscribePreventedError extends RequestError {
+  static readonly code = 632
+}
+
+export class DatabaseError extends RequestError {
+  static readonly code = 633
 }
 
 // Local Errors
