@@ -378,10 +378,12 @@ export class KioskSessionHandler extends BaseSessionHandler {
 }
 
 export class KioskSession {
+  private readonly _facilityId: number
   private readonly _sessionHandler: KioskSessionHandler
 
   constructor ({ accessToken }: { accessToken: string }, connection: MetricsConnection) {
     this._sessionHandler = new KioskSessionHandler(connection, { accessToken })
+    this._facilityId = this._sessionHandler.decodedAccessToken.facility.id
   }
 
   get sessionHandler () {
@@ -390,6 +392,10 @@ export class KioskSession {
 
   get kioskToken () {
     return this._sessionHandler.accessToken
+  }
+
+  get facilityId () {
+    return this._facilityId
   }
 
   close () {
@@ -480,11 +486,13 @@ export class StrengthMachineSessionHandler extends BaseSessionHandler {
 }
 
 export class StrengthMachineSession {
+  private readonly _facilityId: number
   private readonly _sessionHandler: StrengthMachineSessionHandler
   protected _facilityStrengthMachineData: FacilityStrengthMachineData
 
   constructor ({ accessToken, facilityStrengthMachine }: { accessToken: string, facilityStrengthMachine: FacilityStrengthMachineData }, connection: MetricsConnection) {
     this._sessionHandler = new StrengthMachineSessionHandler(connection, { accessToken })
+    this._facilityId = this._sessionHandler.decodedAccessToken.facility.id
     this._facilityStrengthMachineData = facilityStrengthMachine
   }
 
@@ -498,6 +506,10 @@ export class StrengthMachineSession {
 
   get onAccessTokenChangeEvent () {
     return this._sessionHandler.onAccessTokenChangeEvent
+  }
+
+  get facilityId () {
+    return this._facilityId
   }
 
   close () {
