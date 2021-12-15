@@ -15,7 +15,7 @@ import { Facilities, Facility, FacilityData, FacilityListResponse, FacilityRespo
 import { FacilityAccessControl, FacilityAccessControlResponse } from './models/facilityAccessControl'
 import { FacilityConfiguration, FacilityConfigurationResponse } from './models/facilityConfiguration'
 import { KioskSessionResponse } from './models/facilityKiosk'
-import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting } from './models/facilityRelationship'
+import { FacilityRelationshipResponse, FacilityUserMemberRelationship, FacilityUserMemberRelationships, FacilityUserRelationship, FacilityUserRelationshipListResponse, FacilityUserRelationships, FacilityUserRelationshipSorting, UserFacilityRelationship } from './models/facilityRelationship'
 import { FacilityStrengthMachine, FacilityStrengthMachineData } from './models/facilityStrengthMachine'
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './models/facilityStrengthMachineConfiguration'
 import { GlobalAccessControlData } from './models/globalAccessControl'
@@ -735,10 +735,16 @@ export class UserSession extends UserSessionBase<User> {
 
 export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
   protected readonly _user: FacilityMemberUser
+  protected readonly _facilityRelationship: UserFacilityRelationship
 
   constructor (facilityUserResponse: FacilityUserResponse, connection: MetricsConnection) {
-    super(facilityUserResponse, connection)
-    this._user = new FacilityMemberUser(facilityUserResponse.user, this._sessionHandler, facilityUserResponse.facilityRelationshipId)
+    super({ ...facilityUserResponse, user: facilityUserResponse.facilityRelationship.user }, connection)
+    this._user = new FacilityMemberUser(facilityUserResponse.facilityRelationship.user, this._sessionHandler, facilityUserResponse.facilityRelationship.id)
+    this._facilityRelationship = new UserFacilityRelationship(facilityUserResponse.facilityRelationship, this._sessionHandler)
+  }
+
+  get facilityRelationship () {
+    return this._facilityRelationship
   }
 }
 

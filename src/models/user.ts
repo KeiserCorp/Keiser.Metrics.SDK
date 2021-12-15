@@ -56,8 +56,7 @@ export interface ExchangeableUserResponse extends UserResponse {
 }
 
 export interface FacilityUserResponse extends AuthenticatedResponse {
-  user: UserData
-  facilityRelationshipId: number
+  facilityRelationship: FacilityRelationshipData
 }
 
 /** @hidden */

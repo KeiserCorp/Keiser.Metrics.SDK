@@ -72,6 +72,7 @@ describe('A500', function () {
     expect(typeof facilityUserSession).to.not.equal('undefined')
     expect(typeof facilityUserSession.user).to.not.equal('undefined')
     expect(facilityUserSession.user.id).to.equal(facilityRelationship.userId)
+    expect(facilityUserSession.facilityRelationship.id).to.equal(facilityRelationship.id)
   })
 
   it('can create A500 utilization instance', async function () {
