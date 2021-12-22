@@ -580,6 +580,14 @@ export abstract class UserSessionBase<UserType extends User = User> {
     this._sessionHandler.keepAlive = value
   }
 
+  get accessToken () {
+    return this._sessionHandler.accessToken
+  }
+
+  get onAccessTokenChangeEvent () {
+    return this._sessionHandler.onAccessTokenChangeEvent
+  }
+
   get refreshToken () {
     return this._sessionHandler.refreshToken
   }
