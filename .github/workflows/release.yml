@@ -116,7 +116,7 @@ jobs:
         run: npm run build
 
       - name: Bundle Core Files
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: dist/core
           dest: Keiser.Metrics.SDK-${{ needs.version-check.outputs.version }}.dist.zip
@@ -132,7 +132,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Bundle Admin Files
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: dist/admin
           dest: Keiser.Metrics.SDK.Admin-${{ needs.version-check.outputs.version }}.dist.zip
@@ -148,7 +148,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Bundle SSO Files
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: dist/sso
           dest: Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
