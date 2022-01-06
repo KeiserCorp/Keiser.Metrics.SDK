@@ -17,6 +17,7 @@ export interface DevelopmentAccountRelationshipRequestData {
   displayEmail: string
   role: DevelopmentAccountRelationshipRole
   code?: string
+  company: string
 }
 
 export interface DevelopmentAccountRelationshipRequestResponse extends AuthenticatedResponse {
@@ -90,5 +91,9 @@ export class DevelopmentAccountRelationshipRequest extends Model {
 
   get code () {
     return this._developmentAccountRelationshipRequestData.code
+  }
+
+  get company () {
+    return this._developmentAccountRelationshipRequestData.company
   }
 }

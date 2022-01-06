@@ -83,7 +83,7 @@ export class DevelopmentAccount extends Model {
     return new Application(application, this.sessionHandler)
   }
 
-  async getApplications (options: { sort?: ApplicationSorting, ascending?: boolean, limit?: number, offset?: number }) {
+  async getApplications (options: { name?: string, sort?: ApplicationSorting, ascending?: boolean, limit?: number, offset?: number }) {
     const { applications, applicationsMeta } = (await this.action('application:list', { ...options, developmentAccountId: this.id })) as ApplicationListResponse
     return new Applications(applications, applicationsMeta, this.sessionHandler)
   }

@@ -93,6 +93,17 @@ describe('Development Account Relationship', function () {
     createdDevelopmentAccountRelationshipRequest = developmentAccountRelationshipRequest
   })
 
+  it('can get a Development Account Relationship Request with a code', async function () {
+    const developmentAccountRelationshipRequest = await demoUser.getDevelopmentAccountRelationshipRequest({
+      code: createdDevelopmentAccountRelationshipRequest.code
+    })
+
+    expect(developmentAccountRelationshipRequest).to.be.an('object')
+    expect(developmentAccountRelationshipRequest.code).to.not.be.equal(null)
+    expect(developmentAccountRelationshipRequest.developmentAccountId).to.be.equal(createdDevelopmentAccountRelationshipRequest.developmentAccountId)
+    expect(developmentAccountRelationshipRequest.displayEmail).to.be.equal(createdDevelopmentAccountRelationshipRequest.displayEmail)
+  })
+
   it('can list Development Account Relationship Requests', async function () {
     const developmentAccountRelationshipRequests = await createdDevelopmentAccount.getDevelopmentAccountRelationshipRequests({
       sort: DevelopmentAccountRelationshipRequestSorting.ID,
@@ -105,6 +116,7 @@ describe('Development Account Relationship', function () {
     expect(developmentAccountRelationshipRequests.length).to.be.above(0)
     expect(developmentAccountRelationshipRequests.meta.sort).to.be.equal(DevelopmentAccountRelationshipRequestSorting.ID)
     expect(developmentAccountRelationshipRequests[0].code).to.not.equal(null)
+    expect(developmentAccountRelationshipRequests[0].company).to.be.equal('Keiser')
     expect(developmentAccountRelationshipRequests[0].developmentAccountId).to.be.equal(createdDevelopmentAccount.id)
     expect(developmentAccountRelationshipRequests[0].displayEmail).to.be.equal('demo@keiser.com')
   })
