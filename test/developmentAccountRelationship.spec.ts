@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import { ActionPreventedError } from '../src/error'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipRole, DevelopmentAccountRelationshipSorting } from '../src/models/developmentAccountRelationship'
 import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestSorting } from '../src/models/developmentAccountRelationshipRequest'
@@ -116,7 +116,6 @@ describe('Development Account Relationship', function () {
     expect(developmentAccountRelationshipRequests.length).to.be.above(0)
     expect(developmentAccountRelationshipRequests.meta.sort).to.be.equal(DevelopmentAccountRelationshipRequestSorting.ID)
     expect(developmentAccountRelationshipRequests[0].code).to.not.equal(null)
-    expect(developmentAccountRelationshipRequests[0].company).to.be.equal('Keiser')
     expect(developmentAccountRelationshipRequests[0].developmentAccountId).to.be.equal(createdDevelopmentAccount.id)
     expect(developmentAccountRelationshipRequests[0].displayEmail).to.be.equal('demo@keiser.com')
   })
@@ -187,6 +186,6 @@ describe('Development Account Relationship', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError?.code).to.be.equal(UnknownEntityError.code)
+    expect(extError?.code).to.be.equal(601)
   })
 })
