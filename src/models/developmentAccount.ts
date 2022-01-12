@@ -98,7 +98,7 @@ export class DevelopmentAccount extends Model {
     return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
   }
 
-  async getDevelopmentAccountRelationshipRequests (options: { email?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
+  async getDevelopmentAccountRelationshipRequests (options: { email?: string, company?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
     const { developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta } = await this.action('developmentAccountRelationshipRequest:list', { ...options, developmentAccountId: this.id }) as DevelopmentAccountRelationshipRequestListResponse
     return new DevelopmentAccountRelationshipRequests(developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta, this.sessionHandler)
   }
