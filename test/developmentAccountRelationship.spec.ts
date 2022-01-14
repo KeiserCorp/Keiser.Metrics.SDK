@@ -186,6 +186,6 @@ describe('Development Account Relationship', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError?.code).to.be.equal(601)
+    expect(extError?.code).to.be.equal(605)
   })
 })
