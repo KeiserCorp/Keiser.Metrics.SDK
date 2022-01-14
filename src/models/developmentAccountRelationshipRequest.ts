@@ -35,6 +35,7 @@ export interface DevelopmentAccountRelationshipRequestListResponseMeta extends L
   developmentAccountId?: number
   userId?: number
   email?: string
+  company: string
   sort: DevelopmentAccountRelationshipRequestSorting
 }
 
