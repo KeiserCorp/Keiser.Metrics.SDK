@@ -26,6 +26,7 @@ export interface ApplicationListResponse extends AuthenticatedResponse {
 
 export interface ApplicationListResponseMeta extends ListMeta {
   developmentAccountId: number
+  name: string
   sort: ApplicationSorting
 }
 
