@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { DevelopmentAccountData } from './developmentAccount'
 import { DevelopmentAccountRelationshipRole } from './developmentAccountRelationship'
 
 export enum DevelopmentAccountRelationshipRequestSorting {
@@ -17,6 +18,7 @@ export interface DevelopmentAccountRelationshipRequestData {
   displayEmail: string
   role: DevelopmentAccountRelationshipRole
   code?: string
+  developmentAccount: DevelopmentAccountData
 }
 
 export interface DevelopmentAccountRelationshipRequestResponse extends AuthenticatedResponse {
@@ -33,6 +35,7 @@ export interface DevelopmentAccountRelationshipRequestListResponseMeta extends L
   developmentAccountId?: number
   userId?: number
   email?: string
+  company: string
   sort: DevelopmentAccountRelationshipRequestSorting
 }
 
@@ -61,7 +64,7 @@ export class DevelopmentAccountRelationshipRequest extends Model {
   }
 
   async delete () {
-    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id })
+    await this.action('developmentAccountRelationshipRequest:delete', { id: this.id, developmentAccountId: this.developmentAccountId })
   }
 
   ejectData () {
@@ -90,5 +93,9 @@ export class DevelopmentAccountRelationshipRequest extends Model {
 
   get code () {
     return this._developmentAccountRelationshipRequestData.code
+  }
+
+  get developmentAccount () {
+    return this._developmentAccountRelationshipRequestData.developmentAccount
   }
 }

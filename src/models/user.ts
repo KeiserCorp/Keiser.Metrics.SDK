@@ -298,12 +298,12 @@ export class User extends SubscribableModel {
     return new DevelopmentAccounts(developmentAccounts, developmentAccountsMeta, this.sessionHandler)
   }
 
-  async getDevelopmentAccountRelationshipRequest (params: { id: number, developmentAccountId: number}) {
+  async getDevelopmentAccountRelationshipRequest (params: { id?: number, developmentAccountId?: number, code?: string }) {
     const { developmentAccountRelationshipRequest } = await this.action('developmentAccountRelationshipRequest:show', params) as DevelopmentAccountRelationshipRequestResponse
     return new DevelopmentAccountRelationshipRequest(developmentAccountRelationshipRequest, this.sessionHandler)
   }
 
-  async getDevelopmentAccountRelationshipRequests (options: { developmentAccountId?: number, email?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
+  async getDevelopmentAccountRelationshipRequests (options: { developmentAccountId?: number, email?: string, company?: string, sort?: DevelopmentAccountRelationshipRequestSorting, ascending?: boolean, limit?: number, offset?: number}) {
     const { developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta } = await this.action('developmentAccountRelationshipRequest:list', { ...options, userId: this.id }) as DevelopmentAccountRelationshipRequestListResponse
     return new DevelopmentAccountRelationshipRequests(developmentAccountRelationshipRequests, developmentAccountRelationshipRequestsMeta, this.sessionHandler)
   }

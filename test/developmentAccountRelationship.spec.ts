@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionPreventedError, UnknownEntityError } from '../src/error'
+import { ActionPreventedError } from '../src/error'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipRole, DevelopmentAccountRelationshipSorting } from '../src/models/developmentAccountRelationship'
 import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestSorting } from '../src/models/developmentAccountRelationshipRequest'
@@ -93,6 +93,17 @@ describe('Development Account Relationship', function () {
     createdDevelopmentAccountRelationshipRequest = developmentAccountRelationshipRequest
   })
 
+  it('can get a Development Account Relationship Request with a code', async function () {
+    const developmentAccountRelationshipRequest = await demoUser.getDevelopmentAccountRelationshipRequest({
+      code: createdDevelopmentAccountRelationshipRequest.code
+    })
+
+    expect(developmentAccountRelationshipRequest).to.be.an('object')
+    expect(developmentAccountRelationshipRequest.code).to.not.be.equal(null)
+    expect(developmentAccountRelationshipRequest.developmentAccountId).to.be.equal(createdDevelopmentAccountRelationshipRequest.developmentAccountId)
+    expect(developmentAccountRelationshipRequest.displayEmail).to.be.equal(createdDevelopmentAccountRelationshipRequest.displayEmail)
+  })
+
   it('can list Development Account Relationship Requests', async function () {
     const developmentAccountRelationshipRequests = await createdDevelopmentAccount.getDevelopmentAccountRelationshipRequests({
       sort: DevelopmentAccountRelationshipRequestSorting.ID,
@@ -175,6 +186,6 @@ describe('Development Account Relationship', function () {
     }
 
     expect(extError).to.be.an('error')
-    expect(extError?.code).to.be.equal(UnknownEntityError.code)
+    expect(extError?.code).to.be.equal(605)
   })
 })
