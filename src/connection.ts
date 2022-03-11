@@ -111,6 +111,10 @@ export class MetricsConnection {
     return this._onPushDataEvent.asEvent()
   }
 
+  get baseUrl () {
+    return new URL(this._restEndpoint)
+  }
+
   private async openConnection () {
     if (this._persistConnection) {
       this.checkCallbacks()

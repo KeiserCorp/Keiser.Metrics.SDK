@@ -5,6 +5,7 @@ import { A500DataSet, A500DataSetData } from './a500DataSet'
 import { Session, SessionData } from './session'
 import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
+import { UserData } from './user'
 
 export enum ResistancePrecision {
   Integer = 'int',
@@ -21,6 +22,10 @@ export enum StrengthTestType {
 export enum StrengthMachineDataSetSorting {
   ID = 'id',
   CompletedAt = 'completedAt'
+}
+
+export enum StrengthMachineDataSetExportFormat {
+  KA5 = 'ka5'
 }
 
 export interface StrengthMachineDataSetData {
@@ -49,6 +54,10 @@ export interface StrengthMachineDataSetData {
   session?: SessionData
 }
 
+export interface KA5StrengthMachineDataSetData extends StrengthMachineDataSetData {
+  user: UserData
+}
+
 export interface StrengthMachineDataSetTestData {
   testType: StrengthTestType
   high: StrengthMachineDataSetTestSubsetData
@@ -75,6 +84,12 @@ export interface StrengthMachineDataSetListResponseMeta extends UserListMeta {
   from?: string
   to?: string
   sort: StrengthMachineDataSetSorting
+}
+
+export interface StrengthMachineDataSetExportResponse extends AuthenticatedResponse {
+  format: StrengthMachineDataSetExportFormat
+  encoding: 'b64'
+  data: string
 }
 
 export class StrengthMachineDataSets extends SubscribableModelList<StrengthMachineDataSet, StrengthMachineDataSetData, StrengthMachineDataSetListResponseMeta> {
@@ -240,6 +255,20 @@ export class StrengthMachineDataSet extends SubscribableModel {
 
   eagerStrengthExercise () {
     return typeof this._strengthMachineDataSetData.strengthExercise !== 'undefined' ? new StrengthExercise(this._strengthMachineDataSetData.strengthExercise, this.sessionHandler) : undefined
+  }
+
+  async getExportBuffer (params: { format: StrengthMachineDataSetExportFormat }) {
+    const { encoding, data } = await this.action('strengthMachineDataSet:export', { ...params, id: this.id }) as StrengthMachineDataSetExportResponse
+    switch (encoding) {
+      case 'b64':
+        return Buffer.from(data, 'base64')
+    }
+  }
+
+  getFlatExportUrl (params: { format: StrengthMachineDataSetExportFormat }) {
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/user/${this._strengthMachineDataSetData.userId.toString()}/strength-machine-data-set/${this.id}.${params.format}`)
+    url.searchParams.append('authorization', this.sessionHandler.accessToken)
+    return url.toString()
   }
 }
 
