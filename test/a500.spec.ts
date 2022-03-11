@@ -1,8 +1,11 @@
+import axios from 'axios'
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
+import { decompressKA5FromBuffer } from '../src/lib/compress'
 import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
+import { StrengthMachineDataSetExportFormat } from '../src/models/strengthMachineDataSet'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'
 import { a500SetDataSample, a500TimeSeriesDataPointSamples } from './samples/a500'
 import { randomEmailAddress, randomNumberSequence } from './utils/dummy'
@@ -114,5 +117,49 @@ describe('A500', function () {
       expect(a500DataSet.eagerLeftTestResult()).to.not.equal('undefined')
       expect(a500DataSet.eagerRightTestResult()).to.not.equal('undefined')
     }
+  })
+
+  it('can export a500 data set in action', async function () {
+    this.timeout(10000)
+    if (typeof a500ResultId === 'undefined') {
+      this.skip()
+    }
+
+    const strengthMachineDataSet = await facilityUserSession.user.getStrengthMachineDataSet({ id: a500ResultId })
+
+    expect(typeof strengthMachineDataSet).to.not.equal('undefined')
+    expect(strengthMachineDataSet.id).to.equal(a500ResultId)
+
+    const exportBuffer = await strengthMachineDataSet.getExportBuffer({ format: StrengthMachineDataSetExportFormat.KA5 })
+
+    expect(typeof exportBuffer).to.not.equal('undefined')
+    expect(new TextDecoder('utf-8').decode(new Uint8Array(exportBuffer).slice(0, 6))).to.equal('ka5.1!')
+
+    const strengthMachineDataSetData = decompressKA5FromBuffer(exportBuffer)
+    expect(typeof strengthMachineDataSetData).to.equal('object')
+    expect(typeof strengthMachineDataSetData.user).to.equal('object')
+  })
+
+  it('can export a500 data set to flat file', async function () {
+    this.timeout(10000)
+    if (typeof a500ResultId === 'undefined') {
+      this.skip()
+    }
+
+    const strengthMachineDataSet = await facilityUserSession.user.getStrengthMachineDataSet({ id: a500ResultId })
+
+    expect(typeof strengthMachineDataSet).to.not.equal('undefined')
+    expect(strengthMachineDataSet.id).to.equal(a500ResultId)
+
+    const exportUrl = strengthMachineDataSet.getFlatExportUrl({ format: StrengthMachineDataSetExportFormat.KA5 })
+
+    expect(typeof exportUrl).to.equal('string')
+    const response = await axios.get(exportUrl, { responseType: 'arraybuffer' })
+    expect(response.status).to.equal(200)
+    expect(typeof response.data).to.equal('object')
+
+    const strengthMachineDataSetData = decompressKA5FromBuffer(response.data)
+    expect(typeof strengthMachineDataSetData).to.equal('object')
+    expect(typeof strengthMachineDataSetData.user).to.equal('object')
   })
 })
