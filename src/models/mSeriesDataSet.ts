@@ -27,13 +27,19 @@ export interface MSeriesDataSetData {
   averageCadence: number
   maxPower: number
   averagePower: number
+  maxWattsPerKilogram: number
+  averageWattsPerKilogram: number
+  averageFtp: number | null
+  maxFtp: number | null
   energyOutput: number
   caloricBurn: number
   distance: number
   averageMetabolicEquivalent: number | null
   stepCount: number | null
-  duration: string
+  duration: number
   initialOffset: string
+  targetFtp: number | null
+  weight: number // metric
   mSeriesFtpMeasurement?: MSeriesFtpMeasurementData
   graphData?: MSeriesDataPointData[]
   session?: SessionData
@@ -172,6 +178,34 @@ export class MSeriesDataSet extends SubscribableModel {
   }
 
   /**
+   * @returns Maximum watts per kilogram
+   */
+  get maxWattsPerKilogram () {
+    return this._mSeriesDataSetData.maxWattsPerKilogram
+  }
+
+  /**
+   * @returns Average watts per kilogram
+   */
+  get averageWattsPerKilogram () {
+    return this._mSeriesDataSetData.averageWattsPerKilogram
+  }
+
+  /**
+   * @returns Maximum ftp percentage
+   */
+  get maxFtp () {
+    return this._mSeriesDataSetData.maxFtp
+  }
+
+  /**
+   * @returns Average ftp percentage
+   */
+  get averageFtp () {
+    return this._mSeriesDataSetData.averageFtp
+  }
+
+  /**
    * @returns Energy produced Joules
    */
   get energyOutput () {
@@ -210,7 +244,7 @@ export class MSeriesDataSet extends SubscribableModel {
    * @returns Duration in number of seconds since start
    */
   get duration () {
-    return durationToSeconds(this._mSeriesDataSetData.duration)
+    return ~~(this._mSeriesDataSetData.duration / 1000)
   }
 
   /**
@@ -218,6 +252,20 @@ export class MSeriesDataSet extends SubscribableModel {
    */
   get initialOffset () {
     return durationToSeconds(this._mSeriesDataSetData.initialOffset)
+  }
+
+  /**
+   * @returns Ftp that was used during the data set.  This value can differ from the MSeriesFtpMeasurement
+   */
+  get targetFtp () {
+    return this._mSeriesDataSetData.targetFtp
+  }
+
+  /**
+   * @returns Weight in metric.
+   */
+  get weight () {
+    return this._mSeriesDataSetData.weight
   }
 
   get graphData () {
