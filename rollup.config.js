@@ -108,7 +108,7 @@ const buildConfig = (entryPoint) => {
         nodeResolve(),
         inject({
           Buffer: ['buffer', 'Buffer'],
-          include: ['src/lib/*']
+          include: ['src/**/*']
         }),
         generatePackageJson({
           outputFolder: DIST,
@@ -166,7 +166,7 @@ const buildConfig = (entryPoint) => {
         nodeResolve(),
         inject({
           Buffer: ['buffer', 'Buffer'],
-          include: ['src/lib/*']
+          include: ['src/**/*']
         })
       ]
     }
