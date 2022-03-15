@@ -69,6 +69,7 @@ const buildConfig = (entryPoint) => {
     {
       input: SRC,
       preserveModules: true,
+      treeshake: false,
       output: [
         {
           dir: DIST,
@@ -128,6 +129,7 @@ const buildConfig = (entryPoint) => {
     {
       input: SRC,
       preserveModules: true,
+      treeshake: false,
       output: [
         {
           dir: ESNEXT_DIST,
