@@ -266,7 +266,7 @@ export class StrengthMachineDataSet extends SubscribableModel {
   }
 
   getFlatExportUrl (params: { format: StrengthMachineDataSetExportFormat }) {
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/user/${this._strengthMachineDataSetData.userId.toString()}/strength-machine-data-set/${this.id}.${params.format}`)
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/user/${this._strengthMachineDataSetData.userId.toString()}/strength-machine-data-set/${this.completedAt.toJSON().slice(0, 19)}.${params.format}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }

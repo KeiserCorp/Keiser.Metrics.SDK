@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { ForceUnit } from '../src/constants'
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
-import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
+import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetExportFormat, StrengthMachineDataSetSorting } from '../src/models/strengthMachineDataSet'
 import { User } from '../src/models/user'
 import { ModelChangeEvent } from '../src/session'
 import { IsBrowser } from './utils/constants'
@@ -67,6 +67,16 @@ describe('Strength Machine Data Set', function () {
     expect(typeof strengthMachineDataSet).to.equal('object')
     expect(strengthMachineDataSet.id).to.equal(createdStrengthMachineDataSet.id)
     expect(strengthMachineDataSet.repetitionCount).to.equal(createdStrengthMachineDataSet.repetitionCount)
+  })
+
+  it('can generate flat export url', async function () {
+    const strengthMachineDataSet = await user.getStrengthMachineDataSet({ id: createdStrengthMachineDataSet.id })
+    const exportUrl = strengthMachineDataSet.getFlatExportUrl({ format: StrengthMachineDataSetExportFormat.KA5 })
+    expect(typeof exportUrl).to.equal('string')
+
+    const split1 = exportUrl.split('/')
+    const fileName = split1[split1.length - 1].split('?')[0]
+    expect(fileName).to.equal(`${strengthMachineDataSet.completedAt.toJSON().slice(0, 19)}.ka5`)
   })
 
   it('can delete Strength Machine data set', async function () {
