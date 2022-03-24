@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { UserApplicationAuthorization, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizations, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
 
 export enum ApplicationSorting {
   ID = 'id',
@@ -80,6 +81,16 @@ export class Application extends Model {
     const { application } = await this.action('application:show', { id: this.id, developmentAccountId: this.developmentAccountId }) as ApplicationResponse
     this.setApplication(application)
     return this
+  }
+
+  async getUserApplicationAuthorization (params: { id: number, developmentAccountId: number }) {
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { params }) as UserApplicationAuthorizationResponse
+    return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
+  }
+
+  async getUserApplicationAuthorizations (options: { developmentAccountId: number, applicationId: number, sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number }) {
+    const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:developerList', { ...options }) as UserApplicationAuthorizationListResponse
+    return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
 
   async update (options: { applicationName?: string, redirectUrl?: string }) {

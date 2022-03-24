@@ -4,7 +4,7 @@ import Metrics from './core'
 import { ClientSideActionPrevented } from './error'
 import { DecodeJWT } from './lib/jwt'
 import { GlobalAccessControl, GlobalAccessControlData } from './models/globalAccessControl'
-import { OAuthProviders } from './models/oauthService'
+import { oAuthGrantTypes, OAuthProviders } from './models/oauthService'
 import { Gender } from './models/profile'
 import { ExchangeableUserResponse } from './models/user'
 import { CheckReturnRouteResponse, RedirectResponse, UserSession } from './session'
@@ -13,6 +13,10 @@ export default class MetricsSSO extends Metrics {
   async isReturnRouteValid (params: {returnUrl: string}) {
     const response = await this._connection.action('auth:validateReturnRoute', params) as CheckReturnRouteResponse
     return response.valid
+  }
+
+  async token (params: { clientIdentifier: string, clientSecret: string, authorizationCode?: string, refreshToken?: string, grantType: oAuthGrantTypes }) {
+    return await this._connection.action('oauth:initiate', { ...params })
   }
 
   async authenticateWithToken (params: { token: string }) {

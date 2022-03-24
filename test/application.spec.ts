@@ -21,7 +21,9 @@ describe('Application', function () {
     const developmentAccount = await user.createDevelopmentAccount({
       company: 'Keiser',
       address: '2470 S Cherry Ave, Fresno, CA 93706',
-      websiteUrl: 'www.keiser.com'
+      websiteUrl: 'www.keiser.com',
+      privacyUrl: 'www.keiser.com/privacy',
+      termsUrl: 'www.keiser.com/terms'
     })
 
     createdDevelopmentAccount = developmentAccount
@@ -33,7 +35,7 @@ describe('Application', function () {
     metricsInstance?.dispose()
   })
 
-  it('can create an Appliction', async function () {
+  it('can create an Application', async function () {
     const application = await createdDevelopmentAccount.createApplication({
       applicationName: 'Test Application',
       redirectUrl: 'www.testapplication.com/redirect'

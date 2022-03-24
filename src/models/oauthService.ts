@@ -14,6 +14,16 @@ export enum OAuthProviders {
   TrainingPeaks = 'trainingpeaks'
 }
 
+export enum oAuthResponseTypes {
+  Code = 'code',
+  Token = 'token'
+}
+
+export enum oAuthGrantTypes {
+  AuthorizationCode = 'authorization_code',
+  RefreshToken = 'refresh_token'
+}
+
 export interface OAuthServiceData {
   id: number
   userId: number
