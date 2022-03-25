@@ -21,7 +21,7 @@ export interface TaskStats {
 }
 
 export interface TaskWorkers {
-  [key: string]: 'started' | TaskWorkerStatus
+  [key: string]: string
 }
 
 export interface TaskPayload {
