@@ -1,6 +1,7 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Units } from './constants'
 import { Core } from './models/core'
+import { oAuthGrantTypes } from './models/oauthService'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
 import { UserResponse } from './models/user'
@@ -29,6 +30,12 @@ interface CoreEndpointResponse {
     metricsApp: string
     facility: string
   }
+}
+
+interface OAuthTokenResponse {
+  accessToken: string
+  refreshToken: string
+  expiresIn: string
 }
 
 export default class Metrics {
@@ -75,6 +82,11 @@ export default class Metrics {
       ssoUrl.searchParams.append(name, value)
     }
     return ssoUrl
+  }
+
+  async token (params: { clientIdentifier: string, clientSecret: string, authorizationCode?: string, refreshToken?: string, grantType: oAuthGrantTypes}) {
+    const response = await this._connection.action('oauth:token', { ...params }) as OAuthTokenResponse
+    return { accessToken: response.accessToken, refreshToken: response.refreshToken, expiresIn: response.expiresIn }
   }
 
   async authenticateWithExchangeToken (params: { exchangeToken: string}) {
