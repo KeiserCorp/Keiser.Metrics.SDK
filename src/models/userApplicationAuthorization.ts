@@ -44,7 +44,7 @@ export class UserApplicationAuthorization extends Model {
   }
 
   async reload () {
-    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:show', { id: this.id }) as UserApplicationAuthorizationResponse
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', { id: this.id }) as UserApplicationAuthorizationResponse
     this.setUserApplicationAuthorization(userApplicationAuthorization)
     return this
   }

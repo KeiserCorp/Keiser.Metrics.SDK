@@ -84,7 +84,7 @@ export class Application extends Model {
   }
 
   async getUserApplicationAuthorization (params: { id: number, developmentAccountId: number }) {
-    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { params }) as UserApplicationAuthorizationResponse
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { ...params }) as UserApplicationAuthorizationResponse
     return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
   }
 

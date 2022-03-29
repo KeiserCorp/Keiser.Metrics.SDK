@@ -1,11 +1,12 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
+import { UnknownEntityError } from '../src/error'
 import { Application } from '../src/models/application'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { oAuthGrantTypes, oAuthResponseTypes } from '../src/models/oauthService'
 import { User } from '../src/models/user'
-import { UserApplicationAuthorizationSorting } from '../src/models/userApplicationAuthorization'
+import { UserApplicationAuthorization, UserApplicationAuthorizationSorting } from '../src/models/userApplicationAuthorization'
 import { createNewUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('User Application Authorization', function () {
@@ -14,6 +15,7 @@ describe('User Application Authorization', function () {
   let user: User
   let createdApplication: Application
   let createdDevelopmentAccount: DevelopmentAccount
+  let createdUserApplicationAuthorization: UserApplicationAuthorization
   let authorizationCode: string
 
   before(async function () {
@@ -83,5 +85,58 @@ describe('User Application Authorization', function () {
     expect(userApplicationAuthorizations.meta.sort).to.be.equal(UserApplicationAuthorizationSorting.ID)
     expect(userApplicationAuthorizations[0].applicationId).to.equal(createdApplication.id)
     expect(userApplicationAuthorizations[0].userId).to.equal(user.id)
+
+    createdUserApplicationAuthorization = userApplicationAuthorizations[0]
+  })
+
+  it('can list user application authorizations as a developer', async function () {
+    const userApplicationAuthorizations = await createdApplication.getUserApplicationAuthorizations({
+      developmentAccountId: createdDevelopmentAccount.id,
+      applicationId: createdApplication.id
+    })
+
+    expect(Array.isArray(userApplicationAuthorizations)).to.equal(true)
+    expect(userApplicationAuthorizations.length).to.be.above(0)
+    expect(userApplicationAuthorizations.meta.sort).to.be.equal(UserApplicationAuthorizationSorting.ID)
+    expect(userApplicationAuthorizations[0].applicationId).to.equal(createdApplication.id)
+    expect(userApplicationAuthorizations[0].userId).to.equal(user.id)
+  })
+
+  it('can show a user application authorization as a user', async function () {
+    const userApplicationAuthorization = await user.getUserApplicationAuthorization({
+      id: createdUserApplicationAuthorization.id
+    })
+
+    expect(userApplicationAuthorization).to.be.an('object')
+    expect(userApplicationAuthorization.id).to.not.equal(null)
+    expect(userApplicationAuthorization.userId).to.not.equal(null)
+    expect(userApplicationAuthorization.applicationId).to.not.equal(null)
+  })
+
+  it('can show a user application authorization as a developer', async function () {
+    const userApplicationAuthorization = await createdApplication.getUserApplicationAuthorization({
+      id: createdUserApplicationAuthorization.id,
+      developmentAccountId: createdDevelopmentAccount.id
+    })
+
+    expect(userApplicationAuthorization).to.be.an('object')
+    expect(userApplicationAuthorization.id).to.not.equal(null)
+    expect(userApplicationAuthorization.userId).to.not.equal(null)
+    expect(userApplicationAuthorization.applicationId).to.not.equal(null)
+  })
+
+  it('can delete a user application authorization', async function () {
+    let extError
+
+    await createdUserApplicationAuthorization.userDelete()
+
+    try {
+      await createdUserApplicationAuthorization.reload()
+    } catch (error: any) {
+      extError = error
+    }
+
+    expect(extError).to.be.an('error')
+    expect(extError?.code).to.be.equal(UnknownEntityError.code)
   })
 })
