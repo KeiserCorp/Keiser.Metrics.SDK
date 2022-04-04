@@ -14,12 +14,12 @@ export enum OAuthProviders {
   TrainingPeaks = 'trainingpeaks'
 }
 
-export enum oAuthResponseTypes {
+export enum OAuthResponseTypes {
   Code = 'code',
   Token = 'token'
 }
 
-export enum oAuthGrantTypes {
+export enum OAuthGrantTypes {
   AuthorizationCode = 'authorization_code',
   RefreshToken = 'refresh_token'
 }

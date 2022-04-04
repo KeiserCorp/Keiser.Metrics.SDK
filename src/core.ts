@@ -1,7 +1,7 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Units } from './constants'
 import { Core } from './models/core'
-import { oAuthGrantTypes } from './models/oauthService'
+import { OAuthGrantTypes } from './models/oauthService'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
 import { UserResponse } from './models/user'
@@ -84,7 +84,7 @@ export default class Metrics {
     return ssoUrl
   }
 
-  async token (params: { clientIdentifier: string, clientSecret: string, authorizationCode?: string, refreshToken?: string, grantType: oAuthGrantTypes}) {
+  async token (params: { clientIdentifier: string, clientSecret: string, authorizationCode?: string, refreshToken?: string, grantType: OAuthGrantTypes}) {
     const response = await this._connection.action('oauth:token', { ...params }) as OAuthTokenResponse
     return { accessToken: response.accessToken, refreshToken: response.refreshToken, expiresIn: response.expiresIn }
   }

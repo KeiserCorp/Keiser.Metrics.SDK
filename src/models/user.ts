@@ -19,12 +19,12 @@ import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChalleng
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse } from './mSeriesChallengeParticipant'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
-import { OAuthProviders, oAuthResponseTypes, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
+import { OAuthProviders, OAuthResponseTypes, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
-import { UserApplicationAuthorization, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizations, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
+import { UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizationSorting, UserApplicationAuthorizationsUser, UserApplicationAuthorizationUser } from './userApplicationAuthorization'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
@@ -169,7 +169,7 @@ export class User extends SubscribableModel {
     return typeof this._userData.oauthServices !== 'undefined' ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
   }
 
-  async authorize (params: { clientIdentifier: string, redirectUrl: string, responseType: oAuthResponseTypes, state: string }) {
+  async authorize (params: { clientIdentifier: string, redirectUrl: string, responseType: OAuthResponseTypes, state: string }) {
     const response = await this.action('oauth:authorize', { ...params }) as RedirectResponse
     return { redirectUrl: response.url }
   }
@@ -321,12 +321,12 @@ export class User extends SubscribableModel {
 
   async getUserApplicationAuthorization (params: { id: number, userId?: number }) {
     const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', params) as UserApplicationAuthorizationResponse
-    return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
+    return new UserApplicationAuthorizationUser(userApplicationAuthorization, this.sessionHandler)
   }
 
-  async getUserApplicationAuthorizations (options: { userId?: number, sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number}) {
+  async getUserApplicationAuthorizations (options?: { userId?: number, sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number}) {
     const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:userList', { ...options }) as UserApplicationAuthorizationListResponse
-    return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
+    return new UserApplicationAuthorizationsUser(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
 
   async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {

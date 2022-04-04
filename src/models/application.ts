@@ -1,6 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { UserApplicationAuthorization, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizations, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
+import { UserApplicationAuthorizationDeveloper, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizationsDeveloper, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
 
 export enum ApplicationSorting {
   ID = 'id',
@@ -85,12 +85,12 @@ export class Application extends Model {
 
   async getUserApplicationAuthorization (params: { id: number }) {
     const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { ...params, developmentAccountId: this.developmentAccountId }) as UserApplicationAuthorizationResponse
-    return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
+    return new UserApplicationAuthorizationDeveloper(userApplicationAuthorization, this.sessionHandler)
   }
 
   async getUserApplicationAuthorizations (options?: { sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number }) {
     const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:developerList', { ...options, applicationId: this.id, developmentAccountId: this.developmentAccountId }) as UserApplicationAuthorizationListResponse
-    return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
+    return new UserApplicationAuthorizationsDeveloper(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
 
   async update (options: { applicationName?: string, redirectUrl?: string }) {

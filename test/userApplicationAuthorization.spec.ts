@@ -4,9 +4,9 @@ import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { Application } from '../src/models/application'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
-import { oAuthGrantTypes, oAuthResponseTypes } from '../src/models/oauthService'
+import { OAuthGrantTypes, OAuthResponseTypes } from '../src/models/oauthService'
 import { User } from '../src/models/user'
-import { UserApplicationAuthorization, UserApplicationAuthorizationSorting } from '../src/models/userApplicationAuthorization'
+import { UserApplicationAuthorizationSorting, UserApplicationAuthorizationUser } from '../src/models/userApplicationAuthorization'
 import { createNewUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
 describe('User Application Authorization', function () {
@@ -15,7 +15,7 @@ describe('User Application Authorization', function () {
   let user: User
   let createdApplication: Application
   let createdDevelopmentAccount: DevelopmentAccount
-  let createdUserApplicationAuthorization: UserApplicationAuthorization
+  let createdUserApplicationAuthorization: UserApplicationAuthorizationUser
   let authorizationCode: string
 
   before(async function () {
@@ -51,7 +51,7 @@ describe('User Application Authorization', function () {
     const response = await user.authorize({
       clientIdentifier: createdApplication.clientId,
       redirectUrl: createdApplication.redirectUrl,
-      responseType: oAuthResponseTypes.Code,
+      responseType: OAuthResponseTypes.Code,
       state: 'test'
     })
 
@@ -66,7 +66,7 @@ describe('User Application Authorization', function () {
       clientIdentifier: createdApplication.clientId,
       clientSecret: createdApplication.clientSecret,
       authorizationCode: authorizationCode,
-      grantType: oAuthGrantTypes.AuthorizationCode
+      grantType: OAuthGrantTypes.AuthorizationCode
     })
 
     expect(credentials).to.be.an('object')
@@ -126,7 +126,7 @@ describe('User Application Authorization', function () {
   it('can delete a user application authorization', async function () {
     let extError
 
-    await createdUserApplicationAuthorization.userDelete()
+    await createdUserApplicationAuthorization.delete()
 
     try {
       await createdUserApplicationAuthorization.reload()

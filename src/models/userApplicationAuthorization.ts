@@ -25,9 +25,14 @@ export interface UserApplicationAuthorizationListResponseMeta extends ListMeta {
   sort: UserApplicationAuthorizationSorting
 }
 
-export class UserApplicationAuthorizations extends ModelList<UserApplicationAuthorization, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
+export class UserApplicationAuthorizationsUser extends ModelList<UserApplicationAuthorizationUser, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
   constructor (userApplicationAuthorizations: UserApplicationAuthorizationData[], userApplicationAuthorizationsMeta: UserApplicationAuthorizationListResponseMeta, sessionHandler: SessionHandler) {
-    super(UserApplicationAuthorization, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
+    super(UserApplicationAuthorizationUser, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
+  }
+}
+export class UserApplicationAuthorizationsDeveloper extends ModelList<UserApplicationAuthorizationDeveloper, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
+  constructor (userApplicationAuthorizations: UserApplicationAuthorizationData[], userApplicationAuthorizationsMeta: UserApplicationAuthorizationListResponseMeta, sessionHandler: SessionHandler) {
+    super(UserApplicationAuthorizationDeveloper, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
   }
 }
 
@@ -41,12 +46,6 @@ export class UserApplicationAuthorization extends Model {
 
   protected setUserApplicationAuthorization (userApplicationAuthorizationData: UserApplicationAuthorizationData) {
     this._userApplicationAuthorizationData = userApplicationAuthorizationData
-  }
-
-  async reload () {
-    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', { id: this.id }) as UserApplicationAuthorizationResponse
-    this.setUserApplicationAuthorization(userApplicationAuthorization)
-    return this
   }
 
   ejectData () {
@@ -64,12 +63,28 @@ export class UserApplicationAuthorization extends Model {
   get applicationId () {
     return this._userApplicationAuthorizationData.applicationId
   }
+}
 
-  async userDelete () {
-    await this.action('userApplicationAuthorization:userDelete', { id: this.id, userId: this.userId })
+export class UserApplicationAuthorizationUser extends UserApplicationAuthorization {
+  async reload () {
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', { id: this.id, userId: this.userId }) as UserApplicationAuthorizationResponse
+    this.setUserApplicationAuthorization(userApplicationAuthorization)
+    return this
   }
 
-  async developerDelete (params: { developmentAccountId: number }) {
+  async delete () {
+    await this.action('userApplicationAuthorization:userDelete', { id: this.id, userId: this.userId })
+  }
+}
+
+export class UserApplicationAuthorizationDeveloper extends UserApplicationAuthorization {
+  async reload (params: { developmentAccountId: number }) {
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { ...params, id: this.id }) as UserApplicationAuthorizationResponse
+    this.setUserApplicationAuthorization(userApplicationAuthorization)
+    return this
+  }
+
+  async delete (params: { developmentAccountId: number }) {
     await this.action('userApplicationAuthorization:developerDelete', { ...params, id: this.id })
   }
 }
