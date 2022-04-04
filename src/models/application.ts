@@ -88,7 +88,7 @@ export class Application extends Model {
     return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
   }
 
-  async getUserApplicationAuthorizations (options: { sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number }) {
+  async getUserApplicationAuthorizations (options?: { sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number }) {
     const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:developerList', { ...options, applicationId: this.id, developmentAccountId: this.developmentAccountId }) as UserApplicationAuthorizationListResponse
     return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
