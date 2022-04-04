@@ -91,8 +91,7 @@ describe('User Application Authorization', function () {
 
   it('can list user application authorizations as a developer', async function () {
     const userApplicationAuthorizations = await createdApplication.getUserApplicationAuthorizations({
-      developmentAccountId: createdDevelopmentAccount.id,
-      applicationId: createdApplication.id
+      ascending: true
     })
 
     expect(Array.isArray(userApplicationAuthorizations)).to.equal(true)
@@ -115,8 +114,7 @@ describe('User Application Authorization', function () {
 
   it('can show a user application authorization as a developer', async function () {
     const userApplicationAuthorization = await createdApplication.getUserApplicationAuthorization({
-      id: createdUserApplicationAuthorization.id,
-      developmentAccountId: createdDevelopmentAccount.id
+      id: createdUserApplicationAuthorization.id
     })
 
     expect(userApplicationAuthorization).to.be.an('object')
