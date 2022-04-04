@@ -417,6 +417,7 @@ export class KioskSession {
 
   async fingerprintLogin (params: { facilityRelationshipId: number, hash: string }) {
     const response = await this.action('facilityKiosk:fingerprintLogin', params) as FacilityUserResponse
+    console.table(response)
     return new FacilityUserSession(response, this.sessionHandler.connection)
   }
 
@@ -746,8 +747,8 @@ export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
   protected readonly _facilityRelationship: UserFacilityRelationship
 
   constructor (facilityUserResponse: FacilityUserResponse, connection: MetricsConnection) {
-    super({ ...facilityUserResponse, user: facilityUserResponse.facilityRelationship.user }, connection)
-    this._user = new FacilityMemberUser(facilityUserResponse.facilityRelationship.user, this._sessionHandler, facilityUserResponse.facilityRelationship.id)
+    super({ ...facilityUserResponse, user: facilityUserResponse.user}, connection)
+    this._user = new FacilityMemberUser(facilityUserResponse.user, this._sessionHandler, facilityUserResponse.facilityRelationshipId)
     this._facilityRelationship = new UserFacilityRelationship(facilityUserResponse.facilityRelationship, this._sessionHandler)
   }
 

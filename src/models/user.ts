@@ -10,7 +10,7 @@ import { DevelopmentAccount, DevelopmentAccountListResponse, DevelopmentAccountR
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipResponse } from './developmentAccountRelationship'
 import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequestResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './developmentAccountRelationshipRequest'
 import { EmailAddress, EmailAddressData, EmailAddresses, EmailAddressListResponse, EmailAddressResponse, EmailAddressSorting } from './emailAddress'
-import { FacilityRelationshipData, FacilityRelationshipResponse, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
+import { FacilityRelationshipData, FacilityRelationshipResponse, FacilitySessionUserData, UserFacilityEmployeeRelationship, UserFacilityEmployeeRelationships, UserFacilityMemberRelationship, UserFacilityMemberRelationships, UserFacilityRelationship, UserFacilityRelationshipListResponse, UserFacilityRelationshipSorting } from './facilityRelationship'
 import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, FacilityRelationshipRequestResponse, FacilityRelationshipRequests, FacilityRelationshipRequestSorting } from './facilityRelationshipRequest'
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
@@ -57,6 +57,8 @@ export interface ExchangeableUserResponse extends UserResponse {
 
 export interface FacilityUserResponse extends AuthenticatedResponse {
   facilityRelationship: FacilityRelationshipData
+  facilityRelationshipId: number
+  user: FacilitySessionUserData
 }
 
 /** @hidden */
