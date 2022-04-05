@@ -169,7 +169,7 @@ export class User extends SubscribableModel {
     return typeof this._userData.oauthServices !== 'undefined' ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
   }
 
-  async authorize (params: { clientIdentifier: string, redirectUrl: string, responseType: OAuthResponseTypes, state: string }) {
+  async OAuthAuthorize (params: { clientIdentifier: string, redirectUrl: string, responseType: OAuthResponseTypes, state: string }) {
     const response = await this.action('oauth:authorize', { ...params }) as RedirectResponse
     return { redirectUrl: response.url }
   }

@@ -40,6 +40,10 @@ export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
   kioskToken: string
 }
 
+export interface OAuthTokenResponse extends AuthenticatedResponse {
+  expiresIn: string
+}
+
 export interface StrengthMachineInitializeResponse extends AuthenticatedResponse {
   facilityStrengthMachine: FacilityStrengthMachineData
 }
@@ -107,6 +111,10 @@ export interface AccessToken extends SessionToken {
 
 export interface RefreshToken extends SessionToken {
   type: 'refresh'
+}
+
+export interface OAuthToken extends SessionToken {
+  userApplicationAuthorization: { id: number }
 }
 
 export interface KioskToken extends JWTToken {
@@ -348,6 +356,26 @@ export class UserSessionHandler extends BaseSessionHandler {
 
   get userId () {
     return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
+  }
+
+  async logout () {
+    const authParams = { authorization: this.refreshToken ?? this.accessToken }
+    await this._connection.action('auth:logout', authParams)
+    this.close()
+  }
+}
+
+export class OAuthSession extends BaseSessionHandler {
+  constructor (OAuthTokenResponse: OAuthTokenResponse, connection: MetricsConnection) {
+    super(connection, OAuthTokenResponse, false)
+  }
+
+  get decodedAccessToken (): any {
+    return DecodeJWT(this.accessToken) as OAuthToken
+  }
+
+  get expiresIn () {
+    return this.expiresIn
   }
 
   async logout () {
