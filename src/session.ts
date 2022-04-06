@@ -378,14 +378,6 @@ export class OAuthSessionHandler extends BaseSessionHandler {
     return DecodeJWT(this.accessToken) as OAuthToken
   }
 
-  get accessToken () {
-    return this._oauthTokenResponse.accessToken
-  }
-
-  get refreshToken () {
-    return this._oauthTokenResponse.refreshToken
-  }
-
   get expiresIn () {
     return this._oauthTokenResponse.expiresIn
   }
