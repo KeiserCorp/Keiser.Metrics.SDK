@@ -9,7 +9,7 @@ import { User } from '../src/models/user'
 import { UserApplicationAuthorizationSorting, UserApplicationAuthorizationUser } from '../src/models/userApplicationAuthorization'
 import { createNewUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
-describe.only('User Application Authorization', function () {
+describe('User Application Authorization', function () {
   this.timeout(100000)
   let metricsInstance: Metrics
   let user: User
@@ -48,7 +48,7 @@ describe.only('User Application Authorization', function () {
   })
 
   it('can authorize a user for an application', async function () {
-    const response = await user.OAuthAuthorize({
+    const response = await user.oauthAuthorize({
       clientIdentifier: createdApplication.clientId,
       redirectUrl: createdApplication.redirectUrl,
       responseType: OAuthResponseTypes.Code,

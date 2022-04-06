@@ -365,23 +365,73 @@ export class UserSessionHandler extends BaseSessionHandler {
   }
 }
 
-export class OAuthSession extends BaseSessionHandler {
-  constructor (OAuthTokenResponse: OAuthTokenResponse, connection: MetricsConnection) {
-    super(connection, OAuthTokenResponse, false)
+export class OAuthSessionHandler extends BaseSessionHandler {
+  private readonly _oauthTokenResponse: OAuthTokenResponse
+
+  constructor (connection: MetricsConnection, oauthTokenResponse: OAuthTokenResponse) {
+    super(connection, oauthTokenResponse, false)
+
+    this._oauthTokenResponse = oauthTokenResponse
   }
 
   get decodedAccessToken (): any {
     return DecodeJWT(this.accessToken) as OAuthToken
   }
 
+  get accessToken () {
+    return this._oauthTokenResponse.accessToken
+  }
+
+  get refreshToken () {
+    return this._oauthTokenResponse.refreshToken
+  }
+
   get expiresIn () {
-    return this.expiresIn
+    return this._oauthTokenResponse.expiresIn
   }
 
   async logout () {
     const authParams = { authorization: this.refreshToken ?? this.accessToken }
     await this._connection.action('auth:logout', authParams)
     this.close()
+  }
+}
+
+export class OAuthSession {
+  private readonly _sessionHandler: OAuthSessionHandler
+  private readonly _userApplicationAuthorizationId: number
+
+  constructor (oauthTokenResponse: OAuthTokenResponse, connection: MetricsConnection) {
+    this._sessionHandler = new OAuthSessionHandler(connection, oauthTokenResponse)
+    this._userApplicationAuthorizationId = this._sessionHandler.decodedAccessToken.userApplicationAuthorization.id
+  }
+
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
+  get accessToken () {
+    return this._sessionHandler.accessToken
+  }
+
+  get refreshToken () {
+    return this._sessionHandler.refreshToken
+  }
+
+  get expiresIn () {
+    return this._sessionHandler.expiresIn
+  }
+
+  get userApplicationAuthorizationId () {
+    return this._userApplicationAuthorizationId
+  }
+
+  close () {
+    this._sessionHandler.close()
+  }
+
+  async logout () {
+    await this._sessionHandler.logout()
   }
 }
 
