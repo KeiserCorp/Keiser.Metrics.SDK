@@ -1,5 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { Application, ApplicationResponse } from './application'
+import { User, UserResponse } from './user'
 
 export enum UserApplicationAuthorizationSorting {
   ID = 'id',
@@ -62,6 +64,16 @@ export class UserApplicationAuthorization extends Model {
 
   get applicationId () {
     return this._userApplicationAuthorizationData.applicationId
+  }
+
+  async getUser () {
+    const { user } = await this.action('user:show', { userId: this.userId }) as UserResponse
+    return new User(user, this.sessionHandler)
+  }
+
+  async getApplication (developmentAccountId: number) {
+    const { application } = await this.action('application:show', { id: this.applicationId, developmentAccountId: developmentAccountId }) as ApplicationResponse
+    return new Application(application, this.sessionHandler)
   }
 }
 
