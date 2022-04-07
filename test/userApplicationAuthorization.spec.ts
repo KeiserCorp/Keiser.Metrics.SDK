@@ -2,20 +2,20 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
-import { Application } from '../src/models/application'
+import { PrivilegedApplication } from '../src/models/application'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
-import { OAuthGrantTypes, OAuthResponseTypes } from '../src/models/oauthService'
+import { OAuthResponseTypes } from '../src/models/oauthService'
 import { User } from '../src/models/user'
-import { UserApplicationAuthorizationSorting, UserApplicationAuthorizationUser } from '../src/models/userApplicationAuthorization'
+import { UserApplicationAuthorization, UserApplicationAuthorizationSorting } from '../src/models/userApplicationAuthorization'
 import { createNewUserSession, getMetricsAdminInstance } from './utils/fixtures'
 
-describe('User Application Authorization', function () {
+describe.only('User Application Authorization', function () {
   this.timeout(100000)
   let metricsInstance: Metrics
   let user: User
-  let createdApplication: Application
+  let createdApplication: PrivilegedApplication
   let createdDevelopmentAccount: DevelopmentAccount
-  let createdUserApplicationAuthorization: UserApplicationAuthorizationUser
+  let createdUserApplicationAuthorization: UserApplicationAuthorization
   let authorizationCode: string
 
   before(async function () {
@@ -62,17 +62,16 @@ describe('User Application Authorization', function () {
   })
 
   it('can call token endpoint for oauth token', async function () {
-    const credentials = await metricsInstance.getOAuthToken({
+    const session = await metricsInstance.oauthExchangeAuthorizationCode({
       clientIdentifier: createdApplication.clientId,
       clientSecret: createdApplication.clientSecret,
-      authorizationCode: authorizationCode,
-      grantType: OAuthGrantTypes.AuthorizationCode
+      authorizationCode: authorizationCode
     })
 
-    expect(credentials).to.be.an('object')
-    expect(credentials.accessToken).to.not.equal(null)
-    expect(credentials.refreshToken).to.not.equal(null)
-    expect(credentials.expiresIn).to.not.equal(null)
+    expect(session).to.be.an('object')
+    expect(session.accessToken).to.not.equal(null)
+    expect(session.refreshToken).to.not.equal(null)
+    expect(session.expiresIn).to.not.equal(null)
   })
 
   it('can list user application authorizations as a user', async function () {

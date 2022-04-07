@@ -1,5 +1,5 @@
 import { ListMeta, Model, ModelList } from '../model'
-import { Application, ApplicationListResponse, ApplicationResponse, Applications, ApplicationSorting } from '../models/application'
+import { ApplicationListResponse, ApplicationResponse, ApplicationSorting, PrivilegedApplication, PrivilegedApplications } from '../models/application'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { DevelopmentAccountRelationship, DevelopmentAccountRelationshipListResponse, DevelopmentAccountRelationshipResponse, DevelopmentAccountRelationshipRole, DevelopmentAccountRelationships, DevelopmentAccountRelationshipSorting } from './developmentAccountRelationship'
 import { DevelopmentAccountRelationshipRequest, DevelopmentAccountRelationshipRequestListResponse, DevelopmentAccountRelationshipRequestResponse, DevelopmentAccountRelationshipRequests, DevelopmentAccountRelationshipRequestSorting } from './developmentAccountRelationshipRequest'
@@ -85,17 +85,17 @@ export class DevelopmentAccount extends Model {
 
   async createApplication (params: { applicationName: string, redirectUrl: string }) {
     const { application } = (await this.action('application:create', { ...params, developmentAccountId: this.id })) as ApplicationResponse
-    return new Application(application, this.sessionHandler)
+    return new PrivilegedApplication(application, this.sessionHandler)
   }
 
   async getApplication (params: { id: number }) {
     const { application } = (await this.action('application:show', { ...params, developmentAccountId: this.id })) as ApplicationResponse
-    return new Application(application, this.sessionHandler)
+    return new PrivilegedApplication(application, this.sessionHandler)
   }
 
   async getApplications (options: { name?: string, sort?: ApplicationSorting, ascending?: boolean, limit?: number, offset?: number }) {
     const { applications, applicationsMeta } = (await this.action('application:list', { ...options, developmentAccountId: this.id })) as ApplicationListResponse
-    return new Applications(applications, applicationsMeta, this.sessionHandler)
+    return new PrivilegedApplications(applications, applicationsMeta, this.sessionHandler)
   }
 
   async initializeDevelopmentAccountRelationshipRequest (params: { email: string, role: DevelopmentAccountRelationshipRole }) {

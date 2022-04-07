@@ -27,7 +27,7 @@ import { StrengthMachine, StrengthMachineIdentifier, StrengthMachineListResponse
 import { StretchExercise, StretchExerciseListResponse, StretchExerciseResponse, StretchExercises, StretchExerciseSorting } from './models/stretchExercise'
 import { StretchExerciseMuscle, StretchExerciseMuscleResponse } from './models/stretchExerciseMuscle'
 import { StretchExerciseVariant, StretchExerciseVariantResponse } from './models/stretchExerciseVariant'
-import { FacilityMemberUser, FacilityUserResponse, User, UserResponse } from './models/user'
+import { FacilityMemberUser, FacilityUserResponse, OAuthUserResponse, User, UserResponse } from './models/user'
 
 /** @ignore */
 const MODEL_UPDATE_ROOM_REGEX = /^sub:/
@@ -40,7 +40,7 @@ export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
   kioskToken: string
 }
 
-export interface OAuthTokenResponse extends AuthenticatedResponse {
+export interface OAuthTokenResponse extends UserResponse {
   expiresIn: string
 }
 
@@ -386,44 +386,6 @@ export class OAuthSessionHandler extends BaseSessionHandler {
     const authParams = { authorization: this.refreshToken ?? this.accessToken }
     await this._connection.action('auth:logout', authParams)
     this.close()
-  }
-}
-
-export class OAuthSession {
-  private readonly _sessionHandler: OAuthSessionHandler
-  private readonly _userApplicationAuthorizationId: number
-
-  constructor (oauthTokenResponse: OAuthTokenResponse, connection: MetricsConnection) {
-    this._sessionHandler = new OAuthSessionHandler(connection, oauthTokenResponse)
-    this._userApplicationAuthorizationId = this._sessionHandler.decodedAccessToken.userApplicationAuthorization.id
-  }
-
-  get sessionHandler () {
-    return this._sessionHandler
-  }
-
-  get accessToken () {
-    return this._sessionHandler.accessToken
-  }
-
-  get refreshToken () {
-    return this._sessionHandler.refreshToken
-  }
-
-  get expiresIn () {
-    return this._sessionHandler.expiresIn
-  }
-
-  get userApplicationAuthorizationId () {
-    return this._userApplicationAuthorizationId
-  }
-
-  close () {
-    this._sessionHandler.close()
-  }
-
-  async logout () {
-    await this._sessionHandler.logout()
   }
 }
 
@@ -823,6 +785,47 @@ export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
 
   get facilityRelationship () {
     return this._facilityRelationship
+  }
+}
+
+export class OAuthSession extends UserSessionBase<User> {
+  protected _user: User
+  protected _sessionHandler: OAuthSessionHandler
+  private readonly _userApplicationAuthorizationId: number
+
+  constructor (oauthUserResponse: OAuthUserResponse, connection: MetricsConnection) {
+    super(oauthUserResponse, connection)
+    this._sessionHandler = new OAuthSessionHandler(connection, oauthUserResponse)
+    this._user = new User(oauthUserResponse.user, this._sessionHandler)
+    this._userApplicationAuthorizationId = this._sessionHandler.decodedAccessToken.userApplicationAuthorization.id
+  }
+
+  get sessionHandler () {
+    return this._sessionHandler
+  }
+
+  get accessToken () {
+    return this._sessionHandler.accessToken
+  }
+
+  get refreshToken () {
+    return this._sessionHandler.refreshToken
+  }
+
+  get expiresIn () {
+    return this._sessionHandler.expiresIn
+  }
+
+  get userApplicationAuthorizationId () {
+    return this._userApplicationAuthorizationId
+  }
+
+  close () {
+    this._sessionHandler.close()
+  }
+
+  async logout () {
+    await this._sessionHandler.logout()
   }
 }
 

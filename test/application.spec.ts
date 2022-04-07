@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
-import { Application, ApplicationSorting } from '../src/models/application'
+import { ApplicationSorting, PrivilegedApplication } from '../src/models/application'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
@@ -10,7 +10,7 @@ import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 describe('Application', function () {
   let metricsInstance: Metrics
   let user: User
-  let createdApplication: Application
+  let createdApplication: PrivilegedApplication
   let createdDevelopmentAccount: DevelopmentAccount
 
   before(async function () {

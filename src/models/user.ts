@@ -24,7 +24,7 @@ import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressRespon
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
-import { UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizationSorting, UserApplicationAuthorizationsUser, UserApplicationAuthorizationUser } from './userApplicationAuthorization'
+import { UserApplicationAuthorization, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizations, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
@@ -54,6 +54,12 @@ export interface UserResponse extends AuthenticatedResponse {
 
 export interface ExchangeableUserResponse extends UserResponse {
   exchangeToken: string
+}
+
+export interface OAuthUserResponse extends UserResponse {
+  accessToken: string
+  refreshToken: string
+  expiresIn: string
 }
 
 export interface FacilityUserResponse extends AuthenticatedResponse {
@@ -321,12 +327,12 @@ export class User extends SubscribableModel {
 
   async getUserApplicationAuthorization (params: { id: number, userId?: number }) {
     const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', params) as UserApplicationAuthorizationResponse
-    return new UserApplicationAuthorizationUser(userApplicationAuthorization, this.sessionHandler)
+    return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
   }
 
   async getUserApplicationAuthorizations (options?: { userId?: number, sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number}) {
     const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:userList', { ...options }) as UserApplicationAuthorizationListResponse
-    return new UserApplicationAuthorizationsUser(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
+    return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
 
   async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {

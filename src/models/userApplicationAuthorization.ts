@@ -27,18 +27,18 @@ export interface UserApplicationAuthorizationListResponseMeta extends ListMeta {
   sort: UserApplicationAuthorizationSorting
 }
 
-export class UserApplicationAuthorizationsUser extends ModelList<UserApplicationAuthorizationUser, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
+export class UserApplicationAuthorizations extends ModelList<UserApplicationAuthorization, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
   constructor (userApplicationAuthorizations: UserApplicationAuthorizationData[], userApplicationAuthorizationsMeta: UserApplicationAuthorizationListResponseMeta, sessionHandler: SessionHandler) {
-    super(UserApplicationAuthorizationUser, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
+    super(UserApplicationAuthorization, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
   }
 }
-export class UserApplicationAuthorizationsDeveloper extends ModelList<UserApplicationAuthorizationDeveloper, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
+export class DeveloperUserApplicationAuthorizations extends ModelList<DeveloperUserApplicationAuthorization, UserApplicationAuthorizationData, UserApplicationAuthorizationListResponseMeta> {
   constructor (userApplicationAuthorizations: UserApplicationAuthorizationData[], userApplicationAuthorizationsMeta: UserApplicationAuthorizationListResponseMeta, sessionHandler: SessionHandler) {
-    super(UserApplicationAuthorizationDeveloper, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
+    super(DeveloperUserApplicationAuthorization, userApplicationAuthorizations, userApplicationAuthorizationsMeta, sessionHandler)
   }
 }
 
-export class UserApplicationAuthorization extends Model {
+export class UserApplicationAuthorizationBase extends Model {
   protected _userApplicationAuthorizationData: UserApplicationAuthorizationData
 
   constructor (userApplicationAuthorizationData: UserApplicationAuthorizationData, sessionHandler: SessionHandler) {
@@ -66,18 +66,13 @@ export class UserApplicationAuthorization extends Model {
     return this._userApplicationAuthorizationData.applicationId
   }
 
-  async getUser () {
-    const { user } = await this.action('user:show', { userId: this.userId }) as UserResponse
-    return new User(user, this.sessionHandler)
-  }
-
   async getApplication (developmentAccountId: number) {
     const { application } = await this.action('application:show', { id: this.applicationId, developmentAccountId: developmentAccountId }) as ApplicationResponse
     return new Application(application, this.sessionHandler)
   }
 }
 
-export class UserApplicationAuthorizationUser extends UserApplicationAuthorization {
+export class UserApplicationAuthorization extends UserApplicationAuthorizationBase {
   async reload () {
     const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', { id: this.id, userId: this.userId }) as UserApplicationAuthorizationResponse
     this.setUserApplicationAuthorization(userApplicationAuthorization)
@@ -89,11 +84,16 @@ export class UserApplicationAuthorizationUser extends UserApplicationAuthorizati
   }
 }
 
-export class UserApplicationAuthorizationDeveloper extends UserApplicationAuthorization {
+export class DeveloperUserApplicationAuthorization extends UserApplicationAuthorizationBase {
   async reload (params: { developmentAccountId: number }) {
     const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { ...params, id: this.id }) as UserApplicationAuthorizationResponse
     this.setUserApplicationAuthorization(userApplicationAuthorization)
     return this
+  }
+
+  async getUser () {
+    const { user } = await this.action('user:show', { userId: this.userId }) as UserResponse
+    return new User(user, this.sessionHandler)
   }
 
   async delete (params: { developmentAccountId: number }) {
