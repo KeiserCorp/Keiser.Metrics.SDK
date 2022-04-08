@@ -28,7 +28,10 @@
     "build": "rollup --config",
     "release": "node .bin/publish-npm.cjs",
     "docs": "typedoc --tsconfig tsconfig.typedoc.json",
-    "changelog": "npx auto-changelog -t keepachangelog -p --commit-limit false"
+    "changelog": "npx auto-changelog -t keepachangelog -p --commit-limit false",
+    "link:core": "cd ./dist/core && npm link",
+    "link:admin": "cd ./dist/admin && npm link",
+    "link:sso": "cd ./dist/sso && npm link"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.0",
