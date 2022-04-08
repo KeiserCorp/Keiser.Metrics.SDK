@@ -788,7 +788,7 @@ export class FacilityUserSession extends UserSessionBase<FacilityMemberUser> {
   }
 }
 
-export class OAuthSession extends UserSessionBase<User> {
+export class UserOAuthSession extends UserSessionBase<User> {
   protected _user: User
   protected _sessionHandler: OAuthSessionHandler
   private readonly _userApplicationAuthorizationId: number
