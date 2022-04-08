@@ -9,7 +9,7 @@ export enum A500DataSetType {
   Test = 'test'
 }
 
-export interface A500RepData {
+export interface BaseA500RepData {
   side: Side
   count: number
   work: number
@@ -19,8 +19,6 @@ export interface A500RepData {
   averagePower: number
   peakVelocity: number
   averageVelocity: number
-  peakForce: number
-  averageForce: number
   rangeOfMotion: number
   setPointForce: number
   forceUnit: ForceUnit
@@ -29,6 +27,18 @@ export interface A500RepData {
   addedMass: number
   addedForce: number
 }
+
+export interface A500RepRotaryData extends BaseA500RepData {
+  peakTorque: number
+  averageTorque: number
+}
+
+export interface A500RepLinearData extends BaseA500RepData {
+  peakForce: number
+  averageForce: number
+}
+
+export type A500RepData = A500RepRotaryData | A500RepLinearData
 
 export interface A500SetData {
   startedAt: Date
