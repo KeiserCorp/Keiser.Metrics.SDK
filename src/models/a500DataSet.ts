@@ -1,6 +1,6 @@
 import { ForceUnit, Side, TestSide } from '../constants'
 import { eject } from '../lib/eject'
-import { A500RepDataPoint, A500RepDataPointData } from './a500RepDataPoint'
+import { A500RepDataPointData, A500RepLinearDataPoint, A500RepRotaryDataPoint } from './a500RepDataPoint'
 import { A500TestResult, A500TestResultData } from './a500TestResult'
 import { A500TimeSeriesPoint, A500TimeSeriesPointData } from './a500TimeSeriesPoint'
 
@@ -90,7 +90,7 @@ export class A500DataSet {
   }
 
   eagerRepDataPoints () {
-    return typeof this._a500DataSetData.a500RepDataPoints !== 'undefined' ? this._a500DataSetData.a500RepDataPoints.map(a500RepDataPoint => new A500RepDataPoint(a500RepDataPoint)) : undefined
+    return typeof this._a500DataSetData.a500RepDataPoints !== 'undefined' ? this._a500DataSetData.a500RepDataPoints.map(a500RepDataPoint => 'peakTorque' in a500RepDataPoint ? new A500RepRotaryDataPoint(a500RepDataPoint) : new A500RepLinearDataPoint(a500RepDataPoint)) : undefined
   }
 
   eagerTimeSeriesPoints () {
