@@ -104,9 +104,62 @@ export type A500TimeSeriesPointSample = BaseA500TimeSeriesPointRotarySample | Ba
 
 export class A500TimeSeriesPoint {
   private readonly _a500TimeSeriesPointData: A500TimeSeriesPointData
+  private readonly _leftA500TimeSeriesDataPointSide: A500TimeSeriesDataPointSide
+  private readonly _rightA500TimeSeriesDataPointSide: A500TimeSeriesDataPointSide | null
 
   constructor (a500TimeSeriesPointData: A500TimeSeriesPointData) {
     this._a500TimeSeriesPointData = a500TimeSeriesPointData
+    if (this._a500TimeSeriesPointData.leftTorque !== null) {
+      this._leftA500TimeSeriesDataPointSide = new A500TimeSeriesDataPointSideRotary({
+        position: this._a500TimeSeriesPointData.leftPosition,
+        power: this._a500TimeSeriesPointData.leftPower,
+        torque: this._a500TimeSeriesPointData.leftTorque,
+        velocity: this._a500TimeSeriesPointData.leftVelocity,
+        acceleration: this._a500TimeSeriesPointData.leftAcceleration,
+        forceOfMassAcceleration: this._a500TimeSeriesPointData.leftForceOfMassAcceleration,
+        mechanicalWeight: this._a500TimeSeriesPointData.leftMechanicalWeight,
+        rawPower: this._a500TimeSeriesPointData.leftRawPower
+      })
+    } else {
+      this._leftA500TimeSeriesDataPointSide = new A500TimeSeriesDataPointSideLinear({
+        position: this._a500TimeSeriesPointData.leftPosition,
+        power: this._a500TimeSeriesPointData.leftPower,
+        force: this._a500TimeSeriesPointData.leftForce,
+        velocity: this._a500TimeSeriesPointData.leftVelocity,
+        acceleration: this._a500TimeSeriesPointData.leftAcceleration,
+        forceOfMassAcceleration: this._a500TimeSeriesPointData.leftForceOfMassAcceleration,
+        mechanicalWeight: this._a500TimeSeriesPointData.leftMechanicalWeight,
+        rawPower: this._a500TimeSeriesPointData.leftRawPower
+      })
+    }
+
+    if (this._a500TimeSeriesPointData.rightPosition === null) {
+      this._rightA500TimeSeriesDataPointSide = null
+    } else {
+      if (this._a500TimeSeriesPointData.rightTorque !== null) {
+        this._rightA500TimeSeriesDataPointSide = new A500TimeSeriesDataPointSideRotary({
+          position: this._a500TimeSeriesPointData.rightPosition,
+          power: this._a500TimeSeriesPointData.rightPower,
+          torque: this._a500TimeSeriesPointData.rightTorque,
+          velocity: this._a500TimeSeriesPointData.rightVelocity,
+          acceleration: this._a500TimeSeriesPointData.rightAcceleration,
+          forceOfMassAcceleration: this._a500TimeSeriesPointData.rightForceOfMassAcceleration,
+          mechanicalWeight: this._a500TimeSeriesPointData.rightMechanicalWeight,
+          rawPower: this._a500TimeSeriesPointData.rightRawPower
+        })
+      } else {
+        this._rightA500TimeSeriesDataPointSide = new A500TimeSeriesDataPointSideLinear({
+          position: this._a500TimeSeriesPointData.rightPosition,
+          power: this._a500TimeSeriesPointData.rightPower,
+          force: this._a500TimeSeriesPointData.rightForce,
+          velocity: this._a500TimeSeriesPointData.rightVelocity,
+          acceleration: this._a500TimeSeriesPointData.rightAcceleration,
+          forceOfMassAcceleration: this._a500TimeSeriesPointData.rightForceOfMassAcceleration,
+          mechanicalWeight: this._a500TimeSeriesPointData.rightMechanicalWeight,
+          rawPower: this._a500TimeSeriesPointData.rightRawPower
+        })
+      }
+    }
   }
 
   ejectData () {
@@ -122,59 +175,11 @@ export class A500TimeSeriesPoint {
   }
 
   get left () {
-    if (this._a500TimeSeriesPointData.leftTorque !== null) {
-      return new A500TimeSeriesDataPointSideRotary({
-        position: this._a500TimeSeriesPointData.leftPosition,
-        power: this._a500TimeSeriesPointData.leftPower,
-        torque: this._a500TimeSeriesPointData.leftTorque,
-        velocity: this._a500TimeSeriesPointData.leftVelocity,
-        acceleration: this._a500TimeSeriesPointData.leftAcceleration,
-        forceOfMassAcceleration: this._a500TimeSeriesPointData.leftForceOfMassAcceleration,
-        mechanicalWeight: this._a500TimeSeriesPointData.leftMechanicalWeight,
-        rawPower: this._a500TimeSeriesPointData.leftRawPower
-      })
-    } else {
-      return new A500TimeSeriesDataPointSideLinear({
-        position: this._a500TimeSeriesPointData.leftPosition,
-        power: this._a500TimeSeriesPointData.leftPower,
-        force: this._a500TimeSeriesPointData.leftForce,
-        velocity: this._a500TimeSeriesPointData.leftVelocity,
-        acceleration: this._a500TimeSeriesPointData.leftAcceleration,
-        forceOfMassAcceleration: this._a500TimeSeriesPointData.leftForceOfMassAcceleration,
-        mechanicalWeight: this._a500TimeSeriesPointData.leftMechanicalWeight,
-        rawPower: this._a500TimeSeriesPointData.leftRawPower
-      })
-    }
+    return this._leftA500TimeSeriesDataPointSide
   }
 
   get right () {
-    if (this._a500TimeSeriesPointData.rightPosition === null) {
-      return null
-    } else {
-      if (this._a500TimeSeriesPointData.rightTorque !== null) {
-        return new A500TimeSeriesDataPointSideRotary({
-          position: this._a500TimeSeriesPointData.rightPosition,
-          power: this._a500TimeSeriesPointData.rightPower,
-          torque: this._a500TimeSeriesPointData.rightTorque,
-          velocity: this._a500TimeSeriesPointData.rightVelocity,
-          acceleration: this._a500TimeSeriesPointData.rightAcceleration,
-          forceOfMassAcceleration: this._a500TimeSeriesPointData.rightForceOfMassAcceleration,
-          mechanicalWeight: this._a500TimeSeriesPointData.rightMechanicalWeight,
-          rawPower: this._a500TimeSeriesPointData.rightRawPower
-        })
-      } else {
-        return new A500TimeSeriesDataPointSideLinear({
-          position: this._a500TimeSeriesPointData.rightPosition,
-          power: this._a500TimeSeriesPointData.rightPower,
-          force: this._a500TimeSeriesPointData.rightForce,
-          velocity: this._a500TimeSeriesPointData.rightVelocity,
-          acceleration: this._a500TimeSeriesPointData.rightAcceleration,
-          forceOfMassAcceleration: this._a500TimeSeriesPointData.rightForceOfMassAcceleration,
-          mechanicalWeight: this._a500TimeSeriesPointData.rightMechanicalWeight,
-          rawPower: this._a500TimeSeriesPointData.rightRawPower
-        })
-      }
-    }
+    return this._rightA500TimeSeriesDataPointSide
   }
 }
 
