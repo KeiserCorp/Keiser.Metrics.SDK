@@ -57,7 +57,6 @@ export interface ExchangeableUserResponse extends UserResponse {
 }
 
 export interface OAuthUserResponse extends UserResponse {
-  accessToken: string
   refreshToken: string
   expiresIn: string
 }

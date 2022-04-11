@@ -5,7 +5,7 @@ import { OAuthGrantTypes } from './models/oauthService'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
 import { OAuthUserResponse, UserResponse } from './models/user'
-import { KioskSession, StrengthMachineInitializeResponse, StrengthMachineSession, UserOAuthSession, UserSession } from './session'
+import { KioskSession, OAuthUserSession, StrengthMachineInitializeResponse, StrengthMachineSession, UserSession } from './session'
 
 interface SSORequestParameters {
   returnUrl: string
@@ -78,16 +78,6 @@ export default class Metrics {
     return ssoUrl
   }
 
-  async oauthExchangeRefreshToken (params: { clientIdentifier: string, clientSecret: string, refreshToken: string }) {
-    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.RefreshToken }) as OAuthUserResponse
-    return new UserOAuthSession(response, this._connection)
-  }
-
-  async oauthExchangeAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, authorizationCode: string }) {
-    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.AuthorizationCode }) as OAuthUserResponse
-    return new UserOAuthSession(response, this._connection)
-  }
-
   async authenticateWithExchangeToken (params: { exchangeToken: string}) {
     const response = await this._connection.action('auth:exchangeFulfillment', params) as UserResponse
     return new UserSession(response, this._connection)
@@ -108,6 +98,16 @@ export default class Metrics {
   async authenticateWithToken (params: { token: string }) {
     const response = await this._connection.action('user:show', { authorization: params.token }) as UserResponse
     return new UserSession(response, this._connection)
+  }
+
+  async authenticateWithOAuthRefreshToken (params: { clientIdentifier: string, clientSecret: string, refreshToken: string }) {
+    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.RefreshToken }) as OAuthUserResponse
+    return new OAuthUserSession(response, this._connection)
+  }
+
+  async authenticateWithOAuthAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, authorizationCode: string }) {
+    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.AuthorizationCode }) as OAuthUserResponse
+    return new OAuthUserSession(response, this._connection)
   }
 
   async authenticateWithKioskToken (params: { kioskToken: string }) {
