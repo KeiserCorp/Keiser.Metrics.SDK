@@ -119,7 +119,7 @@ export interface OAuthAccessToken extends AccessToken {
   userApplicationAuthorization: { id: number }
 }
 
-export interface oauthRefreshToken extends RefreshToken {
+export interface OAuthRefreshToken extends RefreshToken {
   userApplicationAuthorization: { id: number }
 }
 
