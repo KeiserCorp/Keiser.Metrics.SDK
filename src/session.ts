@@ -400,7 +400,12 @@ export class OAuthSessionHandler extends BaseSessionHandler {
   constructor (connection: MetricsConnection, oauthTokenResponse: OAuthTokenResponse) {
     super(connection, oauthTokenResponse, false)
 
-    this._oauthTokenResponse = oauthTokenResponse
+    this._oauthTokenResponse = {
+      accessToken: oauthTokenResponse.oauthAccessToken,
+      refreshToken: oauthTokenResponse.oauthRefreshToken,
+      expiresIn: oauthTokenResponse.expiresIn,
+      user: oauthTokenResponse.user
+    }
   }
 
   get decodedAccessToken (): any {
