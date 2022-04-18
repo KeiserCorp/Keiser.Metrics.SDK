@@ -175,7 +175,12 @@ export class User extends SubscribableModel {
   }
 
   async oauthAuthorize (params: { clientIdentifier: string, redirectUrl: string, responseType: OAuthResponseTypes, state: string }) {
-    const response = await this.action('oauth:authorize', { ...params }) as RedirectResponse
+    const response = await this.action('oauth:authorize', {
+      client_id: params.clientIdentifier,
+      redirect_url: params.redirectUrl,
+      response_type: params.responseType,
+      state: params.state
+    }) as RedirectResponse
     return { redirectUrl: response.url }
   }
 

@@ -34,6 +34,8 @@ const MODEL_UPDATE_ROOM_REGEX = /^sub:/
 export interface AuthenticatedResponse {
   accessToken: string
   refreshToken?: string
+  oauthAccessToken?: string
+  oauthRefreshToken?: string
 }
 
 export interface FacilityKioskTokenResponse extends AuthenticatedResponse {
@@ -113,7 +115,11 @@ export interface RefreshToken extends SessionToken {
   type: 'refresh'
 }
 
-export interface OAuthToken extends SessionToken {
+export interface OAuthAccessToken extends AccessToken {
+  userApplicationAuthorization: { id: number }
+}
+
+export interface oauthRefreshToken extends RefreshToken {
   userApplicationAuthorization: { id: number }
 }
 
@@ -164,6 +170,8 @@ export abstract class BaseSessionHandler {
   private _keepAlive: boolean = true
   private _accessToken: string = ''
   private _refreshToken: string | null = null
+  private _oauthAccessToken: string | null = null
+  private _oauthRefreshToken: string | null = null
   private _accessTokenTimeout: ReturnType<typeof setTimeout> | null = null
   private readonly _modelChangeEventHandlerMap = new Map<string, ModelChangeEventHandler>()
   private readonly _onAccessTokenChangeEvent = new EventDispatcher<AccessTokenChangeEvent>()
@@ -194,6 +202,11 @@ export abstract class BaseSessionHandler {
     if (typeof response.refreshToken !== 'undefined') {
       this._refreshToken = response.refreshToken
       this._onRefreshTokenChangeEvent.dispatchAsync({ refreshToken: this._refreshToken })
+    }
+
+    if (typeof response.oauthRefreshToken !== 'undefined' && typeof response.oauthAccessToken !== 'undefined') {
+      this._oauthRefreshToken = response.oauthRefreshToken
+      this._oauthAccessToken = response.oauthAccessToken
     }
   }
 
@@ -247,8 +260,20 @@ export abstract class BaseSessionHandler {
     return this._refreshToken
   }
 
+  get oauthAccessToken () {
+    return this._oauthAccessToken
+  }
+
+  get oauthRefreshToken () {
+    return this._oauthRefreshToken
+  }
+
   get decodedRefreshToken () {
     return this._refreshToken !== null ? DecodeJWT(this._refreshToken) as RefreshToken : null
+  }
+
+  get decodedOAuthRefreshToken () {
+    return this._oauthRefreshToken !== null ? DecodeJWT(this._oauthRefreshToken) as RefreshToken : null
   }
 
   get onRefreshTokenChangeEvent () {
@@ -354,6 +379,10 @@ export class UserSessionHandler extends BaseSessionHandler {
     return DecodeJWT(this.accessToken) as AccessToken
   }
 
+  get decodedOAuthAccessToken () {
+    return DecodeJWT(this.oauthAccessToken) as OAuthAccessToken
+  }
+
   get userId () {
     return this._userId ?? (this._userId = this.decodedAccessToken.user.id)
   }
@@ -375,7 +404,11 @@ export class OAuthSessionHandler extends BaseSessionHandler {
   }
 
   get decodedAccessToken (): any {
-    return DecodeJWT(this.accessToken) as OAuthToken
+    return DecodeJWT(this.accessToken) as AccessToken
+  }
+
+  get decodedOAuthAccessToken (): any {
+    return DecodeJWT(this.oauthAccessToken) as OAuthAccessToken
   }
 
   get expiresIn () {
@@ -797,7 +830,7 @@ export class OAuthUserSession extends UserSessionBase<User> {
     super(oauthUserResponse, connection)
     this._sessionHandler = new OAuthSessionHandler(connection, oauthUserResponse)
     this._user = new User(oauthUserResponse.user, this._sessionHandler)
-    this._userApplicationAuthorizationId = this._sessionHandler.decodedAccessToken.userApplicationAuthorization.id
+    this._userApplicationAuthorizationId = this._sessionHandler.decodedOAuthAccessToken.userApplicationAuthorization.id
   }
 
   get sessionHandler () {

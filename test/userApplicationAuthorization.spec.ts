@@ -62,10 +62,10 @@ describe('User Application Authorization', function () {
   })
 
   it('can call token endpoint for oauth token', async function () {
-    const session = await metricsInstance.oauthExchangeAuthorizationCode({
+    const session = await metricsInstance.authenticateWithOAuthAuthorizationCode({
       clientIdentifier: createdApplication.clientId,
       clientSecret: createdApplication.clientSecret,
-      authorizationCode: authorizationCode
+      code: authorizationCode
     })
 
     expect(session).to.be.an('object')

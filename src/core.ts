@@ -101,12 +101,22 @@ export default class Metrics {
   }
 
   async authenticateWithOAuthRefreshToken (params: { clientIdentifier: string, clientSecret: string, refreshToken: string }) {
-    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.RefreshToken }) as OAuthUserResponse
+    const response = await this._connection.action('oauth:token', {
+      client_id: params.clientIdentifier,
+      client_secret: params.clientSecret,
+      refresh_token: params.refreshToken,
+      grant_type: OAuthGrantTypes.RefreshToken
+    }) as OAuthUserResponse
     return new OAuthUserSession(response, this._connection)
   }
 
-  async authenticateWithOAuthAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, authorizationCode: string }) {
-    const response = await this._connection.action('oauth:token', { ...params, grantType: OAuthGrantTypes.AuthorizationCode }) as OAuthUserResponse
+  async authenticateWithOAuthAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, code: string }) {
+    const response = await this._connection.action('oauth:token', {
+      client_id: params.clientIdentifier,
+      client_secret: params.clientSecret,
+      code: params.code,
+      grant_type: OAuthGrantTypes.AuthorizationCode
+    }) as OAuthUserResponse
     return new OAuthUserSession(response, this._connection)
   }
 
