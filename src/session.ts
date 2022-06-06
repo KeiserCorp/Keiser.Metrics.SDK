@@ -835,7 +835,7 @@ export class OAuthUserSession extends UserSessionBase<User> {
     super(oauthUserResponse, connection)
     this._sessionHandler = new OAuthSessionHandler(connection, oauthUserResponse)
     this._user = new User(oauthUserResponse.user, this._sessionHandler)
-    this._userApplicationAuthorizationId = this._sessionHandler.decodedOAuthAccessToken.userApplicationAuthorization.id
+    this._userApplicationAuthorizationId = this._sessionHandler.decodedAccessToken.userApplicationAuthorization.id
   }
 
   get sessionHandler () {
