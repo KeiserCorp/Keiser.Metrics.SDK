@@ -4,6 +4,7 @@ import { ForceUnit } from '../src/constants'
 import Metrics from '../src/core'
 import { PrivilegedFacility } from '../src/models/facility'
 import { FacilityStrengthMachineConfiguration } from '../src/models/facilityStrengthMachineConfiguration'
+import { StrengthMachineAppType } from '../src/models/strengthMachine'
 import { ModelChangeEvent } from '../src/session'
 import { IsBrowser } from './utils/constants'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -30,6 +31,7 @@ describe('Facility Machine Configuration', function () {
     facilityStrengthMachineConfiguration = await privilegedFacility.getFacilityStrengthMachineConfiguration()
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
+    expect(typeof facilityStrengthMachineConfiguration.appType).to.equal('string')
     expect(typeof facilityStrengthMachineConfiguration.timeZone).to.equal('string')
     expect(typeof facilityStrengthMachineConfiguration.forceUnit).to.equal('string')
     expect(typeof facilityStrengthMachineConfiguration.primaryFocus).to.equal('string')
@@ -38,6 +40,7 @@ describe('Facility Machine Configuration', function () {
 
   it('can update facility machine configuration', async function () {
     facilityStrengthMachineConfiguration = await facilityStrengthMachineConfiguration.update({
+      appType: StrengthMachineAppType.Commercial,
       timeZone: 'America/Denver',
       forceUnit: ForceUnit.Kilograms,
       primaryFocus: 'velocity',
@@ -46,6 +49,7 @@ describe('Facility Machine Configuration', function () {
     })
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
+    expect(facilityStrengthMachineConfiguration.appType).to.equal(StrengthMachineAppType.Commercial)
     expect(facilityStrengthMachineConfiguration.timeZone).to.equal('America/Denver')
     expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
@@ -57,6 +61,7 @@ describe('Facility Machine Configuration', function () {
     facilityStrengthMachineConfiguration = await facilityStrengthMachineConfiguration.reload()
 
     expect(typeof facilityStrengthMachineConfiguration).to.not.equal('undefined')
+    expect(facilityStrengthMachineConfiguration.appType).to.equal(StrengthMachineAppType.Commercial)
     expect(facilityStrengthMachineConfiguration.timeZone).to.equal('America/Denver')
     expect(facilityStrengthMachineConfiguration.forceUnit).to.equal(ForceUnit.Kilograms)
     expect(facilityStrengthMachineConfiguration.primaryFocus).to.equal('velocity')
@@ -81,6 +86,7 @@ describe('Facility Machine Configuration', function () {
 
     await new Promise(resolve => setTimeout(() => resolve(null), 1000))
     await facilityStrengthMachineConfiguration.update({
+      appType: StrengthMachineAppType.Commercial,
       timeZone: 'America/Denver',
       forceUnit: ForceUnit.Kilograms,
       primaryFocus: 'power',

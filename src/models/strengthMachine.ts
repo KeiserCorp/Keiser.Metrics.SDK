@@ -24,6 +24,13 @@ export enum StrengthMachineSorting {
   Line = 'line'
 }
 
+export enum StrengthMachineAppType {
+  Performance = 'performance',
+  Elder = 'elder',
+  Medical = 'medical',
+  Commercial = 'commercial'
+}
+
 export interface StrengthMachineIdentifier {
   machineModel: string
   firmwareVersion: string

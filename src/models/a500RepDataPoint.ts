@@ -2,7 +2,7 @@ import { ForceUnit, TestSide } from '../constants'
 import { eject } from '../lib/eject'
 import { AuthenticatedResponse } from '../session'
 
-export interface A500RepDataPointData {
+export interface BaseA500RepDataPointData {
   id: number
   side: TestSide.Left | TestSide.Right
   count: number
@@ -13,8 +13,6 @@ export interface A500RepDataPointData {
   averagePower: number
   peakVelocity: number
   averageVelocity: number
-  peakForce: number
-  averageForce: number
   rangeOfMotion: number
   setPointForce: number
   forceUnit: ForceUnit
@@ -24,16 +22,24 @@ export interface A500RepDataPointData {
   addedForce: number
 }
 
+export interface A500RepDataPointRotaryData extends BaseA500RepDataPointData {
+  peakTorque: number
+  averageTorque: number
+}
+
+export interface A500RepDataPointLinearData extends BaseA500RepDataPointData {
+  peakForce: number
+  averageForce: number
+}
+
+export type A500RepDataPointData = A500RepDataPointRotaryData | A500RepDataPointLinearData
+
 export interface A500RepDataPointResponse extends AuthenticatedResponse {
   a500RepDataPoint: A500RepDataPointData
 }
 
-export class A500RepDataPoint {
-  private readonly _a500RepDataPointData: A500RepDataPointData
-
-  constructor (A500RepDataPointData: A500RepDataPointData) {
-    this._a500RepDataPointData = A500RepDataPointData
-  }
+export abstract class BaseA500RepDataPoint {
+  protected abstract readonly _a500RepDataPointData: A500RepDataPointData
 
   ejectData () {
     return eject(this._a500RepDataPointData)
@@ -79,14 +85,6 @@ export class A500RepDataPoint {
     return this._a500RepDataPointData.averageVelocity
   }
 
-  get peakForce () {
-    return this._a500RepDataPointData.peakForce
-  }
-
-  get averageForce () {
-    return this._a500RepDataPointData.averageForce
-  }
-
   get rangeOfMotion () {
     return this._a500RepDataPointData.rangeOfMotion
   }
@@ -115,3 +113,39 @@ export class A500RepDataPoint {
     return this._a500RepDataPointData.addedForce
   }
 }
+
+export class A500RepRotaryDataPoint extends BaseA500RepDataPoint {
+  protected readonly _a500RepDataPointData: A500RepDataPointRotaryData
+
+  constructor (A500RepDataPointData: A500RepDataPointRotaryData) {
+    super()
+    this._a500RepDataPointData = A500RepDataPointData
+  }
+
+  get peakTorque () {
+    return this._a500RepDataPointData.peakTorque
+  }
+
+  get averageTorque () {
+    return this._a500RepDataPointData.averageTorque
+  }
+}
+
+export class A500RepLinearDataPoint extends BaseA500RepDataPoint {
+  protected readonly _a500RepDataPointData: A500RepDataPointLinearData
+
+  constructor (A500RepDataPointData: A500RepDataPointLinearData) {
+    super()
+    this._a500RepDataPointData = A500RepDataPointData
+  }
+
+  get peakForce () {
+    return this._a500RepDataPointData.peakForce
+  }
+
+  get averageForce () {
+    return this._a500RepDataPointData.averageForce
+  }
+}
+
+export type A500RepDataPoint = A500RepRotaryDataPoint | A500RepLinearDataPoint

@@ -119,12 +119,12 @@ export class AdminSession extends UserSession {
     return new FailedTasks(tasks, tasksMeta, this.sessionHandler)
   }
 
-  async retryAllFailedTasks (options: { taskName?: string } = { }) {
-    await this.action('resque:task:retryAllFailed', options)
+  async retryAllFailedTasks () {
+    await this.action('resque:task:retryAllFailed')
   }
 
-  async deleteAllFailedTasks (options: { taskName?: string } = { }) {
-    await this.action('resque:task:deleteAllFailed', options)
+  async deleteAllFailedTasks () {
+    await this.action('resque:task:deleteAllFailed')
   }
 
   async getExerciseAlias (params: { id: number }) {
