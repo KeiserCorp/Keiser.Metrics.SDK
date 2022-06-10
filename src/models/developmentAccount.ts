@@ -14,6 +14,8 @@ export interface DevelopmentAccountData {
   company: string
   address: string
   websiteUrl: string
+  privacyUrl: string
+  termsUrl: string
 }
 
 export interface DevelopmentAccountResponse extends AuthenticatedResponse {
@@ -73,6 +75,14 @@ export class DevelopmentAccount extends Model {
     return this._developmentAccountData.websiteUrl
   }
 
+  get privacyUrl () {
+    return this._developmentAccountData.privacyUrl
+  }
+
+  get termsUrl () {
+    return this._developmentAccountData.termsUrl
+  }
+
   async createApplication (params: { applicationName: string, redirectUrl: string }) {
     const { application } = (await this.action('application:create', { ...params, developmentAccountId: this.id })) as ApplicationResponse
     return new Application(application, this.sessionHandler)
@@ -113,7 +123,7 @@ export class DevelopmentAccount extends Model {
     return new DevelopmentAccountRelationships(developmentAccountRelationships, developmentAccountRelationshipsMeta, this.sessionHandler)
   }
 
-  async update (options: { company: string, address: string, websiteUrl: string }) {
+  async update (options?: { company?: string, address?: string, websiteUrl?: string, privacyUrl?: string, termsUrl?: string }) {
     const { developmentAccount } = (await this.action('developmentAccount:update', { ...options, id: this.id })) as DevelopmentAccountResponse
     this.setDevelopmentAccount(developmentAccount)
     return this

@@ -283,7 +283,7 @@ export class User extends SubscribableModel {
     return new UserFacilityEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async createDevelopmentAccount (options: { company?: string, address?: string, websiteUrl?: string }) {
+  async createDevelopmentAccount (options: { company?: string, address?: string, websiteUrl?: string, privacyUrl?: string, termsUrl?: string }) {
     const { developmentAccount } = (await this.action('developmentAccount:create', { ...options })) as DevelopmentAccountResponse
     return new DevelopmentAccount(developmentAccount, this.sessionHandler)
   }
