@@ -112,10 +112,10 @@ export default class Metrics {
 
   async authenticateWithOAuthAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, code: string }) {
     const response = await this._connection.action('oauth:token', {
-      clientIdentifier: params.clientIdentifier,
-      clientSecret: params.clientSecret,
-      authorizationCode: params.code,
-      grantType: OAuthGrantTypes.AuthorizationCode
+      client_id: params.clientIdentifier,
+      client_secret: params.clientSecret,
+      code: params.code,
+      grant_type: OAuthGrantTypes.AuthorizationCode
     }) as OAuthUserResponse
     return new OAuthUserSession(response, this._connection)
   }
