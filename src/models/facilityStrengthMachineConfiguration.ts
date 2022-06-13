@@ -1,11 +1,10 @@
 import { ForceUnit, TimeZone } from '../constants'
 import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { StrengthMachineAppType, StrengthMachineFocusableAttribute } from './strengthMachine'
+import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface FacilityStrengthMachineConfigurationData {
   facilityId: number
-  appType: StrengthMachineAppType
   timeZone: TimeZone
   forceUnit: ForceUnit
   primaryFocus: StrengthMachineFocusableAttribute
@@ -39,7 +38,7 @@ export class FacilityStrengthMachineConfiguration extends SubscribableModel {
     return this
   }
 
-  async update (params: { appType: StrengthMachineAppType, timeZone: string, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string, locale: string }) {
+  async update (params: { timeZone: string, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string, locale: string }) {
     const { facilityStrengthMachineConfiguration } = await this.action('facilityStrengthMachineConfiguration:update', params) as FacilityStrengthMachineConfigurationResponse
     this.setFacilityStrengthMachineConfiguration(facilityStrengthMachineConfiguration)
     return this
@@ -47,10 +46,6 @@ export class FacilityStrengthMachineConfiguration extends SubscribableModel {
 
   ejectData () {
     return this.eject(this._facilityStrengthMachineConfigurationData)
-  }
-
-  get appType () {
-    return this._facilityStrengthMachineConfigurationData.appType
   }
 
   get timeZone () {
