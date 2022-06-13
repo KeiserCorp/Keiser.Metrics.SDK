@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import Metrics from '../src/core'
-import { ActionErrorProperties, InvalidCredentialsError } from '../src/error'
+import { ActionErrorProperties, DuplicateEntityError, InvalidCredentialsError } from '../src/error'
 import MetricsSSO from '../src/sso'
 import { DemoEmail, DemoPassword, DemoUserId } from './utils/constants'
 import { randomEmailAddress } from './utils/dummy'
@@ -90,6 +90,23 @@ describe('SSO', function () {
     const emailAddress = randomEmailAddress()
     const response = await metricsSSOInstance.initializeUserCreation({ email: emailAddress, returnUrl: 'http://localhost:4200/sso' })
     expect(response).to.be.equal(undefined)
+  })
+
+  it('can catch error when creating new user (duplicate user)', async function () {
+    let session
+    let extError
+
+    try {
+      session = await metricsSSOInstance.initializeUserCreation({ email: DemoEmail, returnUrl: 'http://localhost:4200/sso' })
+    } catch (error) {
+      if (error instanceof Error) {
+        extError = error as ActionErrorProperties
+      }
+    }
+
+    expect(extError).to.be.an('error')
+    expect(extError?.code).to.equal(DuplicateEntityError.code)
+    expect(session).to.not.be.an('object')
   })
 
   it('can request password reset', async function () {

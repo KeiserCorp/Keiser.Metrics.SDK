@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
-import { Application, ApplicationSorting } from '../src/models/application'
+import { ApplicationSorting, PrivilegedApplication } from '../src/models/application'
 import { DevelopmentAccount } from '../src/models/developmentAccount'
 import { User } from '../src/models/user'
 import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
@@ -10,7 +10,7 @@ import { createNewUserSession, getMetricsInstance } from './utils/fixtures'
 describe('Application', function () {
   let metricsInstance: Metrics
   let user: User
-  let createdApplication: Application
+  let createdApplication: PrivilegedApplication
   let createdDevelopmentAccount: DevelopmentAccount
 
   before(async function () {
@@ -21,7 +21,9 @@ describe('Application', function () {
     const developmentAccount = await user.createDevelopmentAccount({
       company: 'Keiser',
       address: '2470 S Cherry Ave, Fresno, CA 93706',
-      websiteUrl: 'www.keiser.com'
+      websiteUrl: 'www.keiser.com',
+      privacyUrl: 'www.keiser.com/privacy',
+      termsUrl: 'www.keiser.com/terms'
     })
 
     createdDevelopmentAccount = developmentAccount
@@ -33,7 +35,7 @@ describe('Application', function () {
     metricsInstance?.dispose()
   })
 
-  it('can create an Appliction', async function () {
+  it('can create an Application', async function () {
     const application = await createdDevelopmentAccount.createApplication({
       applicationName: 'Test Application',
       redirectUrl: 'www.testapplication.com/redirect'

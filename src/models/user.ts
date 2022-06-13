@@ -2,7 +2,7 @@ import { ForceUnit, XOR } from '../constants'
 import { ClientSideActionPrevented } from '../error'
 import { deflateToB64 } from '../lib/compress'
 import { ListMeta, ModelList, SubscribableModel } from '../model'
-import { AuthenticatedResponse, SessionHandler, StrengthMachineSession, UserSessionHandler } from '../session'
+import { AuthenticatedResponse, RedirectResponse, SessionHandler, StrengthMachineSession, UserSessionHandler } from '../session'
 import { A500SetData } from './a500DataSet'
 import { A500TimeSeriesPointSample } from './a500TimeSeriesPoint'
 import { AcceptedTermsVersion, AcceptedTermsVersionData, AcceptedTermsVersionResponse } from './acceptedTermsVersion'
@@ -19,11 +19,12 @@ import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChalleng
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse } from './mSeriesChallengeParticipant'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
 import { MSeriesFtpMeasurement, MSeriesFtpMeasurementListResponse, MSeriesFtpMeasurementResponse, MSeriesFtpMeasurements, MSeriesFtpMeasurementSorting } from './mSeriesFtpMeasurement'
-import { OAuthProviders, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
+import { OAuthProviders, OAuthResponseTypes, OAuthService, OAuthServiceData, OAuthServiceListResponse, OAuthServiceResponse, OAuthServices } from './oauthService'
 import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressResponse } from './primaryEmailAddress'
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
+import { UserApplicationAuthorization, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizations, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
@@ -53,6 +54,11 @@ export interface UserResponse extends AuthenticatedResponse {
 
 export interface ExchangeableUserResponse extends UserResponse {
   exchangeToken: string
+}
+
+export interface OAuthUserResponse extends UserResponse {
+  refreshToken: string
+  expiresIn: string
 }
 
 export interface FacilityUserResponse extends AuthenticatedResponse {
@@ -166,6 +172,16 @@ export class User extends SubscribableModel {
 
   eagerOAuthServices () {
     return typeof this._userData.oauthServices !== 'undefined' ? this._userData.oauthServices.map(oauthService => new OAuthService(oauthService, this.sessionHandler)) : undefined
+  }
+
+  async oauthAuthorize (params: { clientIdentifier: string, redirectUrl: string, responseType: OAuthResponseTypes, state: string }) {
+    const response = await this.action('oauth:authorize', {
+      client_id: params.clientIdentifier,
+      redirect_url: params.redirectUrl,
+      response_type: params.responseType,
+      state: params.state
+    }) as RedirectResponse
+    return { redirectUrl: response.url }
   }
 
   async initiateOAuthService (params: { service: OAuthProviders, redirect: string }) {
@@ -283,7 +299,7 @@ export class User extends SubscribableModel {
     return new UserFacilityEmployeeRelationships(facilityRelationships, facilityRelationshipsMeta, this.sessionHandler)
   }
 
-  async createDevelopmentAccount (options: { company?: string, address?: string, websiteUrl?: string }) {
+  async createDevelopmentAccount (options: { company?: string, address?: string, websiteUrl?: string, privacyUrl: string, termsUrl: string }) {
     const { developmentAccount } = (await this.action('developmentAccount:create', { ...options })) as DevelopmentAccountResponse
     return new DevelopmentAccount(developmentAccount, this.sessionHandler)
   }
@@ -311,6 +327,16 @@ export class User extends SubscribableModel {
   async fulfillDevelopmentAccountRelationshipRequest (params: { code: string, shouldAuthorize: boolean }) {
     const { developmentAccountRelationship } = (await this.action('developmentAccountRelationshipRequest:fulfillment', { ...params })) as DevelopmentAccountRelationshipResponse
     return new DevelopmentAccountRelationship(developmentAccountRelationship, this.sessionHandler)
+  }
+
+  async getUserApplicationAuthorization (params: { id: number, userId?: number }) {
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:userShow', params) as UserApplicationAuthorizationResponse
+    return new UserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
+  }
+
+  async getUserApplicationAuthorizations (options?: { userId?: number, sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number}) {
+    const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:userList', { ...options }) as UserApplicationAuthorizationListResponse
+    return new UserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
   }
 
   async startSession (params: { forceEndPrevious?: boolean, sessionPlanSequenceAssignmentId?: number, continueFromLastSet?: boolean } = { }) {

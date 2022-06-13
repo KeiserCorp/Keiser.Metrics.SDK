@@ -26,13 +26,17 @@ describe('Development Account', function () {
     const developmentAccount = await user.createDevelopmentAccount({
       company: 'Keiser',
       address: '2470 S Cherry Ave, Fresno, CA 93706',
-      websiteUrl: 'www.keiser.com'
+      websiteUrl: 'www.keiser.com',
+      privacyUrl: 'www.keiser.com/privacy',
+      termsUrl: 'www.keiser.com/terms'
     })
 
     expect(developmentAccount).to.be.an('object')
     expect(developmentAccount.company).to.be.equal('Keiser')
     expect(developmentAccount.address).to.be.equal('2470 S Cherry Ave, Fresno, CA 93706')
     expect(developmentAccount.websiteUrl).to.be.equal('www.keiser.com')
+    expect(developmentAccount.privacyUrl).to.be.equal('www.keiser.com/privacy')
+    expect(developmentAccount.termsUrl).to.be.equal('www.keiser.com/terms')
     createdDevelopmentAccount = developmentAccount
   })
 
@@ -43,19 +47,25 @@ describe('Development Account', function () {
     expect(developmentAccount.company).to.be.equal('Keiser')
     expect(developmentAccount.address).to.be.equal('2470 S Cherry Ave, Fresno, CA 93706')
     expect(developmentAccount.websiteUrl).to.be.equal('www.keiser.com')
+    expect(developmentAccount.privacyUrl).to.be.equal('www.keiser.com/privacy')
+    expect(developmentAccount.termsUrl).to.be.equal('www.keiser.com/terms')
   })
 
   it('can update a Development Account', async function () {
     const developmentAccount = await (await user.getDevelopmentAccount({ id: createdDevelopmentAccount.id })).update({
       company: 'Peloton',
       address: '125W 25th Street 11th Floor New York, NY 10001',
-      websiteUrl: 'www.onepeloton.com'
+      websiteUrl: 'www.onepeloton.com',
+      privacyUrl: 'www.onepeloton.com/privacy',
+      termsUrl: 'www.onepeloton.com/terms'
     })
 
     expect(developmentAccount).to.be.an('object')
     expect(developmentAccount.company).to.be.equal('Peloton')
     expect(developmentAccount.address).to.be.equal('125W 25th Street 11th Floor New York, NY 10001')
     expect(developmentAccount.websiteUrl).to.be.equal('www.onepeloton.com')
+    expect(developmentAccount.privacyUrl).to.be.equal('www.onepeloton.com/privacy')
+    expect(developmentAccount.termsUrl).to.be.equal('www.onepeloton.com/terms')
     createdDevelopmentAccount = developmentAccount
   })
 

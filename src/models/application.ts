@@ -1,5 +1,6 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
+import { DeveloperUserApplicationAuthorization, DeveloperUserApplicationAuthorizations, UserApplicationAuthorizationListResponse, UserApplicationAuthorizationResponse, UserApplicationAuthorizationSorting } from './userApplicationAuthorization'
 
 export enum ApplicationSorting {
   ID = 'id',
@@ -82,6 +83,26 @@ export class Application extends Model {
     return this
   }
 
+  async getUserApplicationAuthorization (params: { id: number }) {
+    const { userApplicationAuthorization } = await this.action('userApplicationAuthorization:developerShow', { ...params, developmentAccountId: this.developmentAccountId }) as UserApplicationAuthorizationResponse
+    return new DeveloperUserApplicationAuthorization(userApplicationAuthorization, this.sessionHandler)
+  }
+
+  async getUserApplicationAuthorizations (options?: { sort?: UserApplicationAuthorizationSorting, ascending?: boolean, limit?: number, offset?: number }) {
+    const { userApplicationAuthorizations, userApplicationAuthorizationsMeta } = await this.action('userApplicationAuthorization:developerList', { ...options, applicationId: this.id, developmentAccountId: this.developmentAccountId }) as UserApplicationAuthorizationListResponse
+    return new DeveloperUserApplicationAuthorizations(userApplicationAuthorizations, userApplicationAuthorizationsMeta, this.sessionHandler)
+  }
+}
+
+/** @hidden */
+export class PrivilegedApplications extends ModelList<PrivilegedApplication, ApplicationData, ApplicationListResponseMeta> {
+  constructor (applications: ApplicationData[], applicationsMeta: ApplicationListResponseMeta, sessionHandler: SessionHandler) {
+    super(PrivilegedApplication, applications, applicationsMeta, sessionHandler)
+  }
+}
+
+/** @hidden */
+export class PrivilegedApplication extends Application {
   async update (options: { applicationName?: string, redirectUrl?: string }) {
     const { application } = (await this.action('application:update', { ...options, id: this.id, developmentAccountId: this.developmentAccountId })) as ApplicationResponse
     this.setApplication(application)

@@ -1,10 +1,11 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Units } from './constants'
 import { Core } from './models/core'
+import { OAuthGrantTypes } from './models/oauthService'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
-import { UserResponse } from './models/user'
-import { KioskSession, StrengthMachineInitializeResponse, StrengthMachineSession, UserSession } from './session'
+import { OAuthUserResponse, UserResponse } from './models/user'
+import { KioskSession, OAuthUserSession, StrengthMachineInitializeResponse, StrengthMachineSession, UserSession } from './session'
 
 interface SSORequestParameters {
   returnUrl: string
@@ -97,6 +98,26 @@ export default class Metrics {
   async authenticateWithToken (params: { token: string }) {
     const response = await this._connection.action('user:show', { authorization: params.token }) as UserResponse
     return new UserSession(response, this._connection)
+  }
+
+  async authenticateWithOAuthRefreshToken (params: { clientIdentifier: string, clientSecret: string, refreshToken: string }) {
+    const response = await this._connection.action('oauth:token', {
+      client_id: params.clientIdentifier,
+      client_secret: params.clientSecret,
+      refresh_token: params.refreshToken,
+      grant_type: OAuthGrantTypes.RefreshToken
+    }) as OAuthUserResponse
+    return new OAuthUserSession(response, this._connection)
+  }
+
+  async authenticateWithOAuthAuthorizationCode (params: { clientIdentifier: string, clientSecret: string, code: string }) {
+    const response = await this._connection.action('oauth:token', {
+      client_id: params.clientIdentifier,
+      client_secret: params.clientSecret,
+      code: params.code,
+      grant_type: OAuthGrantTypes.AuthorizationCode
+    }) as OAuthUserResponse
+    return new OAuthUserSession(response, this._connection)
   }
 
   async authenticateWithKioskToken (params: { kioskToken: string }) {

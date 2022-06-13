@@ -1,12 +1,11 @@
 import { ForceUnit } from '../constants'
 import { SubscribableModel } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
-import { StrengthMachineAppType, StrengthMachineFocusableAttribute } from './strengthMachine'
+import { StrengthMachineFocusableAttribute } from './strengthMachine'
 
 export interface A500MachineStateData {
   facilityStrengthMachineId: number
   isFacilityConfigurationOverridden: boolean
-  appType: StrengthMachineAppType
   forceUnit: ForceUnit
   primaryFocus: StrengthMachineFocusableAttribute
   secondaryFocus: StrengthMachineFocusableAttribute
@@ -38,7 +37,7 @@ export class A500MachineState extends SubscribableModel {
     return this
   }
 
-  async update (params: { isFacilityConfigurationOverridden: boolean, appType: StrengthMachineAppType, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
+  async update (params: { isFacilityConfigurationOverridden: boolean, forceUnit: ForceUnit, primaryFocus: string, secondaryFocus: string }) {
     const { a500MachineState } = await this.action('a500:updateMachineState', params) as A500MachineStateResponse
     this.setA500MachineState(a500MachineState)
     return this
@@ -50,10 +49,6 @@ export class A500MachineState extends SubscribableModel {
 
   get isFacilityConfigurationOverridden () {
     return this._a500MachineState.isFacilityConfigurationOverridden
-  }
-
-  get appType () {
-    return this._a500MachineState.appType
   }
 
   get forceUnit () {

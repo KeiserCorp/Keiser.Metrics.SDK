@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { ForceUnit } from '../src/constants'
 import Metrics from '../src/core'
 import { A500MachineState } from '../src/models/a500MachineState'
-import { StrengthMachineAppType, StrengthMachineIdentifier } from '../src/models/strengthMachine'
+import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { StrengthMachineSession } from '../src/session'
 import { getDemoUserSession, getMetricsInstance, setActiveEmployeeFacility } from './utils/fixtures'
 
@@ -38,7 +38,6 @@ describe('A500 Machine State', function () {
     a500MachineState = await strengthMachineSession.getA500MachineState()
 
     expect(typeof a500MachineState.isFacilityConfigurationOverridden).to.equal('boolean')
-    expect(typeof a500MachineState.appType).to.equal('string')
     expect(typeof a500MachineState).to.not.equal('undefined')
     expect(typeof a500MachineState.forceUnit).to.equal('string')
     expect(typeof a500MachineState.primaryFocus).to.equal('string')
@@ -48,13 +47,11 @@ describe('A500 Machine State', function () {
   it('can update a500 machine state', async function () {
     a500MachineState = await a500MachineState.update({
       isFacilityConfigurationOverridden: true,
-      appType: StrengthMachineAppType.Medical,
       forceUnit: ForceUnit.Pounds,
       primaryFocus: 'rom',
       secondaryFocus: 'velocity'
     })
     expect(a500MachineState.isFacilityConfigurationOverridden).to.equal(true)
-    expect(a500MachineState.appType).to.equal(StrengthMachineAppType.Medical)
     expect(a500MachineState.forceUnit).to.equal(ForceUnit.Pounds)
     expect(a500MachineState.primaryFocus).to.equal('rom')
     expect(a500MachineState.secondaryFocus).to.equal('velocity')
