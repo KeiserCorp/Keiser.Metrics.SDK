@@ -123,7 +123,7 @@ export class DevelopmentAccount extends Model {
     return new DevelopmentAccountRelationships(developmentAccountRelationships, developmentAccountRelationshipsMeta, this.sessionHandler)
   }
 
-  async update (options?: { company?: string, address?: string, websiteUrl?: string, privacyUrl?: string, termsUrl?: string }) {
+  async update (options: { company?: string, address?: string, websiteUrl?: string, privacyUrl?: string, termsUrl?: string }) {
     const { developmentAccount } = (await this.action('developmentAccount:update', { ...options, id: this.id })) as DevelopmentAccountResponse
     this.setDevelopmentAccount(developmentAccount)
     return this
