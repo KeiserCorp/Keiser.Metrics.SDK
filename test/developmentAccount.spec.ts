@@ -26,7 +26,9 @@ describe('Development Account', function () {
     const developmentAccount = await user.createDevelopmentAccount({
       company: 'Keiser',
       address: '2470 S Cherry Ave, Fresno, CA 93706',
-      websiteUrl: 'www.keiser.com'
+      websiteUrl: 'www.keiser.com',
+      privacyUrl: 'www.keiser.com/privacy',
+      termsUrl: 'www.keiser.com/terms'
     })
 
     expect(developmentAccount).to.be.an('object')
