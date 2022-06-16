@@ -17,7 +17,7 @@ export const machineAdjustments = {
         translation: 'Belt'
       }
     ],
-    primaryAdjustmentIndex: null
+    primaryAdjustmentIndex: 0
   },
   '002099': { // Biaxial Upper Back
     adjustments: [
@@ -310,6 +310,6 @@ export const machineAdjustments = {
   }
 }
 
-export const availableMachineAdjustments = (model: string) => {
+export const getAvailableMachineAdjustments = (model: string) => {
   return machineAdjustments[model]
 }

@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
-import { availableMachineAdjustments } from '../src/lib/machineAdjustments'
+import { getAvailableMachineAdjustments } from '../src/lib/machineAdjustments'
 import { MachineAdjustment, MachineAdjustmentSorting } from '../src/models/machineAdjustment'
 import { User } from '../src/models/user'
 import { getDemoUserSession, getMetricsInstance } from './utils/fixtures'
@@ -23,7 +23,7 @@ describe('Machine Adjustment', function () {
   })
 
   it('can show available adjustments for a strength machine', async function () {
-    const machineAdjustments = availableMachineAdjustments('002099')
+    const machineAdjustments = getAvailableMachineAdjustments('002099')
 
     expect(machineAdjustments).to.be.an('object')
     expect(Array.isArray(machineAdjustments.adjustments)).to.be.equal(true)

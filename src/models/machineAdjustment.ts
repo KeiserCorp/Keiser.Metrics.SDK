@@ -55,7 +55,7 @@ export class MachineAdjustment extends Model {
     return this
   }
 
-  async update (options?: { seat?: string, start?: string, stop?: string, leftPosition?: string, rightPosition?: string }) {
+  async update (options: { seat?: string, start?: string, stop?: string, leftPosition?: string, rightPosition?: string }) {
     const { machineAdjustment } = await this.action('machineAdjustment:update', { ...options, id: this.id, userId: this.userId }) as MachineAdjustmentResponse
     this.setMachineAdjustment(machineAdjustment)
     return this
