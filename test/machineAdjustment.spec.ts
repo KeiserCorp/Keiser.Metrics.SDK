@@ -26,8 +26,6 @@ describe('Machine Adjustment', function () {
     const machineAdjustments = getAvailableMachineAdjustments('002099')
 
     expect(machineAdjustments).to.be.an('object')
-    expect(Array.isArray(machineAdjustments.adjustments)).to.be.equal(true)
-    expect(machineAdjustments.primaryAdjustmentIndex).to.not.be.equal('undefined')
   })
 
   it('can create a user machine adjustment', async function () {

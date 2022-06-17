@@ -1,12 +1,15 @@
 interface AdjustmentPosition {
-  name: string
   range: string[]
-  translation?: string
+  alias: string
+  required: boolean
 }
 
 interface MachineAdjustmentTemplate {
-  adjustments: AdjustmentPosition[]
-  primaryAdjustmentIndex?: number
+  seat?: AdjustmentPosition
+  start?: AdjustmentPosition
+  stop?: AdjustmentPosition
+  leftPosition?: AdjustmentPosition
+  rightPosition?: AdjustmentPosition
 }
 
 export class MachineAdjustmentsRecord {
@@ -20,325 +23,262 @@ export class MachineAdjustmentsRecord {
     this._machineAdjustmentTemplate = machineAdjustmentTemplate
   }
 
-  get adjustments () {
-    return this._machineAdjustmentTemplate.adjustments
+  get seat () {
+    return this._machineAdjustmentTemplate.seat
   }
 
-  get primaryAdjustmentIndex () {
-    return this._machineAdjustmentTemplate.primaryAdjustmentIndex
+  get start () {
+    return this._machineAdjustmentTemplate.start
+  }
+
+  get stop () {
+    return this._machineAdjustmentTemplate.stop
+  }
+
+  get leftPosition () {
+    return this._machineAdjustmentTemplate.leftPosition
+  }
+
+  get rightPosition () {
+    return this._machineAdjustmentTemplate.rightPosition
   }
 }
 
 export const machineAdjustments = {
   '001399': { // Chest Press
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Seat'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Seat',
+      required: false
+    }
   },
   '001599': { // Belt Squat
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3'],
-        translation: 'Belt'
-      }
-    ],
-    primaryAdjustmentIndex: 0
+    leftPosition: {
+      range: ['1', '2', '3'],
+      alias: 'Belt',
+      required: true
+    }
   },
   '002099': { // Biaxial Upper Back
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Seat'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-        translation: 'Chest'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Seat',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      alias: 'Chest',
+      required: false
+    }
   },
   '002599': { // Leg Press
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: null
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2'],
-        translation: null
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: null,
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2'],
+      alias: null,
+      required: false
+    }
   },
   '003097': { // Functional Trainer
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: 'Left Arm'
-      },
-      {
-        name: 'rightPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: 'Right Arm'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: 'Left Arm',
+      required: false
+    },
+    rightPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: 'Right Arm',
+      required: false
+    }
   },
   '003099': { // Performance Trainer
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J', 'L', 'P'],
-        translation: 'Arm'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J', 'L', 'P'],
+      alias: 'Arm',
+      required: false
+    }
   },
-  '003199': { /* Rack */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  },
+  '003199': { /* Rack */ },
   '003299': { // Runner Tall
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: 'Chest'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: 'Chest',
+      required: false
+    }
   },
   '001198': { // Leg Extension Range Limiter
-    adjustments: [
-      {
-        name: 'start',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
-        translation: 'Start'
-      },
-      {
-        name: 'stop',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: 'Stop'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7'],
-        translation: 'Legs'
-      },
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
-        translation: 'Back'
-      }
-    ],
-    primaryAdjustmentIndex: 0
+    start: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
+      alias: 'Start',
+      required: true
+    },
+    stop: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: 'Stop',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7'],
+      alias: 'Legs',
+      required: false
+    },
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
+      alias: 'Back',
+      required: false
+    }
   },
-  '001199': { /* Leg Extension Pro */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  },
+  '001199': { /* Leg Extension Pro */ },
   '001289': { // Leg Curl Range Limiter
-    adjustments: [
-      {
-        name: 'start',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
-        translation: 'Start'
-      },
-      {
-        name: 'stop',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E'],
-        translation: 'Stop'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Leg'
-      },
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
-        translation: 'Back'
-      }
-    ],
-    primaryAdjustmentIndex: 0
+    start: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
+      alias: 'Start',
+      required: true
+    },
+    stop: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E'],
+      alias: 'Stop',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Leg',
+      required: false
+    },
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
+      alias: 'Back',
+      required: false
+    }
   },
   '001298': { // Leg Curl Range Limiter
-    adjustments: [
-      {
-        name: 'start',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
-        translation: 'Start'
-      },
-      {
-        name: 'stop',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E'],
-        translation: 'Stop'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Leg'
-      },
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
-        translation: 'Back'
-      }
-    ],
-    primaryAdjustmentIndex: 0
+    start: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A'],
+      alias: 'Start',
+      required: true
+    },
+    stop: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E'],
+      alias: 'Stop',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Leg',
+      required: false
+    },
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C', 'E', 'F', 'H', 'J'],
+      alias: 'Back',
+      required: false
+    }
   },
-  '001299': { /* Leg Curl Pro */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  },
+  '001299': { /* Leg Curl Pro */ },
   '001598': { // Squat Pro
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7'],
-        translation: 'Shoulder Pads'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7'],
+      alias: 'Shoulder Pads',
+      required: false
+    }
   },
   '001699': { // Military Press
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Seat'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Seat',
+      required: false
+    }
   },
   '001799': { // Arm Curl
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-        translation: 'Seat'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      alias: 'Seat',
+      required: false
+    }
   },
   '001999': { // Triceps
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-        translation: 'Seat'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      alias: 'Seat',
+      required: false
+    }
   },
   '002199': { // Lat Pulldown
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8'],
-        translation: 'Seat'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4'],
-        translation: 'Arms'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8'],
+      alias: 'Seat',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4'],
+      alias: 'Arms',
+      required: false
+    }
   },
   '002399': { // Abductor
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7'],
-        translation: 'Back'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6'],
-        translation: 'Left Leg'
-      },
-      {
-        name: 'rightPosition',
-        range: ['1', '2', '3', '4', '5', '6'],
-        translation: 'Right Leg'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7'],
+      alias: 'Back',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6'],
+      alias: 'Left Leg',
+      required: false
+    },
+    rightPosition: {
+      range: ['1', '2', '3', '4', '5', '6'],
+      alias: 'Right Leg',
+      required: false
+    }
   },
   '002499': { // Adductor
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7'],
-        translation: 'Back'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6'],
-        translation: 'Left Leg'
-      },
-      {
-        name: 'rightPosition',
-        range: ['1', '2', '3', '4', '5', '6'],
-        translation: 'Right Leg'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7'],
+      alias: 'Back',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6'],
+      alias: 'Left Leg',
+      required: false
+    },
+    rightPosition: {
+      range: ['1', '2', '3', '4', '5', '6'],
+      alias: 'Right Leg',
+      required: false
+    }
   },
   '002699': { // Standing Hip
-    adjustments: [
-      {
-        name: 'seat',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'],
-        translation: 'Platform'
-      },
-      {
-        name: 'start',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-        translation: 'Start'
-      },
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7'],
-        translation: 'Leg'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    seat: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'],
+      alias: 'Platform',
+      required: false
+    },
+    start: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      alias: 'Start',
+      required: false
+    },
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7'],
+      alias: 'Leg',
+      required: false
+    }
   },
-  '002899': { /* Lower Back */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  },
-  '002999': { /* Seated Calf */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  },
+  '002899': { /* Lower Back */ },
+  '002999': { /* Seated Calf */ },
   '003298': { // Runner
-    adjustments: [
-      {
-        name: 'leftPosition',
-        range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
-        translation: 'Chest'
-      }
-    ],
-    primaryAdjustmentIndex: null
+    leftPosition: {
+      range: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'C'],
+      alias: 'Chest',
+      required: false
+    }
   },
-  '003197': { /* Half Rack */
-    adjustments: [],
-    primaryAdjustmentIndex: null
-  }
+  '003197': { /* Half Rack */ }
 }
 
 export const getAvailableMachineAdjustments = (model: string) => {
