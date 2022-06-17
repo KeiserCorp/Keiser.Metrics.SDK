@@ -1,6 +1,6 @@
 interface AdjustmentPosition {
   range: string[]
-  alias?: string
+  alias: string
   required: boolean
 }
 
@@ -79,7 +79,7 @@ export const machineAdjustments = {
     },
     leftPosition: {
       range: ['1', '2'],
-      alias: null,
+      alias: 'Legs',
       required: false
     }
   },
