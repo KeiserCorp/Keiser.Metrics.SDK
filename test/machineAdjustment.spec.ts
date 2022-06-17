@@ -70,7 +70,9 @@ describe('Machine Adjustment', function () {
   })
 
   it('can list user machine adjustments', async function () {
-    const machineAdjustments = await user.getMachineAdjustments()
+    const machineAdjustments = await user.getMachineAdjustments({
+      sort: MachineAdjustmentSorting.ID
+    })
 
     expect(Array.isArray(machineAdjustments)).to.equal(true)
     expect(machineAdjustments.length).to.be.above(0)
@@ -78,11 +80,8 @@ describe('Machine Adjustment', function () {
   })
 
   it('can reload a user machine adjustment', async function () {
+    await createdMachineAdjustment.reload()
     expect(createdMachineAdjustment).to.be.an('object')
-    if (typeof createdMachineAdjustment !== 'undefined') {
-      await createdMachineAdjustment.reload()
-      expect(createdMachineAdjustment).to.be.an('object')
-    }
   })
 
   it('can delete a user machine adjustment', async function () {

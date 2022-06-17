@@ -259,7 +259,7 @@ export class User extends SubscribableModel {
     return new MachineAdjustment(machineAdjustment, this.sessionHandler)
   }
 
-  async getMachineAdjustments (options?: { model?: string, sort?: MachineAdjustmentSorting, ascending?: boolean, limit?: number, offset?: number }) {
+  async getMachineAdjustments (options: { model?: string, sort?: MachineAdjustmentSorting, ascending?: boolean, limit?: number, offset?: number }) {
     const { machineAdjustments, machineAdjustmentsMeta } = await this.action('machineAdjustment:list', { ...options, userId: this.id }) as MachineAdjustmentListResponse
     return new MachineAdjustments(machineAdjustments, machineAdjustmentsMeta, this.sessionHandler)
   }

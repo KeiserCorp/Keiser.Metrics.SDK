@@ -1,3 +1,34 @@
+interface AdjustmentPosition {
+  name: string
+  range: string[]
+  translation?: string
+}
+
+interface MachineAdjustmentTemplate {
+  adjustments: AdjustmentPosition[]
+  primaryAdjustmentIndex?: number
+}
+
+export class MachineAdjustmentsRecord {
+  private _machineAdjustmentTemplate: MachineAdjustmentTemplate
+
+  constructor (machineAdjustmentTemplate: MachineAdjustmentTemplate) {
+    this._machineAdjustmentTemplate = machineAdjustmentTemplate
+  }
+
+  protected setMachineAdjustmentTemplate (machineAdjustmentTemplate: MachineAdjustmentTemplate) {
+    this._machineAdjustmentTemplate = machineAdjustmentTemplate
+  }
+
+  get adjustments () {
+    return this._machineAdjustmentTemplate.adjustments
+  }
+
+  get primaryAdjustmentIndex () {
+    return this._machineAdjustmentTemplate.primaryAdjustmentIndex
+  }
+}
+
 export const machineAdjustments = {
   '001399': { // Chest Press
     adjustments: [
@@ -311,5 +342,5 @@ export const machineAdjustments = {
 }
 
 export const getAvailableMachineAdjustments = (model: string) => {
-  return machineAdjustments[model]
+  return new MachineAdjustmentsRecord(machineAdjustments[model])
 }
