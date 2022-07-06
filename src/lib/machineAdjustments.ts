@@ -1,10 +1,10 @@
-interface AdjustmentPosition {
+export interface AdjustmentPosition {
   range: string[]
   alias: string
   required: boolean
 }
 
-interface MachineAdjustmentTemplate {
+export interface MachineAdjustmentTemplate {
   seat?: AdjustmentPosition
   start?: AdjustmentPosition
   stop?: AdjustmentPosition
@@ -282,5 +282,5 @@ export const machineAdjustments = {
 }
 
 export const getAvailableMachineAdjustments = (model: string) => {
-  return new MachineAdjustmentsRecord(machineAdjustments[model])
+  return new MachineAdjustmentsRecord(machineAdjustments[model as keyof typeof machineAdjustments])
 }
