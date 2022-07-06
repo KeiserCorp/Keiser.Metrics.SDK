@@ -1,3 +1,5 @@
+export type MachineModelType = keyof typeof machineAdjustments
+
 export interface AdjustmentPosition {
   range: string[]
   alias: string
@@ -281,6 +283,6 @@ export const machineAdjustments = {
   '003197': { /* Half Rack */ }
 }
 
-export const getAvailableMachineAdjustments = (model: string) => {
-  return new MachineAdjustmentsRecord(machineAdjustments[model as keyof typeof machineAdjustments])
+export const getAvailableMachineAdjustments = (model: MachineModelType) => {
+  return new MachineAdjustmentsRecord(machineAdjustments[model])
 }

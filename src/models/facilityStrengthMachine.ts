@@ -1,4 +1,4 @@
-import { getAvailableMachineAdjustments } from '../lib/machineAdjustments'
+import { getAvailableMachineAdjustments, MachineModelType } from '../lib/machineAdjustments'
 import { FacilityListMeta, SubscribableModel, SubscribableModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { A500MachineState, A500MachineStateData } from './a500MachineState'
@@ -80,7 +80,7 @@ export class FacilityStrengthMachine extends SubscribableModel {
     return { model: 'facilityStrengthMachine', id: this.id }
   }
 
-  async getAvailableAdjustments (model: string) {
+  async getAvailableAdjustments (model: MachineModelType) {
     return getAvailableMachineAdjustments(model)
   }
 
