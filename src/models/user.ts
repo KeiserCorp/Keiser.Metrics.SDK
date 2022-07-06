@@ -15,6 +15,7 @@ import { FacilityRelationshipRequest, FacilityRelationshipRequestListResponse, F
 import { GlobalAccessControl, GlobalAccessControlResponse } from './globalAccessControl'
 import { HeartRateCapturedDataPoint, HeartRateDataSet, HeartRateDataSetListResponse, HeartRateDataSetResponse, HeartRateDataSets, HeartRateDataSetSorting } from './heartRateDataSet'
 import { HeightMeasurement, HeightMeasurementData, HeightMeasurementListResponse, HeightMeasurementResponse, HeightMeasurements, HeightMeasurementSorting } from './heightMeasurement'
+import { MachineAdjustment, MachineAdjustmentListResponse, MachineAdjustmentResponse, MachineAdjustments, MachineAdjustmentSorting } from './machineAdjustment'
 import { JoinableMSeriesChallenge, JoinedMSeriesChallenge, JoinedMSeriesChallenges, MSeriesChallengeFocus, MSeriesChallengeListResponse, MSeriesChallengeRelationship, MSeriesChallengeResponse, MSeriesChallengeSorting, MSeriesChallengeType, PrivilegedMSeriesChallenge, PrivilegedMSeriesChallenges } from './mSeriesChallenge'
 import { MSeriesChallengeParticipant, MSeriesChallengeParticipantResponse } from './mSeriesChallengeParticipant'
 import { MSeriesCapturedDataPoint, MSeriesDataSet, MSeriesDataSetListResponse, MSeriesDataSetResponse, MSeriesDataSets, MSeriesDataSetSorting } from './mSeriesDataSet'
@@ -246,6 +247,21 @@ export class User extends SubscribableModel {
   async getHeightMeasurements (options: { from?: Date, to?: Date, sort?: HeightMeasurementSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { heightMeasurements, heightMeasurementsMeta } = await this.action('heightMeasurement:list', { ...options, userId: this.id }) as HeightMeasurementListResponse
     return new HeightMeasurements(heightMeasurements, heightMeasurementsMeta, this.sessionHandler)
+  }
+
+  async createMachineAdjustment (params: { model: string, seat?: string, start?: string, stop?: string, leftPosition?: string, rightPosition?: string }) {
+    const { machineAdjustment } = await this.action('machineAdjustment:create', { ...params, userId: this.id }) as MachineAdjustmentResponse
+    return new MachineAdjustment(machineAdjustment, this.sessionHandler)
+  }
+
+  async getMachineAdjustment (params: { id: number }) {
+    const { machineAdjustment } = await this.action('machineAdjustment:show', { ...params, userId: this.id }) as MachineAdjustmentResponse
+    return new MachineAdjustment(machineAdjustment, this.sessionHandler)
+  }
+
+  async getMachineAdjustments (options: { model?: string, sort?: MachineAdjustmentSorting, ascending?: boolean, limit?: number, offset?: number }) {
+    const { machineAdjustments, machineAdjustmentsMeta } = await this.action('machineAdjustment:list', { ...options, userId: this.id }) as MachineAdjustmentListResponse
+    return new MachineAdjustments(machineAdjustments, machineAdjustmentsMeta, this.sessionHandler)
   }
 
   async getFacilityRelationshipRequest (params: { id: number }) {
