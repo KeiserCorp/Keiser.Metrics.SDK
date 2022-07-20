@@ -288,7 +288,7 @@ export interface MSeriesDataPointData {
   cadence: number
   power: number
   caloricBurn: number
-  duration: string
+  duration: number
   distance: number
   gear: number | null
   metabolicEquivalent: number | null
@@ -348,7 +348,7 @@ export class MSeriesDataPoint {
    * @returns Duration in number of seconds since start
    */
   get duration () {
-    return durationToSeconds(this._mSeriesDataPointData.duration)
+    return this._mSeriesDataPointData.duration
   }
 
   get distance () {
