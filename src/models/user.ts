@@ -25,6 +25,7 @@ import { PrimaryEmailAddress, PrimaryEmailAddressData, PrimaryEmailAddressRespon
 import { Profile, ProfileData } from './profile'
 import { FacilitySession, FacilitySessionListResponse, FacilitySessions, Session, SessionListResponse, SessionRequireExtendedDataType, SessionResponse, Sessions, SessionSorting, SessionStartResponse } from './session'
 import { ResistancePrecision, StrengthMachineDataSet, StrengthMachineDataSetListResponse, StrengthMachineDataSetResponse, StrengthMachineDataSets, StrengthMachineDataSetSorting } from './strengthMachineDataSet'
+import { StrengthMachineProfileStats, StrengthMachineProfileStatsResponse } from './strengthMachineProfileStats'
 import { UserInBodyIntegration, UserInBodyIntegrationResponse } from './userInBodyIntegration'
 import { WeightMeasurement, WeightMeasurementData, WeightMeasurementListResponse, WeightMeasurementResponse, WeightMeasurements, WeightMeasurementSorting } from './weightMeasurement'
 
@@ -435,6 +436,11 @@ export class User extends SubscribableModel {
   async getStrengthMachineDataSets (options: { from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId: this.id }) as StrengthMachineDataSetListResponse
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler)
+  }
+
+  async getStrengthMachineProfileStats (params: { strengthMachineId: number }) {
+    const { strengthMachineProfileStats } = await this.action('strengthMachineProfileStats:show', { strengthMachineId: params.strengthMachineId }) as StrengthMachineProfileStatsResponse
+    return new StrengthMachineProfileStats(strengthMachineProfileStats, this.sessionHandler)
   }
 
   async getGlobalAccessControl () {
