@@ -440,7 +440,7 @@ export class User extends SubscribableModel {
 
   async getStrengthMachineProfileStats (params: { strengthMachineId: number }) {
     const { strengthMachineProfileStats } = await this.action('strengthMachineProfileStats:show', { strengthMachineId: params.strengthMachineId }) as StrengthMachineProfileStatsResponse
-    return new StrengthMachineProfileStats(strengthMachineProfileStats, { strengthMachineId: params.strengthMachineId }, this.sessionHandler)
+    return new StrengthMachineProfileStats(strengthMachineProfileStats, this.sessionHandler)
   }
 
   async getGlobalAccessControl () {

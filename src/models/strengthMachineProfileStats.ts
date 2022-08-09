@@ -1,11 +1,8 @@
 import { Model } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 
-export interface StrengthMachineProfileStatsMeta {
-  strengthMachineId: number
-}
-
 export interface StrengthMachineProfileStatsData {
+  strengthMachineId: number
   peakPower: number
 }
 
@@ -15,12 +12,10 @@ export interface StrengthMachineProfileStatsResponse extends AuthenticatedRespon
 
 export class StrengthMachineProfileStats extends Model {
   private _strengthMachineProfileStatsData: StrengthMachineProfileStatsData
-  private readonly _strengthMachineProfileStatsMeta: StrengthMachineProfileStatsMeta
 
-  constructor (strengthMachineProfileStatsData: StrengthMachineProfileStatsData, strengthMachineProfileStatsMeta: StrengthMachineProfileStatsMeta, sessionHandler: SessionHandler) {
+  constructor (strengthMachineProfileStatsData: StrengthMachineProfileStatsData, sessionHandler: SessionHandler) {
     super(sessionHandler)
     this._strengthMachineProfileStatsData = strengthMachineProfileStatsData
-    this._strengthMachineProfileStatsMeta = strengthMachineProfileStatsMeta
   }
 
   protected setStrengthMachineProfileStatsData (strengthMachineProfileStatsData: StrengthMachineProfileStatsData) {
@@ -28,7 +23,7 @@ export class StrengthMachineProfileStats extends Model {
   }
 
   async reload () {
-    const { strengthMachineProfileStats } = await this.action('strengthMachineProfileStats:show', { strengthMachineId: this._strengthMachineProfileStatsMeta.strengthMachineId }) as StrengthMachineProfileStatsResponse
+    const { strengthMachineProfileStats } = await this.action('strengthMachineProfileStats:show', { strengthMachineId: this._strengthMachineProfileStatsData.strengthMachineId }) as StrengthMachineProfileStatsResponse
     this.setStrengthMachineProfileStatsData(strengthMachineProfileStats)
     return this
   }
