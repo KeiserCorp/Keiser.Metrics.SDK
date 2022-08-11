@@ -6,6 +6,7 @@ import { decompressKA5FromBuffer } from '../src/lib/compress'
 import { PrivilegedFacility } from '../src/models/facility'
 import { StrengthMachineIdentifier } from '../src/models/strengthMachine'
 import { StrengthMachineDataSetExportFormat } from '../src/models/strengthMachineDataSet'
+import { StrengthMachineProfileStats } from '../src/models/strengthMachineProfileStats'
 import { FacilityUserSession, StrengthMachineSession } from '../src/session'
 import { a500SetDataSample, a500TimeSeriesDataPointSamples } from './samples/a500'
 import { randomEmailAddress, randomNumberSequence } from './utils/dummy'
@@ -29,6 +30,8 @@ describe('A500', function () {
   let strengthMachineSession: StrengthMachineSession
   let facilityUserSession: FacilityUserSession
   let a500ResultId: number
+  let strengthMachineId: number
+  let createdStrengthMachineProfileStats: StrengthMachineProfileStats
 
   before(async function () {
     metricsInstance = getMetricsInstance()
@@ -71,7 +74,6 @@ describe('A500', function () {
   it('can use machine session to login user', async function () {
     const facilityRelationship = await privilegedFacility.createFacilityMemberUser({ email: newUserEmailAddress, name: 'Archie Richards', memberIdentifier: newUserMemberId })
     facilityUserSession = await strengthMachineSession.userLogin({ memberIdentifier: facilityRelationship.memberIdentifier as string })
-
     expect(typeof facilityUserSession).to.not.equal('undefined')
     expect(typeof facilityUserSession.user).to.not.equal('undefined')
     expect(facilityUserSession.user.id).to.equal(facilityRelationship.userId)
@@ -95,6 +97,7 @@ describe('A500', function () {
     expect(response.id).to.not.equal(0)
 
     a500ResultId = response.id
+    strengthMachineId = response.eagerStrengthMachine()?.id ?? 1053
   })
 
   it('can retrieve a500 data set', async function () {
@@ -117,6 +120,23 @@ describe('A500', function () {
       expect(a500DataSet.eagerLeftTestResult()).to.not.equal('undefined')
       expect(a500DataSet.eagerRightTestResult()).to.not.equal('undefined')
     }
+  })
+
+  it('can get a user\'s Strength Machine Profile Stats', async function () {
+    const strengthMachineProfileStats = await facilityUserSession.user.getStrengthMachineProfileStats({ strengthMachineId: strengthMachineId })
+
+    expect(typeof strengthMachineProfileStats).to.equal('object')
+    expect(strengthMachineProfileStats.peakPower).to.equal(496)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(3.15)
+    createdStrengthMachineProfileStats = strengthMachineProfileStats
+  })
+
+  it('can reload Strength Machine Profile Stats', async function () {
+    const strengthMachineProfileStats = await createdStrengthMachineProfileStats.reload()
+
+    expect(typeof strengthMachineProfileStats).to.equal('object')
+    expect(strengthMachineProfileStats.peakPower).to.equal(496)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(3.15)
   })
 
   it('can export a500 data set in action', async function () {

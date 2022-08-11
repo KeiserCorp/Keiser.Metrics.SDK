@@ -61,6 +61,7 @@ describe('Strength Machine Profile Stats', function () {
 
     expect(typeof strengthMachineProfileStats).to.equal('object')
     expect(strengthMachineProfileStats.peakPower).to.equal(5555)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(0)
     createdStrengthMachineProfileStats = strengthMachineProfileStats
   })
 
@@ -69,5 +70,6 @@ describe('Strength Machine Profile Stats', function () {
 
     expect(typeof strengthMachineProfileStats).to.equal('object')
     expect(strengthMachineProfileStats.peakPower).to.equal(5555)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(0)
   })
 })
