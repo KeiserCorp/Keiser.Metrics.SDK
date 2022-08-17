@@ -4,6 +4,7 @@ import { AuthenticatedResponse, SessionHandler } from '../session'
 export interface StrengthMachineProfileStatsData {
   strengthMachineId: number
   peakPower: number
+  peakVelocity: number
 }
 
 export interface StrengthMachineProfileStatsResponse extends AuthenticatedResponse {
@@ -34,5 +35,9 @@ export class StrengthMachineProfileStats extends Model {
 
   get peakPower () {
     return this._strengthMachineProfileStatsData.peakPower
+  }
+
+  get peakVelocity () {
+    return this._strengthMachineProfileStatsData.peakVelocity
   }
 }
