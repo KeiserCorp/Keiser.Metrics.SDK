@@ -232,4 +232,12 @@ export class PrivilegedFacility extends Facility {
     this.setFacilityData(response.facility)
     return this
   }
+  
+  getExportCsv (params: { from: string, to: string}) {
+    // await this.action('strengthMachineDataSet:exportCsv', { ...params })
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from}&to=${params.to}`)
+    url.searchParams.append('authorization', this.sessionHandler.accessToken)
+    return url.toString()
+  }
+
 }
