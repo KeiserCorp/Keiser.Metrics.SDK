@@ -270,7 +270,6 @@ export class StrengthMachineDataSet extends SubscribableModel {
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
-
 }
 
 export class StrengthMachineDataSetTest {
