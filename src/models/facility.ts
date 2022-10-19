@@ -1,4 +1,4 @@
-import { Units, XOR } from '../constants'
+import { ReportGrouping, Units, XOR } from '../constants'
 import { ListMeta, ModelList, SubscribableModel } from '../model'
 import { AuthenticatedResponse, FacilityKioskTokenResponse, KioskSession, SessionHandler } from '../session'
 import { FacilityAccessControl, FacilityAccessControlResponse } from './facilityAccessControl'
@@ -236,6 +236,12 @@ export class PrivilegedFacility extends Facility {
   getExportCsv (params: { from: string, to: string}) {
     // await this.action('strengthMachineDataSet:exportCsv', { ...params })
     const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from}&to=${params.to}`)
+    url.searchParams.append('authorization', this.sessionHandler.accessToken)
+    return url.toString()
+  }
+
+  getCheckIn (params: { from: string, to: string, group: ReportGrouping}) {
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=facilityReport:checkIn&from=${params.from}&to=${params.to}&group=${params.group}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
