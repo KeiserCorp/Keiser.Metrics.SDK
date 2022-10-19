@@ -233,15 +233,15 @@ export class PrivilegedFacility extends Facility {
     return this
   }
 
-  getExportCsv (params: { from: string, to: string}) {
+  getExportCsv (params: { from: Date, to: Date}) {
     // await this.action('strengthMachineDataSet:exportCsv', { ...params })
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from}&to=${params.to}`)
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
 
-  getCheckIn (params: { from: string, to: string, group: ReportGrouping}) {
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=facilityReport:checkIn&from=${params.from}&to=${params.to}&group=${params.group}`)
+  getFacilityReportCheckIn (params: { from: Date, to: Date, group: ReportGrouping}) {
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=facilityReport:checkIn&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}&group=${params.group}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
