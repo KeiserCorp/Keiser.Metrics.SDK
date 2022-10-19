@@ -270,13 +270,6 @@ export class StrengthMachineDataSet extends SubscribableModel {
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
-
-  getExportCsv (params: { from: string, to: string}) {
-    // await this.action('strengthMachineDataSet:exportCsv', { ...params })
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from}&to=${params.to}`)
-    url.searchParams.append('authorization', this.sessionHandler.accessToken)
-    return url.toString()
-  }
 }
 
 export class StrengthMachineDataSetTest {
