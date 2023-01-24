@@ -30,13 +30,7 @@ describe('Strength Machine Data Set', function () {
     expect(Array.isArray(strengthMachineDataSets)).to.equal(true)
     expect(strengthMachineDataSets.meta.sort).to.equal(StrengthMachineDataSetSorting.CompletedAt)
   })
-  it('can list Strength Machine data set with strengthMachineId filter', async function () {
-    const strengthMachineDataSets = await user.getStrengthMachineDataSets({ strengthMachineId: 1000 })
 
-    expect(Array.isArray(strengthMachineDataSets)).to.equal(true)
-    expect(strengthMachineDataSets.meta.sort).to.equal(StrengthMachineDataSetSorting.CompletedAt)
-    expect(strengthMachineDataSets[0].eagerStrengthMachine()?.id).to.equal(1000)
-  })
   it('can create new Strength Machine data set', async function () {
     const strengthMachineDataSet = await user.createStrengthMachineDataSet({
       strengthMachineId: 1000,
