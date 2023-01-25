@@ -433,7 +433,7 @@ export class User extends SubscribableModel {
     return new StrengthMachineDataSet(strengthMachineDataSet, this.sessionHandler)
   }
 
-  async getStrengthMachineDataSets (options: { from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthMachineDataSets (options: { from?: Date, to?: Date, sort?: StrengthMachineDataSetSorting, ascending?: boolean, limit?: number, offset?: number, strengthMachineId?: number } = { }) {
     const { strengthMachineDataSets, strengthMachineDataSetsMeta } = await this.action('strengthMachineDataSet:list', { ...options, userId: this.id }) as StrengthMachineDataSetListResponse
     return new StrengthMachineDataSets(strengthMachineDataSets, strengthMachineDataSetsMeta, this.sessionHandler)
   }

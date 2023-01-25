@@ -54,6 +54,15 @@ describe('Strength Machine Data Set', function () {
     createdStrengthMachineDataSet = strengthMachineDataSet
   })
 
+  it('can list Strength Machine data set with strengthMachineId filter', async function () {
+    const strengthMachineDataSets = await user.getStrengthMachineDataSets({ strengthMachineId: 1000 })
+
+    expect(Array.isArray(strengthMachineDataSets)).to.equal(true)
+    expect(strengthMachineDataSets.meta.sort).to.equal(StrengthMachineDataSetSorting.CompletedAt)
+    expect(strengthMachineDataSets.length).to.equal(1)
+    expect(strengthMachineDataSets[0].eagerStrengthMachine()?.id).to.equal(1000)
+  })
+
   it('can reload Strength Machine data set', async function () {
     const strengthMachineDataSet = await createdStrengthMachineDataSet.reload()
 
