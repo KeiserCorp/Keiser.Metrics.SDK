@@ -126,8 +126,8 @@ describe('A500', function () {
     const strengthMachineProfileStats = await facilityUserSession.user.getStrengthMachineProfileStats({ strengthMachineId: strengthMachineId })
 
     expect(typeof strengthMachineProfileStats).to.equal('object')
-    expect(strengthMachineProfileStats.peakPower).to.equal(496)
-    expect(strengthMachineProfileStats.peakVelocity).to.equal(3.15)
+    expect(strengthMachineProfileStats.peakPower).to.equal(953)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(6.22)
     createdStrengthMachineProfileStats = strengthMachineProfileStats
   })
 
@@ -135,8 +135,8 @@ describe('A500', function () {
     const strengthMachineProfileStats = await createdStrengthMachineProfileStats.reload()
 
     expect(typeof strengthMachineProfileStats).to.equal('object')
-    expect(strengthMachineProfileStats.peakPower).to.equal(496)
-    expect(strengthMachineProfileStats.peakVelocity).to.equal(3.15)
+    expect(strengthMachineProfileStats.peakPower).to.equal(953)
+    expect(strengthMachineProfileStats.peakVelocity).to.equal(6.22)
   })
 
   it('can export a500 data set in action', async function () {
