@@ -274,9 +274,11 @@ export class MetricsConnection {
 
   private async actionRest (action: string, params: Object, callback: (success: any, fail?: any) => void) {
     try {
+      const actionSplit = action.split(':')
+      const actionRoute = actionSplit.length > 1 ? actionSplit[0] + actionSplit[1].charAt(0).toUpperCase() + actionSplit[1].slice(1) : actionSplit[0]
       const response = await Axios({
         method: 'POST',
-        url: `${this._restEndpoint}?action=${action}`,
+        url: `${this._restEndpoint}/${actionRoute}`,
         data: params,
         timeout: this._requestTimeout
       })
