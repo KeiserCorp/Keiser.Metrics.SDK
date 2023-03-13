@@ -32,7 +32,8 @@ describe('Strength Exercise Muscle', function () {
       defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 
@@ -88,12 +89,12 @@ describe('Strength Exercise Muscle', function () {
   it('can update strength exercise muscle', async function () {
     if (typeof createdStrengthExerciseMuscle !== 'undefined') {
       const strengthExerciseMuscleParams = {
-        targetLevel: MuscleTargetLevel.Stabilizer
+        targetLevel: MuscleTargetLevel.Tertiary
       }
       await createdStrengthExerciseMuscle.update(strengthExerciseMuscleParams)
       expect(createdStrengthExerciseMuscle).to.be.an('object')
       expect(createdStrengthExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)
-      expect(createdStrengthExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Stabilizer)
+      expect(createdStrengthExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Tertiary)
     }
   })
 

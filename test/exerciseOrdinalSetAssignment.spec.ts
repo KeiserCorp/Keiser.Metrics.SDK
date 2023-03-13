@@ -38,11 +38,13 @@ describe('Exercise Ordinal Set Assignment', function () {
       defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
     createdStrengthExerciseVariant = await createdStrengthExercise.createStrengthExerciseVariant({
       variant: StrengthExerciseVariantType.Normal,
-      attachment: StrengthExerciseVariantAttachment.Bar
+      attachment: StrengthExerciseVariantAttachment.Bar,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral
     })
   })
 

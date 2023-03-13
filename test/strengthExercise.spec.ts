@@ -39,7 +39,8 @@ describe('Strength Exercise', function () {
       defaultExerciseAlias: newExerciseName,
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     }
     const strengthExercise = await adminSession.createStrengthExercise(strengthExerciseParams)
 
@@ -103,7 +104,8 @@ describe('Strength Exercise', function () {
       const strengthExerciseParams = {
         category: StrengthExerciseCategory.Explosive,
         movement: StrengthExerciseMovement.Isolation,
-        plane: StrengthExercisePlane.Frontal
+        plane: StrengthExercisePlane.Frontal,
+        humanMovement: StrengthExerciseMovement.Unilateral
       }
       await strengthExercise.update(strengthExerciseParams)
       expect(strengthExercise).to.be.an('object')

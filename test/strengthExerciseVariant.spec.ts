@@ -31,7 +31,8 @@ describe('Strength Exercise Variant', function () {
       defaultExerciseAlias: randomCharacterSequence(26),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 
@@ -45,7 +46,8 @@ describe('Strength Exercise Variant', function () {
   it('can create strength exercise variants', async function () {
     const strengthExerciseVariant = await createdStrengthExercise.createStrengthExerciseVariant({
       variant: StrengthExerciseVariantType.Normal,
-      attachment: StrengthExerciseVariantAttachment.Bar
+      attachment: StrengthExerciseVariantAttachment.Bar,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral
     })
 
     expect(strengthExerciseVariant).to.be.an('object')
@@ -83,6 +85,7 @@ describe('Strength Exercise Variant', function () {
   it('can update strength exercise variants', async function () {
     await createdStrengthExerciseVariant.update({
       variant: StrengthExerciseVariantType.Alternate,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral,
       instructionalImage: 'https://cdn.keiser.com/test.png',
       instructionalVideo: 'https://cdn.keiser.com/test.avi'
     })
@@ -97,6 +100,7 @@ describe('Strength Exercise Variant', function () {
   it('can update strength exercise variants again (null states)', async function () {
     await createdStrengthExerciseVariant.update({
       variant: StrengthExerciseVariantType.Normal,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral,
       instructionalVideo: null
     })
 

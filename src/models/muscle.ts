@@ -94,7 +94,7 @@ export enum MuscleArea {
 export enum MuscleTargetLevel {
   Primary = 'primary',
   Secondary = 'secondary',
-  Stabilizer = 'stabilizer'
+  Tertiary = 'tertiary'
 }
 
 export enum MuscleSorting {

@@ -14,6 +14,8 @@ export enum StrengthExerciseCategory {
 }
 
 export enum StrengthExerciseMovement {
+  Unilateral = 'unilateral',
+  Bilateral = 'bilateral',
   Isolation = 'isolation',
   Compound = 'compound'
 }
@@ -37,6 +39,7 @@ export interface StrengthExerciseData {
   category: StrengthExerciseCategory
   movement: StrengthExerciseMovement
   plane: StrengthExercisePlane
+  humanMovement: StrengthExerciseMovement
   defaultExerciseAlias: ExerciseAliasData
   exerciseAliases?: ExerciseAliasData[]
   strengthExerciseVariants?: StrengthExerciseVariantData[]
@@ -145,7 +148,7 @@ export class PrivilegedStrengthExercises extends ModelList<PrivilegedStrengthExe
 
 /** @hidden */
 export class PrivilegedStrengthExercise extends StrengthExercise {
-  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane }) {
+  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
     const { strengthExercise } = await this.action('strengthExercise:update', { ...params, id: this.id }) as StrengthExerciseResponse
     this.setStrengthExerciseData(strengthExercise)
     return this
@@ -180,7 +183,7 @@ export class PrivilegedStrengthExercise extends StrengthExercise {
     return new PrivilegedStrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createStrengthExerciseVariant (params: { strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string | null, instructionalVideo?: string | null }) {
+  async createStrengthExerciseVariant (params: { strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, equipmentMechanicalMovement: StrengthExerciseMovement, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { strengthExerciseVariant } = await this.action('strengthExerciseVariant:create', { ...params, strengthExerciseId: this.id }) as StrengthExerciseVariantResponse
     return new PrivilegedStrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)
   }

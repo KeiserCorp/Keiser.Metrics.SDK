@@ -33,7 +33,8 @@ describe('Exercise Alias', function () {
       defaultExerciseAlias: randomLetterSequence(26),
       category: StrengthExerciseCategory.Complex,
       movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 

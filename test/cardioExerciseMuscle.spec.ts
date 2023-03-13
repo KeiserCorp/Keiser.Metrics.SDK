@@ -85,12 +85,12 @@ describe('Cardio Exercise Muscle', function () {
   it('can update cardio exercise muscle', async function () {
     if (typeof createdCardioExerciseMuscle !== 'undefined') {
       const cardioExerciseMuscleParams = {
-        targetLevel: MuscleTargetLevel.Stabilizer
+        targetLevel: MuscleTargetLevel.Tertiary
       }
       await createdCardioExerciseMuscle.update(cardioExerciseMuscleParams)
       expect(createdCardioExerciseMuscle).to.be.an('object')
       expect(createdCardioExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)
-      expect(createdCardioExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Stabilizer)
+      expect(createdCardioExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Tertiary)
     }
   })
 
