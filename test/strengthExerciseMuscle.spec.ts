@@ -4,7 +4,7 @@ import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseMuscle } from '../src/models/strengthExerciseMuscle'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
@@ -31,7 +31,7 @@ describe('Strength Exercise Muscle', function () {
     createdStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
+      movement: StrengthExerciseMovementDEP.Compound,
       plane: StrengthExercisePlane.Sagittal,
       humanMovement: StrengthExerciseMovement.Bilateral
     })

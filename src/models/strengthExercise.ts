@@ -13,11 +13,14 @@ export enum StrengthExerciseCategory {
   Complex = 'complex'
 }
 
-export enum StrengthExerciseMovement {
-  Unilateral = 'unilateral',
-  Bilateral = 'bilateral',
+export enum StrengthExerciseMovementDEP {
   Isolation = 'isolation',
   Compound = 'compound'
+}
+
+export enum StrengthExerciseMovement {
+  Unilateral = 'unilateral',
+  Bilateral = 'bilateral'
 }
 
 export enum StrengthExercisePlane {

@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantSorting, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
@@ -30,7 +30,7 @@ describe('Strength Exercise Variant', function () {
     createdStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomCharacterSequence(26),
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
+      movement: StrengthExerciseMovementDEP.Compound,
       plane: StrengthExercisePlane.Sagittal,
       humanMovement: StrengthExerciseMovement.Bilateral
     })
