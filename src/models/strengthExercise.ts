@@ -40,7 +40,7 @@ export enum StrengthExerciseSorting {
 export interface StrengthExerciseData {
   id: number
   category: StrengthExerciseCategory
-  movement: StrengthExerciseMovement
+  movement: StrengthExerciseMovementDEP
   plane: StrengthExercisePlane
   humanMovement: StrengthExerciseMovement
   defaultExerciseAlias: ExerciseAliasData
@@ -61,7 +61,7 @@ export interface StrengthExerciseListResponse extends AuthenticatedResponse {
 export interface StrengthExerciseListResponseMeta extends ListMeta {
   defaultAlias?: string
   category?: StrengthExerciseCategory
-  movement?: StrengthExerciseMovement
+  movement?: StrengthExerciseMovementDEP
   plane?: StrengthExercisePlane
   sort: StrengthExerciseSorting
 }
@@ -151,7 +151,7 @@ export class PrivilegedStrengthExercises extends ModelList<PrivilegedStrengthExe
 
 /** @hidden */
 export class PrivilegedStrengthExercise extends StrengthExercise {
-  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
+  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovementDEP, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
     const { strengthExercise } = await this.action('strengthExercise:update', { ...params, id: this.id }) as StrengthExerciseResponse
     this.setStrengthExerciseData(strengthExercise)
     return this

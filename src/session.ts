@@ -20,7 +20,7 @@ import { FacilityStrengthMachine, FacilityStrengthMachineData } from './models/f
 import { FacilityStrengthMachineConfiguration, FacilityStrengthMachineConfigurationResponse } from './models/facilityStrengthMachineConfiguration'
 import { GlobalAccessControlData } from './models/globalAccessControl'
 import { Session } from './models/session'
-import { StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
+import { StrengthExercise, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovementDEP, StrengthExercisePlane, StrengthExerciseResponse, StrengthExercises, StrengthExerciseSorting } from './models/strengthExercise'
 import { StrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './models/strengthExerciseMuscle'
 import { StrengthExerciseVariant, StrengthExerciseVariantResponse } from './models/strengthExerciseVariant'
 import { StrengthMachine, StrengthMachineIdentifier, StrengthMachineListResponse, StrengthMachineResponse, StrengthMachines, StrengthMachineSorting } from './models/strengthMachine'
@@ -646,7 +646,7 @@ export abstract class UserSessionBase<UserType extends User = User> {
     return new StrengthExercise(strengthExercise, this.sessionHandler)
   }
 
-  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovement, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovementDEP, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExercises, strengthExercisesMeta } = await this.action('strengthExercise:list', options) as StrengthExerciseListResponse
     return new StrengthExercises(strengthExercises, strengthExercisesMeta, this.sessionHandler)
   }
