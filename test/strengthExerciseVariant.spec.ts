@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantAttachment, StrengthExerciseVariantSorting, StrengthExerciseVariantType } from '../src/models/strengthExerciseVariant'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
@@ -30,8 +30,9 @@ describe('Strength Exercise Variant', function () {
     createdStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomCharacterSequence(26),
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      movement: StrengthExerciseMovementDEP.Compound,
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 
@@ -45,7 +46,8 @@ describe('Strength Exercise Variant', function () {
   it('can create strength exercise variants', async function () {
     const strengthExerciseVariant = await createdStrengthExercise.createStrengthExerciseVariant({
       variant: StrengthExerciseVariantType.Normal,
-      attachment: StrengthExerciseVariantAttachment.Bar
+      attachment: StrengthExerciseVariantAttachment.Bar,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral
     })
 
     expect(strengthExerciseVariant).to.be.an('object')
@@ -83,6 +85,7 @@ describe('Strength Exercise Variant', function () {
   it('can update strength exercise variants', async function () {
     await createdStrengthExerciseVariant.update({
       variant: StrengthExerciseVariantType.Alternate,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral,
       instructionalImage: 'https://cdn.keiser.com/test.png',
       instructionalVideo: 'https://cdn.keiser.com/test.avi'
     })
@@ -97,6 +100,7 @@ describe('Strength Exercise Variant', function () {
   it('can update strength exercise variants again (null states)', async function () {
     await createdStrengthExerciseVariant.update({
       variant: StrengthExerciseVariantType.Normal,
+      equipmentMechanicalMovement: StrengthExerciseMovement.Bilateral,
       instructionalVideo: null
     })
 

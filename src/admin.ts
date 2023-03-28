@@ -12,7 +12,7 @@ import { ExerciseOrdinalSetAssignmentResponse, PrivilegedExerciseOrdinalSetAssig
 import { FacilityLicense, FacilityLicenseListResponse, FacilityLicenseResponse, FacilityLicenses, FacilityLicenseSorting, LicenseType } from './models/facilityLicense'
 import { AnalyticPermission, ExercisePermission, GlobalAccessControl, GlobalAccessControlCreationResponse, GlobalAccessControlData, GlobalAccessControlListResponse, GlobalAccessControlResponse, GlobalAccessControls, GlobalAccessControlSorting, MSeriesGuidedSessionPermission, Permission } from './models/globalAccessControl'
 import { StatListResponse, Stats, StatSorting } from './models/stat'
-import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseResponse, StrengthExerciseSorting } from './models/strengthExercise'
+import { PrivilegedStrengthExercise, PrivilegedStrengthExercises, StrengthExerciseCategory, StrengthExerciseListResponse, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane, StrengthExerciseResponse, StrengthExerciseSorting } from './models/strengthExercise'
 import { PrivilegedStrengthExerciseMuscle, StrengthExerciseMuscleResponse } from './models/strengthExerciseMuscle'
 import { PrivilegedStrengthExerciseVariant, StrengthExerciseVariantResponse } from './models/strengthExerciseVariant'
 import { PrivilegedStretchExercise, PrivilegedStretchExercises, StretchExerciseListResponse, StretchExerciseResponse, StretchExerciseSorting } from './models/stretchExercise'
@@ -162,12 +162,12 @@ export class AdminSession extends UserSession {
     return new PrivilegedStrengthExercise(strengthExercise, this.sessionHandler)
   }
 
-  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovement, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovementDEP, plane?: StrengthExercisePlane, humanMovement?: StrengthExerciseMovement, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExercises, strengthExercisesMeta } = await this.action('strengthExercise:list', options) as StrengthExerciseListResponse
     return new PrivilegedStrengthExercises(strengthExercises, strengthExercisesMeta, this.sessionHandler)
   }
 
-  async createStrengthExercise (params: { defaultExerciseAlias: string, category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane }) {
+  async createStrengthExercise (params: { defaultExerciseAlias: string, category: StrengthExerciseCategory, movement: StrengthExerciseMovementDEP, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
     const { strengthExercise } = await this.action('strengthExercise:create', params) as StrengthExerciseResponse
     return new PrivilegedStrengthExercise(strengthExercise, this.sessionHandler)
   }

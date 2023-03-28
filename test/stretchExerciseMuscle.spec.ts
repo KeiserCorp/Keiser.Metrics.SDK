@@ -85,12 +85,12 @@ describe('Stretch Exercise Muscle', function () {
   it('can update stretch exercise muscle', async function () {
     if (typeof createdStretchExerciseMuscle !== 'undefined') {
       const stretchExerciseMuscleParams = {
-        targetLevel: MuscleTargetLevel.Stabilizer
+        targetLevel: MuscleTargetLevel.Tertiary
       }
       await createdStretchExerciseMuscle.update(stretchExerciseMuscleParams)
       expect(createdStretchExerciseMuscle).to.be.an('object')
       expect(createdStretchExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)
-      expect(createdStretchExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Stabilizer)
+      expect(createdStretchExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Tertiary)
     }
   })
 

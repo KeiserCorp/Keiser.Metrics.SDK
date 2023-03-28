@@ -4,7 +4,7 @@ import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
 import { ExerciseAliasSorting, PrivilegedExerciseAlias } from '../src/models/exerciseAlias'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
 import { randomLetterSequence } from './utils/dummy'
@@ -32,8 +32,9 @@ describe('Exercise Alias', function () {
     newStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomLetterSequence(26),
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      movement: StrengthExerciseMovementDEP.Compound,
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 

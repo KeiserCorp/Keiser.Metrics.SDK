@@ -13,9 +13,14 @@ export enum StrengthExerciseCategory {
   Complex = 'complex'
 }
 
-export enum StrengthExerciseMovement {
+export enum StrengthExerciseMovementDEP {
   Isolation = 'isolation',
   Compound = 'compound'
+}
+
+export enum StrengthExerciseMovement {
+  Unilateral = 'unilateral',
+  Bilateral = 'bilateral'
 }
 
 export enum StrengthExercisePlane {
@@ -29,14 +34,16 @@ export enum StrengthExerciseSorting {
   DefaultAlias = 'defaultAlias',
   Category = 'category',
   Movement = 'movement',
-  Plane = 'plane'
+  Plane = 'plane',
+  HumanMovement = 'humanMovement'
 }
 
 export interface StrengthExerciseData {
   id: number
   category: StrengthExerciseCategory
-  movement: StrengthExerciseMovement
+  movement: StrengthExerciseMovementDEP
   plane: StrengthExercisePlane
+  humanMovement: StrengthExerciseMovement
   defaultExerciseAlias: ExerciseAliasData
   exerciseAliases?: ExerciseAliasData[]
   strengthExerciseVariants?: StrengthExerciseVariantData[]
@@ -55,7 +62,7 @@ export interface StrengthExerciseListResponse extends AuthenticatedResponse {
 export interface StrengthExerciseListResponseMeta extends ListMeta {
   defaultAlias?: string
   category?: StrengthExerciseCategory
-  movement?: StrengthExerciseMovement
+  movement?: StrengthExerciseMovementDEP
   plane?: StrengthExercisePlane
   sort: StrengthExerciseSorting
 }
@@ -130,7 +137,7 @@ export class StrengthExercise extends Model {
     return typeof this._strengthExerciseData.strengthExerciseVariants !== 'undefined' ? this._strengthExerciseData.strengthExerciseVariants.map(strengthExerciseVariant => new StrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)) : undefined
   }
 
-  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, equipmentMechanicalMovement?: StrengthExerciseMovement, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExerciseVariants, strengthExerciseVariantsMeta } = await this.action('strengthExerciseVariant:list', options) as StrengthExerciseVariantListResponse
     return new StrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }
@@ -145,7 +152,7 @@ export class PrivilegedStrengthExercises extends ModelList<PrivilegedStrengthExe
 
 /** @hidden */
 export class PrivilegedStrengthExercise extends StrengthExercise {
-  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovement, plane: StrengthExercisePlane }) {
+  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovementDEP, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
     const { strengthExercise } = await this.action('strengthExercise:update', { ...params, id: this.id }) as StrengthExerciseResponse
     this.setStrengthExerciseData(strengthExercise)
     return this
@@ -175,12 +182,12 @@ export class PrivilegedStrengthExercise extends StrengthExercise {
     return new PrivilegedStrengthExerciseMuscle(strengthExerciseMuscle, this.sessionHandler)
   }
 
-  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, equipmentMechanicalMovement?: StrengthExerciseMovement, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExerciseVariants, strengthExerciseVariantsMeta } = await this.action('strengthExerciseVariant:list', options) as StrengthExerciseVariantListResponse
     return new PrivilegedStrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }
 
-  async createStrengthExerciseVariant (params: { strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string | null, instructionalVideo?: string | null }) {
+  async createStrengthExerciseVariant (params: { strengthMachineId?: number, variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, equipmentMechanicalMovement: StrengthExerciseMovement, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { strengthExerciseVariant } = await this.action('strengthExerciseVariant:create', { ...params, strengthExerciseId: this.id }) as StrengthExerciseVariantResponse
     return new PrivilegedStrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)
   }

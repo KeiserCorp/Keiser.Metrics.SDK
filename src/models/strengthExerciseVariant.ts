@@ -1,7 +1,7 @@
 import { ListMeta, Model, ModelList } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { ExerciseOrdinalSetAssignment, ExerciseOrdinalSetAssignmentData } from './exerciseOrdinalSetAssignment'
-import { StrengthExercise, StrengthExerciseData } from './strengthExercise'
+import { StrengthExercise, StrengthExerciseData, StrengthExerciseMovement } from './strengthExercise'
 import { StrengthMachine, StrengthMachineData } from './strengthMachine'
 
 export enum StrengthExerciseVariantType {
@@ -26,13 +26,15 @@ export enum StrengthExerciseVariantAttachment {
 export enum StrengthExerciseVariantSorting {
   ID = 'id',
   Variant = 'variant',
-  Attachment = 'attachment'
+  Attachment = 'attachment',
+  EquipmentMechanicalMovement = 'equipmentMechanicalMovement'
 }
 
 export interface StrengthExerciseVariantData {
   id: number
   variant: StrengthExerciseVariantType
   attachment: StrengthExerciseVariantAttachment | null
+  equipmentMechanicalMovement: StrengthExerciseMovement
   instructionalImage: string | null
   instructionalVideo: string | null
   strengthExercise?: StrengthExerciseData
@@ -127,7 +129,7 @@ export class PrivilegedStrengthExerciseVariants extends ModelList<PrivilegedStre
 
 /** @hidden */
 export class PrivilegedStrengthExerciseVariant extends StrengthExerciseVariant {
-  async update (params: { variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, instructionalImage?: string | null, instructionalVideo?: string | null }) {
+  async update (params: { variant: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, equipmentMechanicalMovement: StrengthExerciseMovement, instructionalImage?: string | null, instructionalVideo?: string | null }) {
     const { strengthExerciseVariant } = await this.action('strengthExerciseVariant:update', { ...params, id: this.id }) as StrengthExerciseVariantResponse
     this.setStrengthExerciseVariant(strengthExerciseVariant)
     return this

@@ -4,7 +4,7 @@ import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { UnknownEntityError } from '../src/error'
 import { MuscleIdentifier, MuscleSorting, MuscleTargetLevel } from '../src/models/muscle'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane } from '../src/models/strengthExercise'
 import { PrivilegedStrengthExerciseMuscle } from '../src/models/strengthExerciseMuscle'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
@@ -31,8 +31,9 @@ describe('Strength Exercise Muscle', function () {
     createdStrengthExercise = await adminSession.createStrengthExercise({
       defaultExerciseAlias: randomCharacterSequence(16),
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      movement: StrengthExerciseMovementDEP.Compound,
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     })
   })
 
@@ -88,12 +89,12 @@ describe('Strength Exercise Muscle', function () {
   it('can update strength exercise muscle', async function () {
     if (typeof createdStrengthExerciseMuscle !== 'undefined') {
       const strengthExerciseMuscleParams = {
-        targetLevel: MuscleTargetLevel.Stabilizer
+        targetLevel: MuscleTargetLevel.Tertiary
       }
       await createdStrengthExerciseMuscle.update(strengthExerciseMuscleParams)
       expect(createdStrengthExerciseMuscle).to.be.an('object')
       expect(createdStrengthExerciseMuscle.muscle).to.equal(MuscleIdentifier.Deltoid)
-      expect(createdStrengthExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Stabilizer)
+      expect(createdStrengthExerciseMuscle.targetLevel).to.equal(MuscleTargetLevel.Tertiary)
     }
   })
 

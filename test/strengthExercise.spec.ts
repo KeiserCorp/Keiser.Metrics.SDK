@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import MetricsAdmin, { AdminSession } from '../src/admin'
 import Metrics from '../src/core'
 import { ActionErrorProperties, UnknownEntityError } from '../src/error'
-import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExercisePlane, StrengthExerciseSorting } from '../src/models/strengthExercise'
+import { PrivilegedStrengthExercise, StrengthExerciseCategory, StrengthExerciseMovement, StrengthExerciseMovementDEP, StrengthExercisePlane, StrengthExerciseSorting } from '../src/models/strengthExercise'
 import { UserSession } from '../src/session'
 import MetricsSSO from '../src/sso'
 import { randomCharacterSequence } from './utils/dummy'
@@ -38,8 +38,9 @@ describe('Strength Exercise', function () {
     const strengthExerciseParams = {
       defaultExerciseAlias: newExerciseName,
       category: StrengthExerciseCategory.Complex,
-      movement: StrengthExerciseMovement.Compound,
-      plane: StrengthExercisePlane.Sagittal
+      movement: StrengthExerciseMovementDEP.Compound,
+      plane: StrengthExercisePlane.Sagittal,
+      humanMovement: StrengthExerciseMovement.Bilateral
     }
     const strengthExercise = await adminSession.createStrengthExercise(strengthExerciseParams)
 
@@ -48,7 +49,7 @@ describe('Strength Exercise', function () {
     expect(defaultExerciseAlias).to.be.an('object')
     expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
     expect(strengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
-    expect(strengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
+    expect(strengthExercise.movement).to.equal(StrengthExerciseMovementDEP.Compound)
     expect(strengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)
     createdStrengthExercise = strengthExercise
   })
@@ -70,7 +71,7 @@ describe('Strength Exercise', function () {
       expect(defaultExerciseAlias).to.be.an('object')
       expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
       expect(createdStrengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
-      expect(createdStrengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
+      expect(createdStrengthExercise.movement).to.equal(StrengthExerciseMovementDEP.Compound)
       expect(createdStrengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)
     }
   })
@@ -83,7 +84,7 @@ describe('Strength Exercise', function () {
       expect(defaultExerciseAlias).to.be.an('object')
       expect(defaultExerciseAlias.alias).to.equal(newExerciseName)
       expect(strengthExercise.category).to.equal(StrengthExerciseCategory.Complex)
-      expect(strengthExercise.movement).to.equal(StrengthExerciseMovement.Compound)
+      expect(strengthExercise.movement).to.equal(StrengthExerciseMovementDEP.Compound)
       expect(strengthExercise.plane).to.equal(StrengthExercisePlane.Sagittal)
     }
   })
@@ -102,13 +103,14 @@ describe('Strength Exercise', function () {
       const strengthExercise = await adminSession.getStrengthExercise({ id: createdStrengthExercise.id })
       const strengthExerciseParams = {
         category: StrengthExerciseCategory.Explosive,
-        movement: StrengthExerciseMovement.Isolation,
-        plane: StrengthExercisePlane.Frontal
+        movement: StrengthExerciseMovementDEP.Isolation,
+        plane: StrengthExercisePlane.Frontal,
+        humanMovement: StrengthExerciseMovement.Unilateral
       }
       await strengthExercise.update(strengthExerciseParams)
       expect(strengthExercise).to.be.an('object')
       expect(strengthExercise.category).to.equal(StrengthExerciseCategory.Explosive)
-      expect(strengthExercise.movement).to.equal(StrengthExerciseMovement.Isolation)
+      expect(strengthExercise.movement).to.equal(StrengthExerciseMovementDEP.Isolation)
       expect(strengthExercise.plane).to.equal(StrengthExercisePlane.Frontal)
     }
   })
