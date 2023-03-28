@@ -26,7 +26,8 @@ export enum StrengthExerciseVariantAttachment {
 export enum StrengthExerciseVariantSorting {
   ID = 'id',
   Variant = 'variant',
-  Attachment = 'attachment'
+  Attachment = 'attachment',
+  EquipmentMechanicalMovement = 'equipmentMechanicalMovement'
 }
 
 export interface StrengthExerciseVariantData {

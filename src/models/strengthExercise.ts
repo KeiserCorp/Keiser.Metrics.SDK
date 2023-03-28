@@ -34,7 +34,8 @@ export enum StrengthExerciseSorting {
   DefaultAlias = 'defaultAlias',
   Category = 'category',
   Movement = 'movement',
-  Plane = 'plane'
+  Plane = 'plane',
+  HumanMovement = 'humanMovement'
 }
 
 export interface StrengthExerciseData {
@@ -136,7 +137,7 @@ export class StrengthExercise extends Model {
     return typeof this._strengthExerciseData.strengthExerciseVariants !== 'undefined' ? this._strengthExerciseData.strengthExerciseVariants.map(strengthExerciseVariant => new StrengthExerciseVariant(strengthExerciseVariant, this.sessionHandler)) : undefined
   }
 
-  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, attachment?: StrengthExerciseVariantAttachment, equipmentMechanicalMovement?: StrengthExerciseMovement, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExerciseVariants, strengthExerciseVariantsMeta } = await this.action('strengthExerciseVariant:list', options) as StrengthExerciseVariantListResponse
     return new StrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }
@@ -181,7 +182,7 @@ export class PrivilegedStrengthExercise extends StrengthExercise {
     return new PrivilegedStrengthExerciseMuscle(strengthExerciseMuscle, this.sessionHandler)
   }
 
-  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExerciseVariants (options: { strengthExerciseId?: number, strengthMachineId?: number, variant?: StrengthExerciseVariantType, equipmentMechanicalMovement?: StrengthExerciseMovement, sort?: StrengthExerciseVariantSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExerciseVariants, strengthExerciseVariantsMeta } = await this.action('strengthExerciseVariant:list', options) as StrengthExerciseVariantListResponse
     return new PrivilegedStrengthExerciseVariants(strengthExerciseVariants, strengthExerciseVariantsMeta, this.sessionHandler)
   }

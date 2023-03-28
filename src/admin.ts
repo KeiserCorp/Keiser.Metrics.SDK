@@ -162,7 +162,7 @@ export class AdminSession extends UserSession {
     return new PrivilegedStrengthExercise(strengthExercise, this.sessionHandler)
   }
 
-  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovementDEP, plane?: StrengthExercisePlane, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
+  async getStrengthExercises (options: { defaultAlias?: string, category?: StrengthExerciseCategory, movement?: StrengthExerciseMovementDEP, plane?: StrengthExercisePlane, humanMovement?: StrengthExerciseMovement, sort?: StrengthExerciseSorting, ascending?: boolean, limit?: number, offset?: number } = { }) {
     const { strengthExercises, strengthExercisesMeta } = await this.action('strengthExercise:list', options) as StrengthExerciseListResponse
     return new PrivilegedStrengthExercises(strengthExercises, strengthExercisesMeta, this.sessionHandler)
   }
