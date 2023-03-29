@@ -152,7 +152,7 @@ export class PrivilegedStrengthExercises extends ModelList<PrivilegedStrengthExe
 
 /** @hidden */
 export class PrivilegedStrengthExercise extends StrengthExercise {
-  async update (params: { category: StrengthExerciseCategory, movement: StrengthExerciseMovementDEP, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
+  async update (params: { category: StrengthExerciseCategory, movement?: StrengthExerciseMovementDEP, plane: StrengthExercisePlane, humanMovement: StrengthExerciseMovement }) {
     const { strengthExercise } = await this.action('strengthExercise:update', { ...params, id: this.id }) as StrengthExerciseResponse
     this.setStrengthExerciseData(strengthExercise)
     return this
