@@ -8,8 +8,8 @@
   "editor.formatOnSave": true,
   "editor.bracketPairColorization.enabled": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.addMissingImports": true
+    "source.fixAll": "explicit",
+    "source.addMissingImports": "explicit"
   },
   "search.exclude": {
     "**/dist": true,

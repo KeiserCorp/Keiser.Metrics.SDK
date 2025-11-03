@@ -51,7 +51,7 @@ export class FacilityAccessControlKiosk extends Model {
     primaryIdentification?: PrimaryIdentification
     secondaryIdentification?: SecondaryIdentification
   }) {
-    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', { apiVersion: 1, ...params }) as FacilityAccessControlKioskResponse
+    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', { ...params }) as FacilityAccessControlKioskResponse
     this.setFacilityAccessControlKioskData(facilityAccessControlKiosk)
     return this
   }
