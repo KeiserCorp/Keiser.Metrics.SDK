@@ -1,5 +1,6 @@
 import { eject } from './lib/eject'
 import { EventDispatcher } from './lib/event'
+import { ActionName } from './lib/routes'
 import { BaseSessionHandler, ListSubscribeParameters, ModelChangeEvent, ModelSubscribeParameters, SessionHandler } from './session'
 
 export interface ListMeta {
@@ -26,7 +27,7 @@ export class Model<SessionHandlerType extends BaseSessionHandler = SessionHandle
     this.sessionHandler = sessionHandler
   }
 
-  protected async action (action: string, params: Object = { }) {
+  protected async action (action: ActionName, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
   }
 }

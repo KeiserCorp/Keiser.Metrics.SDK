@@ -4,6 +4,7 @@ import { BrokenCircuitError, BulkheadRejectedError, ConsecutiveBreaker, Policy }
 import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
 import { ActionErrorProperties, ConnectionFaultError, GetErrorInstance, RequestError, SessionError } from './error'
 import { EventDispatcher } from './lib/event'
+import { ActionName, convertToRoute, RouteDefinition } from './lib/routes'
 
 /** @ignore */
 const PING_REGEX = /^primus::ping::(\d{13})$/
@@ -172,7 +173,7 @@ export class MetricsConnection {
     }
   }
 
-  async action (action: string, params: Object = { }) {
+  async action (action: ActionName, params: Object = { }) {
     try {
       const result = await this._retryStrategy.execute(async () => {
         return await new Promise((resolve, reject) => {
@@ -180,7 +181,11 @@ export class MetricsConnection {
           if (this.socketConnected) {
             void this.actionSocket(action, params, callback)
           } else {
-            void this.actionRest(action, params, callback)
+            const route = convertToRoute(action)
+            if (route == null) {
+              return reject(new Error(`Unknown action name: ${action}`))
+            }
+            void this.actionRest(route, params, callback)
           }
         })
       })
@@ -272,11 +277,11 @@ export class MetricsConnection {
     }
   }
 
-  private async actionRest (action: string, params: Object, callback: (success: any, fail?: any) => void) {
+  private async actionRest (route: RouteDefinition, params: Object, callback: (success: any, fail?: any) => void) {
     try {
       const response = await Axios({
-        method: 'POST',
-        url: `${this._restEndpoint}?action=${action}`,
+        method: route.method,
+        url: `${this._restEndpoint}${route.path}`,
         data: params,
         timeout: this._requestTimeout
       })

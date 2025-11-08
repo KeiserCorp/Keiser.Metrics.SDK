@@ -3,6 +3,7 @@ import { DEFAULT_REQUEST_TIMEOUT, JWT_TTL_LIMIT } from './constants'
 import { SessionError } from './error'
 import { EventDispatcher } from './lib/event'
 import { DecodeJWT } from './lib/jwt'
+import { ActionName } from './lib/routes'
 import { A500MachineState, A500MachineStateResponse } from './models/a500MachineState'
 import { CardioExercise, CardioExerciseListResponse, CardioExerciseResponse, CardioExercises, CardioExerciseSorting } from './models/cardioExercise'
 import { CardioExerciseMuscle, CardioExerciseMuscleResponse } from './models/cardioExerciseMuscle'
@@ -262,7 +263,7 @@ export abstract class BaseSessionHandler {
 
   abstract logout (): void
 
-  async action (action: string, params: Object = { }) {
+  async action (action: ActionName, params: Object = { }) {
     let response
     if (this._keepAlive && this._accessTokenTimeout !== null && this.decodedAccessToken.exp * 1000 - Date.now() <= JWT_TTL_LIMIT + DEFAULT_REQUEST_TIMEOUT) {
       clearTimeout(this._accessTokenTimeout)
@@ -284,7 +285,7 @@ export abstract class BaseSessionHandler {
 
   async subscribeToModel (subscribeParameters: ModelSubscribeParameters, callback: (modelChangeEvent: ModelChangeEvent) => void) {
     const subscriptionKey = `sub:${subscribeParameters.model}:${subscribeParameters.id}`
-    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, { id: subscribeParameters.id, userId: subscribeParameters.userId, facilityRelationshipId: subscribeParameters.facilityRelationshipId }) as SubscriptionResponse
+    const subscribe = async () => await this.action((subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`) as ActionName, { id: subscribeParameters.id, userId: subscribeParameters.userId, facilityRelationshipId: subscribeParameters.facilityRelationshipId }) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 
@@ -299,7 +300,7 @@ export abstract class BaseSessionHandler {
         params = { facilityId: subscribeParameters.parentId }
         break
     }
-    const subscribe = async () => await this.action(subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`, params) as SubscriptionResponse
+    const subscribe = async () => await this.action((subscribeParameters.actionOverride ?? `${subscribeParameters.model}:subscribe`) as ActionName, params) as SubscriptionResponse
     return await this.subscribe(subscriptionKey, subscribe, callback)
   }
 
@@ -366,7 +367,7 @@ export class KioskSessionHandler extends BaseSessionHandler {
     return DecodeJWT(this.accessToken) as KioskToken
   }
 
-  async action (action: string, params: Object = { }) {
+  async action (action: ActionName, params: Object = { }) {
     const authParams = { authorization: this.accessToken, ...params }
     return await this.connection.action(action, authParams) as any
   }
@@ -406,17 +407,12 @@ export class KioskSession {
     await this._sessionHandler.logout()
   }
 
-  private async action (action: string, params: Object = { }) {
+  private async action (action: ActionName, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
   }
 
   async userLogin (params: { primaryIdentification: string | number, secondaryIdentification?: string | number }) {
     const response = await this.action('facilityKiosk:userLogin', params) as FacilityUserResponse
-    return new FacilityUserSession(response, this.sessionHandler.connection)
-  }
-
-  async fingerprintLogin (params: { facilityRelationshipId: number, hash: string }) {
-    const response = await this.action('facilityKiosk:fingerprintLogin', params) as FacilityUserResponse
     return new FacilityUserSession(response, this.sessionHandler.connection)
   }
 
@@ -475,7 +471,7 @@ export class StrengthMachineSessionHandler extends BaseSessionHandler {
     return DecodeJWT(this.accessToken) as StrengthMachineToken
   }
 
-  async action (action: string, params: Object = { }) {
+  async action (action: ActionName, params: Object = { }) {
     const authParams = { authorization: this.accessToken, ...params }
     return await this.connection.action(action, authParams) as any
   }
@@ -516,7 +512,7 @@ export class StrengthMachineSession {
     this._sessionHandler.close()
   }
 
-  private async action (action: string, params: Object = { }) {
+  private async action (action: ActionName, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
   }
 
@@ -612,7 +608,7 @@ export abstract class UserSessionBase<UserType extends User = User> {
     return this._sessionHandler instanceof UserSessionHandler && typeof this._sessionHandler.decodedAccessToken.facility !== 'undefined' && this._sessionHandler.decodedAccessToken.facility !== null ? new PrivilegedFacility(this._sessionHandler.decodedAccessToken.facility, this._sessionHandler) : undefined
   }
 
-  protected async action (action: string, params: Object = { }) {
+  protected async action (action: ActionName, params: Object = { }) {
     return await this.sessionHandler.action(action, params)
   }
 
