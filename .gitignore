@@ -1,6 +1,9 @@
 # Folder view configuration files
 .DS_Store
 Desktop.ini
+AGENTS.md
+CLAUDE.md
+GEMINI.md
 
 # Thumbnail cache files
 ._*
