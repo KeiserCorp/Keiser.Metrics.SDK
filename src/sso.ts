@@ -21,7 +21,7 @@ export default class MetricsSSO extends Metrics {
   }
 
   async authenticateWithCredentials (params: { email: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
-    const response = await this._connection.action('auth:login', { refreshable: true, ...params, apiVersion: 1 }) as ExchangeableUserResponse
+    const response = await this._connection.action('auth:login', { refreshable: true, ...params }) as ExchangeableUserResponse
     return new ExchangeableUserSession(response, this._connection)
   }
 
@@ -30,7 +30,7 @@ export default class MetricsSSO extends Metrics {
   }
 
   async initiatePasswordReset (params: { email: string, returnUrl: string, requiresElevated?: boolean }) {
-    await this._connection.action('auth:resetRequest', { ...params, apiVersion: 1 })
+    await this._connection.action('auth:resetRequest', { ...params })
   }
 
   async fulfillUserCreation (params: { authorizationCode: string, password: string, refreshable?: boolean, requiresElevated?: boolean, acceptedTermsRevision: string, name: string, birthday: string, gender: Gender, language?: string, units: Units, metricWeight?: number, metricHeight?: number}) {
@@ -59,7 +59,7 @@ export default class MetricsSSO extends Metrics {
   }
 
   async authenticateWithResetToken (params: { resetToken: string, password: string, refreshable?: boolean, requiresElevated?: boolean}) {
-    const response = await this._connection.action('auth:resetFulfillment', { refreshable: true, ...params, apiVersion: 1 }) as ExchangeableUserResponse
+    const response = await this._connection.action('auth:resetFulfillment', { refreshable: true, ...params }) as ExchangeableUserResponse
     return new ExchangeableUserSession(response, this._connection)
   }
 
