@@ -1,7 +1,6 @@
 import { FacilityListMeta, SubscribableModel, SubscribableModelList, UserListMeta } from '../model'
 import { AuthenticatedResponse, SessionHandler } from '../session'
 import { Facility, FacilityData, PrivilegedFacility } from './facility'
-import { Fingerprint, FingerprintReaderModel, FingerprintResponse } from './fingerprint'
 import { Session, SessionData } from './session'
 import { FacilityEmployeeUser, FacilityMemberUser, User, UserData } from './user'
 
@@ -114,16 +113,6 @@ export abstract class FacilityRelationship extends SubscribableModel {
 
   get employeeRole () {
     return this._facilityRelationshipData.employeeRole
-  }
-
-  async getFingerprint () {
-    const { fingerprint } = await this.action('fingerprint:show', { facilityRelationshipId: this.id }) as FingerprintResponse
-    return new Fingerprint(fingerprint, this.sessionHandler)
-  }
-
-  async createFingerprint (params: { template: Uint8Array, fingerprintReaderModel: FingerprintReaderModel}) {
-    const { fingerprint } = await this.action('fingerprint:update', { fingerprintReaderModel: params.fingerprintReaderModel, template: JSON.stringify(Array.from(params.template)), facilityRelationshipId: this.id }) as FingerprintResponse
-    return new Fingerprint(fingerprint, this.sessionHandler)
   }
 }
 

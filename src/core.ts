@@ -1,5 +1,6 @@
 import { ConnectionOptions, MetricsConnection } from './connection'
 import { Units } from './constants'
+import { ActionName } from './lib/routes'
 import { Core } from './models/core'
 import { Gender } from './models/profile'
 import { StrengthMachineIdentifier } from './models/strengthMachine'
@@ -60,7 +61,7 @@ export default class Metrics {
     this._connection.dispose()
   }
 
-  async action (action: string, params: Object = { }) {
+  async action (action: ActionName, params: Object = { }) {
     return await this._connection.action(action, params)
   }
 
