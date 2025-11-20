@@ -1,15 +1,31 @@
 import Axios, { AxiosError } from 'axios'
-import { BrokenCircuitError, BulkheadRejectedError, ConsecutiveBreaker, Policy } from 'cockatiel'
+import {
+  BrokenCircuitError,
+  BulkheadRejectedError,
+  ConsecutiveBreaker,
+  Policy
+} from 'cockatiel'
 
-import { DEFAULT_REQUEST_TIMEOUT, DEFAULT_REST_ENDPOINT, DEFAULT_SOCKET_ENDPOINT } from './constants'
-import { ActionErrorProperties, ConnectionFaultError, GetErrorInstance, RequestError, SessionError } from './error'
+import {
+  DEFAULT_REQUEST_TIMEOUT,
+  DEFAULT_REST_ENDPOINT,
+  DEFAULT_SOCKET_ENDPOINT
+} from './constants'
+import {
+  ActionErrorProperties,
+  ConnectionFaultError,
+  GetErrorInstance,
+  RequestError,
+  SessionError
+} from './error'
 import { EventDispatcher } from './lib/event'
 import { ActionName, convertToRoute, RouteDefinition } from './lib/routes'
 
 /** @ignore */
 const PING_REGEX = /^primus::ping::(\d{13})$/
 /** @ignore */
-const ERROR_FILTER = (error: any) => typeof error.error === 'undefined' || error.error?.code === 0
+const ERROR_FILTER = (error: any) =>
+  typeof error.error === 'undefined' || error.error?.code === 0
 
 export interface ErrorResponse {
   error: {
@@ -63,15 +79,24 @@ export class MetricsConnection {
   private _lastMessageId = 0
   private _checkCallbacksTimeoutInstance: NodeJS.Timeout | null = null
   private _socketRetryAttempts: number = 0
-  private readonly _callbacks: Map<number, { expiresAt: number | null, callback: (success: any, fail?: any) => void }> = new Map()
+  private readonly _callbacks: Map<
+  number,
+  { expiresAt: number | null, callback: (success: any, fail?: any) => void }
+  > = new Map()
+
   private readonly _socketBulkhead = Policy.bulkhead(5, 25)
   private readonly _retryStrategy = Policy.wrap(
     Policy.handleWhen(ERROR_FILTER).retry().delay([125, 1000, 5000]),
-    Policy.handleWhen(ERROR_FILTER).circuitBreaker(15000, new ConsecutiveBreaker(10))
+    Policy.handleWhen(ERROR_FILTER).circuitBreaker(
+      15000,
+      new ConsecutiveBreaker(10)
+    )
   )
 
   private readonly _onDisposeEvent = new EventDispatcher<void>()
-  private readonly _onConnectionChangeEvent = new EventDispatcher<ConnectionEvent>()
+  private readonly _onConnectionChangeEvent =
+  new EventDispatcher<ConnectionEvent>()
+
   private readonly _onPushDataEvent = new EventDispatcher<PushDataEvent>()
 
   constructor (options: ConnectionOptions) {
@@ -136,7 +161,12 @@ export class MetricsConnection {
     this._socket = null
     this.dispatchConnectionChange()
 
-    const retryTimeout = this._socketRetryAttempts++ < 3 ? 0 : (this._socketRetryAttempts < 24 ? 2000 : 30000)
+    const retryTimeout =
+      this._socketRetryAttempts++ < 3
+        ? 0
+        : this._socketRetryAttempts < 24
+          ? 2000
+          : 30000
     setTimeout(() => void this.openConnection(), retryTimeout)
   }
 
@@ -153,7 +183,10 @@ export class MetricsConnection {
 
   private onSocketMessage (messageEvent: MessageEvent) {
     try {
-      const data = JSON.parse(messageEvent.data) as SocketResponseMessage | SocketPushMessage | string
+      const data = JSON.parse(messageEvent.data) as
+        | SocketResponseMessage
+        | SocketPushMessage
+        | string
       if (typeof data === 'string') {
         if (PING_REGEX.test(data)) {
           const pingResults = PING_REGEX.exec(data)
@@ -173,11 +206,12 @@ export class MetricsConnection {
     }
   }
 
-  async action (action: ActionName, params: Object = { }) {
+  async action (action: ActionName, params: Object = {}) {
     try {
       const result = await this._retryStrategy.execute(async () => {
         return await new Promise((resolve, reject) => {
-          const callback = (success: any, fail?: any) => typeof fail !== 'undefined' ? reject(fail) : resolve(success)
+          const callback = (success: any, fail?: any) =>
+            typeof fail !== 'undefined' ? reject(fail) : resolve(success)
           if (this.socketConnected) {
             void this.actionSocket(action, params, callback)
           } else {
@@ -212,7 +246,9 @@ export class MetricsConnection {
     this._callbacks.forEach((callback, key) => {
       if (clear || (callback.expiresAt !== null && callback.expiresAt <= now)) {
         try {
-          callback.callback(null, { error: { statusText: 'Request timed out.' } })
+          callback.callback(null, {
+            error: { statusText: 'Request timed out.' }
+          })
         } finally {
           this._callbacks.delete(key)
         }
@@ -220,7 +256,10 @@ export class MetricsConnection {
     })
 
     if (!clear) {
-      this._checkCallbacksTimeoutInstance = setTimeout(() => this.checkCallbacks(), 100)
+      this._checkCallbacksTimeoutInstance = setTimeout(
+        () => this.checkCallbacks(),
+        100
+      )
     }
   }
 
@@ -228,11 +267,23 @@ export class MetricsConnection {
     this._socket?.send(`"primus::pong::${time}"`)
   }
 
-  private parseResponse (data: { context: 'response', messageId?: number, error?: any }) {
-    if (typeof data.messageId !== 'undefined' && this._callbacks.has(data.messageId)) {
+  private parseResponse (data: {
+    context: 'response'
+    messageId?: number
+    error?: any
+  }) {
+    if (
+      typeof data.messageId !== 'undefined' &&
+      this._callbacks.has(data.messageId)
+    ) {
       if (typeof data.error !== 'undefined') {
-        const errorInstance = GetErrorInstance(data.error as ActionErrorProperties)
-        if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
+        const errorInstance = GetErrorInstance(
+          data.error as ActionErrorProperties
+        )
+        if (
+          errorInstance instanceof RequestError ||
+          errorInstance instanceof SessionError
+        ) {
           this._callbacks.get(data.messageId)?.callback(errorInstance)
         } else {
           this._callbacks.get(data.messageId)?.callback(null, errorInstance)
@@ -244,54 +295,78 @@ export class MetricsConnection {
     }
   }
 
-  private parseMessage (data: {context: 'user', message: any, room: string, from: number, sentAt: number}) {
+  private parseMessage (data: {
+    context: 'user'
+    message: any
+    room: string
+    from: number
+    sentAt: number
+  }) {
     this._onPushDataEvent.dispatchAsync(data as PushDataEvent)
   }
 
-  private async actionSocket (action: string, params: Object, callback: (success: any, fail?: any) => void) {
+  private async actionSocket (
+    action: string,
+    params: Object,
+    callback: (success: any, fail?: any) => void
+  ) {
     try {
-      await this._socketBulkhead.execute(async () => await new Promise<void>(resolve => {
-        this._lastMessageId++
-        const args = {
-          messageId: this._lastMessageId,
-          event: 'action',
-          params: { action, ...params }
-        }
+      await this._socketBulkhead.execute(
+        async () =>
+          await new Promise<void>((resolve) => {
+            this._lastMessageId++
+            const args = {
+              messageId: this._lastMessageId,
+              event: 'action',
+              params: { action, ...params }
+            }
 
-        this._callbacks.set(this._lastMessageId, {
-          callback: (success: any, fail?: any) => {
-            callback(success, fail)
-            resolve()
-          },
-          expiresAt: Date.now() + this._requestTimeout
-        })
+            this._callbacks.set(this._lastMessageId, {
+              callback: (success: any, fail?: any) => {
+                callback(success, fail)
+                resolve()
+              },
+              expiresAt: Date.now() + this._requestTimeout
+            })
 
-        this._socket?.send(JSON.stringify(args))
-      }))
+            this._socket?.send(JSON.stringify(args))
+          })
+      )
     } catch (error) {
       if (error instanceof BulkheadRejectedError) {
-        callback(null, { error: { statusText: 'Socket request queue is full.' } })
+        callback(null, {
+          error: { statusText: 'Socket request queue is full.' }
+        })
       } else {
         callback(null, { error })
       }
     }
   }
 
-  private async actionRest (route: RouteDefinition, params: Object, callback: (success: any, fail?: any) => void) {
+  private async actionRest (
+    route: RouteDefinition,
+    params: Object,
+    callback: (success: any, fail?: any) => void
+  ) {
     try {
       const response = await Axios({
         method: route.method,
         url: `${this._restEndpoint}${route.path}`,
-        data: params,
+        ...(route.method === 'get' ? { params } : { data: params }),
         timeout: this._requestTimeout
       })
       callback(response.data)
     } catch (error) {
       if (error instanceof Error) {
-        const actionError = (error as AxiosError<{error: ActionErrorProperties }>)?.response?.data?.error
+        const actionError = (
+          error as AxiosError<{ error: ActionErrorProperties }>
+        )?.response?.data?.error
         if (typeof actionError !== 'undefined') {
           const errorInstance = GetErrorInstance(actionError)
-          if (errorInstance instanceof RequestError || errorInstance instanceof SessionError) {
+          if (
+            errorInstance instanceof RequestError ||
+            errorInstance instanceof SessionError
+          ) {
             callback(errorInstance)
           } else {
             callback(null, errorInstance)
