@@ -244,7 +244,7 @@ export class MSeriesDataSet extends SubscribableModel {
    * @returns Duration in number of seconds since start
    */
   get duration () {
-    return ~~(this._mSeriesDataSetData.duration / 1000)
+    return this._mSeriesDataSetData.duration
   }
 
   /**
