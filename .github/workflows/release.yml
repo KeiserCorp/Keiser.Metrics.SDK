@@ -95,6 +95,9 @@ jobs:
     needs: version-check
     if: needs.version-check.outputs.changed == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -172,8 +175,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: "https://registry.npmjs.org"
-          scope: "@keiser"
+
+      - name: Configure npm for Trusted Publishers
+        run: |
+          # Remove any existing .npmrc that might interfere with OIDC auth
+          rm -f ~/.npmrc
+          rm -f .npmrc
+          npm config set registry https://registry.npmjs.org/
+          echo "npm version: $(npm --version)"
+          echo "node version: $(node --version)"
+          npm config list
 
       - name: Release to NPM
         run: npm run release

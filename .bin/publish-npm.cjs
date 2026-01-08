@@ -32,7 +32,7 @@ function publishPackage(target) {
     const npm = /^win/.test(process.platform) ? "npm.cmd" : "npm";
 
     console.log(`Publishing ${target}...`);
-    spawn(npm, ["publish", "--provenance", ...args, ...tagArgs], {
+    spawn(npm, ["publish", "--provenance", "--access", "public", ...args, ...tagArgs], {
       stdio: "inherit",
       cwd: join(process.cwd(), targetPath),
     })
