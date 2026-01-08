@@ -105,8 +105,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 14
-          registry-url: "https://registry.npmjs.org"
-          scope: "@keiser"
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -121,13 +119,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Clear npm authentication cache
-        run: |
-          # Clear any cached authentication tokens that might interfere with OIDC
-          npm cache clean --force
-          # Remove any cached token credentials
-          rm -rf ~/.npm/_cacache/tmp/* 2>/dev/null || true
 
       - name: Bundle Core Files
         uses: vimtor/action-zip@v1
@@ -177,12 +168,12 @@ jobs:
           asset_name: Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
           asset_content_type: application/zip
 
-      - name: Verify OIDC configuration
-        run: |
-          echo "Checking npm configuration..."
-          echo "NODE_AUTH_TOKEN is: ${NODE_AUTH_TOKEN:-not set}"
-          cat ~/.npmrc || echo "No .npmrc in home directory"
-          npm config list
+      - name: Use Node.js v20 for Publishing
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          scope: "@keiser"
 
       - name: Release to NPM
         run: npm run release
