@@ -176,14 +176,19 @@ jobs:
         with:
           node-version: 20
 
+      - name: Update npm for OIDC Trusted Publishing
+        run: |
+          # Trusted publishing requires npm 11.5.1+
+          npm install -g npm@latest
+          echo "npm version: $(npm --version)"
+          echo "node version: $(node --version)"
+
       - name: Configure npm for Trusted Publishers
         run: |
           # Remove any existing .npmrc that might interfere with OIDC auth
           rm -f ~/.npmrc
           rm -f .npmrc
           npm config set registry https://registry.npmjs.org/
-          echo "npm version: $(npm --version)"
-          echo "node version: $(node --version)"
           npm config list
 
       - name: Release to NPM
