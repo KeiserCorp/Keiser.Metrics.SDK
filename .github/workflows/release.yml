@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Use Node.js v14
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 14
 
@@ -62,7 +62,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js v14
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         if: steps.check.outputs.changed == 'true'
         with:
           node-version: 14
@@ -122,6 +122,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Clear npm authentication cache
+        run: |
+          # Clear any cached authentication tokens that might interfere with OIDC
+          npm cache clean --force
+          # Remove any cached token credentials
+          rm -rf ~/.npm/_cacache/tmp/* 2>/dev/null || true
+
       - name: Bundle Core Files
         uses: vimtor/action-zip@v1
         with:
@@ -169,6 +176,13 @@ jobs:
           asset_path: ./Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
           asset_name: Keiser.Metrics.SDK.SSO-${{ needs.version-check.outputs.version }}.dist.zip
           asset_content_type: application/zip
+
+      - name: Verify OIDC configuration
+        run: |
+          echo "Checking npm configuration..."
+          echo "NODE_AUTH_TOKEN is: ${NODE_AUTH_TOKEN:-not set}"
+          cat ~/.npmrc || echo "No .npmrc in home directory"
+          npm config list
 
       - name: Release to NPM
         run: npm run release
