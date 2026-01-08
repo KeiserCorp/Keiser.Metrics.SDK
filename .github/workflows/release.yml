@@ -106,6 +106,7 @@ jobs:
         with:
           node-version: 14
           registry-url: "https://registry.npmjs.org"
+          scope: "@keiser"
 
       - name: Cache node_modules
         uses: actions/cache@v4
