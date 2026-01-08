@@ -6,6 +6,10 @@ on:
 
 name: Master
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   test:
     name: Test
@@ -98,9 +102,10 @@ jobs:
           fetch-depth: 0
 
       - name: Use Node.js v14
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 14
+          registry-url: "https://registry.npmjs.org"
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -166,8 +171,6 @@ jobs:
 
       - name: Release to NPM
         run: npm run release
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Extract Branch Name
         run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
@@ -185,13 +188,13 @@ jobs:
           FOLDER: dist/docs
           SINGLE_COMMIT: true
           CLEAN: true
-          COMMIT_MESSAGE: "v${{ steps.check.outputs.version }} Release"
+          COMMIT_MESSAGE: "v${{ needs.version-check.outputs.version }} Release"
 
       - name: Send Notification
-        uses: bayssmekanique/action-simple-slack-notifier@v1
+        uses: SimonScholz/google-chat-action@v1.1.0
         if: always()
         with:
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: "#deployment"
-          status: ${{ job.status }}
-          version: ${{ needs.version-check.outputs.version }}
+          webhookUrl: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+          jobStatus: ${{ job.status }}
+          title: "Release v${{ needs.version-check.outputs.version }}"
+          subtitle: "${{ github.repository }} - ${{ github.ref_name }}"
