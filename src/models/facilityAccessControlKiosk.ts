@@ -5,7 +5,7 @@ export enum PrimaryIdentification {
   UUID = 'uuid',
   MemberIdentifier = 'memberIdentifier',
   EmailAddress = 'emailAddress',
-  FullName = 'fullName'
+  FullName = 'fullName',
 }
 
 export enum SecondaryIdentification {
@@ -13,7 +13,7 @@ export enum SecondaryIdentification {
   UUID = 'uuid',
   MemberIdentifier = 'memberIdentifier',
   YearOfBirth = 'yearOfBirth',
-  MemberSecret = 'memberSecret'
+  MemberSecret = 'memberSecret',
 }
 
 export interface FacilityAccessControlKioskData {
@@ -30,17 +30,24 @@ export interface FacilityAccessControlKioskResponse extends AuthenticatedRespons
 export class FacilityAccessControlKiosk extends Model {
   private _facilityAccessControlKioskData: FacilityAccessControlKioskData
 
-  constructor (facilityAccessControlKioskData: FacilityAccessControlKioskData, sessionHandler: SessionHandler) {
+  constructor (
+    facilityAccessControlKioskData: FacilityAccessControlKioskData,
+    sessionHandler: SessionHandler
+  ) {
     super(sessionHandler)
     this._facilityAccessControlKioskData = facilityAccessControlKioskData
   }
 
-  private setFacilityAccessControlKioskData (facilityAccessControlKioskData: FacilityAccessControlKioskData) {
+  private setFacilityAccessControlKioskData (
+    facilityAccessControlKioskData: FacilityAccessControlKioskData
+  ) {
     this._facilityAccessControlKioskData = facilityAccessControlKioskData
   }
 
   async reload () {
-    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:show') as FacilityAccessControlKioskResponse
+    const { facilityAccessControlKiosk } = (await this.action(
+      'facilityAccessControlKiosk:show'
+    )) as FacilityAccessControlKioskResponse
     this.setFacilityAccessControlKioskData(facilityAccessControlKiosk)
     return this
   }
@@ -51,7 +58,10 @@ export class FacilityAccessControlKiosk extends Model {
     primaryIdentification?: PrimaryIdentification
     secondaryIdentification?: SecondaryIdentification
   }) {
-    const { facilityAccessControlKiosk } = await this.action('facilityAccessControlKiosk:update', { ...params }) as FacilityAccessControlKioskResponse
+    const { facilityAccessControlKiosk } = (await this.action(
+      'facilityAccessControlKiosk:update',
+      { apiVersion: 1, ...params }
+    )) as FacilityAccessControlKioskResponse
     this.setFacilityAccessControlKioskData(facilityAccessControlKiosk)
     return this
   }
@@ -69,7 +79,8 @@ export class FacilityAccessControlKiosk extends Model {
   }
 
   get isFingerprintAuthenticationAllowed () {
-    return this._facilityAccessControlKioskData.isFingerprintAuthenticationAllowed
+    return this._facilityAccessControlKioskData
+      .isFingerprintAuthenticationAllowed
   }
 
   get primaryIdentification () {
