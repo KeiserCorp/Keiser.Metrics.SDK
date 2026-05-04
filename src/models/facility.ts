@@ -235,13 +235,13 @@ export class PrivilegedFacility extends Facility {
 
   getExportCsv (params: { from: Date, to: Date}) {
     // await this.action('strengthMachineDataSet:exportCsv', { ...params })
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}`)
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/strength-machine-data-set/export-csv?from=${params.from.toUTCString()}&to=${params.to.toUTCString()}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
 
   getFacilityReportCheckIn (params: { from: Date, to: Date, group: ReportGrouping}) {
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=facilityReport:checkIn&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}&group=${params.group}`)
+    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/facility/report/check-in?from=${params.from.toUTCString()}&to=${params.to.toUTCString()}&group=${params.group}`)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
