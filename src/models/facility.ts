@@ -235,13 +235,20 @@ export class PrivilegedFacility extends Facility {
 
   getExportCsv (params: { from: Date, to: Date}) {
     // await this.action('strengthMachineDataSet:exportCsv', { ...params })
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=strengthMachineDataSet:exportCsv&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}`)
+    const baseWithSlash = `${this.sessionHandler.connection.baseUrl.href.replace(/\/+$/, '')}/`
+    const url = new URL('strength-machine-data-set/export-csv', baseWithSlash)
+    url.searchParams.append('from', params.from.toISOString())
+    url.searchParams.append('to', params.to.toISOString())
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
 
   getFacilityReportCheckIn (params: { from: Date, to: Date, group: ReportGrouping}) {
-    const url = new URL(this.sessionHandler.connection.baseUrl.toString() + `/api?action=facilityReport:checkIn&from=${params.from.toUTCString()}&to=${params.to.toUTCString()}&group=${params.group}`)
+    const baseWithSlash = `${this.sessionHandler.connection.baseUrl.href.replace(/\/+$/, '')}/`
+    const url = new URL('facility/report/check-in', baseWithSlash)
+    url.searchParams.append('from', params.from.toISOString())
+    url.searchParams.append('to', params.to.toISOString())
+    url.searchParams.append('group', params.group)
     url.searchParams.append('authorization', this.sessionHandler.accessToken)
     return url.toString()
   }
